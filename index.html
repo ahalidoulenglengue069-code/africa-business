@@ -1,1 +1,211 @@
-        
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>BuSAF - Business Africain</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f3f6f9;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #006b3f, #009e60);
+      color: white;
+      text-align: center;
+      padding: 28px 15px;
+      border-radius: 0 0 25px 25px;
+    }
+
+    header h1 {
+      font-size: 34px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 16px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .welcome {
+      background: white;
+      padding: 22px;
+      border-radius: 18px;
+      text-align: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    .welcome h2 {
+      color: #006b3f;
+      margin-bottom: 10px;
+    }
+
+    .welcome p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 22px 10px;
+      text-align: center;
+      text-decoration: none;
+      color: #222;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      transition: transform .2s;
+    }
+
+    .card:active {
+      transform: scale(.97);
+    }
+
+    .card .icon {
+      font-size: 34px;
+      margin-bottom: 10px;
+    }
+
+    .card h3 {
+      font-size: 15px;
+      color: #006b3f;
+    }
+
+    .bottom {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .bottom a {
+      color: #006b3f;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    footer {
+      text-align: center;
+      color: #777;
+      font-size: 13px;
+      padding: 25px 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🌍 BuSAF</h1>
+    <p>Business Africain</p>
+  </header>
+
+  <main class="container">
+
+    <section class="welcome">
+      <h2>Bienvenue sur BuSAF</h2>
+      <p>
+        Une plateforme africaine pour découvrir des produits,
+        développer son activité et gérer son business.
+      </p>
+    </section>
+
+    <section class="grid">
+
+      <a class="card" href="connexion.html">
+        <div class="icon">🔐</div>
+        <h3>Connexion</h3>
+      </a>
+
+      <a class="card" href="inscription.html">
+        <div class="icon">📝</div>
+        <h3>Inscription</h3>
+      </a>
+
+      <a class="card" href="partenaires.html">
+        <div class="icon">🤝</div>
+        <h3>Partenaires</h3>
+      </a>
+
+      <a class="card" href="marche.html">
+        <div class="icon">🛒</div>
+        <h3>Marché BuSAF</h3>
+      </a>
+
+      <a class="card" href="boutique.html">
+        <div class="icon">🏪</div>
+        <h3>Ma Boutique</h3>
+      </a>
+
+      <a class="card" href="invites.html">
+        <div class="icon">👥</div>
+        <h3>Mes Invités</h3>
+      </a>
+
+      <a class="card" href="commandes.html">
+        <div class="icon">📦</div>
+        <h3>Mes Commandes</h3>
+      </a>
+
+      <a class="card" href="compte.html">
+        <div class="icon">💼</div>
+        <h3>Mon Compte</h3>
+      </a>
+
+      <a class="card" href="benefices.html">
+        <div class="icon">💰</div>
+        <h3>Mes Bénéfices</h3>
+      </a>
+
+      <a class="card" href="commissions.html">
+        <div class="icon">🤝</div>
+        <h3>Mes Commissions</h3>
+      </a>
+
+      <a class="card" href="progression.html">
+        <div class="icon">⭐</div>
+        <h3>Progression Partner</h3>
+      </a>
+
+      <a class="card" href="BUSAF_reinitialiser_mot_de_passe.html">
+        <div class="icon">🔑</div>
+        <h3>Mot de passe oublié</h3>
+      </a>
+
+    </section>
+
+    <div class="bottom">
+      <p>
+        Déjà membre ?
+        <a href="connexion.html">Se connecter</a>
+      </p>
+    </div>
+
+  </main>
+
+  <footer>
+    © 2026 BuSAF — Business Africain
+  </footer>
+
+</body>
+</html>        
