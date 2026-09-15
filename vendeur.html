@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Vendeur - BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fa;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #0b7a3b;
+      color: white;
+      text-align: center;
+      padding: 20px 15px;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .icone {
+      text-align: center;
+      font-size: 55px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #0b7a3b;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .info {
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .case {
+      padding: 14px;
+      margin-top: 10px;
+      background: #f0f7f3;
+      border-radius: 10px;
+    }
+
+    .case strong {
+      color: #0b7a3b;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .retour {
+      background: #555;
+      color: white;
+    }
+
+    .accueil {
+      background: #0b7a3b;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🛒 Vendeur</h1>
+    <p>🤝 Partenaires BuSAF</p>
+  </header>
+
+  <div class="container">
+
+    <div class="card">
+
+      <div class="icone">🛒</div>
+
+      <h2>Espace Vendeur</h2>
+
+      <p class="info">
+        Le vendeur peut proposer et vendre des produits ou services
+        dans le respect des règles de BuSAF.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Activités du vendeur</h2>
+
+      <div class="case">
+        🛒 <strong>Vendre</strong><br>
+        Proposer des produits ou services aux clients.
+      </div>
+
+      <div class="case">
+        📦 <strong>Gérer les commandes</strong><br>
+        Suivre les commandes et leur traitement.
+      </div>
+
+      <div class="case">
+        💰 <strong>Suivre les revenus</strong><br>
+        Consulter les revenus liés aux ventes.
+      </div>
+
+      <div class="case">
+        📊 <strong>Suivre les ventes</strong><br>
+        Consulter l'évolution de son activité.
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Règle importante</h2>
+
+      <p class="info">
+        Les opérations du vendeur doivent respecter les règles
+        commerciales de BuSAF.
+      </p>
+
+    </div>
+
+    <div class="buttons">
+
+      <button class="retour" onclick="history.back()">
+        ← RETOUR
+      </button>
+
+      <button class="accueil" onclick="window.location.href='index.html'">
+        🏠 ACCUEIL
+      </button>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
