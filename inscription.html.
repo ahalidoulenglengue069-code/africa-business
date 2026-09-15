@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inscription - BuSAF</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      background: linear-gradient(135deg, #006b3f, #f4c300);
+    }
+
+    .box {
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      padding: 28px 22px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,.2);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 34px;
+      font-weight: bold;
+      color: #006b3f;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin: 8px 0 22px;
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+      margin-bottom: 15px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #006b3f;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    button:disabled {
+      background: #999;
+    }
+
+    #message {
+      text-align: center;
+      margin-top: 15px;
+      line-height: 1.5;
+    }
+
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #006b3f;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="box">
+
+    <div class="logo">🌍 BuSAF</div>
+    <div class="subtitle">Business Africain</div>
+
+    <h2>Créer un compte</h2>
+
+    <form id="signupForm">
+
+      <label for="nom">Nom complet</label>
+      <input
+        type="text"
+        id="nom"
+        placeholder="Votre nom complet"
+        required
+      >
+
+      <label for="telephone">Téléphone</label>
+      <input
+        type="tel"
+        id="telephone"
+        placeholder="Votre numéro de téléphone"
+        required
+      >
+
+      <label for="ville">Ville</label>
+      <input
+        type="text"
+        id="ville"
+        placeholder="Votre ville"
+        required
+      >
+
+      <label for="email">Adresse e-mail</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Votre adresse e-mail"
+        required
+      >
+
+      <label for="password">Mot de passe</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Minimum 6 caractères"
+        minlength="6"
+        required
+      >
+
+      <label for="confirmation">Confirmer le mot de passe</label>
+      <input
+        type="password"
+        id="confirmation"
+        placeholder="Répétez le mot de passe"
+        minlength="6"
+        required
+      >
+
+      <button type="submit" id="signupButton">
+        Créer mon compte
+      </button>
+
+    </form>
+
+    <div id="message"></div>
+
+    <a href="connexion.html">Déjà membre ? Se connecter</a>
+
+    <a href="index.html">← Retour à l'accueil</a>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL =
+      "https://hbfbocrodyfydvikxbql.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+
+    const supabaseClient = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    const signupForm = document.getElementById("signupForm");
+    const signupButton = document.getElementById("signupButton");
+    const message = document.getElementById("message");
+
+    signupForm.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const nom = document.getElementById("nom").value.trim();
+      const telephone = document.getElementById("telephone").value.trim();
+      const ville = document.getElementById("ville").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmation =
+        document.getElementById("confirmation").value;
+
+      if (password !== confirmation) {
+        message.style.color = "red";
+        message.textContent =
+          "Les deux mots de passe ne correspondent pas.";
+        return;
+      }
+
+      signupButton.disabled = true;
+      signupButton.textContent = "Inscription...";
+      message.textContent = "";
+
+      const { data, error } =
+        await supabaseClient.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              nom_complet: nom,
+              telephone: telephone,
+              ville: ville
+            }
+          }
+        });
+
+      if (error) {
+        message.style.color = "red";
+        message.textContent = "Erreur : " + error.message;
+      } else {
+        message.style.color = "green";
+        message.textContent =
+          "Inscription réussie. Vérifiez votre e-mail si une confirmation est demandée.";
+
+        signupForm.reset();
+
+        setTimeout(function() {
+          window.location.href = "connexion.html";
+        }, 2500);
+      }
+
+      signupButton.disabled = false;
+      signupButton.textContent = "Créer mon compte";
+    });
+  </script>
+
+</body>
+</html>
