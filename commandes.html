@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Commandes - BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f3f6f9;
+      color: #222;
+    }
+
+    header {
+      background: linear-gradient(135deg, #006b3f, #009e60);
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+      border-radius: 0 0 22px 22px;
+    }
+
+    header h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 15px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .intro,
+    .commande {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    .intro h2 {
+      color: #006b3f;
+      margin-bottom: 10px;
+    }
+
+    .intro p,
+    .commande p {
+      color: #555;
+      line-height: 1.5;
+    }
+
+    .commande {
+      border-left: 5px solid #006b3f;
+    }
+
+    .commande h3 {
+      color: #006b3f;
+      margin-bottom: 8px;
+    }
+
+    .statut {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 7px 12px;
+      border-radius: 20px;
+      background: #fff8d6;
+      color: #8a6500;
+      font-size: 13px;
+      font-weight: bold;
+    }
+
+    .vide {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      text-align: center;
+      color: #666;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin: 25px 0;
+      color: #006b3f;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>📦 Mes Commandes</h1>
+    <p>BuSAF — Business Africain</p>
+  </header>
+
+  <main class="container">
+
+    <section class="intro">
+      <h2>Mes commandes</h2>
+      <p>
+        Retrouvez ici vos commandes effectuées sur le
+        Marché BuSAF et, séparément, vos commandes auprès
+        des boutiques personnelles.
+      </p>
+    </section>
+
+    <section id="listeCommandes">
+
+      <div class="vide">
+        📦<br><br>
+        Aucune commande pour le moment.
+      </div>
+
+    </section>
+
+    <a class="back" href="index.html">
+      ← Retour à l'accueil
+    </a>
+
+  </main>
+
+  <script>
+    /*
+      Les commandes réelles seront chargées depuis
+      Supabase lorsque le système de commandes sera connecté.
+    */
+  </script>
+
+</body>
+</html>
