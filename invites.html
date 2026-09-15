@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mes Invités - BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f3f6f9;
+      color: #222;
+      padding-bottom: 30px;
+    }
+
+    header {
+      background: linear-gradient(135deg, #006b3f, #009e60);
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+      border-radius: 0 0 22px 22px;
+    }
+
+    header h1 {
+      font-size: 30px;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      font-size: 15px;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 22px;
+      margin-bottom: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+    }
+
+    h2 {
+      color: #006b3f;
+      margin-bottom: 12px;
+    }
+
+    p {
+      color: #555;
+      line-height: 1.5;
+      margin-bottom: 15px;
+    }
+
+    .info {
+      background: #fff8d6;
+      border-left: 5px solid #f4c300;
+      padding: 15px;
+      border-radius: 10px;
+      line-height: 1.5;
+      margin-bottom: 18px;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      border: none;
+      border-radius: 10px;
+      background: #006b3f;
+      color: white;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:disabled {
+      background: #999;
+    }
+
+    #message {
+      display: none;
+      margin-top: 18px;
+      padding: 15px;
+      border-radius: 12px;
+      background: #eef7f2;
+      line-height: 1.5;
+    }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 25px;
+      color: #006b3f;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>👥 Mes Invités</h1>
+    <p>BuSAF — Business Africain</p>
+  </header>
+
+  <main class="container">
+
+    <section class="card">
+
+      <h2>Mes invités</h2>
+
+      <div class="info">
+        Pour participer au système d'invitation, le membre doit
+        d'abord avoir acheté au moins un produit du Marché BuSAF.
+      </div>
+
+      <p>
+        Cet espace permettra de gérer vos invitations et de suivre
+        les personnes que vous avez invitées.
+      </p>
+
+      <button id="inviteButton" onclick="inviter()">
+        👤 Inviter une personne
+      </button>
+
+      <div id="message"></div>
+
+    </section>
+
+    <a class="back" href="index.html">
+      ← Retour à l'accueil
+    </a>
+
+  </main>
+
+  <script>
+    function inviter() {
+      const message = document.getElementById("message");
+
+      message.style.display = "block";
+      message.textContent =
+        "Le système vérifiera automatiquement votre éligibilité " +
+        "avant de permettre l'envoi d'une invitation.";
+    }
+  </script>
+
+</body>
+</html>
