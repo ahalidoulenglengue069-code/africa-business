@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Transporteur - BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fa;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #0b7a3b;
+      color: white;
+      text-align: center;
+      padding: 20px 15px;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 650px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 15px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+    }
+
+    .icone {
+      text-align: center;
+      font-size: 55px;
+      margin-bottom: 10px;
+    }
+
+    h2 {
+      color: #0b7a3b;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .info {
+      line-height: 1.7;
+      font-size: 15px;
+    }
+
+    .case {
+      padding: 14px;
+      margin-top: 10px;
+      background: #f0f7f3;
+      border-radius: 10px;
+      line-height: 1.5;
+    }
+
+    .case strong {
+      color: #0b7a3b;
+    }
+
+    .important {
+      background: #fff8e1;
+      color: #795600;
+      padding: 15px;
+      border-radius: 10px;
+      line-height: 1.6;
+      margin-top: 15px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    button {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .retour {
+      background: #555;
+      color: white;
+    }
+
+    .accueil {
+      background: #0b7a3b;
+      color: white;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🚚 Transporteur</h1>
+    <p>🤝 Partenaires BuSAF</p>
+  </header>
+
+  <div class="container">
+
+    <div class="card">
+
+      <div class="icone">🚚</div>
+
+      <h2>Espace Transporteur</h2>
+
+      <p class="info">
+        Cet espace est destiné aux personnes ou entreprises qui
+        assurent le transport de produits physiques dans le cadre
+        des activités qui le nécessitent.
+      </p>
+
+    </div>
+
+    <div class="card">
+
+      <h2>Activités du transporteur</h2>
+
+      <div class="case">
+        📦 <strong>Prise en charge</strong><br>
+        Récupérer les produits physiques à transporter.
+      </div>
+
+      <div class="case">
+        🚚 <strong>Transport</strong><br>
+        Acheminer les produits physiques d'un point à un autre.
+      </div>
+
+      <div class="case">
+        📍 <strong>Suivi du trajet</strong><br>
+        Suivre le déplacement des produits pendant le transport.
+      </div>
+
+      <div class="case">
+        🤝 <strong>Collaboration</strong><br>
+        Travailler avec les boutiques personnelles et les services
+        de livraison lorsque cela est nécessaire.
+      </div>
+
+    </div>
+
+    <div class="card">
+
+      <h2>⚠️ Règle BuSAF</h2>
+
+      <div class="important">
+        <strong>
+          Le Marché BuSAF ne nécessite pas de transport physique.
+        </strong>
+
+        <br><br>
+
+        Les produits du Marché BuSAF sont numériques ou business
+        et sont reçus directement sur le téléphone du client.
+
+        <br><br>
+
+        Le transporteur intervient uniquement lorsqu'une activité,
+        notamment une <strong>boutique personnelle</strong>,
+        concerne des produits physiques nécessitant un transport.
+      </div>
+
+    </div>
+
+    <div class="buttons">
+
+      <button class="retour" onclick="history.back()">
+        ← RETOUR
+      </button>
+
+      <button class="accueil" onclick="window.location.href='index.html'">
+        🏠 ACCUEIL
+      </button>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
