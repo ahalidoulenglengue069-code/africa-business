@@ -3,457 +3,237 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Africa Business</title>
+  <title>Connexion BuSAF</title>
 
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
       font-family: Arial, sans-serif;
     }
 
     body {
-      background: #f5f7fa;
-      color: #17202a;
-    }
-
-    header {
-      background: #0b6b3a;
-      color: white;
-      padding: 20px;
-      text-align: center;
-    }
-
-    header h1 {
-      font-size: 28px;
-    }
-
-    header p {
-      margin-top: 6px;
-    }
-
-    nav {
+      margin: 0;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #006b3c, #00a859);
       display: flex;
-      overflow-x: auto;
-      background: white;
-      border-bottom: 1px solid #ddd;
-    }
-
-    nav button {
-      border: none;
-      background: white;
-      padding: 15px;
-      min-width: 110px;
-      font-weight: bold;
-      cursor: pointer;
-    }
-
-    nav button:hover {
-      background: #eef7f1;
-    }
-
-    main {
-      max-width: 1000px;
-      margin: auto;
+      justify-content: center;
+      align-items: center;
       padding: 20px;
     }
 
-    .section {
-      display: none;
-    }
-
-    .section.active {
-      display: block;
-    }
-
-    .card {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 18px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-    }
-
-    .card h2 {
-      margin-bottom: 12px;
-      color: #0b6b3a;
-    }
-
-    .stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 12px;
-    }
-
-    .stat {
-      background: #eef7f1;
-      border-radius: 10px;
-      padding: 18px;
-    }
-
-    .stat strong {
-      display: block;
-      font-size: 25px;
-      margin-top: 8px;
-    }
-
-    input, select {
+    .container {
       width: 100%;
-      padding: 12px;
-      margin: 7px 0 14px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
+      max-width: 420px;
+      background: white;
+      padding: 30px 25px;
+      border-radius: 20px;
+      box-shadow: 0 8px 25px rgba(0,0,0,0.25);
     }
 
-    button.action {
-      background: #0b6b3a;
+    .logo {
+      text-align: center;
+      font-size: 45px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #006b3c;
+      font-size: 32px;
+      margin: 10px 0;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 15px;
+      margin-bottom: 18px;
+      border: 1px solid #ccc;
+      border-radius: 10px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      padding: 15px;
+      background: #006b3c;
       color: white;
       border: none;
-      padding: 12px 18px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    button.danger {
-      background: #b42318;
-    }
-
-    .product {
-      border: 1px solid #ddd;
       border-radius: 10px;
-      padding: 15px;
-      margin-top: 10px;
-    }
-
-    .badge {
-      display: inline-block;
-      background: #f2c94c;
-      padding: 5px 9px;
-      border-radius: 20px;
-      font-size: 12px;
+      font-size: 17px;
       font-weight: bold;
     }
 
-    footer {
+    .message {
+      display: none;
+      padding: 12px;
+      margin-bottom: 18px;
+      border-radius: 8px;
       text-align: center;
-      padding: 30px;
-      color: #666;
+    }
+
+    .success {
+      display: block;
+      background: #e1f7e9;
+      color: #087f35;
+    }
+
+    .error {
+      display: block;
+      background: #ffe5e5;
+      color: #b00020;
+    }
+
+    .register {
+      text-align: center;
+      margin-top: 25px;
+    }
+
+    .register a {
+      color: #006b3c;
+      font-weight: bold;
+      text-decoration: none;
     }
   </style>
 </head>
 
 <body>
 
-<header>
-  <h1>🌍 Africa Business</h1>
-  <p>Marketplace africain</p>
-</header>
+  <div class="container">
 
-<nav>
-  <button onclick="showSection('accueil')">Accueil</button>
-  <button onclick="showSection('produits')">Produits</button>
-  <button onclick="showSection('membres')">Membres</button>
-  <button onclick="showSection('commissions')">Commissions</button>
-  <button onclick="showSection('partenaires')">Partenaires</button>
-  <button onclick="showSection('fondateur')">Fondateur</button>
-  <button onclick="showSection('reunion')">Réunion</button>
-</nav>
+    <div class="logo">🌍</div>
 
-<main>
+    <h1>BuSAF</h1>
 
-  <!-- ACCUEIL -->
-  <section id="accueil" class="section active">
-    <div class="card">
-      <h2>Bienvenue sur Africa Business</h2>
-      <p>
-        Une plateforme permettant au marché, aux membres et aux partenaires
-        de travailler ensemble autour des produits et des ventes.
-      </p>
-    </div>
+    <p class="subtitle">Business Africain</p>
 
-    <div class="stats">
-      <div class="stat">
-        Membres
-        <strong id="nombreMembres">0</strong>
-      </div>
+    <div id="message" class="message"></div>
 
-      <div class="stat">
-        Produits
-        <strong id="nombreProduits">0</strong>
-      </div>
+    <form id="loginForm">
 
-      <div class="stat">
-        Partenaires
-        <strong id="nombrePartenaires">0</strong>
-      </div>
+      <label for="email">Adresse e-mail</label>
 
-      <div class="stat">
-        Ventes
-        <strong id="nombreVentes">0</strong>
-      </div>
-    </div>
-  </section>
+      <input
+        type="email"
+        id="email"
+        placeholder="Entrez votre e-mail"
+        required
+      >
 
+      <label for="password">Mot de passe</label>
 
-  <!-- PRODUITS -->
-  <section id="produits" class="section">
-    <div class="card">
-      <h2>Produits du marché</h2>
+      <input
+        type="password"
+        id="password"
+        placeholder="Entrez votre mot de passe"
+        required
+      >
 
-      <div class="product">
-        <h3>Produit du marché</h3>
-        <p>Prix : À définir</p>
-        <p>Commission du produit : À définir</p>
-        <span class="badge">Produit Africa Business</span>
-      </div>
-
-      <br>
-
-      <p>
-        Chaque produit pourra avoir son propre pourcentage de commission.
-        Ces pourcentages seront configurés par le marché.
-      </p>
-    </div>
-  </section>
-
-
-  <!-- MEMBRES -->
-  <section id="membres" class="section">
-    <div class="card">
-      <h2>Espace membre</h2>
-
-      <label>Nom du membre</label>
-      <input id="nomMembre" type="text" placeholder="Entrez le nom">
-
-      <label>Code ou nom de l'inviteur</label>
-      <input id="inviteur" type="text" placeholder="Qui vous a invité ?">
-
-      <button class="action" onclick="ajouterMembre()">
-        Créer le membre
+      <button type="submit" id="loginButton">
+        SE CONNECTER
       </button>
 
-      <p id="messageMembre" style="margin-top:15px;"></p>
+    </form>
+
+    <div class="register">
+      Vous n'avez pas encore de compte ?
+      <br><br>
+
+      <a href="BUSAF_inscription_v7.html">
+        CRÉER UN COMPTE
+      </a>
     </div>
 
-    <div class="card">
-      <h2>Règle de travail</h2>
-      <p>
-        Un nouveau membre peut acheter un produit du marché afin de
-        commencer son activité de revente.
-      </p>
-      <br>
-      <p>
-        Le système enregistrera également la personne qui l'a invité
-        afin de pouvoir calculer les commissions d'invitation.
-      </p>
-    </div>
-  </section>
+  </div>
 
+  <script>
+    const SUPABASE_URL =
+      "https://hbfbocrodyfydvikxbql.supabase.co";
 
-  <!-- COMMISSIONS -->
-  <section id="commissions" class="section">
-    <div class="card">
-      <h2>Système de commissions</h2>
+    const SUPABASE_KEY =
+      "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
 
-      <p>
-        Les commissions seront calculées selon les règles du marché.
-      </p>
+    const form =
+      document.getElementById("loginForm");
 
-      <br>
+    const message =
+      document.getElementById("message");
 
-      <p>
-        <strong>Commission du produit :</strong>
-        chaque produit possède son propre pourcentage.
-      </p>
+    const button =
+      document.getElementById("loginButton");
 
-      <br>
+    form.addEventListener("submit", async function(event) {
 
-      <p>
-        <strong>Commission d'invitation :</strong>
-        lorsqu'un membre invite une nouvelle personne qui crée son compte
-        et commence son activité, le système peut enregistrer la
-        commission destinée à l'inviteur.
-      </p>
+      event.preventDefault();
 
-      <br>
+      const email =
+        document.getElementById("email").value.trim();
 
-      <p>
-        <strong>Première revente :</strong>
-        selon la règle définie pour Africa Business, la première revente
-        du produit acheté par le membre ne génère pas de commission
-        pour le marché.
-      </p>
+      const password =
+        document.getElementById("password").value;
 
-      <br>
+      button.disabled = true;
+      button.textContent = "CONNEXION...";
 
-      <p>
-        Les pourcentages exacts seront configurés avant la mise en
-        production.
-      </p>
-    </div>
-  </section>
+      message.className = "message";
+      message.textContent = "";
 
+      try {
 
-  <!-- PARTENAIRES -->
-  <section id="partenaires" class="section">
-    <div class="card">
-      <h2>Programme Partenaire</h2>
+        const response = await fetch(
+          SUPABASE_URL + "/auth/v1/token?grant_type=password",
+          {
+            method: "POST",
 
-      <p>
-        Un membre qui réalise <strong>10 ventes de produits du marché
-        pendant le même mois</strong> devient partenaire.
-      </p>
+            headers: {
+              "Content-Type": "application/json",
+              "apikey": SUPABASE_KEY
+            },
 
-      <br>
+            body: JSON.stringify({
+              email: email,
+              password: password
+            })
+          }
+        );
 
-      <p>
-        Le statut partenaire sera enregistré automatiquement lorsque
-        les conditions seront remplies.
-      </p>
+        const data = await response.json();
 
-      <br>
+        if (!response.ok) {
+          throw new Error("Connexion impossible");
+        }
 
-      <span class="badge">Objectif : 10 ventes / mois</span>
-    </div>
-  </section>
+        message.className = "message success";
+        message.textContent =
+          "Connexion réussie !";
 
+        setTimeout(function() {
+          window.location.href = "accueil.html";
+        }, 1000);
 
-  <!-- FONDATEUR -->
-  <section id="fondateur" class="section">
-    <div class="card">
-      <h2>👑 Espace Fondateur</h2>
+      } catch (error) {
 
-      <p>
-        Cet espace sera réservé à la gestion du marché.
-      </p>
+        message.className = "message error";
+        message.textContent =
+          "E-mail ou mot de passe incorrect.";
 
-      <br>
+        button.disabled = false;
+        button.textContent = "SE CONNECTER";
 
-      <div class="stats">
-        <div class="stat">
-          Revenus du marché
-          <strong>0</strong>
-        </div>
+      }
 
-        <div class="stat">
-          Commissions
-          <strong>0</strong>
-        </div>
-
-        <div class="stat">
-          Membres actifs
-          <strong>0</strong>
-        </div>
-
-        <div class="stat">
-          Partenaires
-          <strong>0</strong>
-        </div>
-      </div>
-
-      <br>
-
-      <p>
-        Le fondateur pourra ensuite gérer les produits, les pourcentages,
-        les membres, les ventes, les commissions et les revenus.
-      </p>
-    </div>
-  </section>
-
-
-  <!-- REUNION -->
-  <section id="reunion" class="section">
-    <div class="card">
-      <h2>🎥 Espace réunion</h2>
-
-      <p>
-        Cet espace est destiné au fondateur.
-      </p>
-
-      <br>
-
-      <label>Titre de la réunion</label>
-      <input id="titreReunion" type="text"
-             placeholder="Exemple : Réunion des partenaires">
-
-      <label>Date et heure</label>
-      <input id="dateReunion" type="datetime-local">
-
-      <button class="action" onclick="lancerReunion()">
-        Lancer une réunion
-      </button>
-
-      <p id="messageReunion" style="margin-top:15px;"></p>
-    </div>
-  </section>
-
-</main>
-
-<footer>
-  © Africa Business — Marketplace africain
-</footer>
-
-
-<script>
-
-  let membres = [];
-  let ventes = 0;
-
-  function showSection(id) {
-    document.querySelectorAll('.section').forEach(function(section) {
-      section.classList.remove('active');
     });
-
-    document.getElementById(id).classList.add('active');
-  }
-
-
-  function ajouterMembre() {
-
-    const nom = document.getElementById('nomMembre').value.trim();
-    const inviteur = document.getElementById('inviteur').value.trim();
-
-    if (!nom) {
-      document.getElementById('messageMembre').textContent =
-        "Veuillez entrer le nom du membre.";
-      return;
-    }
-
-    membres.push({
-      nom: nom,
-      inviteur: inviteur,
-      ventes: 0,
-      partenaire: false
-    });
-
-    document.getElementById('nombreMembres').textContent = membres.length;
-
-    document.getElementById('messageMembre').textContent =
-      "Membre créé avec succès.";
-
-    document.getElementById('nomMembre').value = "";
-    document.getElementById('inviteur').value = "";
-  }
-
-
-  function lancerReunion() {
-
-    const titre = document.getElementById('titreReunion').value.trim();
-    const date = document.getElementById('dateReunion').value;
-
-    if (!titre || !date) {
-      document.getElementById('messageReunion').textContent =
-        "Veuillez remplir le titre et la date.";
-      return;
-    }
-
-    document.getElementById('messageReunion').textContent =
-      "Réunion créée : " + titre + " — " + date;
-  }
-
-</script>
+  </script>
 
 </body>
-    </html>
+</html>
