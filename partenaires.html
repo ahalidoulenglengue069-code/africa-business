@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Partenaires - BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f5f7fa;
+      color: #222;
+      min-height: 100vh;
+    }
+
+    header {
+      background: #0b7a3b;
+      color: white;
+      text-align: center;
+      padding: 20px 15px;
+    }
+
+    header h1 {
+      font-size: 25px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 14px;
+    }
+
+    .container {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 15px;
+    }
+
+    .intro {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      text-align: center;
+      line-height: 1.6;
+    }
+
+    .intro h2 {
+      color: #0b7a3b;
+      margin-bottom: 10px;
+    }
+
+    .grille {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .case {
+      background: white;
+      border-radius: 15px;
+      min-height: 140px;
+      padding: 20px 10px;
+      text-align: center;
+      text-decoration: none;
+      color: #222;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      transition: 0.2s;
+    }
+
+    .case:active {
+      transform: scale(0.96);
+    }
+
+    .icone {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .titre {
+      font-size: 17px;
+      font-weight: bold;
+      color: #0b7a3b;
+    }
+
+    .description {
+      font-size: 12px;
+      color: #666;
+      margin-top: 6px;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 10px;
+      margin-top: 25px;
+    }
+
+    button {
+      flex: 1;
+      border: none;
+      border-radius: 10px;
+      padding: 13px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .retour {
+      background: #555;
+      color: white;
+    }
+
+    .accueil {
+      background: #0b7a3b;
+      color: white;
+    }
+
+    @media (max-width: 400px) {
+      .grille {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🤝 Partenaires BuSAF</h1>
+    <p>🌍 BuSAF / Business Africain</p>
+  </header>
+
+  <div class="container">
+
+    <div class="intro">
+      <h2>Espace Partenaires</h2>
+
+      <p>
+        Découvrez les différentes catégories de partenaires
+        qui peuvent participer au développement de BuSAF.
+      </p>
+    </div>
+
+    <div class="grille">
+
+      <a class="case" href="vendeur.html">
+        <div class="icone">🛒</div>
+        <div class="titre">Vendeur</div>
+        <div class="description">
+          Vente des produits et services
+        </div>
+      </a>
+
+      <a class="case" href="producteur.html">
+        <div class="icone">🌾</div>
+        <div class="titre">Producteur</div>
+        <div class="description">
+          Production et approvisionnement
+        </div>
+      </a>
+
+      <a class="case" href="entreprise.html">
+        <div class="icone">🏢</div>
+        <div class="titre">Entreprise</div>
+        <div class="description">
+          Partenariats professionnels
+        </div>
+      </a>
+
+      <a class="case" href="livraison.html">
+        <div class="icone">📦</div>
+        <div class="titre">Livraison</div>
+        <div class="description">
+          Services de livraison
+        </div>
+      </a>
+
+      <a class="case" href="transporteur.html">
+        <div class="icone">🚚</div>
+        <div class="titre">Transporteur</div>
+        <div class="description">
+          Transport des marchandises
+        </div>
+      </a>
+
+      <a class="case" href="publicite.html">
+        <div class="icone">📢</div>
+        <div class="titre">Publicité</div>
+        <div class="description">
+          Promotion et visibilité
+        </div>
+      </a>
+
+    </div>
+
+    <div class="buttons">
+
+      <button class="retour" onclick="history.back()">
+        ← RETOUR
+      </button>
+
+      <button class="accueil" onclick="window.location.href='index.html'">
+        🏠 ACCUEIL
+      </button>
+
+    </div>
+
+  </div>
+
+</body>
+</html>
