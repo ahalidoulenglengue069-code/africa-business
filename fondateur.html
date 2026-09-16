@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fondateur BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f6f9;
+      color: #222;
+    }
+
+    header {
+      background: linear-gradient(135deg, #075e54, #128c7e);
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+    }
+
+    main {
+      max-width: 800px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .welcome,
+    .card,
+    .message {
+      background: white;
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 3px 10px #0001;
+    }
+
+    .welcome {
+      text-align: center;
+    }
+
+    .welcome h2 {
+      color: #075e54;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      text-align: center;
+    }
+
+    .icon {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .card h3 {
+      color: #075e54;
+      font-size: 17px;
+      margin: 8px 0;
+    }
+
+    .card p {
+      color: #666;
+      font-size: 13px;
+      min-height: 38px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 13px 10px;
+      margin-top: 8px;
+      background: #128c7e;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #075e54;
+    }
+
+    .secondary {
+      background: #555;
+    }
+
+    .secondary:hover {
+      background: #333;
+    }
+
+    .danger {
+      background: #b42318;
+    }
+
+    .danger:hover {
+      background: #8b1a12;
+    }
+
+    .message {
+      display: none;
+      text-align: center;
+    }
+
+    .message h2 {
+      color: #075e54;
+    }
+
+    .important {
+      background: #fff4d6;
+      border-left: 5px solid #e0a000;
+      padding: 15px;
+      border-radius: 10px;
+      margin-top: 15px;
+    }
+
+    .actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+
+    .actions button {
+      flex: 1;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 13px;
+    }
+
+    @media (max-width: 500px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .actions {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>👑 Fondateur BuSAF</h1>
+    <p>BuSAF / Business Africain</p>
+  </header>
+
+  <main>
+
+    <section class="welcome">
+      <h2>Bienvenue dans l’espace Fondateur</h2>
+
+      <p>
+        Cet espace présente les fonctions de supervision,
+        de gestion et d'organisation de la plateforme BuSAF.
+      </p>
+
+      <div class="important">
+        🔐 Accès réservé au fondateur et aux administrateurs autorisés.
+      </div>
+    </section>
+
+    <section class="grid">
+
+      <div class="card">
+        <div class="icon">📊</div>
+        <h3>Tableau de bord</h3>
+        <p>Consulter les informations générales de BuSAF.</p>
+        <button onclick="ouvrirEspace('Tableau de bord')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">👥</div>
+        <h3>Gestion des membres</h3>
+        <p>Gérer les membres et leurs informations autorisées.</p>
+        <button onclick="ouvrirEspace('Gestion des membres')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">📦</div>
+        <h3>Gestion des produits</h3>
+        <p>Gérer les produits du Marché BuSAF.</p>
+        <button onclick="ouvrirEspace('Gestion des produits')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">🛒</div>
+        <h3>Gestion des ventes</h3>
+        <p>Consulter et suivre les ventes confirmées.</p>
+        <button onclick="ouvrirEspace('Gestion des ventes')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">💰</div>
+        <h3>Commissions</h3>
+        <p>Suivre les commissions et les bénéfices.</p>
+        <button onclick="ouvrirEspace('Gestion des commissions')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">🤝</div>
+        <h3>Gestion des réunions</h3>
+        <p>Organiser les réunions des membres BuSAF.</p>
+        <button onclick="ouvrirEspace('Gestion des réunions')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">🏦</div>
+        <h3>Dépôts et retraits</h3>
+        <p>Superviser les opérations financières autorisées.</p>
+        <button onclick="ouvrirEspace('Dépôts et retraits')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">📈</div>
+        <h3>Statistiques</h3>
+        <p>Consulter les statistiques générales de BuSAF.</p>
+        <button onclick="ouvrirEspace('Statistiques générales')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">📢</div>
+        <h3>Notifications</h3>
+        <p>Préparer les informations officielles aux membres.</p>
+        <button onclick="ouvrirEspace('Notifications aux membres')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">📜</div>
+        <h3>Conditions et règles</h3>
+        <p>Consulter les règles officielles de BuSAF.</p>
+        <button onclick="window.location.href='conditions.html'">
+          OUVRIR
+        </button>
+      </div>
+
+    </section>
+
+    <section id="message" class="message">
+      <h2 id="titreMessage"></h2>
+
+      <p id="texteMessage"></p>
+
+      <button onclick="confirmerAction()">
+        CONFIRMER
+      </button>
+
+      <button class="secondary" onclick="fermerMessage()">
+        ANNULER
+      </button>
+    </section>
+
+    <div class="actions">
+      <button class="secondary" onclick="history.back()">
+        ← RETOUR
+      </button>
+
+      <button onclick="window.location.href='index.html'">
+        🏠 ACCUEIL
+      </button>
+    </div>
+
+  </main>
+
+  <footer>
+    © 2026 BuSAF / Business Africain
+  </footer>
+
+  <script>
+    let espaceChoisi = "";
+
+    function ouvrirEspace(nomEspace) {
+      espaceChoisi = nomEspace;
+
+      document.getElementById("titreMessage").textContent =
+        nomEspace;
+
+      document.getElementById("texteMessage").textContent =
+        "Voulez-vous ouvrir cet espace du fondateur ?";
+
+      document.getElementById("message").style.display = "block";
+
+      document.getElementById("message").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    function confirmerAction() {
+      document.getElementById("texteMessage").textContent =
+        "Action confirmée : " + espaceChoisi +
+        ". Cette fonction sera connectée au véritable tableau de bord du fondateur.";
+
+      document.querySelector("#message button").style.display =
+        "none";
+    }
+
+    function fermerMessage() {
+      document.getElementById("message").style.display = "none";
+    }
+  </script>
+
+</body>
+        </html>
