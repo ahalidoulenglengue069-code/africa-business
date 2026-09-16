@@ -6,7 +6,106 @@
 
   <title>Inscription - BuSAF</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+  const SUPABASE_URL =
+    "https://hbfbocrodyfydvikxbql.supabase.co";
+
+  const SUPABASE_KEY =
+    "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+
+  const message = document.getElementById("message");
+  const signupForm = document.getElementById("signupForm");
+  const signupButton = document.getElementById("signupButton");
+
+  function afficherMessage(texte, couleur) {
+    message.textContent = texte;
+    message.style.color = couleur;
+  }
+
+  if (typeof supabase === "undefined") {
+    afficherMessage(
+      "Connexion au système impossible. Vérifiez votre Internet puis rechargez la page.",
+      "red"
+    );
+  } else {
+
+    const supabaseClient = supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_KEY
+    );
+
+    signupForm.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      const nom = document.getElementById("nom").value.trim();
+      const telephone = document.getElementById("telephone").value.trim();
+      const ville = document.getElementById("ville").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmation =
+        document.getElementById("confirmation").value;
+
+      if (password !== confirmation) {
+        afficherMessage(
+          "Les deux mots de passe ne correspondent pas.",
+          "red"
+        );
+        return;
+      }
+
+      signupButton.disabled = true;
+      signupButton.textContent = "Création en cours...";
+
+      afficherMessage(
+        "Connexion à BuSAF. Veuillez patienter...",
+        "#a66a00"
+      );
+
+      try {
+        const resultat =
+          await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              data: {
+                nom_complet: nom,
+                telephone: telephone,
+                ville: ville
+              }
+            }
+          });
+
+        if (resultat.error) {
+          afficherMessage(
+            "Erreur : " + resultat.error.message,
+            "red"
+          );
+          return;
+        }
+
+        afficherMessage(
+          "Compte créé avec succès. Vérifiez votre adresse e-mail si nécessaire.",
+          "green"
+        );
+
+        signupButton.textContent = "Compte créé";
+
+      } catch (erreur) {
+        afficherMessage(
+          "Erreur technique : " + erreur.message,
+          "red"
+        );
+
+      } finally {
+        signupButton.disabled = false;
+
+        if (signupButton.textContent !== "Compte créé") {
+          signupButton.textContent = "Créer mon compte";
+        }
+      }
+    });
+  }
+  </script>
 
   <style>
     * {
