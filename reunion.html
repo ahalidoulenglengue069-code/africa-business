@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Réunions - BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f2f6f9;
+      color: #222;
+    }
+
+    header {
+      background: linear-gradient(135deg, #075e54, #128c7e);
+      color: white;
+      text-align: center;
+      padding: 25px 15px;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    header p {
+      margin: 8px 0 0;
+    }
+
+    main {
+      max-width: 700px;
+      margin: auto;
+      padding: 20px;
+    }
+
+    .intro {
+      background: white;
+      padding: 18px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 3px 10px #0001;
+      margin-bottom: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 15px;
+      padding: 20px 12px;
+      text-align: center;
+      box-shadow: 0 3px 10px #0001;
+    }
+
+    .card .icon {
+      font-size: 38px;
+      margin-bottom: 10px;
+    }
+
+    .card h3 {
+      font-size: 17px;
+      margin: 8px 0;
+    }
+
+    .card p {
+      font-size: 13px;
+      color: #666;
+      min-height: 38px;
+    }
+
+    button {
+      width: 100%;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 8px;
+      margin-top: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      background: #128c7e;
+      color: white;
+    }
+
+    button:hover {
+      background: #075e54;
+    }
+
+    .secondary {
+      background: #555;
+    }
+
+    .secondary:hover {
+      background: #333;
+    }
+
+    .message {
+      display: none;
+      background: white;
+      margin-top: 20px;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 3px 10px #0001;
+      text-align: center;
+    }
+
+    .message h2 {
+      color: #075e54;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    .actions button {
+      flex: 1;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: #666;
+      font-size: 13px;
+    }
+
+    @media (max-width: 450px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>🤝 Réunions BuSAF</h1>
+    <p>BuSAF / Business Africain</p>
+  </header>
+
+  <main>
+
+    <div class="intro">
+      <h2>Bienvenue dans l’espace Réunions</h2>
+      <p>
+        Organisez vos réunions, participez aux rencontres
+        et échangez avec les membres de BuSAF.
+      </p>
+    </div>
+
+    <div class="grid">
+
+      <div class="card">
+        <div class="icon">🌍</div>
+        <h3>Réunion générale</h3>
+        <p>Réunion organisée par le fondateur BuSAF.</p>
+        <button onclick="ouvrirReunion('Réunion générale')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">🆕</div>
+        <h3>Nouveaux membres</h3>
+        <p>Réunion destinée aux nouveaux membres.</p>
+        <button onclick="ouvrirReunion('Réunion des nouveaux membres')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">⭐</div>
+        <h3>Membres Partner</h3>
+        <p>Réunion des membres déjà Partner avec BuSAF.</p>
+        <button onclick="ouvrirReunion('Réunion des membres Partner')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">📅</div>
+        <h3>Mes réunions</h3>
+        <p>Consulter les réunions auxquelles tu participes.</p>
+        <button onclick="ouvrirReunion('Mes réunions')">
+          OUVRIR
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">➕</div>
+        <h3>Créer une réunion</h3>
+        <p>Créer une nouvelle réunion BuSAF.</p>
+        <button onclick="ouvrirReunion('Créer une réunion')">
+          CRÉER
+        </button>
+      </div>
+
+      <div class="card">
+        <div class="icon">👥</div>
+        <h3>Inviter mes invités</h3>
+        <p>Inviter tes invités à une réunion.</p>
+        <button onclick="ouvrirReunion('Inviter mes invités')">
+          INVITER
+        </button>
+      </div>
+
+    </div>
+
+    <div id="message" class="message">
+      <h2 id="titreMessage"></h2>
+
+      <p id="texteMessage"></p>
+
+      <button onclick="confirmerAction()">
+        CONFIRMER
+      </button>
+
+      <button class="secondary" onclick="fermerMessage()">
+        ANNULER
+      </button>
+    </div>
+
+    <div class="actions">
+      <button class="secondary" onclick="history.back()">
+        ← RETOUR
+      </button>
+
+      <button onclick="window.location.href='index.html'">
+        🏠 ACCUEIL
+      </button>
+    </div>
+
+  </main>
+
+  <footer>
+    © 2026 BuSAF / Business Africain
+  </footer>
+
+  <script>
+    let actionChoisie = "";
+
+    function ouvrirReunion(nomReunion) {
+      actionChoisie = nomReunion;
+
+      document.getElementById("titreMessage").textContent =
+        nomReunion;
+
+      document.getElementById("texteMessage").textContent =
+        "Voulez-vous ouvrir cet espace ?";
+
+      document.getElementById("message").style.display = "block";
+
+      document.getElementById("message").scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+
+    function confirmerAction() {
+      document.getElementById("texteMessage").textContent =
+        "Tu as confirmé : " + actionChoisie +
+        ". Cette fonction sera connectée aux vraies réunions BuSAF.";
+
+      document.querySelector("#message button").style.display =
+        "none";
+    }
+
+    function fermerMessage() {
+      document.getElementById("message").style.display = "none";
+    }
+  </script>
+
+</body>
+          </html>
