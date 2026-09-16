@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <title>Inscription - BuSAF</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -26,11 +27,11 @@
 
     .box {
       width: 100%;
-      max-width: 430px;
+      max-width: 440px;
       background: white;
       padding: 28px 22px;
       border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,.2);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, .20);
     }
 
     .logo {
@@ -49,6 +50,7 @@
     h2 {
       text-align: center;
       margin-bottom: 20px;
+      color: #222;
     }
 
     label {
@@ -64,6 +66,12 @@
       border-radius: 10px;
       font-size: 16px;
       margin-bottom: 15px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #006b3f;
+      box-shadow: 0 0 0 2px rgba(0, 107, 63, .12);
     }
 
     button {
@@ -75,16 +83,31 @@
       color: white;
       font-size: 16px;
       font-weight: bold;
+      cursor: pointer;
     }
 
     button:disabled {
       background: #999;
+      cursor: not-allowed;
     }
 
     #message {
       text-align: center;
       margin-top: 15px;
       line-height: 1.5;
+      font-size: 14px;
+    }
+
+    .success {
+      color: green;
+    }
+
+    .error {
+      color: red;
+    }
+
+    .warning {
+      color: #a66a00;
     }
 
     a {
@@ -95,6 +118,14 @@
       text-decoration: none;
       font-weight: bold;
     }
+
+    .small {
+      margin-top: 12px;
+      color: #777;
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.5;
+    }
   </style>
 </head>
 
@@ -103,63 +134,83 @@
   <div class="box">
 
     <div class="logo">🌍 BuSAF</div>
-    <div class="subtitle">Business Africain</div>
 
-    <h2>Créer un compte</h2>
+    <div class="subtitle">
+      Business Africain
+    </div>
+
+    <h2>Créer mon compte</h2>
 
     <form id="signupForm">
 
       <label for="nom">Nom complet</label>
+
       <input
         type="text"
         id="nom"
         placeholder="Votre nom complet"
+        autocomplete="name"
         required
       >
 
       <label for="telephone">Téléphone</label>
+
       <input
         type="tel"
         id="telephone"
         placeholder="Votre numéro de téléphone"
+        autocomplete="tel"
         required
       >
 
       <label for="ville">Ville</label>
+
       <input
         type="text"
         id="ville"
         placeholder="Votre ville"
+        autocomplete="address-level2"
         required
       >
 
       <label for="email">Adresse e-mail</label>
+
       <input
         type="email"
         id="email"
         placeholder="Votre adresse e-mail"
+        autocomplete="email"
         required
       >
 
       <label for="password">Mot de passe</label>
+
       <input
         type="password"
         id="password"
         placeholder="Minimum 6 caractères"
         minlength="6"
+        autocomplete="new-password"
         required
       >
 
-      <label for="confirmation">Confirmer le mot de passe</label>
+      <label for="confirmation">
+        Confirmer le mot de passe
+      </label>
+
       <input
         type="password"
         id="confirmation"
         placeholder="Répétez le mot de passe"
         minlength="6"
+        autocomplete="new-password"
         required
       >
 
-      <button type="submit" id="signupButton">
+      <button
+        type="submit"
+        id="signupButton"
+      >
         Créer mon compte
       </button>
 
@@ -167,9 +218,18 @@
 
     <div id="message"></div>
 
-    <a href="connexion.html">Déjà membre ? Se connecter</a>
+    <div class="small">
+      Après la création, tes informations seront enregistrées
+      dans ton compte BuSAF.
+    </div>
 
-    <a href="index.html">← Retour à l'accueil</a>
+    <a href="connexion.html">
+      Déjà membre ? Se connecter
+    </a>
+
+    <a href="index.html">
+      ← Retour à l'accueil
+    </a>
 
   </div>
 
@@ -185,63 +245,194 @@
       SUPABASE_KEY
     );
 
-    const signupForm = document.getElementById("signupForm");
-    const signupButton = document.getElementById("signupButton");
-    const message = document.getElementById("message");
+    const signupForm =
+      document.getElementById("signupForm");
 
-    signupForm.addEventListener("submit", async function(event) {
-      event.preventDefault();
+    const signupButton =
+      document.getElementById("signupButton");
 
-      const nom = document.getElementById("nom").value.trim();
-      const telephone = document.getElementById("telephone").value.trim();
-      const ville = document.getElementById("ville").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const confirmation =
-        document.getElementById("confirmation").value;
+    const message =
+      document.getElementById("message");
 
-      if (password !== confirmation) {
-        message.style.color = "red";
-        message.textContent =
-          "Les deux mots de passe ne correspondent pas.";
-        return;
-      }
+    function afficherMessage(texte, type) {
+      message.textContent = texte;
+      message.className = type;
+    }
 
-      signupButton.disabled = true;
-      signupButton.textContent = "Inscription...";
-      message.textContent = "";
+    signupForm.addEventListener(
+      "submit",
+      async function(event) {
 
-      const { data, error } =
-        await supabaseClient.auth.signUp({
-          email: email,
-          password: password,
-          options: {
-            data: {
-              nom_complet: nom,
-              telephone: telephone,
-              ville: ville
+        event.preventDefault();
+
+        const nom =
+          document.getElementById("nom").value.trim();
+
+        const telephone =
+          document.getElementById("telephone").value.trim();
+
+        const ville =
+          document.getElementById("ville").value.trim();
+
+        const email =
+          document.getElementById("email").value.trim();
+
+        const password =
+          document.getElementById("password").value;
+
+        const confirmation =
+          document.getElementById("confirmation").value;
+
+        if (password !== confirmation) {
+          afficherMessage(
+            "Les deux mots de passe ne correspondent pas.",
+            "error"
+          );
+          return;
+        }
+
+        if (password.length < 6) {
+          afficherMessage(
+            "Le mot de passe doit contenir au moins 6 caractères.",
+            "error"
+          );
+          return;
+        }
+
+        signupButton.disabled = true;
+        signupButton.textContent = "Création du compte...";
+
+        afficherMessage(
+          "Veuillez patienter...",
+          "warning"
+        );
+
+        try {
+
+          /*
+            1. Création du compte dans Supabase Auth
+          */
+
+          const {
+            data: inscription,
+            error: erreurInscription
+          } = await supabaseClient.auth.signUp({
+
+            email: email,
+
+            password: password,
+
+            options: {
+              data: {
+                nom_complet: nom,
+                telephone: telephone,
+                ville: ville
+              }
             }
+
+          });
+
+          if (erreurInscription) {
+            throw erreurInscription;
           }
-        });
 
-      if (error) {
-        message.style.color = "red";
-        message.textContent = "Erreur : " + error.message;
-      } else {
-        message.style.color = "green";
-        message.textContent =
-          "Inscription réussie. Vérifiez votre e-mail si une confirmation est demandée.";
+          if (!inscription.user) {
+            throw new Error(
+              "Le compte n'a pas été créé."
+            );
+          }
 
-        signupForm.reset();
+          const userId =
+            inscription.user.id;
 
-        setTimeout(function() {
-          window.location.href = "connexion.html";
-        }, 2500);
+          /*
+            2. Enregistrement du profil dans profils_busaf
+          */
+
+          const {
+            error: erreurProfil
+          } = await supabaseClient
+            .from("profils_busaf")
+            .insert([{
+
+              user_id: userId,
+
+              nom_complet: nom,
+
+              telephone: telephone,
+
+              Ville: ville,
+
+              Role: "membre"
+
+            }]);
+
+          /*
+            3. Message selon le résultat
+          */
+
+          if (erreurProfil) {
+
+            console.error(
+              "Erreur profil :",
+              erreurProfil
+            );
+
+            afficherMessage(
+              "Compte créé, mais le profil doit encore être enregistré. Vérifiez votre e-mail puis connectez-vous.",
+              "warning"
+            );
+
+          } else {
+
+            afficherMessage(
+              "Compte créé avec succès ! Vérifiez votre e-mail si une confirmation est demandée.",
+              "success"
+            );
+
+          }
+
+          /*
+            4. On vide le formulaire seulement après
+               la réussite de la création
+          */
+
+          signupForm.reset();
+
+          /*
+            5. Retour vers la connexion
+          */
+
+          setTimeout(function() {
+
+            window.location.href =
+              "connexion.html";
+
+          }, 3500);
+
+        } catch (erreur) {
+
+          console.error(erreur);
+
+          afficherMessage(
+            "Erreur : " + (
+              erreur.message ||
+              "Impossible de créer le compte."
+            ),
+            "error"
+          );
+
+        } finally {
+
+          signupButton.disabled = false;
+
+          signupButton.textContent =
+            "Créer mon compte";
+
+        }
+
       }
-
-      signupButton.disabled = false;
-      signupButton.textContent = "Créer mon compte";
-    });
+    );
   </script>
 
 </body>
