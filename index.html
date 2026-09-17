@@ -4,241 +4,406 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>BuSAF - Business Africain</title>
+  <title>Inscription - BuSAF</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
     }
 
     body {
-      background: #f3f6f9;
+      margin: 0;
+      padding: 20px 0;
+      font-family: Arial, sans-serif;
+      background: #f4f7f6;
       color: #222;
-      min-height: 100vh;
-    }
-
-    header {
-      background: linear-gradient(135deg, #006b3f, #009e60);
-      color: white;
-      text-align: center;
-      padding: 28px 15px;
-      border-radius: 0 0 25px 25px;
-    }
-
-    header h1 {
-      font-size: 34px;
-      margin-bottom: 8px;
-    }
-
-    header p {
-      font-size: 16px;
     }
 
     .container {
-      max-width: 900px;
-      margin: auto;
-      padding: 20px;
-    }
-
-    .welcome {
+      width: 92%;
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 25px;
       background: white;
-      padding: 22px;
-      border-radius: 18px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
+    }
+
+    .logo {
       text-align: center;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
+      font-size: 30px;
+      font-weight: bold;
     }
 
-    .welcome h2 {
-      color: #006b3f;
-      margin-bottom: 10px;
-    }
-
-    .welcome p {
+    .subtitle {
+      margin-top: 5px;
+      margin-bottom: 25px;
+      text-align: center;
       color: #555;
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      text-align: center;
+      font-size: 24px;
+    }
+
+    .description {
+      margin-bottom: 25px;
+      color: #666;
+      text-align: center;
       line-height: 1.5;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 15px;
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      font-weight: bold;
     }
 
-    .card {
+    input,
+    select {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
       background: white;
-      border-radius: 16px;
-      padding: 22px 10px;
-      text-align: center;
-      text-decoration: none;
-      color: #222;
-      box-shadow: 0 4px 12px rgba(0,0,0,.08);
-      transition: transform .2s;
+      font-size: 16px;
     }
 
-    .card:active {
-      transform: scale(.97);
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #198754;
     }
 
-    .card .icon {
-      font-size: 34px;
-      margin-bottom: 10px;
-    }
-
-    .card h3 {
-      font-size: 15px;
-      color: #006b3f;
-      line-height: 1.4;
-    }
-
-    .section-title {
-      text-align: center;
-      color: #006b3f;
-      margin: 28px 0 15px;
-      font-size: 21px;
-    }
-
-    .founder-card {
-      background: linear-gradient(135deg, #fff8df, #ffffff);
-      border: 2px solid #e0b84c;
-    }
-
-    .founder-card h3 {
-      color: #9a6b00;
-    }
-
-    .bottom {
-      text-align: center;
+    button {
+      width: 100%;
       margin-top: 25px;
+      padding: 15px;
+      border: none;
+      border-radius: 8px;
+      background: #198754;
+      color: white;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
     }
 
-    .bottom a {
-      color: #006b3f;
+    button:disabled {
+      background: #999;
+      cursor: not-allowed;
+    }
+
+    #message {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      text-align: center;
+      line-height: 1.5;
+      overflow-wrap: anywhere;
+    }
+
+    #message.success {
+      display: block;
+      background: #d1e7dd;
+      color: #0f5132;
+    }
+
+    #message.error {
+      display: block;
+      background: #f8d7da;
+      color: #842029;
+    }
+
+    .back,
+    .login {
+      display: block;
+      margin-top: 20px;
+      color: #198754;
+      text-align: center;
       text-decoration: none;
       font-weight: bold;
     }
 
-    footer {
-      text-align: center;
+    .footer {
+      margin-top: 25px;
       color: #777;
+      text-align: center;
       font-size: 13px;
-      padding: 25px 10px;
+      line-height: 1.5;
     }
   </style>
 </head>
 
 <body>
 
-  <header>
-    <h1>🌍 BuSAF</h1>
-    <p>Business Africain</p>
-  </header>
+  <div class="container">
 
-  <main class="container">
+    <div class="logo">🌍 BuSAF</div>
 
-    <section class="welcome">
-      <h2>Bienvenue sur BuSAF</h2>
-
-      <p>
-        Une plateforme africaine pour découvrir des produits,
-        développer son activité et gérer son business.
-      </p>
-    </section>
-
-    <section class="grid">
-
-      <a class="card" href="connexion.html">
-        <div class="icon">🔐</div>
-        <h3>Connexion</h3>
-      </a>
-
-      <a class="card" href="inscription.html">
-        <div class="icon">📝</div>
-        <h3>Inscription</h3>
-      </a>
-
-      <a class="card" href="partenaires.html">
-        <div class="icon">🤝</div>
-        <h3>Partenaires</h3>
-      </a>
-
-      <a class="card" href="marche.html">
-        <div class="icon">🛒</div>
-        <h3>Marché BuSAF</h3>
-      </a>
-
-      <a class="card" href="boutique.html">
-        <div class="icon">🏪</div>
-        <h3>Ma Boutique</h3>
-      </a>
-
-      <a class="card" href="invites.html">
-        <div class="icon">👥</div>
-        <h3>Mes Invités</h3>
-      </a>
-
-      <a class="card" href="commandes.html">
-        <div class="icon">📦</div>
-        <h3>Mes Commandes</h3>
-      </a>
-
-      <a class="card" href="compte.html">
-        <div class="icon">💼</div>
-        <h3>Mon Compte</h3>
-      </a>
-
-      <a class="card" href="benefices.html">
-        <div class="icon">💰</div>
-        <h3>Mes Bénéfices</h3>
-      </a>
-
-      <a class="card" href="commissions.html">
-        <div class="icon">🤝</div>
-        <h3>Mes Commissions</h3>
-      </a>
-
-      <a class="card" href="progression.html">
-        <div class="icon">⭐</div>
-        <h3>Progression Partner</h3>
-      </a>
-
-      <a class="card" href="reunion.html">
-        <div class="icon">🤝</div>
-        <h3>Réunions</h3>
-      </a>
-
-      <a class="card" href="conditions.html">
-        <div class="icon">📜</div>
-        <h3>Conditions / Règles</h3>
-      </a>
-
-      <a class="card founder-card" href="fondateur.html">
-        <div class="icon">👑</div>
-        <h3>Fondateur BuSAF</h3>
-      </a>
-
-      <a class="card" href="BUSAF_reinitialiser_mot_de_passe.html">
-        <div class="icon">🔑</div>
-        <h3>Mot de passe oublié</h3>
-      </a>
-
-    </section>
-
-    <div class="bottom">
-      <p>
-        Déjà membre ?
-        <a href="connexion.html">Se connecter</a>
-      </p>
+    <div class="subtitle">
+      Business Africain
     </div>
 
-  </main>
+    <h1>Créer mon compte</h1>
 
-  <footer>
-    © 2026 BuSAF — Business Africain
-  </footer>
+    <div class="description">
+      Rejoignez BuSAF et commencez votre activité sur la plateforme.
+    </div>
+
+    <form id="signupForm">
+
+      <label for="nom">Nom complet</label>
+      <input
+        type="text"
+        id="nom"
+        placeholder="Votre nom complet"
+        autocomplete="name"
+        required
+      >
+
+      <label for="telephone">Téléphone</label>
+      <input
+        type="tel"
+        id="telephone"
+        placeholder="Votre numéro de téléphone"
+        autocomplete="tel"
+        required
+      >
+
+      <label for="ville">Ville</label>
+      <input
+        type="text"
+        id="ville"
+        placeholder="Votre ville"
+        required
+      >
+
+      <label for="email">Adresse e-mail</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Votre adresse e-mail"
+        autocomplete="email"
+        required
+      >
+
+      <label for="password">Mot de passe</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Minimum 6 caractères"
+        autocomplete="new-password"
+        minlength="6"
+        required
+      >
+
+      <label for="confirmation">Confirmer le mot de passe</label>
+      <input
+        type="password"
+        id="confirmation"
+        placeholder="Répétez le mot de passe"
+        autocomplete="new-password"
+        minlength="6"
+        required
+      >
+
+      <label for="role">Type de compte</label>
+      <select id="role" required>
+        <option value="membre">Membre</option>
+        <option value="formateur">Formateur</option>
+        <option value="vendeur">Vendeur</option>
+      </select>
+
+      <button type="submit" id="signupButton">
+        CRÉER MON COMPTE
+      </button>
+
+    </form>
+
+    <div id="message"></div>
+
+    <a class="back" href="index.html">
+      ← RETOUR
+    </a>
+
+    <a class="login" href="connexion.html">
+      Déjà membre ? Se connecter
+    </a>
+
+    <div class="footer">
+      Vos informations personnelles sont enregistrées
+      dans votre profil BuSAF.
+    </div>
+
+  </div>
+
+  <script>
+    const SUPABASE_URL =
+      "https://hbfbocrodyfydvikxbql.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+
+    const form = document.getElementById("signupForm");
+    const button = document.getElementById("signupButton");
+    const message = document.getElementById("message");
+
+    function afficherMessage(texte, type) {
+      message.textContent = texte;
+      message.className = type;
+    }
+
+    function obtenirSupabase() {
+      if (
+        !window.supabase ||
+        typeof window.supabase.createClient !== "function"
+      ) {
+        return null;
+      }
+
+      return window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+    }
+
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
+
+      message.textContent = "";
+      message.className = "";
+
+      const supabaseClient = obtenirSupabase();
+
+      if (!supabaseClient) {
+        afficherMessage(
+          "❌ La connexion Supabase n'est pas disponible. Vérifie ta connexion Internet puis recharge la page.",
+          "error"
+        );
+        return;
+      }
+
+      const nom = document.getElementById("nom").value.trim();
+      const telephone = document.getElementById("telephone").value.trim();
+      const ville = document.getElementById("ville").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmation = document.getElementById("confirmation").value;
+      const role = document.getElementById("role").value;
+
+      if (!nom || !telephone || !ville || !email) {
+        afficherMessage(
+          "❌ Remplis tous les champs obligatoires.",
+          "error"
+        );
+        return;
+      }
+
+      if (password.length < 6) {
+        afficherMessage(
+          "❌ Le mot de passe doit contenir au moins 6 caractères.",
+          "error"
+        );
+        return;
+      }
+
+      if (password !== confirmation) {
+        afficherMessage(
+          "❌ Les deux mots de passe ne sont pas identiques.",
+          "error"
+        );
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "CRÉATION EN COURS...";
+
+      try {
+        const resultat = await supabaseClient.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              nom_complet: nom,
+              telephone: telephone,
+              ville: ville,
+              role: role
+            }
+          }
+        });
+
+        if (resultat.error) {
+          throw resultat.error;
+        }
+
+        if (!resultat.data || !resultat.data.user) {
+          throw new Error(
+            "Supabase n'a pas retourné l'utilisateur."
+          );
+        }
+
+        afficherMessage(
+          "✅ COMPTE BuSAF CRÉÉ AVEC SUCCÈS ! " +
+          "Vérifie ton adresse e-mail si une confirmation est demandée, " +
+          "puis connecte-toi.",
+          "success"
+        );
+
+        button.textContent = "COMPTE CRÉÉ";
+
+      } catch (error) {
+        console.error("Erreur inscription :", error);
+
+        let texte = error.message || "Erreur inconnue.";
+
+        const erreur = texte.toLowerCase();
+
+        if (
+          erreur.includes("already registered") ||
+          erreur.includes("user already exists")
+        ) {
+          texte =
+            "Cette adresse e-mail possède déjà un compte. Utilise Connexion.";
+        } else if (
+          erreur.includes("invalid email")
+        ) {
+          texte =
+            "L'adresse e-mail n'est pas valide.";
+        } else if (
+          erreur.includes("password")
+        ) {
+          texte =
+            "Le mot de passe doit contenir au moins 6 caractères.";
+        } else if (
+          erreur.includes("rate limit")
+        ) {
+          texte =
+            "Trop de tentatives. Attends quelques minutes puis réessaie.";
+        } else if (
+          erreur.includes("fetch") ||
+          erreur.includes("network") ||
+          erreur.includes("failed")
+        ) {
+          texte =
+            "Impossible de contacter Supabase. Vérifie Internet puis recharge la page.";
+        }
+
+        afficherMessage(
+          "❌ INSCRIPTION REFUSÉE : " + texte,
+          "error"
+        );
+
+        button.disabled = false;
+        button.textContent = "CRÉER MON COMPTE";
+      }
+    });
+  </script>
 
 </body>
 </html>
