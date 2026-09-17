@@ -6,6 +6,7 @@
 
   <title>Inscription - BuSAF</title>
 
+  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -15,72 +16,85 @@
 
     body {
       margin: 0;
-      padding: 20px 12px;
-      min-height: 100vh;
       font-family: Arial, sans-serif;
-      background: linear-gradient(135deg, #087f3e, #b7d900);
+      background: #f4f7f6;
+      color: #222;
     }
 
     .container {
-      width: 100%;
-      max-width: 520px;
-      margin: auto;
-      padding: 25px 20px;
+      width: 92%;
+      max-width: 500px;
+      margin: 40px auto;
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.10);
     }
 
     .logo {
       text-align: center;
-      color: #087f3e;
-      font-size: 32px;
+      font-size: 30px;
       font-weight: bold;
+      margin-bottom: 5px;
     }
 
     .subtitle {
       text-align: center;
-      color: #666;
-      margin: 8px 0 25px;
+      color: #555;
+      margin-bottom: 25px;
     }
 
     h1 {
       text-align: center;
-      color: #087f3e;
-      font-size: 25px;
+      font-size: 24px;
+      margin-bottom: 10px;
+    }
+
+    .description {
+      text-align: center;
+      color: #666;
+      margin-bottom: 25px;
+      line-height: 1.5;
     }
 
     label {
       display: block;
-      margin-top: 16px;
-      margin-bottom: 7px;
+      margin-top: 15px;
+      margin-bottom: 6px;
       font-weight: bold;
     }
 
-    input {
+    input,
+    select {
       width: 100%;
-      padding: 14px;
+      padding: 13px;
       border: 1px solid #ccc;
-      border-radius: 12px;
+      border-radius: 8px;
       font-size: 16px;
+      background: white;
     }
 
-    input:focus {
+    input:focus,
+    select:focus {
       outline: none;
-      border-color: #087f3e;
+      border-color: #198754;
     }
 
     button {
       width: 100%;
       margin-top: 25px;
-      padding: 16px;
+      padding: 14px;
       border: none;
-      border-radius: 12px;
-      background: #087f3e;
+      border-radius: 8px;
+      background: #198754;
       color: white;
-      font-size: 18px;
+      font-size: 17px;
       font-weight: bold;
       cursor: pointer;
+    }
+
+    button:hover {
+      background: #157347;
     }
 
     button:disabled {
@@ -88,373 +102,716 @@
       cursor: not-allowed;
     }
 
-    #message {
-      display: none;
-      margin-top: 18px;
-      padding: 14px;
-      border-radius: 10px;
+    .back {
+      display: block;
       text-align: center;
+      margin-top: 15px;
+      text-decoration: none;
+      color: #198754;
       font-weight: bold;
-      line-height: 1.5;
-      word-break: break-word;
-    }
-
-    .success {
-      display: block !important;
-      background: #e1f7e8;
-      color: #087f3e;
-    }
-
-    .error {
-      display: block !important;
-      background: #ffe5e5;
-      color: #b00020;
     }
 
     .login {
       display: block;
-      margin-top: 25px;
       text-align: center;
-      color: #087f3e;
-      font-weight: bold;
+      margin-top: 20px;
+      color: #198754;
       text-decoration: none;
+      font-weight: bold;
+    }
+
+    #message {
+      margin-top: 20px;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      line-height: 1.5;
+      display: none;
+    }
+
+    #message.success {
+      display: block;
+      background: #d1e7dd;
+      color: #0f5132;
+    }
+
+    #message.error {
+      display: block;
+      background: #f8d7da;
+      color: #842029;
+    }
+
+    .footer {
+      text-align: center;
+      margin-top: 25px;
+      color: #777;
+      font-size: 13px;
+      line-height: 1.5;
     }
   </style>
 </head>
 
 <body>
 
-<div class="container">
+  <div class="container">
 
-  <div class="logo">🌍 BuSAF</div>
-  <div class="subtitle">Business Africain</div>
+    <div class="logo">🌍 BuSAF</div>
 
-  <h1>Créer mon compte</h1>
+    <div class="subtitle">
+      Business Africain
+    </div>
 
-  <form id="signupForm">
+    <h1>Créer mon compte</h1>
 
-    <label for="nom">Nom complet</label>
-    <input
-      type="text"
-      id="nom"
-      placeholder="Votre nom complet"
-      required
-    >
+    <div class="description">
+      Rejoignez BuSAF et commencez votre activité sur la plateforme.
+    </div>
 
-    <label for="telephone">Numéro de téléphone</label>
-    <input
-      type="tel"
-      id="telephone"
-      placeholder="Votre numéro de téléphone"
-      required
-    >
+    <form id="signupForm" novalidate>
 
-    <label for="ville">Ville</label>
-    <input
-      type="text"
-      id="ville"
-      placeholder="Votre ville"
-      required
-    >
+      <label for="nom">Nom complet</label>
+      <input
+        type="text"
+        id="nom"
+        placeholder="Votre nom complet"
+        required
+      >
 
-    <label for="email">Adresse e-mail</label>
-    <input
-      type="email"
-      id="email"
-      placeholder="Votre adresse e-mail"
-      required
-    >
+      <label for="telephone">Téléphone</label>
+      <input
+        type="tel"
+        id="telephone"
+        placeholder="Votre numéro de téléphone"
+        required
+      >
 
-    <label for="password">Mot de passe</label>
-    <input
-      type="password"
-      id="password"
-      placeholder="Minimum 6 caractères"
-      minlength="6"
-      required
-    >
+      <label for="ville">Ville</label>
+      <input
+        type="text"
+        id="ville"
+        placeholder="Votre ville"
+        required
+      >
 
-    <label for="confirmation">Confirmer le mot de passe</label>
-    <input
-      type="password"
-      id="confirmation"
-      placeholder="Répétez le mot de passe"
-      minlength="6"
-      required
-    >
+      <label for="email">Adresse e-mail</label>
+      <input
+        type="email"
+        id="email"
+        placeholder="Votre adresse e-mail"
+        required
+      >
 
-    <button type="submit" id="signupButton">
-      CRÉER MON COMPTE
-    </button>
+      <label for="password">Mot de passe</label>
+      <input
+        type="password"
+        id="password"
+        placeholder="Minimum 6 caractères"
+        required
+      >
 
-  </form>
+      <label for="confirmation">Confirmer le mot de passe</label>
+      <input
+        type="password"
+        id="confirmation"
+        placeholder="Répétez le mot de passe"
+        required
+      >
 
-  <div id="message"></div>
+      <label for="role">Type de compte</label>
+      <select id="role">
+        <option value="membre">Membre</option>
+        <option value="formateur">Formateur</option>
+        <option value="vendeur">Vendeur</option>
+      </select>
 
-  <a class="login" href="connexion.html">
-    Déjà membre ? Se connecter
-  </a>
+      <button type="submit" id="signupButton">
+        CRÉER MON COMPTE
+      </button>
 
-</div>
+    </form>
 
-<script>
+    <div id="message"></div>
 
-  // ==========================================
-  // CONNEXION À SUPABASE
-  // ==========================================
+    <a class="back" href="index.html">
+      ← RETOUR
+    </a>
 
-  const SUPABASE_URL =
-    "https://hbfbocrodyfydvikxbql.supabase.co";
+    <a class="login" href="connexion.html">
+      Déjà membre ? Se connecter
+    </a>
 
-  const SUPABASE_KEY =
-    "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+    <div class="footer">
+      Vos informations personnelles sont enregistrées
+      dans votre profil BuSAF.
+    </div>
 
-  const supabaseClient =
-    window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
-    );
-
-
-  // ==========================================
-  // ÉLÉMENTS DE LA PAGE
-  // ==========================================
-
-  const form = document.getElementById("signupForm");
-  const button = document.getElementById("signupButton");
-  const message = document.getElementById("message");
+  </div>
 
 
-  // ==========================================
-  // AFFICHER UN MESSAGE
-  // ==========================================
+  <script>
 
-  function afficherMessage(texte, type) {
+    // ==================================================
+    // CONFIGURATION SUPABASE
+    // ==================================================
 
-    message.textContent = texte;
+    const SUPABASE_URL =
+      "https://hbfbocrodyfydvikxbql.supabase.co";
 
-    message.className = "";
-
-    message.classList.add(type);
-
-  }
+    const SUPABASE_KEY =
+      "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
 
 
-  // ==========================================
-  // INSCRIPTION
-  // ==========================================
+    // ==================================================
+    // INITIALISATION SUPABASE
+    // ==================================================
 
-  form.addEventListener("submit", async function(event) {
-
-    event.preventDefault();
-
-    message.className = "";
-    message.textContent = "";
-
-    const nom =
-      document.getElementById("nom").value.trim();
-
-    const telephone =
-      document.getElementById("telephone").value.trim();
-
-    const ville =
-      document.getElementById("ville").value.trim();
-
-    const email =
-      document.getElementById("email").value.trim();
-
-    const password =
-      document.getElementById("password").value;
-
-    const confirmation =
-      document.getElementById("confirmation").value;
-
-
-    // Vérification mot de passe
-
-    if (password.length < 6) {
-
-      afficherMessage(
-        "❌ Le mot de passe doit contenir au moins 6 caractères.",
-        "error"
-      );
-
-      return;
-    }
-
-
-    // Vérification confirmation
-
-    if (password !== confirmation) {
-
-      afficherMessage(
-        "❌ Les deux mots de passe ne sont pas identiques.",
-        "error"
-      );
-
-      return;
-    }
-
-
-    // Désactiver le bouton
-
-    button.disabled = true;
-
-    button.textContent = "Création en cours...";
-
+    let supabaseClient = null;
 
     try {
 
-      console.log("Début de l'inscription...");
-
-
-      // ==========================================
-      // CRÉATION DU COMPTE SUPABASE AUTH
-      // ==========================================
-
-      const { data, error } =
-        await supabaseClient.auth.signUp({
-
-          email: email,
-
-          password: password,
-
-          options: {
-
-            data: {
-
-              nom_complet: nom,
-
-              telephone: telephone,
-
-              ville: ville,
-
-              role: "membre"
-
-            }
-
-          }
-
-        });
-
-
-      console.log("Réponse Supabase :", data);
-
-
-      // Une erreur Supabase est survenue
-
-      if (error) {
-
-        console.error("Erreur Supabase :", error);
-
-        throw error;
-
+      if (!window.supabase) {
+        throw new Error(
+          "La bibliothèque Supabase n'a pas été chargée."
+        );
       }
 
+      supabaseClient =
+        window.supabase.createClient(
+          SUPABASE_URL,
+          SUPABASE_KEY
+        );
 
-      // ==========================================
-      // COMPTE CRÉÉ
-      // ==========================================
+    } catch (error) {
 
-      if (data && data.user) {
+      console.error(
+        "Erreur initialisation Supabase :",
+        error
+      );
 
-        // Cas où Supabase demande la confirmation
-        // de l'adresse e-mail
+    }
 
-        if (!data.session) {
+
+    // ==================================================
+    // ELEMENTS DE LA PAGE
+    // ==================================================
+
+    const form =
+      document.getElementById("signupForm");
+
+    const button =
+      document.getElementById("signupButton");
+
+    const message =
+      document.getElementById("message");
+
+
+    // ==================================================
+    // AFFICHER UN MESSAGE
+    // ==================================================
+
+    function afficherMessage(texte, type) {
+
+      message.textContent = texte;
+
+      message.className = "";
+
+      message.classList.add(type);
+
+    }
+
+
+    // ==================================================
+    // INSCRIPTION
+    // ==================================================
+
+    form.addEventListener(
+      "submit",
+      async function(event) {
+
+        event.preventDefault();
+
+
+        // Effacer ancien message
+        message.textContent = "";
+        message.className = "";
+
+
+        // Vérifier Supabase
+        if (!supabaseClient) {
 
           afficherMessage(
-            "✅ COMPTE CRÉÉ ! Vérifie ton adresse e-mail pour confirmer ton compte, puis utilise la page Connexion.",
-            "success"
+            "❌ Impossible de contacter Supabase. Recharge la page puis réessaie.",
+            "error"
           );
-
-          button.textContent = "Compte créé";
 
           return;
         }
 
 
-        // Cas où le compte est immédiatement connecté
+        // ==================================================
+        // RECUPERATION DES CHAMPS
+        // ==================================================
 
-        afficherMessage(
-          "✅ COMPTE CRÉÉ AVEC SUCCÈS ! Tu peux maintenant te connecter.",
-          "success"
-        );
+        const nom =
+          document
+            .getElementById("nom")
+            .value
+            .trim();
 
-        button.textContent = "Compte créé";
+        const telephone =
+          document
+            .getElementById("telephone")
+            .value
+            .trim();
 
-        return;
+        const ville =
+          document
+            .getElementById("ville")
+            .value
+            .trim();
+
+        const email =
+          document
+            .getElementById("email")
+            .value
+            .trim();
+
+        const password =
+          document
+            .getElementById("password")
+            .value;
+
+        const confirmation =
+          document
+            .getElementById("confirmation")
+            .value;
+
+        const role =
+          document
+            .getElementById("role")
+            .value;
+
+
+        // ==================================================
+        // VERIFICATIONS
+        // ==================================================
+
+        if (!nom) {
+
+          afficherMessage(
+            "❌ Entre ton nom complet.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if (!telephone) {
+
+          afficherMessage(
+            "❌ Entre ton numéro de téléphone.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if (!ville) {
+
+          afficherMessage(
+            "❌ Entre ta ville.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if (!email) {
+
+          afficherMessage(
+            "❌ Entre ton adresse e-mail.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if (password.length < 6) {
+
+          afficherMessage(
+            "❌ Le mot de passe doit contenir au moins 6 caractères.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        if (password !== confirmation) {
+
+          afficherMessage(
+            "❌ Les deux mots de passe ne sont pas identiques.",
+            "error"
+          );
+
+          return;
+        }
+
+
+        // ==================================================
+        // DESACTIVER LE BOUTON
+        // ==================================================
+
+        button.disabled = true;
+
+        button.textContent =
+          "Création en cours...";
+
+
+        try {
+
+          console.log(
+            "Début de l'inscription..."
+          );
+
+
+          // ==================================================
+          // CREATION DU COMPTE SUPABASE AUTH
+          // ==================================================
+
+          const {
+            data,
+            error
+          } =
+            await supabaseClient.auth.signUp({
+
+              email: email,
+
+              password: password,
+
+              options: {
+
+                data: {
+
+                  nom_complet: nom,
+
+                  telephone: telephone,
+
+                  ville: ville,
+
+                  role: role
+
+                }
+
+              }
+
+            });
+
+
+          console.log(
+            "Réponse Supabase :",
+            data
+          );
+
+
+          // ==================================================
+          // ERREUR SUPABASE
+          // ==================================================
+
+          if (error) {
+
+            console.error(
+              "Erreur Supabase :",
+              error
+            );
+
+            throw error;
+
+          }
+
+
+          // ==================================================
+          // VERIFIER L'UTILISATEUR
+          // ==================================================
+
+          if (!data || !data.user) {
+
+            throw new Error(
+              "Supabase n'a pas retourné l'identifiant utilisateur."
+            );
+
+          }
+
+
+          const userId =
+            data.user.id;
+
+
+          console.log(
+            "Utilisateur créé :",
+            userId
+          );
+
+
+          // ==================================================
+          // SI UNE SESSION EST DISPONIBLE
+          // ==================================================
+
+          if (data.session) {
+
+            console.log(
+              "Session disponible. Création du profil..."
+            );
+
+
+            // ==================================================
+            // CREATION DU PROFIL BUSAF
+            // ==================================================
+
+            const {
+              error: profileError
+            } =
+              await supabaseClient
+                .from("profils_busaf")
+                .upsert(
+
+                  {
+
+                    user_id: userId,
+
+                    nom_complet: nom,
+
+                    telephone: telephone,
+
+                    Ville: ville,
+
+                    Role: role
+
+                  },
+
+                  {
+                    onConflict: "user_id"
+                  }
+
+                );
+
+
+            // ==================================================
+            // ERREUR PROFIL
+            // ==================================================
+
+            if (profileError) {
+
+              console.error(
+                "Erreur profil BuSAF :",
+                profileError
+              );
+
+
+              afficherMessage(
+
+                "⚠️ COMPTE CRÉÉ, MAIS LE PROFIL BuSAF N'A PAS PU ÊTRE ENREGISTRÉ. " +
+                "L'identifiant utilisateur est : " +
+                userId,
+
+                "error"
+
+              );
+
+
+              button.disabled = false;
+
+              button.textContent =
+                "CRÉER MON COMPTE";
+
+              return;
+
+            }
+
+
+            // ==================================================
+            // SUCCES COMPLET
+            // ==================================================
+
+            console.log(
+              "Profil BuSAF créé avec succès."
+            );
+
+
+            afficherMessage(
+
+              "✅ COMPTE BuSAF CRÉÉ AVEC SUCCÈS ! " +
+              "Tu peux maintenant te connecter.",
+
+              "success"
+
+            );
+
+
+            button.textContent =
+              "Compte créé";
+
+
+            return;
+
+          }
+
+
+          // ==================================================
+          // PAS DE SESSION = CONFIRMATION E-MAIL
+          // ==================================================
+
+          afficherMessage(
+
+            "✅ COMPTE CRÉÉ ! " +
+            "Vérifie ton adresse e-mail pour confirmer ton compte, " +
+            "puis utilise la page Connexion.",
+
+            "success"
+
+          );
+
+
+          button.textContent =
+            "Compte créé";
+
+
+        } catch (error) {
+
+          console.error(
+            "ERREUR INSCRIPTION :",
+            error
+          );
+
+
+          let erreur =
+            error.message ||
+            "Erreur inconnue";
+
+
+          const erreurMinuscule =
+            erreur.toLowerCase();
+
+
+          // ==================================================
+          // EMAIL RATE LIMIT
+          // ==================================================
+
+          if (
+            erreurMinuscule.includes(
+              "rate limit"
+            ) ||
+            erreurMinuscule.includes(
+              "email rate limit"
+            )
+          ) {
+
+            erreur =
+              "Supabase limite actuellement les inscriptions par e-mail. " +
+              "Attends quelques minutes avant de refaire un essai.";
+
+          }
+
+
+          // ==================================================
+          // EMAIL DEJA UTILISE
+          // ==================================================
+
+          else if (
+            erreurMinuscule.includes(
+              "user already registered"
+            )
+          ) {
+
+            erreur =
+              "Cette adresse e-mail possède déjà un compte. " +
+              "Utilise la page Connexion.";
+
+          }
+
+
+          // ==================================================
+          // MOT DE PASSE
+          // ==================================================
+
+          else if (
+            erreurMinuscule.includes(
+              "password"
+            )
+          ) {
+
+            erreur =
+              "Le mot de passe n'est pas accepté. " +
+              "Utilise au moins 6 caractères.";
+
+          }
+
+
+          // ==================================================
+          // EMAIL INVALIDE
+          // ==================================================
+
+          else if (
+            erreurMinuscule.includes(
+              "invalid email"
+            )
+          ) {
+
+            erreur =
+              "L'adresse e-mail n'est pas valide.";
+
+          }
+
+
+          // ==================================================
+          // ERREUR RLS / PROFIL
+          // ==================================================
+
+          else if (
+            erreurMinuscule.includes(
+              "row-level security"
+            ) ||
+            erreurMinuscule.includes(
+              "permission denied"
+            )
+          ) {
+
+            erreur =
+              "Le compte a été créé, mais Supabase bloque l'enregistrement du profil. " +
+              "La sécurité de la table profils_busaf doit être configurée.";
+
+          }
+
+
+          // ==================================================
+          // AFFICHER L'ERREUR
+          // ==================================================
+
+          afficherMessage(
+
+            "❌ INSCRIPTION REFUSÉE : " +
+            erreur,
+
+            "error"
+
+          );
+
+
+          button.disabled = false;
+
+          button.textContent =
+            "CRÉER MON COMPTE";
+
+        }
 
       }
+    );
 
-
-      // Aucun utilisateur retourné
-
-      afficherMessage(
-        "❌ Supabase n'a pas retourné d'identifiant utilisateur. Réessaie.",
-        "error"
-      );
-
-      button.disabled = false;
-      button.textContent = "CRÉER MON COMPTE";
-
-
-    } catch (error) {
-
-      console.error("ERREUR INSCRIPTION :", error);
-
-
-      let erreur = error.message || "Erreur inconnue";
-
-
-      // Traduction de quelques erreurs fréquentes
-
-      if (
-        erreur.toLowerCase().includes("rate limit") ||
-        erreur.toLowerCase().includes("email rate limit")
-      ) {
-
-        erreur =
-          "Supabase limite actuellement les inscriptions par e-mail. Attends quelques minutes avant de refaire un essai.";
-
-      }
-
-
-      if (
-        erreur.toLowerCase().includes("user already registered")
-      ) {
-
-        erreur =
-          "Cette adresse e-mail possède déjà un compte. Utilise la page Connexion.";
-
-      }
-
-
-      if (
-        erreur.toLowerCase().includes("password")
-      ) {
-
-        erreur =
-          "Le mot de passe n'est pas accepté. Utilise au moins 6 caractères.";
-
-      }
-
-
-      afficherMessage(
-        "❌ INSCRIPTION REFUSÉE : " + erreur,
-        "error"
-      );
-
-
-      button.disabled = false;
-
-      button.textContent = "CRÉER MON COMPTE";
-
-    }
-
-  });
-
-</script>
+  </script>
 
 </body>
 </html>
