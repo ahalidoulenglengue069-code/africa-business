@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>Inscription - BuSAF</title>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -15,63 +14,59 @@
 
     body {
       margin: 0;
+      padding: 20px 12px;
       min-height: 100vh;
       font-family: Arial, sans-serif;
       background: linear-gradient(135deg, #087f3e, #b7d900);
-      padding: 25px 12px;
     }
 
     .container {
       width: 100%;
       max-width: 520px;
       margin: auto;
+      padding: 25px 20px;
       background: white;
       border-radius: 20px;
-      padding: 25px 20px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.18);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
     }
 
     .logo {
       text-align: center;
+      color: #087f3e;
       font-size: 32px;
       font-weight: bold;
-      color: #087f3e;
-      margin-bottom: 5px;
     }
 
     .subtitle {
       text-align: center;
       color: #666;
-      margin-bottom: 25px;
+      margin: 8px 0 25px;
     }
 
     h1 {
       text-align: center;
       color: #087f3e;
       font-size: 25px;
-      margin-bottom: 25px;
     }
 
     label {
       display: block;
-      font-weight: bold;
       margin-top: 16px;
       margin-bottom: 7px;
-      color: #222;
+      font-weight: bold;
     }
 
     input {
       width: 100%;
-      padding: 15px;
-      border: 1px solid #cccccc;
+      padding: 14px;
+      border: 1px solid #ccc;
       border-radius: 12px;
       font-size: 16px;
-      outline: none;
     }
 
     input:focus {
+      outline: none;
       border-color: #087f3e;
-      box-shadow: 0 0 4px rgba(8, 127, 62, 0.3);
     }
 
     button {
@@ -84,15 +79,13 @@
       color: white;
       font-size: 18px;
       font-weight: bold;
-      cursor: pointer;
     }
 
     button:disabled {
-      background: #999999;
-      cursor: not-allowed;
+      background: #999;
     }
 
-    .message {
+    #message {
       display: none;
       margin-top: 18px;
       padding: 14px;
@@ -103,33 +96,24 @@
     }
 
     .success {
-      display: block;
-      background: #e2f7e9;
+      display: block !important;
+      background: #e1f7e8;
       color: #087f3e;
     }
 
     .error {
-      display: block;
+      display: block !important;
       background: #ffe5e5;
       color: #b00020;
     }
 
-    .login-link {
+    .login {
       display: block;
-      text-align: center;
       margin-top: 25px;
+      text-align: center;
       color: #087f3e;
       font-weight: bold;
       text-decoration: none;
-      font-size: 17px;
-    }
-
-    .info {
-      margin-top: 20px;
-      text-align: center;
-      color: #777;
-      font-size: 14px;
-      line-height: 1.5;
     }
   </style>
 </head>
@@ -139,7 +123,6 @@
   <div class="container">
 
     <div class="logo">🌍 BuSAF</div>
-
     <div class="subtitle">Business Africain</div>
 
     <h1>Créer mon compte</h1>
@@ -151,7 +134,6 @@
         type="text"
         id="nom"
         placeholder="Votre nom complet"
-        autocomplete="name"
         required
       >
 
@@ -160,7 +142,6 @@
         type="tel"
         id="telephone"
         placeholder="Votre numéro de téléphone"
-        autocomplete="tel"
         required
       >
 
@@ -169,7 +150,6 @@
         type="text"
         id="ville"
         placeholder="Votre ville"
-        autocomplete="address-level2"
         required
       >
 
@@ -178,7 +158,6 @@
         type="email"
         id="email"
         placeholder="Votre adresse e-mail"
-        autocomplete="email"
         required
       >
 
@@ -187,7 +166,6 @@
         type="password"
         id="password"
         placeholder="Minimum 6 caractères"
-        autocomplete="new-password"
         minlength="6"
         required
       >
@@ -197,7 +175,6 @@
         type="password"
         id="confirmation"
         placeholder="Répétez le mot de passe"
-        autocomplete="new-password"
         minlength="6"
         required
       >
@@ -208,40 +185,30 @@
 
     </form>
 
-    <div id="message" class="message"></div>
+    <div id="message"></div>
 
-    <a class="login-link" href="connexion.html">
+    <a class="login" href="connexion.html">
       Déjà membre ? Se connecter
     </a>
-
-    <div class="info">
-      Après la création, tu pourras te connecter à ton compte BuSAF.
-    </div>
 
   </div>
 
   <script>
-    const SUPABASE_URL =
-      "https://hbfbocrodyfydvikxbql.supabase.co";
-
-    const SUPABASE_KEY =
-      "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
-
     const supabaseClient = window.supabase.createClient(
-      SUPABASE_URL,
-      SUPABASE_KEY
+      "https://hbfbocrodyfydvikxbql.supabase.co",
+      "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L"
     );
 
-    const signupForm = document.getElementById("signupForm");
-    const signupButton = document.getElementById("signupButton");
+    const form = document.getElementById("signupForm");
+    const button = document.getElementById("signupButton");
     const message = document.getElementById("message");
 
     function afficherMessage(texte, type) {
       message.textContent = texte;
-      message.className = "message " + type;
+      message.className = type;
     }
 
-    signupForm.addEventListener("submit", async function(event) {
+    form.addEventListener("submit", async function(event) {
       event.preventDefault();
 
       const nom = document.getElementById("nom").value.trim();
@@ -250,9 +217,6 @@
       const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value;
       const confirmation = document.getElementById("confirmation").value;
-
-      message.className = "message";
-      message.textContent = "";
 
       if (password.length < 6) {
         afficherMessage(
@@ -270,8 +234,8 @@
         return;
       }
 
-      signupButton.disabled = true;
-      signupButton.textContent = "Création en cours...";
+      button.disabled = true;
+      button.textContent = "Création en cours...";
 
       try {
         const { data, error } =
@@ -292,19 +256,12 @@
           throw error;
         }
 
-        if (data.session) {
-          afficherMessage(
-            "Compte créé avec succès. Tu peux maintenant te connecter.",
-            "success"
-          );
-        } else {
-          afficherMessage(
-            "Compte créé avec succès. Vérifie ton adresse e-mail, puis connecte-toi.",
-            "success"
-          );
-        }
+        afficherMessage(
+          "Compte créé avec succès. Vérifie ton e-mail si nécessaire, puis connecte-toi.",
+          "success"
+        );
 
-        signupButton.textContent = "Compte créé";
+        button.textContent = "Compte créé";
 
       } catch (error) {
         afficherMessage(
@@ -312,8 +269,8 @@
           "error"
         );
 
-        signupButton.disabled = false;
-        signupButton.textContent = "Créer mon compte";
+        button.disabled = false;
+        button.textContent = "Créer mon compte";
       }
     });
   </script>
