@@ -6,7 +6,6 @@
 
   <title>Inscription - BuSAF</title>
 
-  <!-- Supabase -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -16,6 +15,7 @@
 
     body {
       margin: 0;
+      padding: 20px 0;
       font-family: Arial, sans-serif;
       background: #f4f7f6;
       color: #222;
@@ -24,9 +24,9 @@
     .container {
       width: 92%;
       max-width: 500px;
-      margin: 40px auto;
-      background: white;
+      margin: 20px auto;
       padding: 25px;
+      background: white;
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.10);
     }
@@ -35,26 +35,24 @@
       text-align: center;
       font-size: 30px;
       font-weight: bold;
-      margin-bottom: 5px;
     }
 
     .subtitle {
       text-align: center;
       color: #555;
-      margin-bottom: 25px;
+      margin: 5px 0 25px;
     }
 
     h1 {
       text-align: center;
       font-size: 24px;
-      margin-bottom: 10px;
     }
 
     .description {
       text-align: center;
       color: #666;
-      margin-bottom: 25px;
       line-height: 1.5;
+      margin-bottom: 25px;
     }
 
     label {
@@ -67,66 +65,37 @@
     input,
     select {
       width: 100%;
-      padding: 13px;
+      padding: 14px;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 16px;
       background: white;
     }
 
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #198754;
-    }
-
     button {
       width: 100%;
       margin-top: 25px;
-      padding: 14px;
+      padding: 15px;
       border: none;
       border-radius: 8px;
       background: #198754;
       color: white;
       font-size: 17px;
       font-weight: bold;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background: #157347;
     }
 
     button:disabled {
       background: #999;
-      cursor: not-allowed;
-    }
-
-    .back {
-      display: block;
-      text-align: center;
-      margin-top: 15px;
-      text-decoration: none;
-      color: #198754;
-      font-weight: bold;
-    }
-
-    .login {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      color: #198754;
-      text-decoration: none;
-      font-weight: bold;
     }
 
     #message {
+      display: none;
       margin-top: 20px;
-      padding: 12px;
+      padding: 15px;
       border-radius: 8px;
       text-align: center;
       line-height: 1.5;
-      display: none;
+      overflow-wrap: anywhere;
     }
 
     #message.success {
@@ -141,9 +110,18 @@
       color: #842029;
     }
 
-    .footer {
+    a {
+      display: block;
       text-align: center;
+      margin-top: 20px;
+      color: #198754;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .footer {
       margin-top: 25px;
+      text-align: center;
       color: #777;
       font-size: 13px;
       line-height: 1.5;
@@ -167,7 +145,7 @@
       Rejoignez BuSAF et commencez votre activité sur la plateforme.
     </div>
 
-    <form id="signupForm" novalidate>
+    <form id="signupForm">
 
       <label for="nom">Nom complet</label>
       <input
@@ -206,6 +184,7 @@
         type="password"
         id="password"
         placeholder="Minimum 6 caractères"
+        minlength="6"
         required
       >
 
@@ -214,6 +193,7 @@
         type="password"
         id="confirmation"
         placeholder="Répétez le mot de passe"
+        minlength="6"
         required
       >
 
@@ -232,11 +212,9 @@
 
     <div id="message"></div>
 
-    <a class="back" href="index.html">
-      ← RETOUR
-    </a>
+    <a href="index.html">← RETOUR</a>
 
-    <a class="login" href="connexion.html">
+    <a href="connexion.html">
       Déjà membre ? Se connecter
     </a>
 
@@ -247,570 +225,156 @@
 
   </div>
 
-
   <script>
-
-    // ==================================================
-    // CONFIGURATION SUPABASE
-    // ==================================================
-
     const SUPABASE_URL =
       "https://hbfbocrodyfydvikxbql.supabase.co";
 
     const SUPABASE_KEY =
       "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
 
+    const form = document.getElementById("signupForm");
+    const button = document.getElementById("signupButton");
+    const message = document.getElementById("message");
 
-    // ==================================================
-    // INITIALISATION SUPABASE
-    // ==================================================
+    function afficherMessage(texte, type) {
+      message.textContent = texte;
+      message.className = type;
+    }
 
-    let supabaseClient = null;
+    form.addEventListener("submit", async function(event) {
+      event.preventDefault();
 
-    try {
+      message.textContent = "";
+      message.className = "";
 
-      if (!window.supabase) {
-        throw new Error(
-          "La bibliothèque Supabase n'a pas été chargée."
+      if (
+        !window.supabase ||
+        typeof window.supabase.createClient !== "function"
+      ) {
+        afficherMessage(
+          "❌ La bibliothèque Supabase ne s'est pas chargée. Recharge la page.",
+          "error"
         );
+        return;
       }
 
-      supabaseClient =
-        window.supabase.createClient(
+      const nom = document.getElementById("nom").value.trim();
+      const telephone = document.getElementById("telephone").value.trim();
+      const ville = document.getElementById("ville").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const confirmation = document.getElementById("confirmation").value;
+      const role = document.getElementById("role").value;
+
+      if (!nom || !telephone || !ville || !email) {
+        afficherMessage(
+          "❌ Remplis tous les champs.",
+          "error"
+        );
+        return;
+      }
+
+      if (password.length < 6) {
+        afficherMessage(
+          "❌ Le mot de passe doit contenir au moins 6 caractères.",
+          "error"
+        );
+        return;
+      }
+
+      if (password !== confirmation) {
+        afficherMessage(
+          "❌ Les deux mots de passe ne sont pas identiques.",
+          "error"
+        );
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "CRÉATION EN COURS...";
+
+      try {
+        const supabaseClient = window.supabase.createClient(
           SUPABASE_URL,
           SUPABASE_KEY
         );
 
-    } catch (error) {
-
-      console.error(
-        "Erreur initialisation Supabase :",
-        error
-      );
-
-    }
-
-
-    // ==================================================
-    // ELEMENTS DE LA PAGE
-    // ==================================================
-
-    const form =
-      document.getElementById("signupForm");
-
-    const button =
-      document.getElementById("signupButton");
-
-    const message =
-      document.getElementById("message");
-
-
-    // ==================================================
-    // AFFICHER UN MESSAGE
-    // ==================================================
-
-    function afficherMessage(texte, type) {
-
-      message.textContent = texte;
-
-      message.className = "";
-
-      message.classList.add(type);
-
-    }
-
-
-    // ==================================================
-    // INSCRIPTION
-    // ==================================================
-
-    form.addEventListener(
-      "submit",
-      async function(event) {
-
-        event.preventDefault();
-
-
-        // Effacer ancien message
-        message.textContent = "";
-        message.className = "";
-
-
-        // Vérifier Supabase
-        if (!supabaseClient) {
-
-          afficherMessage(
-            "❌ Impossible de contacter Supabase. Recharge la page puis réessaie.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        // ==================================================
-        // RECUPERATION DES CHAMPS
-        // ==================================================
-
-        const nom =
-          document
-            .getElementById("nom")
-            .value
-            .trim();
-
-        const telephone =
-          document
-            .getElementById("telephone")
-            .value
-            .trim();
-
-        const ville =
-          document
-            .getElementById("ville")
-            .value
-            .trim();
-
-        const email =
-          document
-            .getElementById("email")
-            .value
-            .trim();
-
-        const password =
-          document
-            .getElementById("password")
-            .value;
-
-        const confirmation =
-          document
-            .getElementById("confirmation")
-            .value;
-
-        const role =
-          document
-            .getElementById("role")
-            .value;
-
-
-        // ==================================================
-        // VERIFICATIONS
-        // ==================================================
-
-        if (!nom) {
-
-          afficherMessage(
-            "❌ Entre ton nom complet.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        if (!telephone) {
-
-          afficherMessage(
-            "❌ Entre ton numéro de téléphone.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        if (!ville) {
-
-          afficherMessage(
-            "❌ Entre ta ville.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        if (!email) {
-
-          afficherMessage(
-            "❌ Entre ton adresse e-mail.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        if (password.length < 6) {
-
-          afficherMessage(
-            "❌ Le mot de passe doit contenir au moins 6 caractères.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        if (password !== confirmation) {
-
-          afficherMessage(
-            "❌ Les deux mots de passe ne sont pas identiques.",
-            "error"
-          );
-
-          return;
-        }
-
-
-        // ==================================================
-        // DESACTIVER LE BOUTON
-        // ==================================================
-
-        button.disabled = true;
-
-        button.textContent =
-          "Création en cours...";
-
-
-        try {
-
-          console.log(
-            "Début de l'inscription..."
-          );
-
-
-          // ==================================================
-          // CREATION DU COMPTE SUPABASE AUTH
-          // ==================================================
-
-          const {
-            data,
-            error
-          } =
-            await supabaseClient.auth.signUp({
-
-              email: email,
-
-              password: password,
-
-              options: {
-
-                data: {
-
-                  nom_complet: nom,
-
-                  telephone: telephone,
-
-                  ville: ville,
-
-                  role: role
-
-                }
-
+        const { data, error } =
+          await supabaseClient.auth.signUp({
+            email: email,
+            password: password,
+            options: {
+              data: {
+                nom_complet: nom,
+                telephone: telephone,
+                ville: ville,
+                role: role
               }
-
-            });
-
-
-          console.log(
-            "Réponse Supabase :",
-            data
-          );
-
-
-          // ==================================================
-          // ERREUR SUPABASE
-          // ==================================================
-
-          if (error) {
-
-            console.error(
-              "Erreur Supabase :",
-              error
-            );
-
-            throw error;
-
-          }
-
-
-          // ==================================================
-          // VERIFIER L'UTILISATEUR
-          // ==================================================
-
-          if (!data || !data.user) {
-
-            throw new Error(
-              "Supabase n'a pas retourné l'identifiant utilisateur."
-            );
-
-          }
-
-
-          const userId =
-            data.user.id;
-
-
-          console.log(
-            "Utilisateur créé :",
-            userId
-          );
-
-
-          // ==================================================
-          // SI UNE SESSION EST DISPONIBLE
-          // ==================================================
-
-          if (data.session) {
-
-            console.log(
-              "Session disponible. Création du profil..."
-            );
-
-
-            // ==================================================
-            // CREATION DU PROFIL BUSAF
-            // ==================================================
-
-            const {
-              error: profileError
-            } =
-              await supabaseClient
-                .from("profils_busaf")
-                .upsert(
-
-                  {
-
-                    user_id: userId,
-
-                    nom_complet: nom,
-
-                    telephone: telephone,
-
-                    Ville: ville,
-
-                    Role: role
-
-                  },
-
-                  {
-                    onConflict: "user_id"
-                  }
-
-                );
-
-
-            // ==================================================
-            // ERREUR PROFIL
-            // ==================================================
-
-            if (profileError) {
-
-              console.error(
-                "Erreur profil BuSAF :",
-                profileError
-              );
-
-
-              afficherMessage(
-
-                "⚠️ COMPTE CRÉÉ, MAIS LE PROFIL BuSAF N'A PAS PU ÊTRE ENREGISTRÉ. " +
-                "L'identifiant utilisateur est : " +
-                userId,
-
-                "error"
-
-              );
-
-
-              button.disabled = false;
-
-              button.textContent =
-                "CRÉER MON COMPTE";
-
-              return;
-
             }
+          });
 
-
-            // ==================================================
-            // SUCCES COMPLET
-            // ==================================================
-
-            console.log(
-              "Profil BuSAF créé avec succès."
-            );
-
-
-            afficherMessage(
-
-              "✅ COMPTE BuSAF CRÉÉ AVEC SUCCÈS ! " +
-              "Tu peux maintenant te connecter.",
-
-              "success"
-
-            );
-
-
-            button.textContent =
-              "Compte créé";
-
-
-            return;
-
-          }
-
-
-          // ==================================================
-          // PAS DE SESSION = CONFIRMATION E-MAIL
-          // ==================================================
-
-          afficherMessage(
-
-            "✅ COMPTE CRÉÉ ! " +
-            "Vérifie ton adresse e-mail pour confirmer ton compte, " +
-            "puis utilise la page Connexion.",
-
-            "success"
-
-          );
-
-
-          button.textContent =
-            "Compte créé";
-
-
-        } catch (error) {
-
-          console.error(
-            "ERREUR INSCRIPTION :",
-            error
-          );
-
-
-          let erreur =
-            error.message ||
-            "Erreur inconnue";
-
-
-          const erreurMinuscule =
-            erreur.toLowerCase();
-
-
-          // ==================================================
-          // EMAIL RATE LIMIT
-          // ==================================================
-
-          if (
-            erreurMinuscule.includes(
-              "rate limit"
-            ) ||
-            erreurMinuscule.includes(
-              "email rate limit"
-            )
-          ) {
-
-            erreur =
-              "Supabase limite actuellement les inscriptions par e-mail. " +
-              "Attends quelques minutes avant de refaire un essai.";
-
-          }
-
-
-          // ==================================================
-          // EMAIL DEJA UTILISE
-          // ==================================================
-
-          else if (
-            erreurMinuscule.includes(
-              "user already registered"
-            )
-          ) {
-
-            erreur =
-              "Cette adresse e-mail possède déjà un compte. " +
-              "Utilise la page Connexion.";
-
-          }
-
-
-          // ==================================================
-          // MOT DE PASSE
-          // ==================================================
-
-          else if (
-            erreurMinuscule.includes(
-              "password"
-            )
-          ) {
-
-            erreur =
-              "Le mot de passe n'est pas accepté. " +
-              "Utilise au moins 6 caractères.";
-
-          }
-
-
-          // ==================================================
-          // EMAIL INVALIDE
-          // ==================================================
-
-          else if (
-            erreurMinuscule.includes(
-              "invalid email"
-            )
-          ) {
-
-            erreur =
-              "L'adresse e-mail n'est pas valide.";
-
-          }
-
-
-          // ==================================================
-          // ERREUR RLS / PROFIL
-          // ==================================================
-
-          else if (
-            erreurMinuscule.includes(
-              "row-level security"
-            ) ||
-            erreurMinuscule.includes(
-              "permission denied"
-            )
-          ) {
-
-            erreur =
-              "Le compte a été créé, mais Supabase bloque l'enregistrement du profil. " +
-              "La sécurité de la table profils_busaf doit être configurée.";
-
-          }
-
-
-          // ==================================================
-          // AFFICHER L'ERREUR
-          // ==================================================
-
-          afficherMessage(
-
-            "❌ INSCRIPTION REFUSÉE : " +
-            erreur,
-
-            "error"
-
-          );
-
-
-          button.disabled = false;
-
-          button.textContent =
-            "CRÉER MON COMPTE";
-
+        if (error) {
+          throw error;
         }
 
-      }
-    );
+        if (!data || !data.user) {
+          throw new Error(
+            "Supabase n'a pas retourné l'utilisateur."
+          );
+        }
 
+        if (data.session) {
+          afficherMessage(
+            "✅ COMPTE BuSAF CRÉÉ AVEC SUCCÈS ! Tu peux maintenant te connecter.",
+            "success"
+          );
+        } else {
+          afficherMessage(
+            "✅ COMPTE CRÉÉ ! Vérifie ton adresse e-mail, puis connecte-toi.",
+            "success"
+          );
+        }
+
+        button.textContent = "COMPTE CRÉÉ";
+
+      } catch (error) {
+        console.error("Erreur inscription :", error);
+
+        let texte = error.message || "Erreur inconnue.";
+        const erreur = texte.toLowerCase();
+
+        if (
+          erreur.includes("already registered") ||
+          erreur.includes("user already exists")
+        ) {
+          texte =
+            "Cette adresse e-mail possède déjà un compte. Utilise Connexion.";
+        } else if (erreur.includes("invalid email")) {
+          texte = "L'adresse e-mail n'est pas valide.";
+        } else if (erreur.includes("password")) {
+          texte =
+            "Le mot de passe doit contenir au moins 6 caractères.";
+        } else if (erreur.includes("rate limit")) {
+          texte =
+            "Trop de tentatives. Attends quelques minutes puis réessaie.";
+        } else if (
+          erreur.includes("fetch") ||
+          erreur.includes("network") ||
+          erreur.includes("failed")
+        ) {
+          texte =
+            "Impossible de contacter Supabase. Vérifie Internet puis recharge la page.";
+        }
+
+        afficherMessage(
+          "❌ INSCRIPTION REFUSÉE : " + texte,
+          "error"
+        );
+
+        button.disabled = false;
+        button.textContent = "CRÉER MON COMPTE";
+      }
+    });
   </script>
 
 </body>
