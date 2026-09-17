@@ -496,18 +496,15 @@
                la réussite de la création
           */
 
-          signupForm.reset();
-
           /*
-            5. Retour vers la connexion
-          */
+  Le formulaire reste visible.
+  Le message de résultat reste affiché.
+*/
 
-          setTimeout(function() {
-
-            window.location.href =
-              "connexion.html";
-
-          }, 3500);
+signuif (signupButton.textContent !== "Compte créé") {
+  signupButton.disabled = false;
+  signupButton.textContent = "Créer mon compte";
+}
 
         } catch (erreur) {
 
