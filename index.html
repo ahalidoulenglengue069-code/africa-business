@@ -1,1 +1,1613 @@
 
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>BuSAF / Business Africain</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      background: #f2f6f3;
+      color: #183b2a;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #064e32, #0b8d53);
+      color: white;
+      padding: 22px 18px;
+      border-radius: 0 0 26px 26px;
+    }
+
+    header h1 {
+      font-size: 29px;
+      margin-bottom: 6px;
+    }
+
+    header p {
+      font-size: 14px;
+      opacity: .9;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 1000px;
+      margin: auto;
+      padding: 18px;
+    }
+
+    .page {
+      display: none;
+      animation: apparition .2s ease;
+    }
+
+    .page.active {
+      display: block;
+    }
+
+    @keyframes apparition {
+      from {
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .welcome,
+    .panel {
+      background: white;
+      border-radius: 22px;
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: 0 5px 18px rgba(0, 0, 0, .06);
+    }
+
+    h2 {
+      color: #075b38;
+      margin-bottom: 10px;
+      font-size: 23px;
+    }
+
+    h3 {
+      color: #075b38;
+      margin-bottom: 8px;
+    }
+
+    p {
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 13px;
+    }
+
+    .space {
+      background: white;
+      color: #183b2a;
+      border: 1px solid #e0eae3;
+      border-radius: 18px;
+      min-height: 125px;
+      padding: 16px 10px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: bold;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, .04);
+    }
+
+    .space span {
+      display: block;
+      font-size: 32px;
+      margin-bottom: 10px;
+    }
+
+    .space:active {
+      transform: scale(.98);
+    }
+
+    .space:hover {
+      background: #eaf6ee;
+    }
+
+    .btn {
+      display: inline-block;
+      border: none;
+      border-radius: 11px;
+      background: #087443;
+      color: white;
+      padding: 12px 17px;
+      margin-top: 12px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .btn.secondary {
+      background: #69766f;
+    }
+
+    .btn.warning {
+      background: #b87908;
+    }
+
+    .btn.danger {
+      background: #b42b2b;
+    }
+
+    .btn:active {
+      transform: scale(.98);
+    }
+
+    .back {
+      margin-bottom: 15px;
+    }
+
+    .info {
+      background: #eaf6ee;
+      border-left: 4px solid #087443;
+      padding: 13px;
+      border-radius: 10px;
+      margin-top: 12px;
+    }
+
+    .notice {
+      display: none;
+      padding: 12px;
+      border-radius: 10px;
+      margin-top: 12px;
+      background: #eaf6ee;
+      color: #075b38;
+      line-height: 1.5;
+    }
+
+    .notice.show {
+      display: block;
+    }
+
+    input,
+    textarea,
+    select {
+      width: 100%;
+      padding: 13px;
+      margin-top: 8px;
+      border: 1px solid #cbdacf;
+      border-radius: 10px;
+      background: white;
+      font-size: 15px;
+      outline: none;
+    }
+
+    input:focus,
+    textarea:focus,
+    select:focus {
+      border-color: #087443;
+    }
+
+    label {
+      display: block;
+      margin-top: 12px;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    .product {
+      border: 1px solid #dce8df;
+      border-radius: 15px;
+      padding: 15px;
+      margin-top: 12px;
+      background: #fbfdfb;
+    }
+
+    .product .price {
+      color: #b87908;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .line {
+      height: 1px;
+      background: #e1e9e3;
+      margin: 18px 0;
+    }
+
+    .stat {
+      background: #f0f7f2;
+      border-radius: 14px;
+      padding: 15px;
+      margin-top: 10px;
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 22px;
+      color: #087443;
+      margin-top: 5px;
+    }
+
+    .meeting-controls {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 15px;
+    }
+
+    .meeting-controls button {
+      margin-top: 0;
+    }
+
+    video {
+      width: 100%;
+      max-height: 300px;
+      background: #14251c;
+      border-radius: 15px;
+      margin-top: 15px;
+      display: none;
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px 12px;
+      color: #718077;
+      font-size: 13px;
+    }
+
+    @media (min-width: 650px) {
+      .grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <h1>🌍 BuSAF</h1>
+  <p>Business Africain</p>
+</header>
+
+<main class="container">
+
+  <!-- ACCUEIL -->
+  <section id="accueil" class="page active">
+
+    <div class="welcome">
+      <h2>Bienvenue sur BuSAF</h2>
+
+      <p>
+        Une plateforme africaine pour découvrir des produits,
+        développer une activité et participer à un réseau d’affaires.
+      </p>
+
+      <div class="info">
+        Bienvenue sur BuSAF / Business Africain.
+        Découvrez les espaces, les produits, les boutiques,
+        les avantages et les règles du programme.
+      </div>
+    </div>
+
+    <div class="grid">
+
+      <button class="space" onclick="ouvrir('marche')">
+        <span>🛒</span>
+        Marché BuSAF
+      </button>
+
+      <button class="space" onclick="ouvrir('boutique')">
+        <span>🏪</span>
+        Ma Boutique
+      </button>
+
+      <button class="space" onclick="ouvrir('invites')">
+        <span>👥</span>
+        Mes Invités
+      </button>
+
+      <button class="space" onclick="ouvrir('commandes')">
+        <span>📦</span>
+        Mes Commandes
+      </button>
+
+      <button class="space" onclick="ouvrir('compte')">
+        <span>💼</span>
+        Mon Compte
+      </button>
+
+      <button class="space" onclick="ouvrir('benefices')">
+        <span>💰</span>
+        Mes Bénéfices
+      </button>
+
+      <button class="space" onclick="ouvrir('commissions')">
+        <span>🤝</span>
+        Mes Commissions
+      </button>
+
+      <button class="space" onclick="ouvrir('progression')">
+        <span>⭐</span>
+        Progression Partner
+      </button>
+
+      <button class="space" onclick="ouvrir('avantages')">
+        <span>🎁</span>
+        Avantages des membres
+      </button>
+
+      <button class="space" onclick="ouvrir('reunions')">
+        <span>🎥</span>
+        Réunions
+      </button>
+
+      <button class="space" onclick="ouvrir('conditions')">
+        <span>📜</span>
+        Conditions et règles
+      </button>
+
+      <button class="space" onclick="ouvrir('connexion')">
+        <span>🔐</span>
+        Connexion
+      </button>
+
+    </div>
+
+        </section>
+          <!-- MARCHÉ BUSAF -->
+  <section id="marche" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🛒 Marché BuSAF</h2>
+
+      <p>
+        Le Marché BuSAF contient les produits du marché.
+        Les produits du marché sont séparés des produits
+        des boutiques personnelles.
+      </p>
+
+      <div class="product">
+        <h3>📱 Formation Business Africain</h3>
+
+        <p>
+          Formation numérique pour développer une activité.
+        </p>
+
+        <p class="price">7 000 FCFA</p>
+
+        <button class="btn" onclick="acheterProduit('Formation Business Africain', 7000)">
+          Acheter le produit
+        </button>
+      </div>
+
+      <div class="product">
+        <h3>💼 Formation Vente et Marketing</h3>
+
+        <p>
+          Apprentissage des techniques de vente.
+        </p>
+
+        <p class="price">5 000 FCFA</p>
+
+        <button class="btn" onclick="acheterProduit('Formation Vente et Marketing', 5000)">
+          Acheter le produit
+        </button>
+      </div>
+
+      <div class="product">
+        <h3>🎓 Formation Création de Boutique</h3>
+
+        <p>
+          Guide pour préparer une boutique personnelle.
+        </p>
+
+        <p class="price">3 000 FCFA</p>
+
+        <button class="btn" onclick="acheterProduit('Formation Création de Boutique', 3000)">
+          Acheter le produit
+        </button>
+      </div>
+
+      <div id="messageMarche" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- BOUTIQUE PERSONNELLE -->
+  <section id="boutique" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🏪 Ma Boutique</h2>
+
+      <p>
+        Votre boutique personnelle servira à vendre vos propres
+        produits, services, formations ou autres offres.
+      </p>
+
+      <div class="stat">
+        Frais d’ouverture de la boutique
+        <strong>1 800 FCFA</strong>
+      </div>
+
+      <div class="stat">
+        Part BuSAF sur une vente personnelle
+        <strong>5,5 %</strong>
+      </div>
+
+      <button class="btn" onclick="ouvrir('creationBoutique')">
+        Créer ma boutique
+      </button>
+
+      <div id="messageBoutique" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- CRÉATION BOUTIQUE -->
+  <section id="creationBoutique" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🏪 Créer ma boutique personnelle</h2>
+
+      <p>
+        Préparez les informations de votre boutique.
+      </p>
+
+      <label>Nom de la boutique</label>
+      <input
+        id="nomBoutique"
+        type="text"
+        placeholder="Nom de votre boutique"
+      >
+
+      <label>Description</label>
+      <textarea
+        id="descriptionBoutique"
+        rows="4"
+        placeholder="Présentez votre boutique"
+      ></textarea>
+
+      <label>Type de boutique</label>
+      <select id="typeBoutique">
+        <option value="">Choisir le type</option>
+        <option value="Produits physiques">Produits physiques</option>
+        <option value="Produits numériques">Produits numériques</option>
+        <option value="Services">Services</option>
+        <option value="Formations">Formations</option>
+        <option value="Alimentation">Alimentation</option>
+      </select>
+
+      <button class="btn" onclick="enregistrerBoutique()">
+        Enregistrer ma boutique
+      </button>
+
+      <div id="messageCreationBoutique" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- INVITÉS -->
+  <section id="invites" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>👥 Mes Invités</h2>
+
+      <p>
+        Les membres invités seront affichés dans cet espace.
+      </p>
+
+      <div class="info">
+        Un membre doit avoir acheté au moins un produit
+        du Marché BuSAF avant de pouvoir inviter une autre personne.
+      </div>
+
+      <button class="btn" onclick="ouvrir('nouvelleInvitation')">
+        Ajouter une invitation
+      </button>
+
+      <div id="messageInvites" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- NOUVELLE INVITATION -->
+  <section id="nouvelleInvitation" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>👥 Ajouter une invitation</h2>
+
+      <label>Nom complet de la personne</label>
+      <input
+        id="nomInvite"
+        type="text"
+        placeholder="Nom complet"
+      >
+
+      <label>Email de la personne</label>
+      <input
+        id="emailInvite"
+        type="email"
+        placeholder="Email"
+      >
+
+      <label>Téléphone de la personne</label>
+      <input
+        id="telephoneInvite"
+        type="tel"
+        placeholder="Téléphone"
+      >
+
+      <button class="btn" onclick="ajouterInvitation()">
+        Enregistrer l’invitation
+      </button>
+
+      <div id="messageNouvelleInvitation" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- COMMANDES -->
+  <section id="commandes" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>📦 Mes Commandes</h2>
+
+      <p>
+        Vos commandes du Marché BuSAF et de vos boutiques
+        personnelles seront séparées ici.
+      </p>
+
+      <div class="stat">
+        Commandes du Marché BuSAF
+        <strong id="nombreCommandesMarche">0</strong>
+      </div>
+
+      <div class="stat">
+        Commandes de boutique personnelle
+        <strong id="nombreCommandesBoutique">0</strong>
+      </div>
+
+      <div id="listeCommandes"></div>
+
+    </div>
+  </section>
+
+
+  <!-- COMPTE -->
+  <section id="compte" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>💼 Mon Compte</h2>
+
+      <p>
+        Gérez ici vos informations personnelles.
+      </p>
+
+      <label>Nom complet</label>
+      <input
+        id="nomCompte"
+        type="text"
+        placeholder="Votre nom complet"
+      >
+
+      <label>Téléphone</label>
+      <input
+        id="telephoneCompte"
+        type="tel"
+        placeholder="Votre numéro"
+      >
+
+      <label>Ville</label>
+      <input
+        id="villeCompte"
+        type="text"
+        placeholder="Votre ville"
+      >
+
+      <button class="btn" onclick="sauverCompte()">
+        Enregistrer
+      </button>
+
+      <div id="messageCompte" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- BÉNÉFICES -->
+  <section id="benefices" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>💰 Mes Bénéfices</h2>
+
+      <div class="stat">
+        Bénéfices du Marché BuSAF
+        <strong id="beneficeMarche">0 FCFA</strong>
+      </div>
+
+      <div class="stat">
+        Bénéfices de ma boutique personnelle
+        <strong id="beneficeBoutique">0 FCFA</strong>
+      </div>
+
+      <div class="info">
+        Les bénéfices seront calculés séparément :
+        Marché BuSAF d’un côté et boutique personnelle de l’autre.
+      </div>
+
+    </div>
+  </section>
+    <!-- COMMISSIONS -->
+  <section id="commissions" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🤝 Mes Commissions</h2>
+
+      <div class="stat">
+        Commissions directes
+        <strong id="commissionDirecte">0 FCFA</strong>
+      </div>
+
+      <p>
+        Les commissions concernent uniquement les ventes autorisées
+        du Marché BuSAF.
+      </p>
+
+      <div class="info">
+        Les commissions des parrains ne sont pas visibles par le vendeur.
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- PROGRESSION PARTNER -->
+  <section id="progression" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>⭐ Progression Partner</h2>
+
+      <div class="stat">
+        Ventes du mois
+        <strong id="ventesMois">0 / 10</strong>
+      </div>
+
+      <div class="stat">
+        Prochain palier
+        <strong>10 ventes dans un seul mois</strong>
+      </div>
+
+      <p>
+        Le statut Partner est obtenu après 10 ventes de produits
+        du Marché BuSAF dans un seul mois.
+      </p>
+
+      <div class="info">
+        Les ventes des boutiques personnelles ne comptent pas
+        pour la progression Partner.
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- AVANTAGES DES MEMBRES -->
+  <section id="avantages" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🎁 Avantages des membres</h2>
+
+      <div class="product">
+
+        <h3>Bonus de 5 ventes dans la même journée</h3>
+
+        <p>
+          Un bonus spécial de 6 000 FCFA est prévu lorsqu’un membre
+          réalise 5 ventes confirmées du Marché BuSAF dans la même journée.
+        </p>
+
+      </div>
+
+      <div class="product">
+
+        <h3>Bonus de chaque palier de 100 ventes</h3>
+
+        <p>
+          Un bonus exceptionnel de 40 000 FCFA est prévu à chaque palier
+          de 100 ventes atteint : 100, 200, 300 ventes, etc.
+        </p>
+
+      </div>
+
+      <div class="info">
+        Les bonus sont soumis aux conditions et à la validation
+        du programme BuSAF.
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- RÉUNIONS -->
+  <section id="reunions" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🎥 Réunions BuSAF</h2>
+
+      <p>
+        Les commandes de caméra et de microphone sont séparées.
+        Cette page permet de tester les autorisations de l’appareil.
+      </p>
+
+      <div class="meeting-controls">
+
+        <button class="btn" onclick="activerCamera()">
+          📷 Caméra ON
+        </button>
+
+        <button class="btn danger" onclick="desactiverCamera()">
+          📷 Caméra OFF
+        </button>
+
+        <button class="btn" onclick="activerMicro()">
+          🎙️ Micro ON
+        </button>
+
+        <button class="btn danger" onclick="desactiverMicro()">
+          🎙️ Micro OFF
+        </button>
+
+      </div>
+
+      <video
+        id="video"
+        autoplay
+        muted
+        playsinline>
+      </video>
+
+      <div id="messageReunion" class="notice"></div>
+
+      <div class="line"></div>
+
+      <h3>Types de réunions</h3>
+
+      <button class="btn" onclick="ouvrir('reunionGenerale')">
+        Réunion générale
+      </button>
+
+      <button class="btn" onclick="ouvrir('reunionNouveaux')">
+        Nouveaux membres
+      </button>
+
+      <button class="btn" onclick="ouvrir('reunionPartenaires')">
+        Membres Partner
+      </button>
+
+      <button class="btn" onclick="ouvrir('reunionPersonnelle')">
+        Réunion personnelle
+      </button>
+
+    </div>
+  </section>
+
+
+  <!-- RÉUNION GÉNÉRALE -->
+  <section id="reunionGenerale" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🎥 Réunion générale</h2>
+
+      <p>
+        La réunion générale est convoquée uniquement par le fondateur.
+      </p>
+
+      <button
+        class="btn"
+        onclick="message(
+          'messageGenerale',
+          'La convocation générale sera réservée au compte Fondateur après connexion Supabase.'
+        )">
+
+        Convoquer la réunion
+
+      </button>
+
+      <div id="messageGenerale" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- RÉUNION DES NOUVEAUX MEMBRES -->
+  <section id="reunionNouveaux" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>👥 Réunion des nouveaux membres</h2>
+
+      <p>
+        Cet espace est réservé aux nouveaux membres de BuSAF.
+      </p>
+
+      <div class="info">
+        Les informations et réunions seront gérées avec Supabase.
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- RÉUNION DES PARTNERS -->
+  <section id="reunionPartenaires" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>⭐ Réunion des membres Partner</h2>
+
+      <p>
+        Cet espace est réservé aux membres ayant atteint
+        le statut Partner.
+      </p>
+
+      <div class="info">
+        L’accès réel sera contrôlé par le statut du membre.
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- RÉUNION PERSONNELLE -->
+  <section id="reunionPersonnelle" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🤝 Réunion personnelle</h2>
+
+      <p>
+        Cet espace permettra de réunir ses invités et les clients
+        de sa boutique personnelle.
+      </p>
+
+      <label>Nom de la réunion</label>
+
+      <input
+        id="nomReunionPersonnelle"
+        type="text"
+        placeholder="Nom de la réunion">
+
+      <label>Description</label>
+
+      <textarea
+        id="descriptionReunionPersonnelle"
+        rows="4"
+        placeholder="Présentez la réunion">
+      </textarea>
+
+      <button class="btn" onclick="creerReunionPersonnelle()">
+        Préparer la réunion
+      </button>
+
+      <div id="messageReunionPersonnelle" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- CONDITIONS ET RÈGLES -->
+  <section id="conditions" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>📜 Conditions et règles BuSAF</h2>
+
+      <p>
+        <strong>1.</strong>
+        L’inscription et la participation se font selon les conditions
+        du programme BuSAF.
+      </p>
+
+      <p>
+        <strong>2.</strong>
+        Un membre doit acheter au moins un produit du Marché BuSAF
+        avant de pouvoir inviter une autre personne.
+      </p>
+
+      <p>
+        <strong>3.</strong>
+        Les produits du Marché BuSAF sont séparés des produits
+        des boutiques personnelles.
+      </p>
+
+      <p>
+        <strong>4.</strong>
+        Le Compte Marché et le Compte Boutique sont séparés.
+      </p>
+
+      <p>
+        <strong>5.</strong>
+        Le Stock BuSAF et le Stock Boutique personnelle
+        ne doivent jamais être mélangés.
+      </p>
+
+      <p>
+        <strong>6.</strong>
+        Les ventes personnelles ne comptent pas comme ventes
+        du Marché BuSAF.
+      </p>
+
+      <p>
+        <strong>7.</strong>
+        Les commissions directes concernent uniquement
+        les ventes autorisées du Marché BuSAF.
+      </p>
+
+      <p>
+        <strong>8.</strong>
+        Les données personnelles des membres doivent rester privées.
+      </p>
+
+      <p>
+        <strong>9.</strong>
+        Les frais d’ouverture d’une boutique personnelle sont de
+        1 800 FCFA.
+      </p>
+
+      <p>
+        <strong>10.</strong>
+        La part BuSAF sur une vente personnelle est de 5,5 %.
+      </p>
+
+      <div class="info">
+        Les règles définitives du programme doivent être validées
+        par le fondateur avant l’ouverture officielle.
+      </div>
+
+    </div>
+  </section>
+
+
+  <!-- CONNEXION -->
+  <section id="connexion" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>🔐 Connexion BuSAF</h2>
+
+      <label>Email</label>
+
+      <input
+        type="email"
+        id="emailConnexion"
+        placeholder="Votre email"
+        autocomplete="email">
+
+      <label>Mot de passe</label>
+
+      <input
+        type="password"
+        id="passwordConnexion"
+        placeholder="Votre mot de passe"
+        autocomplete="current-password">
+
+      <button class="btn" onclick="connexionDemo()">
+        Se connecter
+      </button>
+
+      <button class="btn secondary" onclick="ouvrir('inscription')">
+        Créer un compte
+      </button>
+
+      <div id="messageConnexion" class="notice"></div>
+
+    </div>
+  </section>
+
+
+  <!-- INSCRIPTION -->
+  <section id="inscription" class="page">
+
+    <button class="btn secondary back" onclick="retour()">
+      ← Retour
+    </button>
+
+    <div class="panel">
+
+      <h2>📝 Inscription BuSAF</h2>
+
+      <label>Nom complet</label>
+
+      <input
+        id="nomInscription"
+        type="text"
+        placeholder="Nom complet">
+
+      <label>Email</label>
+
+      <input
+        type="email"
+        id="emailInscription"
+        placeholder="Adresse email"
+        autocomplete="email">
+
+      <label>Téléphone</label>
+
+      <input
+        id="telephoneInscription"
+        type="tel"
+        placeholder="Téléphone">
+
+      <label>Ville</label>
+
+      <input
+        id="villeInscription"
+        type="text"
+        placeholder="Ville">
+
+      <label>Mot de passe</label>
+
+      <input
+        id="passwordInscription"
+        type="password"
+        placeholder="Mot de passe"
+        autocomplete="new-password">
+
+      <button class="btn" onclick="inscriptionDemo()">
+        Créer mon compte
+      </button>
+
+      <div id="messageInscription" class="notice"></div>
+
+    </div>
+  </section></main>
+
+<footer>
+  BuSAF / Business Africain
+</footer>
+
+<script>
+  let pageActuelle = "accueil";
+  let historique = [];
+
+  let cameraStream = null;
+  let microStream = null;
+
+  let commandes = [];
+  let invitations = [];
+  let boutique = null;
+
+  function ouvrir(id) {
+    const anciennePage = document.getElementById(pageActuelle);
+    const nouvellePage = document.getElementById(id);
+
+    if (!nouvellePage) {
+      alert("Cette espace n'existe pas encore.");
+      return;
+    }
+
+    if (pageActuelle !== id) {
+      historique.push(pageActuelle);
+    }
+
+    if (anciennePage) {
+      anciennePage.classList.remove("active");
+    }
+
+    nouvellePage.classList.add("active");
+    pageActuelle = id;
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function retour() {
+    const precedente = historique.pop();
+
+    if (!precedente) {
+      ouvrirAccueilDirectement();
+      return;
+    }
+
+    const pageActuelleElement = document.getElementById(pageActuelle);
+    const pagePrecedenteElement = document.getElementById(precedente);
+
+    if (pageActuelleElement) {
+      pageActuelleElement.classList.remove("active");
+    }
+
+    if (pagePrecedenteElement) {
+      pagePrecedenteElement.classList.add("active");
+    }
+
+    pageActuelle = precedente;
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function ouvrirAccueilDirectement() {
+    document.querySelectorAll(".page").forEach(function(page) {
+      page.classList.remove("active");
+    });
+
+    const accueil = document.getElementById("accueil");
+
+    if (accueil) {
+      accueil.classList.add("active");
+    }
+
+    pageActuelle = "accueil";
+    historique = [];
+
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+  }
+
+  function message(id, texte) {
+    const element = document.getElementById(id);
+
+    if (!element) {
+      return;
+    }
+
+    element.textContent = texte;
+    element.classList.add("show");
+  }
+
+  function acheterProduit(nomProduit, prixProduit) {
+    const confirmation = confirm(
+      "Voulez-vous acheter : " +
+      nomProduit +
+      " pour " +
+      prixProduit.toLocaleString("fr-FR") +
+      " FCFA ?"
+    );
+
+    if (!confirmation) {
+      return;
+    }
+
+    commandes.push({
+      id: Date.now(),
+      nom: nomProduit,
+      prix: prixProduit,
+      type: "Marché BuSAF",
+      date: new Date().toLocaleString("fr-FR")
+    });
+
+    afficherCommandes();
+
+    message(
+      "messageMarche",
+      "Commande enregistrée dans cette version de test. " +
+      "Le paiement réel sera connecté avec Supabase."
+    );
+  }
+
+  function afficherCommandes() {
+    const liste = document.getElementById("listeCommandes");
+    const nombreMarche = document.getElementById("nombreCommandesMarche");
+    const nombreBoutique = document.getElementById("nombreCommandesBoutique");
+
+    if (nombreMarche) {
+      nombreMarche.textContent = commandes.filter(function(commande) {
+        return commande.type === "Marché BuSAF";
+      }).length;
+    }
+
+    if (nombreBoutique) {
+      nombreBoutique.textContent = commandes.filter(function(commande) {
+        return commande.type === "Boutique personnelle";
+      }).length;
+    }
+
+    if (!liste) {
+      return;
+    }
+
+    liste.innerHTML = "";
+
+    if (commandes.length === 0) {
+      liste.innerHTML =
+        '<div class="info">Aucune commande enregistrée.</div>';
+      return;
+    }
+
+    commandes.forEach(function(commande) {
+      const bloc = document.createElement("div");
+
+      bloc.className = "product";
+
+      bloc.innerHTML =
+        "<h3>📦 " + commande.nom + "</h3>" +
+        "<p>Type : " + commande.type + "</p>" +
+        "<p>Prix : " +
+        commande.prix.toLocaleString("fr-FR") +
+        " FCFA</p>" +
+        "<p>Date : " + commande.date + "</p>";
+
+      liste.appendChild(bloc);
+    });
+  }
+
+  function enregistrerBoutique() {
+    const nom = document.getElementById("nomBoutique").value.trim();
+    const description = document.getElementById("descriptionBoutique").value.trim();
+    const type = document.getElementById("typeBoutique").value;
+
+    if (!nom || !description || !type) {
+      message(
+        "messageCreationBoutique",
+        "Veuillez remplir tous les champs de la boutique."
+      );
+      return;
+    }
+
+    boutique = {
+      nom: nom,
+      description: description,
+      type: type,
+      fraisOuverture: 1800,
+      partBuSAF: 5.5
+    };
+
+    message(
+      "messageCreationBoutique",
+      "Votre boutique a été préparée dans cette version de test. " +
+      "La création réelle sera enregistrée dans Supabase."
+    );
+  }
+
+  function ajouterInvitation() {
+    const nom = document.getElementById("nomInvite").value.trim();
+    const email = document.getElementById("emailInvite").value.trim();
+    const telephone = document.getElementById("telephoneInvite").value.trim();
+
+    if (!nom || !email || !telephone) {
+      message(
+        "messageNouvelleInvitation",
+        "Veuillez remplir tous les champs de l'invitation."
+      );
+      return;
+    }
+
+    invitations.push({
+      nom: nom,
+      email: email,
+      telephone: telephone,
+      date: new Date().toLocaleString("fr-FR")
+    });
+
+    message(
+      "messageNouvelleInvitation",
+      "Invitation préparée dans cette version de test. " +
+      "L'envoi réel sera connecté avec Supabase."
+    );
+
+    document.getElementById("nomInvite").value = "";
+    document.getElementById("emailInvite").value = "";
+    document.getElementById("telephoneInvite").value = "";
+  }
+
+  function sauverCompte() {
+    const nom = document.getElementById("nomCompte").value.trim();
+    const telephone = document.getElementById("telephoneCompte").value.trim();
+    const ville = document.getElementById("villeCompte").value.trim();
+
+    if (!nom || !telephone || !ville) {
+      message(
+        "messageCompte",
+        "Veuillez remplir votre nom, votre téléphone et votre ville."
+      );
+      return;
+    }
+
+    message(
+      "messageCompte",
+      "Informations préparées. Elles seront enregistrées dans Supabase " +
+      "lorsque la connexion réelle sera activée."
+    );
+  }
+
+  function connexionDemo() {
+    const email = document.getElementById("emailConnexion").value.trim();
+    const password = document.getElementById("passwordConnexion").value;
+
+    if (!email || !password) {
+      message(
+        "messageConnexion",
+        "Veuillez entrer votre email et votre mot de passe."
+      );
+      return;
+    }
+
+    message(
+      "messageConnexion",
+      "Cette version est encore une démonstration. " +
+      "La connexion réelle sera branchée à Supabase."
+    );
+  }
+
+  function inscriptionDemo() {
+    const nom = document.getElementById("nomInscription").value.trim();
+    const email = document.getElementById("emailInscription").value.trim();
+    const telephone = document.getElementById("telephoneInscription").value.trim();
+    const ville = document.getElementById("villeInscription").value.trim();
+    const password = document.getElementById("passwordInscription").value;
+
+    if (!nom || !email || !telephone || !ville || !password) {
+      message(
+        "messageInscription",
+        "Veuillez remplir tous les champs."
+      );
+      return;
+    }
+
+    if (password.length < 6) {
+      message(
+        "messageInscription",
+        "Le mot de passe doit contenir au moins 6 caractères."
+      );
+      return;
+    }
+
+    message(
+      "messageInscription",
+      "Inscription préparée dans cette version de test. " +
+      "La création réelle du compte sera connectée à Supabase."
+    );
+  }
+
+  async function activerCamera() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        message(
+          "messageReunion",
+          "La caméra n'est pas disponible dans ce navigateur."
+        );
+        return;
+      }
+
+      if (cameraStream) {
+        message(
+          "messageReunion",
+          "La caméra est déjà activée."
+        );
+        return;
+      }
+
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false
+      });
+
+      const video = document.getElementById("video");
+
+      video.srcObject = cameraStream;
+      video.style.display = "block";
+
+      message(
+        "messageReunion",
+        "Caméra activée."
+      );
+
+    } catch (erreur) {
+      message(
+        "messageReunion",
+        "Autorisation de caméra refusée ou caméra indisponible."
+      );
+    }
+  }
+
+  function desactiverCamera() {
+    if (cameraStream) {
+      cameraStream.getVideoTracks().forEach(function(track) {
+        track.stop();
+      });
+
+      cameraStream = null;
+    }
+
+    const video = document.getElementById("video");
+
+    if (video) {
+      video.srcObject = null;
+      video.style.display = "none";
+    }
+
+    message(
+      "messageReunion",
+      "Caméra désactivée."
+    );
+  }
+
+  async function activerMicro() {
+    try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        message(
+          "messageReunion",
+          "Le microphone n'est pas disponible dans ce navigateur."
+        );
+        return;
+      }
+
+      if (microStream) {
+        message(
+          "messageReunion",
+          "Le microphone est déjà activé."
+        );
+        return;
+      }
+
+      microStream = await navigator.mediaDevices.getUserMedia({
+        video: false,
+        audio: true
+      });
+
+      message(
+        "messageReunion",
+        "Microphone activé."
+      );
+
+    } catch (erreur) {
+      message(
+        "messageReunion",
+        "Autorisation du microphone refusée ou microphone indisponible."
+      );
+    }
+  }
+
+  function desactiverMicro() {
+    if (microStream) {
+      microStream.getAudioTracks().forEach(function(track) {
+        track.stop();
+      });
+
+      microStream = null;
+    }
+
+    message(
+      "messageReunion",
+      "Microphone désactivé."
+    );
+  }
+
+  function creerReunionPersonnelle() {
+    const nom = document
+      .getElementById("nomReunionPersonnelle")
+      .value
+      .trim();
+
+    const description = document
+      .getElementById("descriptionReunionPersonnelle")
+      .value
+      .trim();
+
+    if (!nom || !description) {
+      message(
+        "messageReunionPersonnelle",
+        "Veuillez remplir le nom et la description de la réunion."
+      );
+      return;
+    }
+
+    message(
+      "messageReunionPersonnelle",
+      "Réunion personnelle préparée dans cette version de test. " +
+      "La création réelle sera connectée à Supabase."
+    );
+  }
+
+  afficherCommandes();
+</script>
+
+</body>
+</html>
