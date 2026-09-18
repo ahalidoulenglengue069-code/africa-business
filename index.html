@@ -1,409 +1,591 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>Inscription - BuSAF</title>
+<title>BuSAF - Business Africain</title>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
 
-  <style>
-    * {
-      box-sizing: border-box;
-    }
+body {
+  background: #f1f5f9;
+  color: #172033;
+  min-height: 100vh;
+}
 
-    body {
-      margin: 0;
-      padding: 20px 0;
-      font-family: Arial, sans-serif;
-      background: #f4f7f6;
-      color: #222;
-    }
+header {
+  background: linear-gradient(135deg, #064e3b, #16a34a);
+  color: white;
+  padding: 22px 15px;
+  text-align: center;
+}
 
-    .container {
-      width: 92%;
-      max-width: 500px;
-      margin: 20px auto;
-      padding: 25px;
-      background: white;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.10);
-    }
+header h1 {
+  font-size: 28px;
+}
 
-    .logo {
-      text-align: center;
-      font-size: 30px;
-      font-weight: bold;
-    }
+header p {
+  margin-top: 6px;
+}
 
-    .subtitle {
-      margin-top: 5px;
-      margin-bottom: 25px;
-      text-align: center;
-      color: #555;
-    }
+main {
+  max-width: 1100px;
+  margin: auto;
+  padding: 15px;
+  padding-bottom: 95px;
+}
 
-    h1 {
-      margin-bottom: 10px;
-      text-align: center;
-      font-size: 24px;
-    }
+.page {
+  display: none;
+}
 
-    .description {
-      margin-bottom: 25px;
-      color: #666;
-      text-align: center;
-      line-height: 1.5;
-    }
+.page.active {
+  display: block;
+}
 
-    label {
-      display: block;
-      margin-top: 15px;
-      margin-bottom: 6px;
-      font-weight: bold;
-    }
+.hero,
+.panel,
+.card,
+.product {
+  background: white;
+  border-radius: 17px;
+  box-shadow: 0 3px 12px #00000012;
+}
 
-    input,
-    select {
-      width: 100%;
-      padding: 14px;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: white;
-      font-size: 16px;
-    }
+.hero {
+  text-align: center;
+  padding: 25px 17px;
+  margin-bottom: 18px;
+}
 
-    input:focus,
-    select:focus {
-      outline: none;
-      border-color: #198754;
-    }
+.hero h2,
+.panel h3 {
+  color: #047857;
+  margin-bottom: 12px;
+}
 
-    button {
-      width: 100%;
-      margin-top: 25px;
-      padding: 15px;
-      border: none;
-      border-radius: 8px;
-      background: #198754;
-      color: white;
-      font-size: 17px;
-      font-weight: bold;
-      cursor: pointer;
-    }
+.hero p,
+.panel p,
+.panel li {
+  line-height: 1.7;
+}
 
-    button:disabled {
-      background: #999;
-      cursor: not-allowed;
-    }
+.section-title {
+  color: #065f46;
+  font-size: 21px;
+  margin: 22px 0 12px;
+}
 
-    #message {
-      display: none;
-      margin-top: 20px;
-      padding: 15px;
-      border-radius: 8px;
-      text-align: center;
-      line-height: 1.5;
-      overflow-wrap: anywhere;
-    }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+  gap: 12px;
+}
 
-    #message.success {
-      display: block;
-      background: #d1e7dd;
-      color: #0f5132;
-    }
+.card {
+  border: none;
+  padding: 17px 10px;
+  min-height: 125px;
+  cursor: pointer;
+  text-align: center;
+}
 
-    #message.error {
-      display: block;
-      background: #f8d7da;
-      color: #842029;
-    }
+.card:active {
+  transform: scale(.97);
+}
 
-    .back,
-    .login {
-      display: block;
-      margin-top: 20px;
-      color: #198754;
-      text-align: center;
-      text-decoration: none;
-      font-weight: bold;
-    }
+.card .emoji {
+  display: block;
+  font-size: 34px;
+  margin-bottom: 9px;
+}
 
-    .footer {
-      margin-top: 25px;
-      color: #777;
-      text-align: center;
-      font-size: 13px;
-      line-height: 1.5;
-    }
-  </style>
+.card strong {
+  display: block;
+  color: #064e3b;
+}
+
+.card small {
+  display: block;
+  color: #64748b;
+  margin-top: 7px;
+  line-height: 1.4;
+}
+
+.panel {
+  padding: 20px;
+  margin-bottom: 15px;
+}
+
+.panel ul {
+  padding-left: 20px;
+}
+
+button,
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 13px;
+  margin-top: 9px;
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  font-size: 15px;
+}
+
+button {
+  background: #047857;
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button.secondary {
+  background: #475569;
+}
+
+button.warning {
+  background: #d97706;
+}
+
+button.danger {
+  background: #dc2626;
+}
+
+button.blue {
+  background: #2563eb;
+}
+
+.notice {
+  background: #fff7ed;
+  color: #9a3412;
+  padding: 13px;
+  border-radius: 12px;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+  padding: 13px;
+  border-radius: 12px;
+  margin-top: 12px;
+  line-height: 1.5;
+}
+
+.product {
+  padding: 17px;
+}
+
+.product h3 {
+  color: #065f46;
+  margin-bottom: 9px;
+}
+
+.price {
+  color: #16a34a;
+  font-weight: bold;
+  font-size: 20px;
+  margin-top: 10px;
+}
+
+.badge {
+  display: inline-block;
+  background: #dcfce7;
+  color: #166534;
+  border-radius: 20px;
+  padding: 7px 10px;
+  margin: 4px;
+  font-size: 12px;
+}
+
+.video-box {
+  background: #111827;
+  color: white;
+  border-radius: 16px;
+  padding: 18px;
+  margin-top: 15px;
+  text-align: center;
+}
+
+.video-box video {
+  width: 100%;
+  display: none;
+  background: black;
+  border-radius: 12px;
+  margin-top: 12px;
+}
+
+.meeting-buttons {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: white;
+  box-shadow: 0 -3px 15px #00000018;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  z-index: 50;
+}
+
+.bottom-nav button {
+  background: white;
+  color: #334155;
+  border-radius: 0;
+  font-size: 11px;
+  padding: 12px 3px;
+}
+
+.bottom-nav button.active {
+  background: #dcfce7;
+  color: #047857;
+}
+
+@media (min-width: 700px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+</style>
 </head>
 
 <body>
 
-  <div class="container">
+<header>
+  <h1>🌍 BuSAF</h1>
+  <p>Business Africain</p>
+</header>
 
-    <div class="logo">🌍 BuSAF</div>
+<main>
 
-    <div class="subtitle">
-      Business Africain
+<section id="accueil" class="page active">
+
+  <div class="hero">
+    <h2>Bienvenue sur BuSAF</h2>
+
+    <p>
+      Découvrez le Marché BuSAF, les produits, les bénéfices,
+      les commissions, les avantages, les conditions et les règles.
+    </p>
+
+    <div>
+      <span class="badge">Marché BuSAF</span>
+      <span class="badge">Boutiques</span>
+      <span class="badge">Réunions</span>
+      <span class="badge">Avantages</span>
     </div>
+  </div>
 
-    <h1>Créer mon compte</h1>
+  <h2 class="section-title">Découvrir BuSAF</h2>
 
-    <div class="description">
-      Rejoignez BuSAF et commencez votre activité sur la plateforme.
-    </div>
+  <div class="grid">
 
-    <form id="signupForm">
+    <button class="card" onclick="ouvrir('marche')">
+      <span class="emoji">🛒</span>
+      <strong>Marché BuSAF</strong>
+      <small>Consulter le marché</small>
+    </button>
 
-      <label for="nom">Nom complet</label>
-      <input
-        type="text"
-        id="nom"
-        placeholder="Votre nom complet"
-        autocomplete="name"
-        required
-      >
+    <button class="card" onclick="ouvrir('produits')">
+      <span class="emoji">📦</span>
+      <strong>Produits</strong>
+      <small>Voir les produits</small>
+    </button>
 
-      <label for="telephone">Téléphone</label>
-      <input
-        type="tel"
-        id="telephone"
-        placeholder="Votre numéro de téléphone"
-        autocomplete="tel"
-        required
-      >
+    <button class="card" onclick="ouvrir('benefices')">
+      <span class="emoji">💰</span>
+      <strong>Bénéfices</strong>
+      <small>Comprendre les bénéfices</small>
+    </button>
 
-      <label for="ville">Ville</label>
-      <input
-        type="text"
-        id="ville"
-        placeholder="Votre ville"
-        required
-      >
+    <button class="card" onclick="ouvrir('commissions')">
+      <span class="emoji">🤝</span>
+      <strong>Commissions</strong>
+      <small>Voir les règles</small>
+    </button>
 
-      <label for="email">Adresse e-mail</label>
-      <input
-        type="email"
-        id="email"
-        placeholder="Votre adresse e-mail"
-        autocomplete="email"
-        required
-      >
+    <button class="card" onclick="ouvrir('avantages')">
+      <span class="emoji">⭐</span>
+      <strong>Avantages</strong>
+      <small>Avantages des membres</small>
+    </button>
 
-      <label for="password">Mot de passe</label>
-      <input
-        type="password"
-        id="password"
-        placeholder="Minimum 6 caractères"
-        autocomplete="new-password"
-        minlength="6"
-        required
-      >
+    <button class="card" onclick="ouvrir('conditions')">
+      <span class="emoji">📋</span>
+      <strong>Conditions</strong>
+      <small>Conditions d’accès</small>
+    </button>
 
-      <label for="confirmation">Confirmer le mot de passe</label>
-      <input
-        type="password"
-        id="confirmation"
-        placeholder="Répétez le mot de passe"
-        autocomplete="new-password"
-        minlength="6"
-        required
-      >
+    <button class="card" onclick="ouvrir('regles')">
+      <span class="emoji">📜</span>
+      <strong>Règles</strong>
+      <small>Règles BuSAF</small>
+    </button>
 
-      <label for="role">Type de compte</label>
-      <select id="role" required>
-        <option value="membre">Membre</option>
-        <option value="formateur">Formateur</option>
-        <option value="vendeur">Vendeur</option>
-      </select>
+    <button class="card" onclick="ouvrir('boutique')">
+      <span class="emoji">🏪</span>
+      <strong>Boutiques</strong>
+      <small>Boutiques personnelles</small>
+    </button>
 
-      <button type="submit" id="signupButton">
-        CRÉER MON COMPTE
+  </div>
+
+  <h2 class="section-title">Mon espace</h2>
+
+  <div class="grid">
+
+    <button class="card" onclick="ouvrir('connexion')">
+      <span class="emoji">🔐</span>
+      <strong>Connexion</strong>
+      <small>Accéder à mon compte</small>
+    </button>
+
+    <button class="card" onclick="ouvrir('inscription')">
+      <span class="emoji">📝</span>
+      <strong>Inscription</strong>
+      <small>Créer un compte</small>
+    </button>
+
+    <button class="card" onclick="ouvrir('reunions')">
+      <span class="emoji">🎥</span>
+      <strong>Réunions</strong>
+      <small>Réunions séparées</small>
+    </button>
+
+    <button class="card" onclick="ouvrir('compte')">
+      <span class="emoji">💼</span>
+      <strong>Mon Compte</strong>
+      <small>Espace personnel</small>
+    </button>
+
+  </div>
+
+</section>
+
+<section id="marche" class="page">
+  <div class="panel">
+    <h3>🛒 Marché BuSAF</h3>
+    <p>
+      Tous les visiteurs peuvent consulter les produits du marché.
+      L’achat et la revente dépendent des conditions BuSAF.
+    </p>
+  </div>
+
+  <div class="grid">
+
+    <div class="product">
+      <h3>📱 Produit digital Business</h3>
+      <p>Produit numérique reçu sur téléphone.</p>
+      <div class="price">7 000 FCFA</div>
+      <button onclick="acheter('Produit digital Business',7000)">
+        VOIR LE PRODUIT
       </button>
+    </div>
 
-    </form>
+    <div class="product">
+      <h3>🎓 Formation BuSAF</h3>
+      <p>Formation sur le fonctionnement du marché.</p>
+      <div class="price">5 000 FCFA</div>
+      <button onclick="acheter('Formation BuSAF',5000)">
+        VOIR LE PRODUIT
+      </button>
+    </div>
 
-    <div id="message"></div>
-
-    <a class="back" href="index.html">
-      ← RETOUR
-    </a>
-
-    <a class="login" href="connexion.html">
-      Déjà membre ? Se connecter
-    </a>
-
-    <div class="footer">
-      Vos informations personnelles sont enregistrées
-      dans votre profil BuSAF.
+    <div class="product">
+      <h3>📚 Guide Business</h3>
+      <p>Guide de découverte commerciale.</p>
+      <div class="price">3 000 FCFA</div>
+      <button onclick="acheter('Guide Business',3000)">
+        VOIR LE PRODUIT
+      </button>
     </div>
 
   </div>
 
-  <script>
-    const SUPABASE_URL =
-      "https://hbfbocrodyfydvikxbql.supabase.co";
+  <button class="secondary" onclick="ouvrir('accueil')">
+    RETOUR
+  </button>
+</section>
 
-    const SUPABASE_KEY =
-      "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+<section id="produits" class="page">
+  <div class="panel">
+    <h3>📦 Produits BuSAF</h3>
 
-    const form = document.getElementById("signupForm");
-    const button = document.getElementById("signupButton");
-    const message = document.getElementById("message");
+    <ul>
+      <li>Produits numériques</li>
+      <li>Formations vidéo</li>
+      <li>Guides professionnels</li>
+      <li>Services commerciaux</li>
+      <li>Produits autorisés par BuSAF</li>
+    </ul>
+  </div>
 
-    function afficherMessage(texte, type) {
-      message.textContent = texte;
-      message.className = type;
-    }
+  <button onclick="ouvrir('marche')">VOIR LES PRODUITS</button>
+  <button class="secondary" onclick="ouvrir('accueil')">RETOUR</button>
+</section>
 
-    function obtenirSupabase() {
-      if (
-        !window.supabase ||
-        typeof window.supabase.createClient !== "function"
-      ) {
-        return null;
-      }
+<section id="benefices" class="page">
+  <div class="panel">
+    <h3>💰 Bénéfices</h3>
 
-      return window.supabase.createClient(
-        SUPABASE_URL,
-        SUPABASE_KEY
-      );
-    }
+    <p>
+      Les bénéfices dépendent des ventes confirmées et des règles
+      applicables à chaque produit.
+    </p>
 
-    form.addEventListener("submit", async function(event) {
-      event.preventDefault();
+    <ul>
+      <li>Bénéfice du vendeur.</li>
+      <li>Part du Marché BuSAF.</li>
+      <li>Commission directe selon les règles.</li>
+      <li>Bonus éventuels selon les conditions.</li>
+      <li>Les bénéfices ne sont jamais garantis.</li>
+    </ul>
+  </div>
 
-      message.textContent = "";
-      message.className = "";
+  <button class="secondary" onclick="ouvrir('accueil')">RETOUR</button>
+</section>
 
-      const supabaseClient = obtenirSupabase();
+<section id="commissions" class="page">
+  <div class="panel">
+    <h3>🤝 Commissions</h3>
 
-      if (!supabaseClient) {
-        afficherMessage(
-          "❌ La connexion Supabase n'est pas disponible. Vérifie ta connexion Internet puis recharge la page.",
-          "error"
-        );
-        return;
-      }
+    <ul>
+      <li>Les commissions concernent les ventes autorisées du marché.</li>
+      <li>Les ventes personnelles sont séparées.</li>
+      <li>Les commissions des autres membres restent privées.</li>
+      <li>Chaque membre voit uniquement ses informations autorisées.</li>
+    </ul>
+  </div>
 
-      const nom = document.getElementById("nom").value.trim();
-      const telephone = document.getElementById("telephone").value.trim();
-      const ville = document.getElementById("ville").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("password").value;
-      const confirmation = document.getElementById("confirmation").value;
-      const role = document.getElementById("role").value;
+  <button class="secondary" onclick="ouvrir('accueil')">RETOUR</button>
+</section>
 
-      if (!nom || !telephone || !ville || !email) {
-        afficherMessage(
-          "❌ Remplis tous les champs obligatoires.",
-          "error"
-        );
-        return;
-      }
+<section id="avantages" class="page">
+  <div class="panel">
+    <h3>⭐ Avantages des membres</h3>
 
-      if (password.length < 6) {
-        afficherMessage(
-          "❌ Le mot de passe doit contenir au moins 6 caractères.",
-          "error"
-        );
-        return;
-      }
+    <ul>
+      <li>Accès aux informations générales.</li>
+      <li>Accès aux produits selon les conditions.</li>
+      <li>Progression selon les ventes confirmées.</li>
+      <li>Avantages spéciaux selon les règles officielles.</li>
+      <li>Bonus de progression selon les paliers applicables.</li>
+    </ul>
+  </div>
 
-      if (password !== confirmation) {
-        afficherMessage(
-          "❌ Les deux mots de passe ne sont pas identiques.",
-          "error"
-        );
-        return;
-      }
+  <button class="secondary" onclick="ouvrir('accueil')">RETOUR</button>
+</section>
 
-      button.disabled = true;
-      button.textContent = "CRÉATION EN COURS...";
+<section id="conditions" class="page">
+  <div class="panel">
+    <h3>📋 Conditions</h3>
 
-      try {
-        const resultat = await supabaseClient.auth.signUp({
-          email: email,
-          password: password,
-          options: {
-            data: {
-              nom_complet: nom,
-              telephone: telephone,
-              ville: ville,
-              role: role
-            }
-          }
-        });
+    <ul>
+      <li>Fournir des informations exactes.</li>
+      <li>Respecter les règles BuSAF.</li>
+      <li>Respecter les autres membres.</li>
+      <li>Ne pas créer de faux comptes.</li>
+      <li>Ne pas publier de produits interdits.</li>
+      <li>Comprendre les conditions avant tout achat.</li>
+      <li>L’invitation est nécessaire selon les règles d’accès.</li>
+    </ul>
+  </div>
 
-        if (resultat.error) {
-          throw resultat.error;
-        }
+  <button class="secondary" onclick="ouvrir('accueil')">RETOUR</button>
+</section>
 
-        if (!resultat.data || !resultat.data.user) {
-          throw new Error(
-            "Supabase n'a pas retourné l'utilisateur."
-          );
-        }
+<section id="regles" class="page">
+  <div class="panel">
+    <h3>📜 Règles BuSAF</h3>
 
-        afficherMessage(
-          "✅ COMPTE BuSAF CRÉÉ AVEC SUCCÈS ! " +
-          "Vérifie ton adresse e-mail si une confirmation est demandée, " +
-          "puis connecte-toi.",
-          "success"
-        );
+    <ul>
+      <li>Un nouveau membre peut consulter les informations générales.</li>
+      <li>Un nouveau membre doit acheter au moins un produit du marché avant d’inviter.</li>
+      <li>Avant son premier achat, il ne peut pas acheter dans les boutiques personnelles des autres membres.</li>
+      <li>Le Stock BuSAF est séparé du Stock Boutique personnelle.</li>
+      <li>Le Compte Marché est séparé du Compte Boutique.</li>
+      <li>Les informations personnelles sont privées.</li>
+      <li>Les ventes personnelles ne comptent pas comme ventes du marché.</li>
+      <li>Seul le fondateur peut convoquer une réunion générale.</li>
+      <li>Les réunions sont séparées selon leur type.</li>
+    </ul>
+  </div>
 
-        button.textContent = "COMPTE CRÉÉ";
+  <button class="secondary" onclick="ouvrir('accueil')">RETOUR</button>
+</section>
 
-      } catch (error) {
-        console.error("Erreur inscription :", error);
+<section id="boutique" class="page">
+  <div class="panel">
+    <h3>🏪 Boutiques personnelles</h3>
 
-        let texte = error.message || "Erreur inconnue.";
+    <p>
+      Les boutiques personnelles sont séparées du Marché BuSAF.
+      Elles peuvent présenter des produits ou services autorisés.
+    </p>
 
-        const erreur = texte.toLowerCase();
+    <p><strong>Ouverture :</strong> 1 800 FCFA</p>
+    <p><strong>Part BuSAF :</strong> 5,5 % par vente personnelle</p>
+  </div>
 
-        if (
-          erreur.includes("already registered") ||
-          erreur.includes("user already exists")
-        ) {
-          texte =
-            "Cette adresse e-mail possède déjà un compte. Utilise Connexion.";
-        } else if (
-          erreur.includes("invalid email")
-        ) {
-          texte =
-            "L'adresse e-mail n'est pas valide.";
-        } else if (
-          erreur.includes("password")
-        ) {
-          texte =
-            "Le mot de passe doit contenir au moins 6 caractères.";
-        } else if (
-          erreur.includes("rate limit")
-        ) {
-          texte =
-            "Trop de tentatives. Attends quelques minutes puis réessaie.";
-        } else if (
-          erreur.includes("fetch") ||
-          erreur.includes("network") ||
-          erreur.includes("failed")
-        ) {
-          texte =
-            "Impossible de contacter Supabase. Vérifie Internet puis recharge la page.";
-        }
+  <button class="secondary" onclick="ouvrir('accueil')">RETOUR</button>
+</section>
 
-        afficherMessage(
-          "❌ INSCRIPTION REFUSÉE : " + texte,
-          "error"
-        );
+</main>
 
-        button.disabled = false;
-        button.textContent = "CRÉER MON COMPTE";
-      }
-    });
-  </script>
+<nav class="bottom-nav">
+  <button onclick="ouvrir('accueil')">🏠<br>Accueil</button>
+  <button onclick="ouvrir('marche')">🛒<br>Marché</button>
+  <button onclick="ouvrir('boutique')">🏪<br>Boutique</button>
+  <button onclick="ouvrir('reunions')">🎥<br>Réunions</button>
+  <button onclick="ouvrir('compte')">💼<br>Compte</button>
+</nav>
+
+<script>
+let utilisateur = null;
+let commandes = [];
+let invites = [];
+let ventes = 0;
+let compteMarche = 0;
+let compteBoutique = 0;
+
+function ouvrir(id) {
+  document.querySelectorAll(".page").forEach(page => {
+    page.classList.remove("active");
+  });
+
+  const page = document.getElementById(id);
+
+  if (page) {
+    page.classList.add("active");
+    window.scrollTo(0, 0);
+  }
+}
+
+function acheter(nom, prix) {
+  alert(
+    "Produit consulté : " + nom +
+    "\nPrix : " + prix + " FCFA" +
+    "\n\nLa connexion à la vraie base et au vrai paiement sera ajoutée ensuite."
+  );
+}
+</script>
 
 </body>
-</html>
+  </html>
+                                                
