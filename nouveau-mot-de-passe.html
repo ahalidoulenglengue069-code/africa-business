@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nouveau mot de passe — BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #ffffff);
+      color: #123b20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-radius: 22px;
+      padding: 28px 22px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      color: #16833b;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin: 6px 0 25px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 15px 0 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #c9d8cd;
+      border-radius: 12px;
+      font-size: 16px;
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #16833b;
+      color: white;
+    }
+
+    .secondary {
+      background: #eaf6ed;
+      color: #16833b;
+    }
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 600;
+    }
+
+    .error {
+      display: block;
+      background: #fdecec;
+      color: #b42318;
+    }
+
+    .success {
+      display: block;
+      background: #e9f8ee;
+      color: #146c2e;
+    }
+
+    .info {
+      background: #eef6ff;
+      color: #164c7d;
+      padding: 12px;
+      border-radius: 10px;
+      margin-bottom: 15px;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="logo">🌍 BuSAF</div>
+  <div class="subtitle">Nouveau mot de passe</div>
+
+  <div class="info">
+    Choisis maintenant ton nouveau mot de passe BuSAF.
+  </div>
+
+  <form id="resetForm">
+
+    <label for="password">
+      Nouveau mot de passe
+    </label>
+
+    <input
+      id="password"
+      type="password"
+      minlength="6"
+      autocomplete="new-password"
+      required
+      placeholder="Minimum 6 caractères"
+    >
+
+    <label for="password2">
+      Confirmer le mot de passe
+    </label>
+
+    <input
+      id="password2"
+      type="password"
+      minlength="6"
+      autocomplete="new-password"
+      required
+      placeholder="Répète le mot de passe"
+    >
+
+    <button
+      id="saveBtn"
+      class="primary"
+      type="submit">
+      ENREGISTRER LE NOUVEAU MOT DE PASSE
+    </button>
+
+  </form>
+
+  <div id="message" class="message"></div>
+
+  <button
+    class="secondary"
+    type="button"
+    onclick="window.location.href='connexion.html'">
+    ANNULER
+  </button>
+
+</div>
+
+<script>
+const SUPABASE_URL =
+  "https://hbfbocrodyfydvikxbql.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+
+
+const form =
+  document.getElementById("resetForm");
+
+const message =
+  document.getElementById("message");
+
+const saveBtn =
+  document.getElementById("saveBtn");
+
+
+function showMessage(text, type) {
+  message.textContent = text;
+  message.className = "message " + type;
+}
+
+
+/*
+  Récupération du token envoyé par Supabase
+  dans l'URL de récupération.
+*/
+
+function getRecoveryToken() {
+
+  const hash =
+    window.location.hash.substring(1);
+
+  const params =
+    new URLSearchParams(hash);
+
+  return {
+    access_token:
+      params.get("access_token"),
+
+    refresh_token:
+      params.get("refresh_token"),
+
+    type:
+      params.get("type")
+  };
+}
+
+
+async function updatePassword() {
+
+  const password =
+    document.getElementById("password").value;
+
+  const password2 =
+    document.getElementById("password2").value;
+
+
+  if (password.length < 6) {
+
+    showMessage(
+      "❌ Le mot de passe doit contenir au moins 6 caractères.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  if (password !== password2) {
+
+    showMessage(
+      "❌ Les deux mots de passe ne correspondent pas.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  const recovery =
+    getRecoveryToken();
+
+
+  if (!recovery.access_token) {
+
+    showMessage(
+      "❌ Le lien de récupération est invalide ou expiré. Demande un nouveau lien.",
+      "error"
+    );
+
+    return;
+  }
+
+
+  saveBtn.disabled = true;
+  saveBtn.textContent = "ENREGISTREMENT...";
+
+
+  try {
+
+    const response =
+      await fetch(
+        SUPABASE_URL + "/auth/v1/user",
+        {
+          method: "PUT",
+
+          headers: {
+            "apikey": SUPABASE_ANON_KEY,
+            "Authorization":
+              "Bearer " + recovery.access_token,
+            "Content-Type":
+              "application/json"
+          },
+
+          body: JSON.stringify({
+            password: password
+          })
+        }
+      );
+
+
+    const data =
+      await response.json();
+
+
+    if (!response.ok) {
+
+      throw new Error(
+        data?.message ||
+        data?.msg ||
+        data?.error_description ||
+        "Impossible de modifier le mot de passe."
+      );
+    }
+
+
+    /*
+      Nouveau mot de passe enregistré.
+    */
+
+    showMessage(
+      "✅ Ton nouveau mot de passe a été enregistré.",
+      "success"
+    );
+
+
+    /*
+      Nettoyage des anciens éléments locaux.
+    */
+
+    localStorage.removeItem(
+      "busaf_access_token"
+    );
+
+    localStorage.removeItem(
+      "busaf_user_id"
+    );
+
+    localStorage.removeItem(
+      "busaf_email"
+    );
+
+    localStorage.removeItem(
+      "busaf_profile"
+    );
+
+
+    saveBtn.textContent =
+      "MOT DE PASSE MODIFIÉ";
+
+
+    setTimeout(function() {
+
+      window.location.href =
+        "connexion.html";
+
+    }, 1500);
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "❌ " +
+      (
+        error.message ||
+        "Impossible de modifier le mot de passe."
+      ),
+      "error"
+    );
+
+    saveBtn.disabled = false;
+
+    saveBtn.textContent =
+      "ENREGISTRER LE NOUVEAU MOT DE PASSE";
+  }
+}
+
+
+form.addEventListener(
+  "submit",
+  function(event) {
+
+    event.preventDefault();
+
+    updatePassword();
+
+  }
+);
+</script>
+
+</body>
+  </html>
