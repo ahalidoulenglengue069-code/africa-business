@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion — BuSAF</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #ffffff);
+      color: #123b20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 430px;
+      background: white;
+      border-radius: 22px;
+      padding: 28px 22px;
+      box-shadow: 0 8px 30px rgba(0,0,0,.12);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 32px;
+      font-weight: 800;
+      color: #16833b;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin-bottom: 25px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 14px 0 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #c9d8cd;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #16833b;
+      box-shadow: 0 0 0 3px rgba(22,131,59,.12);
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 18px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #16833b;
+      color: white;
+    }
+
+    .secondary {
+      background: #eaf6ed;
+      color: #16833b;
+    }
+
+    .link {
+      display: block;
+      text-align: center;
+      margin-top: 18px;
+      color: #16833b;
+      font-weight: 700;
+      text-decoration: none;
+    }
+
+    .message {
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      display: none;
+      font-weight: 600;
+    }
+
+    .error {
+      display: block;
+      background: #fdecec;
+      color: #b42318;
+    }
+
+    .success {
+      display: block;
+      background: #e9f8ee;
+      color: #146c2e;
+    }
+
+    .small {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 13px;
+      color: #666;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+
+    <div class="logo">🌍 BuSAF</div>
+    <div class="subtitle">Business Africain</div>
+
+    <form id="loginForm">
+
+      <label for="email">Adresse e-mail</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="email"
+        required
+        placeholder="Ton adresse e-mail"
+      >
+
+      <label for="password">Mot de passe</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+        placeholder="Ton mot de passe"
+      >
+
+      <button id="loginBtn" class="primary" type="submit">
+        🔐 SE CONNECTER
+      </button>
+
+    </form>
+
+    <div id="message" class="message"></div>
+
+    <a class="link" href="mot-de-passe-oublie.html">
+      🔑 Mot de passe oublié ?
+    </a>
+
+    <button
+      class="secondary"
+      type="button"
+      onclick="window.location.href='inscription.html'">
+      📝 CRÉER MON COMPTE
+    </button>
+
+    <button
+      class="secondary"
+      type="button"
+      onclick="window.location.href='index.html'">
+      ← RETOUR
+    </button>
+
+    <div class="small">
+      BuSAF — Accès sécurisé à ton espace de travail
+    </div>
+
+  </div>
+
+<script>
+const SUPABASE_URL =
+  "https://hbfbocrodyfydvikxbql.supabase.co";
+
+const SUPABASE_ANON_KEY =
+  "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+
+
+const form = document.getElementById("loginForm");
+const message = document.getElementById("message");
+const loginBtn = document.getElementById("loginBtn");
+
+
+function showMessage(text, type) {
+  message.textContent = text;
+  message.className = "message " + type;
+}
+
+
+async function api(path, options = {}) {
+
+  const headers = {
+    "apikey": SUPABASE_ANON_KEY,
+    "Content-Type": "application/json",
+    ...(options.headers || {})
+  };
+
+  const response = await fetch(
+    SUPABASE_URL + path,
+    {
+      ...options,
+      headers
+    }
+  );
+
+  let data = {};
+
+  try {
+    data = await response.json();
+  } catch (_) {
+    data = {};
+  }
+
+  if (!response.ok) {
+    throw new Error(
+      data?.msg ||
+      data?.message ||
+      data?.error_description ||
+      data?.error ||
+      "Erreur Supabase."
+    );
+  }
+
+  return data;
+}
+
+
+form.addEventListener("submit", async function(event) {
+
+  event.preventDefault();
+
+  const email =
+    document.getElementById("email").value.trim();
+
+  const password =
+    document.getElementById("password").value;
+
+  if (!email || !password) {
+    showMessage(
+      "❌ Remplis ton adresse e-mail et ton mot de passe.",
+      "error"
+    );
+    return;
+  }
+
+  loginBtn.disabled = true;
+  loginBtn.textContent = "CONNEXION EN COURS...";
+
+  try {
+
+    /*
+      1. Connexion Supabase Auth
+    */
+
+    const auth = await api(
+      "/auth/v1/token?grant_type=password",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          email: email,
+          password: password
+        })
+      }
+    );
+
+
+    const accessToken = auth.access_token;
+    const userId = auth.user?.id;
+
+    if (!accessToken || !userId) {
+      throw new Error(
+        "Connexion réussie mais session utilisateur introuvable."
+      );
+    }
+
+
+    /*
+      2. Sauvegarde de la session
+    */
+
+    localStorage.setItem(
+      "busaf_access_token",
+      accessToken
+    );
+
+    localStorage.setItem(
+      "busaf_user_id",
+      userId
+    );
+
+    localStorage.setItem(
+      "busaf_email",
+      email
+    );
+
+
+    /*
+      3. Recherche du vrai profil BuSAF
+         Le rôle vient de profils_busaf,
+         pas des métadonnées Auth.
+    */
+
+    const profiles = await api(
+      "/rest/v1/profils_busaf" +
+      "?user_id=eq." +
+      encodeURIComponent(userId) +
+      "&select=id,user_id,nom_complet,role,code_parrain,photo_url,Ville,telephone" +
+      "&limit=1",
+      {
+        method: "GET",
+        headers: {
+          "Authorization": "Bearer " + accessToken
+        }
+      }
+    );
+
+
+    if (!profiles || profiles.length === 0) {
+
+      localStorage.removeItem("busaf_access_token");
+      localStorage.removeItem("busaf_user_id");
+      localStorage.removeItem("busaf_email");
+
+      throw new Error(
+        "Ton compte Auth existe, mais aucun profil BuSAF n'est associé à ce compte."
+      );
+    }
+
+
+    const profile = profiles[0];
+
+    localStorage.setItem(
+      "busaf_profile",
+      JSON.stringify(profile)
+    );
+
+
+    /*
+      4. Vérification du rôle réel
+    */
+
+    const role =
+      String(profile.role || "")
+        .trim()
+        .toLowerCase();
+
+
+    if (role === "fondateur") {
+
+      showMessage(
+        "✅ Connexion réussie. Ouverture de l'espace Fondateur...",
+        "success"
+      );
+
+      setTimeout(function() {
+
+        window.location.href =
+          "index.html#founder";
+
+      }, 700);
+
+      return;
+    }
+
+
+    if (role === "membre") {
+
+      showMessage(
+        "✅ Connexion réussie. Ouverture de ton espace de travail...",
+        "success"
+      );
+
+      setTimeout(function() {
+
+        window.location.href =
+          "index.html#member";
+
+      }, 700);
+
+      return;
+    }
+
+
+    /*
+      5. Rôle inconnu
+    */
+
+    localStorage.removeItem("busaf_access_token");
+    localStorage.removeItem("busaf_user_id");
+    localStorage.removeItem("busaf_email");
+    localStorage.removeItem("busaf_profile");
+
+    throw new Error(
+      "Ton profil BuSAF possède un rôle non reconnu."
+    );
+
+  } catch (error) {
+
+    console.error(error);
+
+    showMessage(
+      "❌ " + (
+        error.message ||
+        "Impossible de se connecter."
+      ),
+      "error"
+    );
+
+    loginBtn.disabled = false;
+    loginBtn.textContent = "🔐 SE CONNECTER";
+  }
+
+});
+</script>
+
+</body>
+  </html>
