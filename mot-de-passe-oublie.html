@@ -1,0 +1,325 @@
+<!DOCTYPE html><html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mot de passe oublié — BuSAF</title>  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #e8f5e9, #ffffff);
+      color: #123b20;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 430px;
+      background: #ffffff;
+      border-radius: 22px;
+      padding: 28px 22px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .logo {
+      text-align: center;
+      font-size: 30px;
+      font-weight: 800;
+      color: #16833b;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #555;
+      margin: 6px 0 25px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    .info {
+      background: #eef6ff;
+      color: #164c7d;
+      padding: 13px;
+      border-radius: 10px;
+      margin-bottom: 18px;
+      line-height: 1.5;
+      font-size: 14px;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 15px 0 7px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #c9d8cd;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #16833b;
+      box-shadow: 0 0 0 3px rgba(22, 131, 59, 0.12);
+    }
+
+    button {
+      width: 100%;
+      border: 0;
+      border-radius: 12px;
+      padding: 14px;
+      margin-top: 20px;
+      font-size: 16px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .primary {
+      background: #16833b;
+      color: white;
+    }
+
+    .primary:disabled {
+      opacity: 0.65;
+      cursor: wait;
+    }
+
+    .secondary {
+      background: #eaf6ed;
+      color: #16833b;
+    }
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 600;
+      line-height: 1.5;
+    }
+
+    .error {
+      display: block;
+      background: #fdecec;
+      color: #b42318;
+    }
+
+    .success {
+      display: block;
+      background: #e9f8ee;
+      color: #146c2e;
+    }
+
+    .small {
+      margin-top: 12px;
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+      line-height: 1.4;
+    }
+  </style></head><body><div class="card">  <div class="logo">🌍 BuSAF</div>  <div class="subtitle">
+    Business Africain
+  </div>  <div class="info">
+    Entre l'adresse e-mail associée à ton compte BuSAF.
+    Un lien sécurisé te sera envoyé pour choisir un nouveau mot de passe.
+  </div>  <form id="recoveryForm"><label for="email">
+  Adresse e-mail
+</label>
+
+<input
+  id="email"
+  type="email"
+  autocomplete="email"
+  placeholder="Ton adresse e-mail"
+  required
+>
+
+<button
+  id="sendBtn"
+  class="primary"
+  type="submit">
+  ENVOYER LE LIEN DE RÉCUPÉRATION
+</button>
+
+  </form>  <div id="message" class="message"></div><button
+class="secondary"
+type="button"
+onclick="window.location.href='connexion.html'">
+← RETOUR À LA CONNEXION
+</button>
+
+  <div class="small">
+    Pour ta sécurité, BuSAF n'indique pas si une adresse e-mail
+    correspond ou non à un compte existant.
+  </div></div><!--
+  Supabase JS officiel.
+  Cette bibliothèque gère correctement le flux de récupération,
+  y compris le flux PKCE.
+--><script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+  const SUPABASE_URL =
+    "https://hbfbocrodyfydvikxbql.supabase.co";
+
+  const SUPABASE_ANON_KEY =
+    "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+
+
+  /*
+    Création du client Supabase.
+  */
+  const supabaseClient =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_ANON_KEY,
+      {
+        auth: {
+          persistSession: true,
+          autoRefreshToken: true,
+          detectSessionInUrl: true
+        }
+      }
+    );
+
+
+  const form =
+    document.getElementById("recoveryForm");
+
+  const emailInput =
+    document.getElementById("email");
+
+  const sendBtn =
+    document.getElementById("sendBtn");
+
+  const message =
+    document.getElementById("message");
+
+
+  function showMessage(text, type) {
+
+    message.textContent = text;
+
+    message.className =
+      "message " + type;
+  }
+
+
+  form.addEventListener(
+    "submit",
+    async function(event) {
+
+      event.preventDefault();
+
+
+      const email =
+        emailInput.value.trim();
+
+
+      if (!email) {
+
+        showMessage(
+          "❌ Entre ton adresse e-mail.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      if (!email.includes("@")) {
+
+        showMessage(
+          "❌ Vérifie ton adresse e-mail.",
+          "error"
+        );
+
+        return;
+      }
+
+
+      /*
+        Destination EXACTE de la page de nouveau mot de passe.
+      */
+      const redirectTo =
+        "https://ahalidoulenglengue069-code.github.io/africa-business/nouveau-mot-de-passe.html";
+
+
+      sendBtn.disabled = true;
+
+      sendBtn.textContent =
+        "ENVOI EN COURS...";
+
+
+      try {
+
+        /*
+          Méthode officielle Supabase.
+          Elle prend en charge le flux de récupération
+          et le paramètre redirectTo.
+        */
+        const { error } =
+          await supabaseClient.auth
+            .resetPasswordForEmail(
+              email,
+              {
+                redirectTo: redirectTo
+              }
+            );
+
+
+        if (error) {
+
+          throw error;
+        }
+
+
+        /*
+          Supabase ne révèle volontairement pas
+          si l'adresse existe réellement.
+        */
+        showMessage(
+          "✅ Si cette adresse correspond à un compte BuSAF, un lien de récupération vient d'être envoyé. Vérifie ta boîte e-mail.",
+          "success"
+        );
+
+
+        sendBtn.textContent =
+          "LIEN ENVOYÉ";
+
+
+      } catch (error) {
+
+        console.error(
+          "Erreur récupération mot de passe :",
+          error
+        );
+
+
+        showMessage(
+          "❌ " +
+          (
+            error?.message ||
+            "Impossible d'envoyer le lien de récupération."
+          ),
+          "error"
+        );
+
+
+        sendBtn.disabled = false;
+
+        sendBtn.textContent =
+          "ENVOYER LE LIEN DE RÉCUPÉRATION";
+      }
+
+    }
+  );
+</script></body>
+  </html>
