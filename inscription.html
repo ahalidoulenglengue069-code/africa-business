@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BuSAF — Créer mon compte</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  font-family:Arial,sans-serif;
+  background:linear-gradient(135deg,#eaf8ef,#f7fff9);
+  color:#173326;
+}
+
+.card{
+  width:min(100%,520px);
+  background:#fff;
+  border-radius:20px;
+  padding:26px;
+  box-shadow:0 12px 35px rgba(0,0,0,.10);
+}
+
+.logo{
+  text-align:center;
+  font-size:30px;
+  font-weight:900;
+  color:#16834a;
+}
+
+.subtitle{
+  text-align:center;
+  color:#557064;
+}
+
+h1{
+  text-align:center;
+  margin:22px 0 8px;
+}
+
+.intro{
+  text-align:center;
+  color:#60746a;
+  font-size:14px;
+  line-height:1.5;
+  margin-bottom:22px;
+}
+
+label{
+  display:block;
+  font-weight:800;
+  margin:14px 0 7px;
+}
+
+input{
+  width:100%;
+  padding:14px;
+  border:1px solid #ccd8d0;
+  border-radius:11px;
+  font-size:16px;
+  outline:none;
+}
+
+input:focus{
+  border-color:#16834a;
+  box-shadow:0 0 0 3px rgba(22,131,74,.10);
+}
+
+button{
+  width:100%;
+  border:0;
+  border-radius:11px;
+  padding:15px;
+  margin-top:22px;
+  background:#16834a;
+  color:#fff;
+  font-size:16px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.65;
+  cursor:not-allowed;
+}
+
+.message{
+  display:none;
+  margin-top:16px;
+  padding:13px;
+  border-radius:11px;
+  line-height:1.45;
+  font-weight:700;
+}
+
+.error{
+  display:block;
+  background:#ffe9e9;
+  color:#9b0000;
+}
+
+.success{
+  display:block;
+  background:#e7f8ed;
+  color:#126b3c;
+}
+
+.rule{
+  margin-top:18px;
+  padding:12px;
+  border-radius:10px;
+  background:#f4faf6;
+  color:#53695d;
+  font-size:13px;
+  line-height:1.5;
+}
+
+.links{
+  text-align:center;
+  margin-top:20px;
+  line-height:1.9;
+}
+
+a{
+  color:#16834a;
+  font-weight:800;
+  text-decoration:none;
+}
+
+.required{
+  color:#b00020;
+}
+</style>
+</head>
+
+<body>
+
+<main class="card">
+
+  <div class="logo">🌍 BuSAF</div>
+  <div class="subtitle">Business Africain</div>
+
+  <h1>Créer mon compte</h1>
+
+  <div class="intro">
+    Pour rejoindre BuSAF, un code parrain valide est obligatoire.
+    Le parrain sera automatiquement enregistré avec ton compte.
+  </div>
+
+  <form id="signupForm" novalidate>
+
+    <label>
+      Nom complet <span class="required">*</span>
+    </label>
+    <input
+      id="nom"
+      type="text"
+      autocomplete="name"
+      required
+    >
+
+    <label>
+      Adresse e-mail <span class="required">*</span>
+    </label>
+    <input
+      id="email"
+      type="email"
+      autocomplete="email"
+      required
+    >
+
+    <label>
+      Téléphone <span class="required">*</span>
+    </label>
+    <input
+      id="telephone"
+      type="tel"
+      autocomplete="tel"
+      required
+    >
+
+    <label>
+      Ville <span class="required">*</span>
+    </label>
+    <input
+      id="ville"
+      type="text"
+      autocomplete="address-level2"
+      required
+    >
+
+    <label>
+      Code parrain <span class="required">*</span>
+    </label>
+    <input
+      id="codeParrain"
+      type="text"
+      autocomplete="off"
+      autocapitalize="characters"
+      placeholder="Ex. BUSAF-FONDATEUR"
+      required
+    >
+
+    <label>
+      Mot de passe <span class="required">*</span>
+    </label>
+    <input
+      id="password"
+      type="password"
+      autocomplete="new-password"
+      minlength="6"
+      required
+    >
+
+    <label>
+      Confirmer le mot de passe <span class="required">*</span>
+    </label>
+    <input
+      id="password2"
+      type="password"
+      autocomplete="new-password"
+      minlength="6"
+      required
+    >
+
+    <button id="signupButton" type="submit">
+      CRÉER MON COMPTE
+    </button>
+
+    <div id="message" class="message"></div>
+
+  </form>
+
+  <div class="rule">
+    <strong>Important :</strong>
+    le code parrain est obligatoire.
+    BuSAF vérifie le code avant d'autoriser la création du compte.
+    Un code inexistant ou invalide bloque l'inscription.
+  </div>
+
+  <div class="links">
+    <div>
+      <a href="index.html">← Retour à l'accueil</a>
+    </div>
+
+    <div>
+      Déjà un compte ?
+      <a href="connexion.html">Se connecter</a>
+    </div>
+  </div>
+
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* =========================================================
+   CONFIGURATION SUPABASE
+   ========================================================= */
+
+const SUPABASE_URL =
+  "https://hbfbocrodyfydvikxbql.supabase.co";
+
+const SUPABASE_PUBLISHABLE_KEY =
+  "sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* =========================================================
+   ÉLÉMENTS DE LA PAGE
+   ========================================================= */
+
+const form =
+  document.getElementById("signupForm");
+
+const button =
+  document.getElementById("signupButton");
+
+const message =
+  document.getElementById("message");
+
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+function showMessage(text, type){
+
+  message.textContent = text;
+
+  message.className =
+    "message " + type;
+
+}
+
+
+/* =========================================================
+   INSCRIPTION
+   ========================================================= */
+
+form.addEventListener("submit", async function(e){
+
+  e.preventDefault();
+
+  message.textContent = "";
+  message.className = "message";
+
+  const nom =
+    document.getElementById("nom")
+      .value
+      .trim();
+
+  const email =
+    document.getElementById("email")
+      .value
+      .trim()
+      .toLowerCase();
+
+  const telephone =
+    document.getElementById("telephone")
+      .value
+      .trim();
+
+  const ville =
+    document.getElementById("ville")
+      .value
+      .trim();
+
+  const codeParrain =
+    document.getElementById("codeParrain")
+      .value
+      .trim()
+      .toUpperCase();
+
+  const password =
+    document.getElementById("password")
+      .value;
+
+  const password2 =
+    document.getElementById("password2")
+      .value;
+
+
+  /* =====================================================
+     VALIDATIONS
+     ===================================================== */
+
+  if(!nom){
+    showMessage(
+      "❌ Le nom complet est obligatoire.",
+      "error"
+    );
+    return;
+  }
+
+  if(!email){
+    showMessage(
+      "❌ L'adresse e-mail est obligatoire.",
+      "error"
+    );
+    return;
+  }
+
+  if(!telephone){
+    showMessage(
+      "❌ Le numéro de téléphone est obligatoire.",
+      "error"
+    );
+    return;
+  }
+
+  if(!ville){
+    showMessage(
+      "❌ La ville est obligatoire.",
+      "error"
+    );
+    return;
+  }
+
+  if(!codeParrain){
+    showMessage(
+      "❌ Le code parrain est obligatoire.",
+      "error"
+    );
+    return;
+  }
+
+  if(password.length < 6){
+    showMessage(
+      "❌ Le mot de passe doit contenir au moins 6 caractères.",
+      "error"
+    );
+    return;
+  }
+
+  if(password !== password2){
+    showMessage(
+      "❌ Les deux mots de passe ne correspondent pas.",
+      "error"
+    );
+    return;
+  }
+
+
+  /* =====================================================
+     DÉBUT DE L'INSCRIPTION
+     ===================================================== */
+
+  button.disabled = true;
+
+  button.textContent =
+    "VÉRIFICATION DU PARRAIN...";
+
+
+  try{
+
+    /*
+      IMPORTANT :
+
+      On vérifie le code parrain AVANT auth.signUp().
+
+      Cela permet d'éviter de créer inutilement
+      un compte Auth avec un mauvais code.
+    */
+
+    const {
+      data: parrain,
+      error: parrainError
+    } = await supabaseClient
+      .from("profils_busaf")
+      .select("id,nom_complet,code_parrain,role")
+      .eq("code_parrain", codeParrain)
+      .limit(1)
+      .maybeSingle();
+
+
+    if(parrainError){
+
+      console.error(
+        "Erreur vérification parrain :",
+        parrainError
+      );
+
+      throw new Error(
+        "Impossible de vérifier le code parrain."
+      );
+    }
+
+
+    if(!parrain){
+
+      throw new Error(
+        "Code parrain invalide ou introuvable. Aucun compte n'a été créé."
+      );
+    }
+
+
+    /*
+      Le code existe.
+      On passe maintenant à la création du compte Auth.
+    */
+
+    button.textContent =
+      "CRÉATION DU COMPTE...";
+
+
+    const {
+      data,
+      error
+    } = await supabaseClient.auth.signUp({
+
+      email: email,
+
+      password: password,
+
+      options: {
+
+        data: {
+
+          /*
+            Ces informations sont récupérées
+            par le trigger Supabase :
+
+            private.creer_profil_membre_depuis_auth()
+          */
+
+          nom_complet: nom,
+
+          telephone: telephone,
+
+          ville: ville,
+
+          Ville: ville,
+
+          code_parrain: codeParrain,
+
+          code_invitation: codeParrain,
+
+          parrain_id: parrain.id,
+
+          parrain_nom: parrain.nom_complet || ""
+
+        }
+
+      }
+
+    });
+
+
+    /* ===================================================
+       ERREUR SUPABASE
+       =================================================== */
+
+    if(error){
+
+      console.error(
+        "Erreur Supabase inscription :",
+        error
+      );
+
+      throw error;
+    }
+
+
+    /* ===================================================
+       VÉRIFICATION DE LA CRÉATION AUTH
+       =================================================== */
+
+    if(!data || !data.user){
+
+      throw new Error(
+        "Le compte n'a pas pu être créé."
+      );
+    }
+
+
+    /*
+      Si la confirmation e-mail est activée,
+      Supabase peut créer l'utilisateur sans ouvrir
+      immédiatement une session.
+    */
+
+    if(!data.session){
+
+      showMessage(
+        "✅ Compte créé avec succès. Vérifie ton adresse e-mail si une confirmation est demandée, puis connecte-toi.",
+        "success"
+      );
+
+      button.disabled = false;
+
+      button.textContent =
+        "CRÉER MON COMPTE";
+
+      return;
+    }
+
+
+    /* ===================================================
+       COMPTE CRÉÉ + SESSION
+       =================================================== */
+
+    showMessage(
+      "✅ Compte BuSAF créé avec succès. Redirection vers la connexion...",
+      "success"
+    );
+
+
+    setTimeout(function(){
+
+      window.location.href =
+        "connexion.html";
+
+    },1400);
+
+
+  }catch(error){
+
+    console.error(
+      "Inscription BuSAF :",
+      error
+    );
+
+
+    let text =
+      error?.message ||
+      "Impossible de créer le compte.";
+
+
+    /* ===================================================
+       MESSAGES D'ERREUR CLAIRS
+       =================================================== */
+
+    if(
+      /user already registered|
+       already registered|
+       already exists/i.test(text)
+    ){
+
+      text =
+        "Cette adresse e-mail possède déjà un compte BuSAF.";
+
+    }
+
+    else if(
+      /invalid.*email/i.test(text)
+    ){
+
+      text =
+        "L'adresse e-mail n'est pas valide.";
+
+    }
+
+    else if(
+      /Code parrain obligatoire/i.test(text)
+    ){
+
+      text =
+        "Code parrain obligatoire. Aucun compte n'a été créé.";
+
+    }
+
+    else if(
+      /Code parrain invalide ou introuvable/i.test(text)
+    ){
+
+      text =
+        "Code parrain invalide ou introuvable. Aucun compte n'a été créé.";
+
+    }
+
+    else if(
+      /Database error saving new user/i.test(text)
+    ){
+
+      text =
+        "❌ BuSAF n'a pas pu enregistrer le nouveau compte. Aucun compte complet n'a été créé. Vérification de la base nécessaire.";
+
+    }
+
+
+    showMessage(
+      "❌ " + text,
+      "error"
+    );
+
+
+    button.disabled = false;
+
+    button.textContent =
+      "CRÉER MON COMPTE";
+
+  }
+
+});
+</script>
+
+</body>
+      </html>
