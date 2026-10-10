@@ -193,7 +193,7 @@ Deno.serve(async (req: Request) => {
           body: JSON.stringify({
             paymentAmount: amount,
             reference,
-            articles: [{ name: cleanText(product.nom, 100) || "Produit Marché BuSAF", quantity: 1, unitPrice: amount }],
+            articles: [{ title: cleanText(product.nom, 100) || "Produit Marché BuSAF", description: "Achat numérique Marché BuSAF", price: amount }],
           }),
         },
       );
