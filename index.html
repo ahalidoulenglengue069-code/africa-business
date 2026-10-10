@@ -721,18 +721,13 @@ function directResale(id){
 }
 function buyProduct(id,mode){
  const p=productForId(id);if(!p)return;
- if(hasBoughtProduct(id)){
-   openModal('✅ Déjà acheté',`<div class="notice success">Tu as déjà acheté <strong>${esc(p.name)}</strong>. Un même produit ne peut pas être acheté deux fois par le même membre.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);return;
- }
  if(mode==='direct'){directResale(id);return;}
- state.orders.unshift({id:Date.now(),product:p.name,productId:p.id,price:p.price,date:new Date().toLocaleString('fr-FR'),mode:'first_purchase',fromSponsor:true});
- state.marketStock++;
- const item=state.marketStockItems.find(x=>x.productId===p.id);if(item)item.qty++;else state.marketStockItems.push({productId:p.id,name:p.name,emoji:p.emoji,price:p.price,qty:1});
- saveState();
- openModal('🛒 Premier achat enregistré',`<div class="notice success"><strong>${esc(p.name)}</strong><br>Le produit est maintenant dans ton Stock BuSAF.</div><div class="notice">Pour un nouveau membre, ce premier achat est réalisé auprès de son parrain direct. Les achats suivants se font dans le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
+ // Ne jamais créditer le stock ni enregistrer un achat depuis le navigateur.
+ // Un achat n'est confirmé qu'après validation du paiement par le serveur.
+ startMarketPurchase(id);
 }
 
-function canInvite(){return state.orders.some(o=>o.mode==="stock"||o.mode==="direct"||o.mode==="yengapay_purchase");}
+function canInvite(){return state.orders.some(o=>o.mode==="yengapay_purchase"&&o.saleId); }
 function invitationCode(){return state.userId?`BUSAF-${state.userId.replace(/-/g,"").slice(0,8).toUpperCase()}`:"BUSAF-MEMBRE";}
 function invitationLink(){return `${location.origin}${location.pathname}#signup?invite=${encodeURIComponent(invitationCode())}`;}
 function invitationText(){return `🌍 Rejoins BuSAF / Business Africain.\nDécouvre le Marché BuSAF et crée ton compte avec mon invitation.\n👉 ${invitationLink()}\n🔑 Code : ${invitationCode()}`;}
@@ -1137,7 +1132,7 @@ async function loadMarketCatalog(force=false){
    const rows=await api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
    state.marketCatalog=Array.isArray(rows)?rows.filter(p=>{
      const type=String(p.type_produit||'').trim().toLowerCase();
-     return !['physical','physique','test'].includes(type);
+     return !['physical','physique'].includes(type) && !type.includes('test');
    }):[];
    state.marketCatalogLoaded=true;
  }catch(e){
