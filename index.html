@@ -1738,13 +1738,10 @@ function confirmStockSale(productId){
  openModal("Confirmer la vente",`<div class="rule"><strong>${esc(item.name)}</strong><br>Quantité : ${qty}<br>Total : ${money(item.price*qty)}</div><label>Nom du client</label><input id="stockCustomer"><label>Mode de paiement</label><select id="stockPayment"><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option><option>Autre</option></select><button class="btn" onclick="finalizeStockSale('${String(productId).replace(/'/g,"\\'")}',${qty})">VALIDER LA VENTE</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
 }
 function finalizeStockSale(productId,qty){
- const item=state.marketStockItems.find(x=>String(x.productId)===String(productId)),customer=document.getElementById("stockCustomer")?.value.trim(),pm=document.getElementById("stockPayment")?.value;
- if(!item||!customer){alert("Nom du client obligatoire.");return;}
- item.qty-=qty;state.marketStock=Math.max(0,state.marketStock-qty);
- recordMarketSale(productId,qty,customer,pm);
- state.orders.unshift({id:Date.now(),product:item.name,productId:String(productId),price:item.price*qty,date:new Date().toLocaleString('fr-FR'),mode:"revente_stock",customer});
- saveState();closeModal();
- openModal("Vente enregistrée",`<div class="notice success">${qty} unité(s) retirée(s) du Stock BuSAF et vente enregistrée.</div><div class="notice warning">Le paiement réel et la validation financière doivent être confirmés côté serveur.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
+ // Sécurité financière : aucune revente ne peut être déclarée validée par le navigateur.
+ // L'API serveur de validation des reventes n'est pas encore disponible dans cette version.
+ closeModal();
+ openModal("Revente non finalisée",`<div class="notice warning">Pour protéger ton Stock BuSAF et les commissions, cette vente n'a pas été enregistrée : la confirmation doit être faite par le serveur. Aucun stock ni solde n'a été modifié. Réessaie lorsque la validation sécurisée sera disponible.</div><button class="btn" onclick="closeModal()">COMPRIS</button>`);
 }
 
 function memberStockMarket(){return page("📦 Stock BuSAF",`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Stock BuSAF est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
