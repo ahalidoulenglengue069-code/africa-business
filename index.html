@@ -691,27 +691,10 @@ function monthlySalesCount(){const k=monthKey();const rows=Array.isArray(state.s
 function dailySalesCount(){const k=dayKey();const rows=Array.isArray(state.sales)?state.sales:[];return rows.filter(x=>x&&dayKey(new Date(x.date))===k).reduce((a,x)=>a+Number(x.qty||0),0);}
 function totalSalesCount(){const rows=Array.isArray(state.sales)?state.sales:[];return rows.reduce((a,x)=>a+Number(x.qty||0),0);}
 function recordMarketSale(productId,qty,customer,paymentMethod){
- const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
- if(!p)return;
- const productName=p.nom||"Produit BuSAF";
- const productPrice=Number(p.prix||0);
- const now=new Date();
- const resaleTotal=productPrice*qty;
- const sellerProfit=resaleTotal*0.045;
- const sponsorCommission=resaleTotal*0.07;
- state.sales.unshift({id:Date.now(),productId:p.id,product:productName,qty,customer,paymentMethod,date:now.toISOString(),sellerProfit,sponsorCommission,total:resaleTotal,validated:true});
- state.marketSales=totalSalesCount();
- state.marketBalance+=sellerProfit;
- addNotification('💰 Revente validée',`${qty} × ${productName} : bénéfice vendeur 4,5 % = ${money(sellerProfit)}.`,`market_sale`);
- addNotification('🤝 Parrain direct',`La commission de 7 % est réservée au parrain direct du vendeur : ${money(sponsorCommission)}.`,`sponsor_commission`);
- const after=totalSalesCount();
- const before=after-qty;
- for(let palier=Math.floor(before/100)+1;palier<=Math.floor(after/100);palier++){
-   addNotification('🏆 Palier 100 ventes',`Le palier ${palier*100} ventes du Marché BuSAF est atteint.`,`bonus100`);
- }
- if(monthlySalesCount()>=10 && !state.notifications.some(n=>n.type==='partner'&&n.month===monthKey(now)))
-   addNotification('⭐ Partner','10 ventes validées du Marché BuSAF atteintes ce mois-ci.','partner');
- saveState();
+ // Une revente ne peut être validée ni rémunérée depuis le navigateur.
+ // Cette fonction reste neutralisée tant que la validation serveur n'est pas implémentée.
+ console.warn("Revente non enregistrée : validation serveur requise.");
+ return false;
 }
 function hasBoughtProduct(id){return state.orders.some(o=>['stock','direct','first_purchase','yengapay_purchase'].includes(o.mode) && String(o.productId)===String(id));}
 function directResale(id){
@@ -1483,7 +1466,10 @@ async function saveBoutiqueProduct(){
  reader.readAsDataURL(f);
 }
 function openBoutiqueSale(i){const p=state.boutiqueProducts[i];if(!p)return;openModal("🏪 Vente Boutique",`<div class="rule"><strong>${esc(p.name)}</strong><br>Prix : ${money(p.price)}<br>Prélèvement de publication : 5 % selon les règles BuSAF, à confirmer côté serveur.</div><label>Nom du client</label><input id="shopCustomer"><label>Mode de paiement</label><select id="shopPayment"><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option><option>Autre</option></select><button class="btn" onclick="confirmBoutiqueSale(${i})">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
-function confirmBoutiqueSale(i){const p=state.boutiqueProducts[i],customer=document.getElementById("shopCustomer")?.value.trim();if(!p||!customer){alert("Nom du client obligatoire.");return;}const sellerAmount=p.price;state.boutiqueBalance+=sellerAmount;state.orders.unshift({id:Date.now(),product:p.name,price:p.price,date:new Date().toLocaleString("fr-FR"),mode:"boutique",customer});addNotification("🏪 Vente boutique",`Vente de ${p.name} enregistrée. Part vendeur : ${money(sellerAmount)}.`,"boutique");saveState();closeModal();openModal("Vente enregistrée",`<div class="notice success">Vente boutique confirmée. Part vendeur : <strong>${money(sellerAmount)}</strong>.</div><div class="notice warning">En production, paiement et prélèvement 5 % doivent être sécurisés côté serveur.</div><button class="btn" onclick="closeModal();setScreen('orders')">VOIR LES COMMANDES</button>`);}
+function confirmBoutiqueSale(i){
+ closeModal();
+ openModal("Fonction retirée",`<div class="notice warning">Ma Boutique et ses ventes sont retirées de cette version de BuSAF. Aucun solde, stock ou commande n'a été modifié.</div><button class="btn" onclick="closeModal()">COMPRIS</button>`);
+}
 
 function memberInvites(){
  const allowed=canInvite();
