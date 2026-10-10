@@ -731,7 +731,7 @@ function buyProduct(id,mode){
  openModal('🛒 Premier achat enregistré',`<div class="notice success"><strong>${esc(p.name)}</strong><br>Le produit est maintenant dans ton Stock BuSAF.</div><div class="notice">Pour un nouveau membre, ce premier achat est réalisé auprès de son parrain direct. Les achats suivants se font dans le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
 }
 
-function canInvite(){return state.orders.some(o=>o.mode==="stock"||o.mode==="direct");}
+function canInvite(){return state.orders.some(o=>o.mode==="stock"||o.mode==="direct"||o.mode==="yengapay_purchase");}
 function invitationCode(){return state.userId?`BUSAF-${state.userId.replace(/-/g,"").slice(0,8).toUpperCase()}`:"BUSAF-MEMBRE";}
 function invitationLink(){return `${location.origin}${location.pathname}#signup?invite=${encodeURIComponent(invitationCode())}`;}
 function invitationText(){return `🌍 Rejoins BuSAF / Business Africain.\nDécouvre le Marché BuSAF et crée ton compte avec mon invitation.\n👉 ${invitationLink()}\n🔑 Code : ${invitationCode()}`;}
@@ -855,7 +855,6 @@ function founderHome(){
  const products=Array.isArray(state.marketCatalog)?state.marketCatalog.length:0;
  const members=state.invites.length;
  const orders=state.orders.length;
- const meetings=state.meetings.length;
  return `<div class="founder-dashboard">
   <section class="founder-hero">
    <span class="founder-badge">👑 ESPACE FONDATEUR</span>
@@ -865,7 +864,6 @@ function founderHome(){
     <div class="founder-stat"><b>${products}</b><small>Produits Marché</small></div>
     <div class="founder-stat"><b>${members}</b><small>Invités suivis</small></div>
     <div class="founder-stat"><b>${orders}</b><small>Commandes</small></div>
-    <div class="founder-stat"><b>${meetings}</b><small>Réunions</small></div>
    </div>
   </section>
   <h2 class="founder-section-title">📊 PILOTAGE</h2>
@@ -892,7 +890,6 @@ function founderHome(){
   </div>
   <h2 class="founder-section-title">📢 COMMUNICATION</h2>
   <div class="founder-grid">
-   ${founderApp('meetings','🎥','Réunions','Gestion des réunions')}
    ${founderApp('notifications','🔔','Notifications','Informations')}
    ${founderApp('founderAnnouncements','📢','Annonces','Communications')}
   </div>
@@ -1137,9 +1134,12 @@ async function loadMarketCatalog(force=false){
  if(state.marketCatalogLoaded&&!force)return;
  try{
    // Cette requête fonctionne aussi pour un visiteur non connecté grâce à la policy anon SELECT.
-   // Les produits physiques sont exclus du Marché et aucun produit n'est filtré par son nom.
-   const rows=await api('/rest/v1/produits?type_produit=neq.physical&select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
-   state.marketCatalog=Array.isArray(rows)?rows:[];
+   // Les produits physiques et les produits de test ne doivent pas apparaître dans le Marché public.
+   const rows=await api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
+   state.marketCatalog=Array.isArray(rows)?rows.filter(p=>{
+     const type=String(p.type_produit||'').trim().toLowerCase();
+     return !['physical','physique','test'].includes(type);
+   }):[];
    state.marketCatalogLoaded=true;
  }catch(e){
    console.warn('Marché BuSAF public:',e);
