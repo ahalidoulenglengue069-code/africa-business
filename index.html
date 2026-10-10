@@ -348,10 +348,10 @@ const publicSpaces=[
 ];
 
 const memberSpaces=[
- ["market","🛒","Marché BuSAF"],["boutique","🏪","Ma Boutique"],["invites","👥","Mes Invités"],["orders","📦","Mes Commandes"],
+ ["market","🛒","Marché BuSAF"],["invites","👥","Mes Invités"],["orders","📦","Mes Commandes"],
  ["account","💼","Mon Compte"],["profits","💰","Mes Bénéfices"],["commissions","🤝","Mes Commissions"],["partner","⭐","Progression Partner"],
- ["memberBenefits","🎁","Avantages membres"],["money","💳","Dépôt / Retrait"],["stockMarket","📦","Stock BuSAF"],["stockBoutique","🏷️","Stock Boutique"],
- ["meetings","🎥","Réunions"],["notifications","🔔","Notifications"],["rules","📜","Règles"],["help","❓","Aide"],
+ ["memberBenefits","🎁","Avantages membres"],["money","💳","Dépôt / Retrait"],["stockMarket","📦","Stock BuSAF"],
+ ["notifications","🔔","Notifications"],["rules","📜","Règles"],["help","❓","Aide"],
  ["privacy","🔒","Confidentialité"],["contact","📞","Contact"],["how","📖","Fonctionnement"],["logout","🚪","Déconnexion"]
 ];
 
@@ -374,7 +374,7 @@ function money(n){return Number(n||0).toLocaleString("fr-FR")+" FCFA"}
 /* ===== NAVIGATION BuSAF : historique réel du bouton Retour Android ===== */
 function normalScreen(screen){
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
- const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","boutique","invites","orders","account","partner","memberBenefits","money","stockMarket","stockBoutique","meetings","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderMembers","founderReferral","founderBoutiques","founderStocks","founderAnnouncements","founderSettings"];
+ const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings"];
  return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
@@ -428,7 +428,7 @@ async function api(path,options={}){
  const r=await fetch(SUPABASE_URL+path,Object.assign({},options,{headers}));
  const text=await r.text();let data={};
  try{data=text?JSON.parse(text):{}}catch{data={raw:text}}
- if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.raw||"Erreur Supabase");
+ if(!r.ok){const err=new Error(data.msg||data.message||data.error_description||data.raw||"Erreur Supabase");err.status=r.status;err.payload=data;throw err;}
  return data;
 }
 async function loadProfile(){
@@ -479,14 +479,23 @@ async function restoreAuthenticatedSession(){
       state.token=oldToken;
       throw new Error("Profil BuSAF introuvable");
     }
-    state.screen=isFounder()?"member":"member";
+    state.screen=isFounder()?"founder":"member";
     return true;
   }catch(e){
-    console.warn("Session locale refusée :",e.message||e);
-    localStorage.removeItem("busaf_access_token");
-    localStorage.removeItem("busaf_user_id");
-    localStorage.removeItem("busaf_email");
-    state.userId=""; state.email=""; state.token=""; state.profile=null; state.screen="public";
+    console.warn("Restauration de session BuSAF :",e.message||e);
+    // Ne pas déconnecter l'utilisateur pour une panne réseau ou une erreur temporaire Supabase.
+    // On efface les identifiants uniquement si le serveur refuse explicitement la session.
+    if(e?.status===401 || e?.status===403 || /session invalide/i.test(String(e?.message||""))){
+      localStorage.removeItem("busaf_access_token");
+      localStorage.removeItem("busaf_user_id");
+      localStorage.removeItem("busaf_email");
+      state.userId=""; state.email=""; state.token=""; state.profile=null; state.screen="public";
+    }else{
+      state.token=storedToken;
+      state.userId=localStorage.getItem("busaf_user_id")||"";
+      state.email=localStorage.getItem("busaf_email")||"";
+      state.screen="public";
+    }
     return false;
   }
 }
@@ -538,7 +547,7 @@ async function login(e){
   localStorage.setItem("busaf_email",email);
   await ensureMemberProfile(d.user);
   addNotification("🔐 Connexion",`Connexion réussie sur ton espace BuSAF.`,"login");
-  setScreen("member");
+  setScreen(isFounder()?"founder":"member");
  }catch(err){
   msg.className="notice error";msg.textContent="❌ "+err.message;
   btn.disabled=false;btn.textContent="SE CONNECTER";
@@ -551,15 +560,24 @@ async function signup(e){
  const email=document.getElementById("regEmail").value.trim();
  const tel=document.getElementById("regTel").value.trim();
  const ville=document.getElementById("regVille").value.trim();
+ const pays=document.getElementById("regPays").value;
+ const villePays=ville+(pays?", "+pays:"");
  const code=document.getElementById("regCode").value.trim();
  const password=document.getElementById("regPassword").value;
  const msg=document.getElementById("regMsg"),btn=document.getElementById("regBtn");
  btn.disabled=true;btn.textContent="CRÉATION...";
  try{
+  if(!pays)throw new Error("Choisis ton pays.");
+  if(!ville)throw new Error("Saisis ta ville.");
   if(!code)throw new Error("Le code d'invitation est obligatoire.");
   if(password.length<6)throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
 
-  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville,code_invitation:code}})});
+  // Vérifier le code du parrain avant de créer un compte Auth, pour éviter les comptes orphelins.
+  const parrains=await api(`/rest/v1/profils_busaf?code_parrain=eq.${encodeURIComponent(code)}&select=id,code_parrain,nom_complet&limit=1`);
+  const parrain=Array.isArray(parrains)?parrains[0]:null;
+  if(!parrain)throw new Error("Code parrain invalide ou introuvable. Aucun compte n'a été créé.");
+
+  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville:villePays,code_invitation:code,pays}})});
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
 
   state.userId=d.user.id;state.email=email;state.token=d.access_token||"";
@@ -572,17 +590,13 @@ async function signup(e){
     return;
   }
 
-  const parrains=await api(`/rest/v1/profils_busaf?code_parrain=eq.${encodeURIComponent(code)}&select=id,code_parrain,nom_complet`);
-  const parrain=Array.isArray(parrains)?parrains[0]:null;
-  if(!parrain)throw new Error("Code parrain invalide ou introuvable.");
-
   const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
 
   const rows=await api("/rest/v1/profils_busaf",{method:"POST",body:JSON.stringify({
     user_id:state.userId,
     nom_complet:nom,
     telephone:tel,
-    Ville:ville,
+    Ville:villePays,
     role:"membre",
     parrain_id:parrain.id,
     code_parrain:nouveauCode,
@@ -707,18 +721,13 @@ function directResale(id){
 }
 function buyProduct(id,mode){
  const p=productForId(id);if(!p)return;
- if(hasBoughtProduct(id)){
-   openModal('✅ Déjà acheté',`<div class="notice success">Tu as déjà acheté <strong>${esc(p.name)}</strong>. Un même produit ne peut pas être acheté deux fois par le même membre.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);return;
- }
  if(mode==='direct'){directResale(id);return;}
- state.orders.unshift({id:Date.now(),product:p.name,productId:p.id,price:p.price,date:new Date().toLocaleString('fr-FR'),mode:'first_purchase',fromSponsor:true});
- state.marketStock++;
- const item=state.marketStockItems.find(x=>x.productId===p.id);if(item)item.qty++;else state.marketStockItems.push({productId:p.id,name:p.name,emoji:p.emoji,price:p.price,qty:1});
- saveState();
- openModal('🛒 Premier achat enregistré',`<div class="notice success"><strong>${esc(p.name)}</strong><br>Le produit est maintenant dans ton Stock BuSAF.</div><div class="notice">Pour un nouveau membre, ce premier achat est réalisé auprès de son parrain direct. Les achats suivants se font dans le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
+ // Ne jamais créditer le stock ni enregistrer un achat depuis le navigateur.
+ // Un achat n'est confirmé qu'après validation du paiement par le serveur.
+ startMarketPurchase(id);
 }
 
-function canInvite(){return state.orders.some(o=>o.mode==="stock"||o.mode==="direct");}
+function canInvite(){return state.orders.some(o=>o.mode==="yengapay_purchase"&&o.saleId); }
 function invitationCode(){return state.userId?`BUSAF-${state.userId.replace(/-/g,"").slice(0,8).toUpperCase()}`:"BUSAF-MEMBRE";}
 function invitationLink(){return `${location.origin}${location.pathname}#signup?invite=${encodeURIComponent(invitationCode())}`;}
 function invitationText(){return `🌍 Rejoins BuSAF / Business Africain.\nDécouvre le Marché BuSAF et crée ton compte avec mon invitation.\n👉 ${invitationLink()}\n🔑 Code : ${invitationCode()}`;}
@@ -842,7 +851,6 @@ function founderHome(){
  const products=Array.isArray(state.marketCatalog)?state.marketCatalog.length:0;
  const members=state.invites.length;
  const orders=state.orders.length;
- const meetings=state.meetings.length;
  return `<div class="founder-dashboard">
   <section class="founder-hero">
    <span class="founder-badge">👑 ESPACE FONDATEUR</span>
@@ -852,7 +860,6 @@ function founderHome(){
     <div class="founder-stat"><b>${products}</b><small>Produits Marché</small></div>
     <div class="founder-stat"><b>${members}</b><small>Invités suivis</small></div>
     <div class="founder-stat"><b>${orders}</b><small>Commandes</small></div>
-    <div class="founder-stat"><b>${meetings}</b><small>Réunions</small></div>
    </div>
   </section>
   <h2 class="founder-section-title">📊 PILOTAGE</h2>
@@ -873,13 +880,11 @@ function founderHome(){
   <h2 class="founder-section-title">🛍️ COMMERCE</h2>
   <div class="founder-grid">
    ${founderApp('founderMarket','🛒','Gestion du Marché','Ajouter, modifier, supprimer')}
-   ${founderApp('founderBoutiques','🏪','Gestion des Boutiques','Supervision')}
    ${founderApp('founderStocks','📦','Gestion des Stocks','Suivi des stocks')}
    ${founderApp('founderMarket','➕','Ajouter un produit','Publier au Marché')}
   </div>
   <h2 class="founder-section-title">📢 COMMUNICATION</h2>
   <div class="founder-grid">
-   ${founderApp('meetings','🎥','Réunions','Gestion des réunions')}
    ${founderApp('notifications','🔔','Notifications','Informations')}
    ${founderApp('founderAnnouncements','📢','Annonces','Communications')}
   </div>
@@ -948,18 +953,17 @@ function memberHome(){
  const p10=Math.min(monthly,10);
  const p100=Math.min(total,100);
  const desc={
-  market:'Produits et revente',boutique:'Publier mes produits',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',stockBoutique:'Produits de Boutique',meetings:'Réunions BuSAF',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
+  market:'Produits et revente',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
  };
  const accent=['accent-green','accent-blue','accent-purple','accent-orange','accent-teal','accent-green','accent-purple','accent-gold','accent-gold','accent-teal','accent-blue','accent-orange','accent-pink','accent-red','accent-red','accent-blue','accent-purple','accent-teal','accent-green','accent-red'];
- const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
+ const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
  return `<div class="member-dashboard member-reference">
    <div class="member-welcome compact-welcome">
-     <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, Boutique, commandes, invitations, bénéfices et suivi.</p></div>
+     <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, commandes, invitations, bénéfices et suivi.</p></div>
      <button class="dash-profile" onclick="setScreen('account')">💼 MON COMPTE</button>
    </div>
    <div class="dashboard-stats">
      <button class="dash-stat" onclick="setScreen('profits')"><span>💰</span><small>Compte Marché</small><strong>${money(state.marketBalance)}</strong></button>
-     <button class="dash-stat" onclick="setScreen('boutique')"><span>🏪</span><small>Compte Boutique</small><strong>${money(state.boutiqueBalance)}</strong></button>
      <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes</small><strong>${state.orders.length}</strong></button>
      <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités</small><strong>${state.invites.length}</strong></button>
    </div>
@@ -998,22 +1002,67 @@ function signupPage(){
  return page("👤 Créer mon compte BuSAF",`
  <form onsubmit="signup(event)">
   <label>Nom complet</label>
-  <input id="regNom" required placeholder="Nom et prénom">
+  <input id="regNom" autocomplete="name" required placeholder="Nom et prénom">
   <label>Adresse e-mail</label>
-  <input id="regEmail" type="email" required placeholder="exemple@email.com">
+  <input id="regEmail" type="email" autocomplete="email" required placeholder="exemple@email.com">
   <label>Téléphone</label>
-  <input id="regTel" required placeholder="Numéro de téléphone">
+  <input id="regTel" type="tel" autocomplete="tel" required placeholder="Numéro de téléphone">
+  <label>Pays</label>
+  <select id="regPays" required>
+   <option value="">Choisir votre pays</option>
+   <option value="Burkina Faso" selected>🇧🇫 Burkina Faso</option>
+   <option value="Bénin">🇧🇯 Bénin</option><option value="Botswana">🇧🇼 Botswana</option>
+   <option value="Côte d’Ivoire">🇨🇮 Côte d’Ivoire</option><option value="Cameroun">🇨🇲 Cameroun</option>
+   <option value="Cap-Vert">🇨🇻 Cap-Vert</option><option value="République centrafricaine">🇨🇫 République centrafricaine</option>
+   <option value="Tchad">🇹🇩 Tchad</option><option value="Comores">🇰🇲 Comores</option>
+   <option value="République du Congo">🇨🇬 République du Congo</option><option value="République démocratique du Congo">🇨🇩 RD Congo</option>
+   <option value="Djibouti">🇩🇯 Djibouti</option><option value="Algérie">🇩🇿 Algérie</option>
+   <option value="Égypte">🇪🇬 Égypte</option><option value="Érythrée">🇪🇷 Érythrée</option>
+   <option value="Eswatini">🇸🇿 Eswatini</option><option value="Éthiopie">🇪🇹 Éthiopie</option>
+   <option value="Gabon">🇬🇦 Gabon</option><option value="Gambie">🇬🇲 Gambie</option>
+   <option value="Ghana">🇬🇭 Ghana</option><option value="Guinée">🇬🇳 Guinée</option>
+   <option value="Guinée-Bissau">🇬🇼 Guinée-Bissau</option><option value="Guinée équatoriale">🇬🇶 Guinée équatoriale</option>
+   <option value="Kenya">🇰🇪 Kenya</option><option value="Lesotho">🇱🇸 Lesotho</option>
+   <option value="Liberia">🇱🇷 Liberia</option><option value="Libye">🇱🇾 Libye</option>
+   <option value="Madagascar">🇲🇬 Madagascar</option><option value="Malawi">🇲🇼 Malawi</option>
+   <option value="Mali">🇲🇱 Mali</option><option value="Maroc">🇲🇦 Maroc</option>
+   <option value="Maurice">🇲🇺 Maurice</option><option value="Mauritanie">🇲🇷 Mauritanie</option>
+   <option value="Mozambique">🇲🇿 Mozambique</option><option value="Namibie">🇳🇦 Namibie</option>
+   <option value="Niger">🇳🇪 Niger</option><option value="Nigeria">🇳🇬 Nigeria</option>
+   <option value="Ouganda">🇺🇬 Ouganda</option><option value="Rwanda">🇷🇼 Rwanda</option>
+   <option value="Sao Tomé-et-Principe">🇸🇹 Sao Tomé-et-Principe</option><option value="Sénégal">🇸🇳 Sénégal</option>
+   <option value="Seychelles">🇸🇨 Seychelles</option><option value="Sierra Leone">🇸🇱 Sierra Leone</option>
+   <option value="Somalie">🇸🇴 Somalie</option><option value="Afrique du Sud">🇿🇦 Afrique du Sud</option>
+   <option value="Soudan du Sud">🇸🇸 Soudan du Sud</option><option value="Soudan">🇸🇩 Soudan</option>
+   <option value="Tanzanie">🇹🇿 Tanzanie</option><option value="Togo">🇹🇬 Togo</option>
+   <option value="Tunisie">🇹🇳 Tunisie</option><option value="Zambie">🇿🇲 Zambie</option>
+   <option value="Zimbabwe">🇿🇼 Zimbabwe</option><option value="Angola">🇦🇴 Angola</option>
+   <option value="Burundi">🇧🇮 Burundi</option><option value="Sahara occidental">🇪🇭 Sahara occidental</option>
+   <option value="France">🇫🇷 France</option><option value="Canada">🇨🇦 Canada</option>
+   <option value="États-Unis">🇺🇸 États-Unis</option><option value="Belgique">🇧🇪 Belgique</option>
+   <option value="Allemagne">🇩🇪 Allemagne</option><option value="Italie">🇮🇹 Italie</option>
+   <option value="Espagne">🇪🇸 Espagne</option><option value="Royaume-Uni">🇬🇧 Royaume-Uni</option>
+   <option value="Autre pays">🌍 Autre pays</option>
+  </select>
   <label>Ville</label>
-  <input id="regVille" required placeholder="Votre ville">
-  <label>Code d'invitation</label>
-  <input id="regCode" required placeholder="Code reçu de votre invitant">
+  <input id="regVille" autocomplete="address-level2" required placeholder="Votre ville">
+  <label>Code d’invitation</label>
+  <div class="input-with-toggle"><input id="regCode" required autocomplete="off" placeholder="Code reçu de votre invitant"><button type="button" class="eye-toggle" aria-label="Afficher le code" onclick="toggleSignupField('regCode',this)">👁️</button></div>
   <label>Mot de passe</label>
-  <input id="regPassword" type="password" minlength="6" required placeholder="6 caractères minimum">
+  <div class="input-with-toggle"><input id="regPassword" type="password" autocomplete="new-password" minlength="6" required placeholder="6 caractères minimum"><button type="button" class="eye-toggle" aria-label="Afficher le mot de passe" onclick="toggleSignupField('regPassword',this)">👁️</button></div>
   <button class="btn" id="regBtn">CRÉER MON COMPTE</button>
  </form>
  <div id="regMsg" class="notice hidden"></div>
  <button class="btn alt" onclick="setScreen('login')">J'AI DÉJÀ UN COMPTE → SE CONNECTER</button>
  `);
+}
+function toggleSignupField(inputId,button){
+ const input=document.getElementById(inputId);
+ if(!input)return;
+ const visible=input.type==="password";
+ input.type=visible?"text":"password";
+ button.textContent=visible?"🙈":"👁️";
+ button.setAttribute("aria-label",visible?"Masquer":"Afficher");
 }
 
 /* =========================
@@ -1042,15 +1091,14 @@ function publicBenefits(){return page("⭐ Avantages",`
 <div class="rule"><h3>🤝 Commission du parrain direct</h3><p>Le parrain direct du vendeur reçoit <strong>7 %</strong> sur la revente validée. La commission ne vient pas du simple achat et ne concerne pas les filleuls indirects.</p></div>
 <div class="rule"><h3>⭐ Partner</h3><p>10 ventes validées du Marché BuSAF dans le même mois donnent le statut Partner.</p></div>
 <div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées donnent 25 000 FCFA par mois pendant 3 mois, selon la règle BuSAF définie.</p></div>`);}
-function publicProfits(){return page("💰 Bénéfices",`<div class="rule"><h3>💰 Revente du Marché</h3><p>Le vendeur reçoit <strong>4,5 %</strong> de bénéfice sur chaque revente validée d'un produit du Marché BuSAF.</p></div><div class="rule"><h3>🤝 Parrain direct</h3><p>Le parrain direct du vendeur reçoit <strong>7 %</strong> sur cette revente validée.</p></div><div class="notice">La commission de 7 % n'est pas déclenchée par l'achat initial et ne concerne pas les filleuls indirects.</div><div class="rule"><h3>🏪 Boutique</h3><p>Les ventes personnelles de Boutique sont séparées du Marché et ne donnent pas la commission directe de 7 %.</p></div>`);}
+function publicProfits(){return page("💰 Bénéfices",`<div class="rule"><h3>💰 Revente du Marché</h3><p>Le vendeur reçoit <strong>4,5 %</strong> de bénéfice sur chaque revente validée d'un produit du Marché BuSAF.</p></div><div class="rule"><h3>🤝 Parrain direct</h3><p>Le parrain direct du vendeur reçoit <strong>7 %</strong> sur cette revente validée.</p></div><div class="notice">La commission de 7 % n'est pas déclenchée par l'achat initial et ne concerne pas les filleuls indirects.</div>`);}
 function publicEarn(){return page("📈 Comment gagner",`<div class="rule"><h3>1. Acheter</h3><p>Le nouveau membre effectue son premier achat auprès de son parrain direct. Ensuite, il peut acheter d'autres produits différents dans le Marché BuSAF.</p></div><div class="rule"><h3>2. Revendre</h3><p>Après achat, il peut revendre le produit directement ou l'ajouter à son Stock BuSAF.</p></div><div class="rule"><h3>3. Bénéfice vendeur</h3><p>Chaque revente validée donne <strong>4,5 %</strong> au vendeur.</p></div><div class="rule"><h3>4. Parrainage</h3><p>Le parrain direct reçoit <strong>7 %</strong> sur les reventes validées de ses invités directs.</p></div><div class="rule"><h3>5. Progression</h3><p>10 ventes validées dans le même mois → Partner. 100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p></div>`);}
 function publicBoutiques(){return page("🏪 Boutiques",`<div class="rule"><h3>Boutiques physiques des membres</h3><p>Les produits physiques publiés par les membres sont regroupés dans l'espace BOUTIQUES. Ils restent séparés des produits numériques du Marché BuSAF.</p></div><div class="rule"><h3>Publication</h3><p>La création de la Boutique est <strong>gratuite</strong>. Lorsqu'un produit physique est publié, BuSAF prélève immédiatement <strong>5 %</strong> du prix indiqué. Le produit reste affiché à son prix exact.</p></div><div class="rule"><h3>Achat et contact</h3><p>Le client peut acheter, envoyer un message ou utiliser WhatsApp selon les possibilités prévues. Le vendeur et l'acheteur peuvent organiser la remise du produit.</p></div><div class="notice">Les commissions de parrainage du Marché ne s'appliquent pas aux ventes personnelles des Boutiques.</div>`);}
 function publicHow(){return page("📖 Fonctionnement",`
 <div class="rule"><h3>Deux activités séparées</h3><p>Le Marché BuSAF et la Boutique personnelle sont deux espaces distincts. Les produits, stocks, ventes, comptes et opérations ne doivent pas être mélangés.</p></div>
-<div class="rule"><h3>Deux stocks</h3><p><strong>Stock BuSAF</strong> = uniquement produits du Marché BuSAF. <strong>Stock Boutique</strong> = uniquement produits/services de la boutique personnelle.</p></div>
-<div class="rule"><h3>Deux comptes</h3><p><strong>Compte Marché</strong> et <strong>Compte Boutique</strong> sont séparés.</p></div>
+<div class="rule"><h3>Stock BuSAF</h3><p>Le stock BuSAF concerne uniquement les produits du Marché BuSAF. Les espaces Boutique personnelle et Réunions ne sont pas proposés dans cette version.</p></div>
 <div class="rule"><h3>Confidentialité</h3><p>Un membre ne doit pas pouvoir consulter les informations privées d'un autre membre.</p></div>`);}
-function publicRules(){return page("📜 Règles & conditions",`<div class="notice success"><strong>Référence fonctionnelle BuSAF</strong></div><div class="rule"><h3>1. Visiteur</h3><p>Sans compte : consultation du Marché, Avantages, Bénéfices, Commissions et Conditions. Aucun achat, vente, invitation ou réunion.</p></div><div class="rule"><h3>2. Inscription</h3><p>L'inscription utilise le lien/code du parrain direct. Chaque membre peut inviter un nombre illimité de personnes.</p></div><div class="rule"><h3>3. Premier achat</h3><p>Après inscription, le nouveau membre doit acheter son premier produit auprès de son parrain direct. Ensuite, il peut acheter d'autres produits dans le Marché BuSAF.</p></div><div class="rule"><h3>4. Un seul achat par produit</h3><p>Un membre peut acheter plusieurs produits différents, mais il ne peut pas acheter deux fois le même produit.</p></div><div class="rule"><h3>5. Revente du Marché</h3><p>Après achat : <strong>REVENDRE DIRECTEMENT</strong> ou <strong>AJOUTER À MON STOCKAGE</strong>. Le vendeur reçoit <strong>4,5 %</strong> sur la revente validée.</p></div><div class="rule"><h3>6. Commission du parrain</h3><p>Le parrain direct reçoit <strong>7 %</strong> sur les reventes validées de ses invités directs. L'achat initial ne déclenche pas cette commission. Aucun niveau indirect ne reçoit cette commission.</p></div><div class="rule"><h3>7. Partner</h3><p><strong>10 ventes validées dans le même mois</strong> → statut Partner. Les ventes de Boutique ne comptent pas.</p></div><div class="rule"><h3>8. Objectif 100 ventes</h3><p><strong>100 ventes validées</strong> → 25 000 FCFA par mois pendant 3 mois, selon les conditions BuSAF.</p></div><div class="rule"><h3>9. Boutiques</h3><p>Les Boutiques regroupent les produits physiques des membres. Création gratuite. À chaque publication, BuSAF prélève immédiatement <strong>5 %</strong> du prix affiché. Le prix public reste celui fixé par le membre.</p></div><div class="rule"><h3>10. Formateur</h3><p>Pour un produit numérique créé par un formateur et vendu dans le Marché, le formateur reçoit <strong>20 %</strong> du prix sur chaque vente confirmée.</p></div><div class="rule"><h3>11. Réunions</h3><p>Réunions partenaire, nouveau membre, 100 ventes et générale. Micro et caméra. Le fondateur seul peut convoquer la réunion générale.</p></div><div class="rule"><h3>12. Interdictions</h3><p>Ne pas mélanger produits du Marché et produits de Boutique, ne pas contourner la règle d'un achat par produit, ne pas falsifier une vente et ne pas consulter les données privées d'un autre membre.</p></div><button class="btn" onclick="ackRules()">J'AI BIEN LU</button><button class="btn alt" onclick="setScreen('public')">RETOUR</button>`);}
+function publicRules(){return page("📜 Règles & conditions",`<div class="notice success"><strong>Référence fonctionnelle BuSAF</strong></div><div class="rule"><h3>1. Visiteur</h3><p>Sans compte : consultation du Marché, Avantages, Bénéfices, Commissions et Conditions. Aucun achat, vente, invitation ou réunion.</p></div><div class="rule"><h3>2. Inscription</h3><p>L'inscription utilise le lien/code du parrain direct. Chaque membre peut inviter un nombre illimité de personnes.</p></div><div class="rule"><h3>3. Premier achat</h3><p>Après inscription, le nouveau membre doit acheter son premier produit auprès de son parrain direct. Ensuite, il peut acheter d'autres produits dans le Marché BuSAF.</p></div><div class="rule"><h3>4. Un seul achat par produit</h3><p>Un membre peut acheter plusieurs produits différents, mais il ne peut pas acheter deux fois le même produit.</p></div><div class="rule"><h3>5. Revente du Marché</h3><p>Après achat : <strong>REVENDRE DIRECTEMENT</strong> ou <strong>AJOUTER À MON STOCKAGE</strong>. Le vendeur reçoit <strong>4,5 %</strong> sur la revente validée.</p></div><div class="rule"><h3>6. Commission du parrain</h3><p>Le parrain direct reçoit <strong>7 %</strong> sur les reventes validées de ses invités directs. L'achat initial ne déclenche pas cette commission. Aucun niveau indirect ne reçoit cette commission.</p></div><div class="rule"><h3>7. Partner</h3><p><strong>10 ventes validées dans le même mois</strong> → statut Partner. Les ventes de Boutique ne comptent pas.</p></div><div class="rule"><h3>8. Objectif 100 ventes</h3><p><strong>100 ventes validées</strong> → 25 000 FCFA par mois pendant 3 mois, selon les conditions BuSAF.</p></div><div class="rule"><h3>10. Formateur</h3><p>Pour un produit numérique créé par un formateur et vendu dans le Marché, le formateur reçoit <strong>20 %</strong> du prix sur chaque vente confirmée.</p></div><div class="rule"><h3>12. Interdictions</h3><p>Ne pas mélanger produits du Marché et produits de Boutique, ne pas contourner la règle d'un achat par produit, ne pas falsifier une vente et ne pas consulter les données privées d'un autre membre.</p></div><button class="btn" onclick="ackRules()">J'AI BIEN LU</button><button class="btn alt" onclick="setScreen('public')">RETOUR</button>`);}
 function ackRules(){localStorage.setItem('busaf_rules_ack','1');openModal('✅ Conditions',`<div class="notice success">Merci. Tu as confirmé avoir lu les règles BuSAF.</div><button class="btn" onclick="closeModal()">OK</button>`);}
 function publicPrivacy(){return page("🔒 Confidentialité",`<div class="rule"><h3>Données personnelles</h3><p>Chaque membre doit rester limité à ses propres informations privées selon les règles d'accès de la plateforme.</p></div><div class="rule"><h3>Opérations</h3><p>Les informations privées, soldes, commissions et opérations d'un autre membre ne doivent pas être exposés.</p></div>`);}
 function publicHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Inscription et connexion</h3><p>Découvre BuSAF avant de créer ton compte.</p><button class="btn" onclick="setScreen('signup')">CRÉER MON COMPTE</button><button class="btn alt" onclick="setScreen('login')">SE CONNECTER</button></div><div class="rule"><h3>🛒 Marché</h3><p>Consulte produits, bénéfices, règles et fonctionnement.</p><button class="btn alt" onclick="setScreen('market')">VOIR LE MARCHÉ</button></div><div class="rule"><h3>📜 Règles</h3><button class="btn alt" onclick="setScreen('rules')">LIRE LES RÈGLES</button></div><div class="rule"><h3>📞 Assistance</h3><button class="btn" onclick="setScreen('contact')">CONTACT</button></div>`);}
@@ -1079,9 +1127,12 @@ async function loadMarketCatalog(force=false){
  if(state.marketCatalogLoaded&&!force)return;
  try{
    // Cette requête fonctionne aussi pour un visiteur non connecté grâce à la policy anon SELECT.
-   // Les produits physiques sont exclus du Marché et aucun produit n'est filtré par son nom.
-   const rows=await api('/rest/v1/produits?type_produit=neq.physical&select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
-   state.marketCatalog=Array.isArray(rows)?rows:[];
+   // Les produits physiques et les produits de test ne doivent pas apparaître dans le Marché public.
+   const rows=await api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
+   state.marketCatalog=Array.isArray(rows)?rows.filter(p=>{
+     const type=String(p.type_produit||'').trim().toLowerCase();
+     return !['physical','physique'].includes(type) && !type.includes('test');
+   }):[];
    state.marketCatalogLoaded=true;
  }catch(e){
    console.warn('Marché BuSAF public:',e);
@@ -1092,7 +1143,7 @@ async function loadMarketCatalog(force=false){
 async function syncConfirmedMarketPurchases(){
  if(!state.userId||!state.token||!state.profile?.id)return;
  try{
-   const rows=await api(`/rest/v1/ventes?acheteur_id=eq.${encodeURIComponent(state.profile.id)}&statut=eq.confirmee&select=id,produit_id,montant,reference,date_vente&order=date_vente.asc`);
+   const rows=await api(`/rest/v1/ventes?acheteur_id=eq.${encodeURIComponent(state.profile.id)}&statut=in.(confirmee,validee)&select=id,produit_id,montant,reference,date_vente&order=date_vente.asc`);
    if(!Array.isArray(rows))return;
    let changed=false;
    for(const sale of rows){
@@ -1122,7 +1173,7 @@ function memberMarket(){
  }).join('');
  const founderButton=marketCanPublish()?`<button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button>`:'';
  const empty=state.marketCatalogLoaded?`<div class="empty">Aucun produit numérique/business n'est encore publié dans le Marché BuSAF.</div>`:`<div class="empty">Chargement des produits du Marché BuSAF…</div>`;
- return page("🛒 Marché BuSAF",`<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits affichés viennent maintenant de <strong>public.produits</strong>. Les produits physiques des Boutiques sont exclus.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><button class="btn alt small" onclick="setScreen('boutique')">🏪 MA BOUTIQUE</button></div>${founderButton}<div class="productgrid">${cards||empty}</div>`);
+ return page("🛒 Marché BuSAF",`<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits affichés viennent maintenant de <strong>public.produits</strong>. Les produits physiques des Boutiques sont exclus.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button></div>${founderButton}<div class="productgrid">${cards||empty}</div>`);
 }
 async function refreshMarketCatalog(){await loadMarketCatalog(true);render();}
 function viewMarketProduct(id){
@@ -1141,6 +1192,20 @@ async function startMarketPurchase(productId){
  const product=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
  if(!product)return;
  try{
+   // Règle d'accès : le nouveau membre doit d'abord acheter un produit
+   // que son parrain direct a déjà acheté, avant les autres produits du Marché.
+   if(!state.profile?.id)await loadProfile();
+   if(!state.profile?.id)throw new Error("Profil BuSAF introuvable. Reconnecte-toi puis réessaie.");
+   const ownSales=await api(`/rest/v1/ventes?acheteur_id=eq.${encodeURIComponent(state.profile.id)}&statut=in.(confirmee,validee)&select=id&limit=1`);
+   if(!Array.isArray(ownSales)||ownSales.length===0){
+     const sponsorId=String(state.profile.parrain_id||"");
+     if(!sponsorId)throw new Error("Ton parrain direct n'est pas associé à ton profil. Contacte l'assistance BuSAF avant de payer.");
+     const sponsorSales=await api(`/rest/v1/ventes?acheteur_id=eq.${encodeURIComponent(sponsorId)}&statut=in.(confirmee,validee)&select=produit_id`);
+     const eligible=new Set((Array.isArray(sponsorSales)?sponsorSales:[]).map(s=>String(s.produit_id||"")).filter(Boolean));
+     if(!eligible.has(String(product.id))){
+       throw new Error("Pour activer ton compte commercial, tu dois d'abord acheter un produit du Marché que ton parrain direct a déjà acheté. Après confirmation du paiement, tu pourras accéder à tous les produits du Marché BuSAF.");
+     }
+   }
    openModal('💳 Préparation du paiement',`<div class="notice">Création sécurisée de ton achat BuSAF…</div>`);
    const response=await fetch(`${SUPABASE_URL}/functions/v1/creer-achat-marche`,{
      method:'POST',
@@ -1216,7 +1281,7 @@ function openMarketProductForm(editId=''){
  if(!marketCanPublish()){openModal('🔒 Marché BuSAF',`<div class="notice warning">Seul le fondateur peut gérer les produits du Marché BuSAF.</div><button class="btn" onclick="closeModal()">OK</button>`);return;}
  const p=editId?(state.marketCatalog||[]).find(x=>String(x.id)===String(editId)):null;
  const title=p?'✏️ Modifier le produit':'➕ Ajouter un produit au Marché BuSAF';
- openModal(title,`<label>Photo du produit ${p?'(laisser vide pour conserver la photo)':'(facultative)'}</label><input id="mpPhoto" type="file" accept="image/*"><label>Nom du produit</label><input id="mpName" value="${esc(p?.nom||'')}" placeholder="Nom"><label>Prix FCFA</label><input id="mpPrice" type="number" min="1" value="${p?.prix??''}" placeholder="Prix"><label>Description</label><textarea id="mpDesc" placeholder="Description du produit numérique/business">${esc(p?.description||'')}</textarea><div class="notice">${p?'Les modifications seront enregistrées directement dans public.produits.':'La publication sera enregistrée directement dans public.produits.'} Aucun achat n'est disponible dans l'espace Fondateur.</div><button class="btn" onclick="saveMarketProduct('${String(editId||'')}')">${p?'💾 ENREGISTRER LES MODIFICATIONS':'VALIDER ET PUBLIER'}</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
+ openModal(title,`<label>Photo du produit ${p?'(laisser vide pour conserver la photo)':'(facultative)'}</label><input id="mpPhoto" type="file" accept="image/*"><label>Nom du produit</label><input id="mpName" value="${esc(p?.nom||'')}" placeholder="Nom"><label>Prix FCFA</label><input id="mpPrice" type="number" min="1" value="${p?.prix??''}" placeholder="Prix"><label>Description</label><textarea id="mpDesc" placeholder="Description du produit numérique/business">${esc(p?.description||'')}</textarea><div class="notice">${p?'Les modifications seront enregistrées directement dans public.produits.':'La publication sera enregistrée directement dans public.produits.'} Aucun achat n'est disponible dans l'espace Fondateur.</div><button id="saveMarketProductBtn" class="btn" onclick="saveMarketProduct('${String(editId||'')}')">${p?'💾 ENREGISTRER LES MODIFICATIONS':'VALIDER ET PUBLIER'}</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
 }
 async function saveMarketProduct(editId=''){
  if(!marketCanPublish()){
@@ -1227,6 +1292,8 @@ async function saveMarketProduct(editId=''){
    alert('Session BuSAF absente. Déconnecte-toi puis reconnecte-toi avec le compte fondateur.');
    return;
  }
+ const publishBtn=document.getElementById("saveMarketProductBtn");
+ if(publishBtn){if(publishBtn.disabled)return;publishBtn.disabled=true;publishBtn.textContent=editId?"MODIFICATION EN COURS…":"PUBLICATION EN COURS…";}
  try{
    // Recharge le profil avant l'insertion pour éviter un state.profile périmé ou vide.
    await loadProfile();
@@ -1294,20 +1361,32 @@ async function saveMarketProduct(editId=''){
        headers:{'Prefer':'return=representation'},
        body:JSON.stringify(body)
      });
-     const created=Array.isArray(rows)?rows[0]:rows;
-     if(!created?.id)throw new Error('Supabase n’a pas confirmé la création du produit.');
+     let created=Array.isArray(rows)?rows[0]:rows;
+     if(!created?.id){
+       const verify=await api(`/rest/v1/produits?nom=eq.${encodeURIComponent(name)}&prix=eq.${encodeURIComponent(String(price))}&createur_id=eq.${encodeURIComponent(creatorId)}&select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc&limit=1`);
+       created=Array.isArray(verify)?verify[0]:null;
+     }
+     if(!created?.id)throw new Error('Supabase n’a pas confirmé la création. Vérifie le catalogue avant de recommencer pour éviter un doublon.');
    }
 
+   // À ce stade, Supabase a confirmé l'enregistrement. Une panne de rafraîchissement
+   // du catalogue ou des notifications ne doit pas annoncer à tort un échec de publication.
    state.marketCatalogLoaded=false;
-   await loadMarketCatalog(true);
-   if(!editId) await logSharedBusafEvent('produit_marche','🛒 Nouveau produit du Marché',{nom,prix});
+   let refreshWarning='';
+   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit enregistré, actualisation du catalogue à réessayer:',refreshError);refreshWarning=' Le produit est enregistré, mais le catalogue n’a pas pu être actualisé automatiquement.';}
+   if(!editId){
+     try{await logSharedBusafEvent('produit_marche','🛒 Nouveau produit du Marché',{nom,prix});}
+     catch(eventError){console.warn('Produit enregistré, notification non envoyée:',eventError);}
+   }
    closeModal();
    render();
    openModal(editId?'✅ Produit modifié':'✅ Produit publié',
-     `<div class="notice success"><strong>${esc(name)}</strong> est ${editId?'maintenant modifié':'maintenant enregistré'} dans le Marché BuSAF.</div><div class="notice">Prix : ${money(price)}<br>Source : Supabase / public.produits</div><button class="btn" onclick="closeModal()">OK</button>`
+     `<div class="notice success"><strong>${esc(name)}</strong> est ${editId?'maintenant modifié':'maintenant enregistré'} dans le Marché BuSAF.</div><div class="notice">Prix : ${money(price)}<br>Source : Supabase / public.produits</div>${refreshWarning?'<div class="notice warning">'+esc(refreshWarning)+'</div>':''}<button class="btn" onclick="closeModal()">OK</button>`
    );
  }catch(e){
    console.error('BuSAF saveMarketProduct:',e);
+   const btn=document.getElementById("saveMarketProductBtn");
+   if(btn){btn.disabled=false;btn.textContent=editId?"💾 ENREGISTRER LES MODIFICATIONS":"VALIDER ET PUBLIER";}
    alert('❌ Opération impossible : '+(e?.message||'Erreur inconnue.'));
  }
 }
@@ -1636,16 +1715,16 @@ async function saveProfile(){
  }
 }
 
-function memberProfits(){const seller=state.sales.reduce((a,x)=>a+Number(x.sellerProfit||0),0);return page("💰 Mes Bénéfices",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div><div class="stat">Compte Boutique<strong>${money(state.boutiqueBalance)}</strong></div></div><div class="rule"><h3>Ventes du Marché</h3><p>Bénéfices vendeur enregistrés localement : <strong>${money(seller)}</strong>.</p></div><div class="notice warning">Les soldes financiers de production doivent être calculés et protégés dans Supabase.</div><button class="btn" onclick="setScreen('money')">💳 DÉPÔT / RETRAIT</button><button class="btn alt" onclick="setScreen('commissions')">🤝 COMMISSIONS</button>`);}
+function memberProfits(){const seller=state.sales.reduce((a,x)=>a+Number(x.sellerProfit||0),0);return page("💰 Mes Bénéfices",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div></div><div class="rule"><h3>Ventes du Marché</h3><p>Bénéfices vendeur enregistrés localement : <strong>${money(seller)}</strong>.</p></div><div class="notice warning">Les soldes financiers de production doivent être calculés et protégés dans Supabase.</div><button class="btn" onclick="setScreen('money')">💳 DÉPÔT / RETRAIT</button><button class="btn alt" onclick="setScreen('commissions')">🤝 COMMISSIONS</button>`);}
 
 function memberCommissions(){const sponsor=state.sales.reduce((a,x)=>a+Number(x.sponsorCommission||0),0);return page("🤝 Mes Commissions",`<div class="stat">Commissions directes enregistrées<strong>${money(sponsor)}</strong></div><div class="rule"><h3>7 %</h3><p>La commission est destinée au parrain direct du vendeur sur les reventes validées de ses invités directs.</p></div><div class="notice">Le vendeur voit son propre bénéfice de 4,5 %. La commission de son parrain est séparée.</div><button class="btn" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
 function memberPartner(){const n=monthlySalesCount(),pct=Math.min(100,n*10),total=totalSalesCount();return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong>${n}/10</strong></div><div class="stat">Ventes totales<strong>${total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>10 ventes du Marché BuSAF dans un même mois. Les ventes personnelles et les mois cumulés ne remplacent pas la condition.</p></div><button class="btn" onclick="setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
 
 function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 4,5 % et son parrain direct reçoit 7 % sur la revente validée.</p></div>`);}
-function memberMoney(){return page("💳 Dépôt / Retrait",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div><div class="stat">Compte Boutique<strong>${money(state.boutiqueBalance)}</strong></div></div><div class="notice warning">Les dépôts et retraits réels doivent être validés côté serveur par le fournisseur de paiement.</div><button class="btn" onclick="openMoneyDeposit()">💳 DÉPÔT</button><button class="btn alt" onclick="openMoneyWithdraw()">💸 RETRAIT</button><button class="btn alt" onclick="setScreen('orders')">📜 HISTORIQUE</button>`);}
-function openMoneyDeposit(){openModal("💳 Dépôt",`<label>Compte</label><select><option>Compte Marché</option><option>Compte Boutique</option></select><label>Montant FCFA</label><input id="depAmount" type="number" min="1"><label>Mode</label><select><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option></select><button class="btn" onclick="requestMoneyDeposit()">CONTINUER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
+function memberMoney(){return page("💳 Dépôt / Retrait",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div></div><div class="notice warning">Les dépôts et retraits réels doivent être validés côté serveur par le fournisseur de paiement.</div><button class="btn" onclick="openMoneyDeposit()">💳 DÉPÔT</button><button class="btn alt" onclick="openMoneyWithdraw()">💸 RETRAIT</button><button class="btn alt" onclick="setScreen('orders')">📜 HISTORIQUE</button>`);}
+function openMoneyDeposit(){openModal("💳 Dépôt",`<label>Compte</label><select><option>Compte Marché</option></select><label>Montant FCFA</label><input id="depAmount" type="number" min="1"><label>Mode</label><select><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option></select><button class="btn" onclick="requestMoneyDeposit()">CONTINUER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 function requestMoneyDeposit(){const a=Number(document.getElementById("depAmount")?.value||0);if(a<=0){alert("Montant invalide.");return;}closeModal();openModal("Dépôt",`<div class="notice warning">Demande préparée. Le solde ne sera crédité qu'après confirmation du paiement côté serveur.</div><button class="btn" onclick="closeModal()">OK</button>`);}
-function openMoneyWithdraw(){openModal("💸 Retrait",`<label>Compte</label><select><option>Compte Marché</option><option>Compte Boutique</option></select><label>Montant FCFA</label><input id="wdAmount" type="number" min="1"><label>Numéro Mobile Money</label><input id="wdPhone" type="tel"><button class="btn" onclick="requestMoneyWithdraw()">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
+function openMoneyWithdraw(){openModal("💸 Retrait",`<label>Compte</label><select id="wdAccount"><option value="marche">Compte Marché</option></select><label>Montant FCFA</label><input id="wdAmount" type="number" min="1"><label>Numéro Mobile Money</label><input id="wdPhone" type="tel"><button class="btn" onclick="requestMoneyWithdraw()">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 function requestMoneyWithdraw(){const a=Number(document.getElementById("wdAmount")?.value||0),phone=document.getElementById("wdPhone")?.value.trim();if(a<=0||!phone){alert("Montant et numéro obligatoires.");return;}closeModal();openModal("Retrait",`<div class="notice warning">Demande préparée. Aucun solde n'est débité dans le navigateur. Le débit réel doit être validé côté serveur.</div><button class="btn" onclick="closeModal()">OK</button>`);}
 
 function sellFromStock(productId){
@@ -1686,7 +1765,7 @@ function readNotification(i){if(state.notifications[i])state.notifications[i].re
 function readAllNotifications(){state.notifications.forEach(n=>n.read=true);saveState();render();}
 
 function memberRules(){return publicRules();}
-function memberHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Compte</h3><p>Créer, connecter, modifier et déconnecter le compte.</p><button class="btn alt" onclick="setScreen('account')">MON COMPTE</button></div><div class="rule"><h3>🛒 Marché</h3><p>Acheter, revendre directement ou ajouter au Stock BuSAF.</p><button class="btn alt" onclick="setScreen('market')">MARCHÉ</button></div><div class="rule"><h3>📦 Stocks</h3><p>Stock BuSAF et Stock Boutique ne sont jamais mélangés.</p><button class="btn alt" onclick="setScreen('stockMarket')">STOCK BuSAF</button><button class="btn alt" onclick="setScreen('stockBoutique')">STOCK BOUTIQUE</button></div><div class="rule"><h3>👥 Invitations</h3><p>Après un achat du Marché : PARTAGER MON INVITATION, copier lien/code et partager.</p><button class="btn alt" onclick="setScreen('invites')">MES INVITÉS</button></div><div class="rule"><h3>💰 Bénéfices / commissions</h3><p>Les montants doivent rester séparés.</p><button class="btn alt" onclick="setScreen('profits')">BÉNÉFICES</button><button class="btn alt" onclick="setScreen('commissions')">COMMISSIONS</button></div><div class="rule"><h3>⭐ Partner / 🎁 Bonus</h3><p>10 ventes dans le mois pour Partner ; 4,5 % de bénéfice vendeur sur une revente validée ; 7 % pour le parrain direct ; 100 ventes validées = 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('partner')">PARTNER</button><button class="btn alt" onclick="setScreen('memberBenefits')">AVANTAGES</button></div><div class="rule"><h3>🏪 Boutique</h3><p>Ouverture gratuite ; prélèvement BuSAF de 5 % à la publication, sans commission directe de parrainage.</p><button class="btn alt" onclick="setScreen('boutique')">MA BOUTIQUE</button></div><div class="rule"><h3>💳 Argent</h3><p>Compte Marché et Compte Boutique restent séparés.</p><button class="btn alt" onclick="setScreen('money')">DÉPÔT / RETRAIT</button></div><div class="rule"><h3>🎥 Réunions</h3><p>Réunions avec invités/clients, caméra et micro indépendants.</p><button class="btn alt" onclick="setScreen('meetings')">RÉUNIONS</button></div><button class="btn" onclick="setScreen('contact')">CONTACTER BuSAF</button>`);}
+function memberHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Compte</h3><p>Créer, connecter, modifier et déconnecter le compte.</p><button class="btn alt" onclick="setScreen('account')">MON COMPTE</button></div><div class="rule"><h3>🛒 Marché</h3><p>Acheter, revendre directement ou ajouter au Stock BuSAF.</p><button class="btn alt" onclick="setScreen('market')">MARCHÉ</button></div><div class="rule"><h3>📦 Stock BuSAF</h3><p>Consulte les produits numériques achetés et disponibles pour la revente.</p><button class="btn alt" onclick="setScreen('stockMarket')">MON STOCK BuSAF</button></div><div class="rule"><h3>👥 Invitations</h3><p>Après confirmation d’un achat du Marché, tu peux partager ton invitation.</p><button class="btn alt" onclick="setScreen('invites')">MES INVITÉS</button></div><div class="rule"><h3>💰 Bénéfices / commissions</h3><p>Les bénéfices vendeur et les commissions de parrainage sont séparés.</p><button class="btn alt" onclick="setScreen('profits')">BÉNÉFICES</button><button class="btn alt" onclick="setScreen('commissions')">COMMISSIONS</button></div><div class="rule"><h3>⭐ Partner / 🎁 Bonus</h3><p>10 ventes validées dans le mois pour Partner ; 4,5 % de bénéfice vendeur sur une revente validée ; 7 % pour le parrain direct ; 100 ventes validées = 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('partner')">PARTNER</button><button class="btn alt" onclick="setScreen('memberBenefits')">AVANTAGES</button></div><div class="rule"><h3>💳 Argent</h3><p>Les dépôts et retraits doivent être confirmés par le serveur de paiement.</p><button class="btn alt" onclick="setScreen('money')">DÉPÔT / RETRAIT</button></div><button class="btn" onclick="setScreen('contact')">CONTACTER BuSAF</button>`);}
 
 function memberPrivacy(){return publicPrivacy();}
 function memberContact(){return publicContact();}
@@ -1705,7 +1784,6 @@ function memberQuick(){
  return `<div class="bottom"><div class="bottom-inner">
  <button onclick="setScreen('member')"><span>🏠</span>Accueil</button>
  <button onclick="setScreen('market')"><span>🛒</span>Marché</button>
- <button onclick="setScreen('boutique')"><span>🏪</span>Boutique</button>
  <button onclick="setScreen('invites')"><span>👥</span>Invités</button>
  <button onclick="setScreen('account')"><span>💼</span>Compte</button>
  </div></div>`;
@@ -1758,9 +1836,8 @@ function render(){
      founderReferral:()=>founderPlaceholder('🤝 Parrainage','Gestion du réseau de parrainage et des commissions.'),
      partner:()=>founderPlaceholder('⭐ Partner','Suivi des statuts Partner.'),
      commissions:()=>founderPlaceholder('💰 Commissions','Suivi des commissions.'),
-     founderBoutiques:()=>founderPlaceholder('🏪 Gestion des Boutiques','Supervision des boutiques.'),
      founderStocks:founderStocks,
-     meetings:memberMeetings,notifications:memberNotifications,
+     notifications:memberNotifications,
      founderAnnouncements:()=>founderPlaceholder('📢 Annonces','Gestion des communications BuSAF.'),
      privacy:()=>founderPlaceholder('🛡️ Sécurité','Sécurité et protection de BuSAF.'),
      founderSettings:()=>founderPlaceholder('⚙️ Paramètres','Configuration générale de BuSAF.'),
@@ -1771,9 +1848,9 @@ function render(){
     if(state.screen==='founder' && !state.founderStats){ founderLoadStats().then(()=>{ if(state.screen==='founder')render(); }).catch(()=>{}); }
    }else{
     const map={
-     member:memberHome,market:memberMarket,boutique:memberBoutique,invites:memberInvites,orders:memberOrders,account:memberAccount,
+     member:memberHome,market:memberMarket,invites:memberInvites,orders:memberOrders,account:memberAccount,
      profits:memberProfits,commissions:memberCommissions,partner:memberPartner,memberBenefits:memberAdvantages,money:memberMoney,
-     stockMarket:memberStockMarket,stockBoutique:memberStockBoutique,meetings:memberMeetings,notifications:memberNotifications,
+     stockMarket:memberStockMarket,notifications:memberNotifications,
      rules:memberRules,help:memberHelp,privacy:memberPrivacy,contact:memberContact,how:memberHow
     };
     content=(map[state.screen]||memberHome)();
@@ -1802,19 +1879,19 @@ async function start(){
 
     // L'interface publique ne doit jamais devenir membre simplement parce qu'une ancienne donnée locale existe.
     render();
-    await loadMarketCatalog().catch(e=>console.warn("Marché public non chargé :",e));
-    render();
+    // Le catalogue se charge en arrière-plan sans retarder la restauration de session.
+    loadMarketCatalog().then(()=>{if(!state.userId)render();}).catch(e=>console.warn("Marché public non chargé :",e));
 
     const authenticated=await restoreAuthenticatedSession();
     if(authenticated){
-      state.screen=isFounder()?"member":"member";
+      state.screen=isFounder()?"founder":"member";
       history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
       await loadMarketCatalog().catch(e=>console.warn("Marché non chargé :",e));
       await syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
       initBusafRealtime();
-      await syncMeetingsFromServer().catch(e=>console.warn("Réunions non synchronisées :",e));
       await syncSharedBusafEvents().catch(e=>console.warn("Événements non synchronisés :",e));
-      setInterval(()=>{syncMeetingsFromServer();syncSharedBusafEvents();},15000);
+      // Les réunions sont désactivées; les notifications se synchronisent moins souvent.
+      window.busafEventsTimer=setInterval(()=>{if(state.userId&&state.token)syncSharedBusafEvents();},60000);
       render();
     }
   }catch(e){
@@ -1837,6 +1914,15 @@ async function start(){
     }
   }
 }
+// Ouvre explicitement la visionneuse pour les anciennes cartes qui utilisent un gestionnaire inline.
+function openPhotoLightbox(src,alt){
+ const box=document.getElementById("photoLightbox");
+ const img=document.getElementById("photoLightboxImage");
+ if(!box||!img||!src)return;
+ img.src=src;img.alt=alt||"Photo BuSAF";img.style.transform="translate3d(0,0,0) scale(1)";
+ box.classList.add("open");box.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";
+}
+
 // Visionneuse universelle : toutes les photos BuSAF peuvent être ouvertes et zoomées.
 function initUniversalPhotoViewer(){
   const box=document.getElementById("photoLightbox");
