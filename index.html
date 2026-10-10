@@ -1096,8 +1096,7 @@ function publicEarn(){return page("📈 Comment gagner",`<div class="rule"><h3>1
 function publicBoutiques(){return page("🏪 Boutiques",`<div class="rule"><h3>Boutiques physiques des membres</h3><p>Les produits physiques publiés par les membres sont regroupés dans l'espace BOUTIQUES. Ils restent séparés des produits numériques du Marché BuSAF.</p></div><div class="rule"><h3>Publication</h3><p>La création de la Boutique est <strong>gratuite</strong>. Lorsqu'un produit physique est publié, BuSAF prélève immédiatement <strong>5 %</strong> du prix indiqué. Le produit reste affiché à son prix exact.</p></div><div class="rule"><h3>Achat et contact</h3><p>Le client peut acheter, envoyer un message ou utiliser WhatsApp selon les possibilités prévues. Le vendeur et l'acheteur peuvent organiser la remise du produit.</p></div><div class="notice">Les commissions de parrainage du Marché ne s'appliquent pas aux ventes personnelles des Boutiques.</div>`);}
 function publicHow(){return page("📖 Fonctionnement",`
 <div class="rule"><h3>Deux activités séparées</h3><p>Le Marché BuSAF et la Boutique personnelle sont deux espaces distincts. Les produits, stocks, ventes, comptes et opérations ne doivent pas être mélangés.</p></div>
-<div class="rule"><h3>Deux stocks</h3><p><strong>Stock BuSAF</strong> = uniquement produits du Marché BuSAF. <strong>Stock Boutique</strong> = uniquement produits/services de la boutique personnelle.</p></div>
-<div class="rule"><h3>Deux comptes</h3><p><strong>Compte Marché</strong> et <strong>Compte Boutique</strong> sont séparés.</p></div>
+<div class="rule"><h3>Stock BuSAF</h3><p>Le stock BuSAF concerne uniquement les produits du Marché BuSAF. Les espaces Boutique personnelle et Réunions ne sont pas proposés dans cette version.</p></div>
 <div class="rule"><h3>Confidentialité</h3><p>Un membre ne doit pas pouvoir consulter les informations privées d'un autre membre.</p></div>`);}
 function publicRules(){return page("📜 Règles & conditions",`<div class="notice success"><strong>Référence fonctionnelle BuSAF</strong></div><div class="rule"><h3>1. Visiteur</h3><p>Sans compte : consultation du Marché, Avantages, Bénéfices, Commissions et Conditions. Aucun achat, vente, invitation ou réunion.</p></div><div class="rule"><h3>2. Inscription</h3><p>L'inscription utilise le lien/code du parrain direct. Chaque membre peut inviter un nombre illimité de personnes.</p></div><div class="rule"><h3>3. Premier achat</h3><p>Après inscription, le nouveau membre doit acheter son premier produit auprès de son parrain direct. Ensuite, il peut acheter d'autres produits dans le Marché BuSAF.</p></div><div class="rule"><h3>4. Un seul achat par produit</h3><p>Un membre peut acheter plusieurs produits différents, mais il ne peut pas acheter deux fois le même produit.</p></div><div class="rule"><h3>5. Revente du Marché</h3><p>Après achat : <strong>REVENDRE DIRECTEMENT</strong> ou <strong>AJOUTER À MON STOCKAGE</strong>. Le vendeur reçoit <strong>4,5 %</strong> sur la revente validée.</p></div><div class="rule"><h3>6. Commission du parrain</h3><p>Le parrain direct reçoit <strong>7 %</strong> sur les reventes validées de ses invités directs. L'achat initial ne déclenche pas cette commission. Aucun niveau indirect ne reçoit cette commission.</p></div><div class="rule"><h3>7. Partner</h3><p><strong>10 ventes validées dans le même mois</strong> → statut Partner. Les ventes de Boutique ne comptent pas.</p></div><div class="rule"><h3>8. Objectif 100 ventes</h3><p><strong>100 ventes validées</strong> → 25 000 FCFA par mois pendant 3 mois, selon les conditions BuSAF.</p></div><div class="rule"><h3>10. Formateur</h3><p>Pour un produit numérique créé par un formateur et vendu dans le Marché, le formateur reçoit <strong>20 %</strong> du prix sur chaque vente confirmée.</p></div><div class="rule"><h3>12. Interdictions</h3><p>Ne pas mélanger produits du Marché et produits de Boutique, ne pas contourner la règle d'un achat par produit, ne pas falsifier une vente et ne pas consulter les données privées d'un autre membre.</p></div><button class="btn" onclick="ackRules()">J'AI BIEN LU</button><button class="btn alt" onclick="setScreen('public')">RETOUR</button>`);}
 function ackRules(){localStorage.setItem('busaf_rules_ack','1');openModal('✅ Conditions',`<div class="notice success">Merci. Tu as confirmé avoir lu les règles BuSAF.</div><button class="btn" onclick="closeModal()">OK</button>`);}
@@ -1837,7 +1836,6 @@ function render(){
      founderReferral:()=>founderPlaceholder('🤝 Parrainage','Gestion du réseau de parrainage et des commissions.'),
      partner:()=>founderPlaceholder('⭐ Partner','Suivi des statuts Partner.'),
      commissions:()=>founderPlaceholder('💰 Commissions','Suivi des commissions.'),
-     founderBoutiques:()=>founderPlaceholder('🏪 Gestion des Boutiques','Supervision des boutiques.'),
      founderStocks:founderStocks,
      notifications:memberNotifications,
      founderAnnouncements:()=>founderPlaceholder('📢 Annonces','Gestion des communications BuSAF.'),
@@ -1886,7 +1884,7 @@ async function start(){
 
     const authenticated=await restoreAuthenticatedSession();
     if(authenticated){
-      state.screen=isFounder()?"member":"member";
+      state.screen=isFounder()?"founder":"member";
       history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
       await loadMarketCatalog().catch(e=>console.warn("Marché non chargé :",e));
       await syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
@@ -1916,6 +1914,15 @@ async function start(){
     }
   }
 }
+// Ouvre explicitement la visionneuse pour les anciennes cartes qui utilisent un gestionnaire inline.
+function openPhotoLightbox(src,alt){
+ const box=document.getElementById("photoLightbox");
+ const img=document.getElementById("photoLightboxImage");
+ if(!box||!img||!src)return;
+ img.src=src;img.alt=alt||"Photo BuSAF";img.style.transform="translate3d(0,0,0) scale(1)";
+ box.classList.add("open");box.setAttribute("aria-hidden","false");document.body.style.overflow="hidden";
+}
+
 // Visionneuse universelle : toutes les photos BuSAF peuvent être ouvertes et zoomées.
 function initUniversalPhotoViewer(){
   const box=document.getElementById("photoLightbox");
