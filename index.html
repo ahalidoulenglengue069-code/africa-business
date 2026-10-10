@@ -1150,6 +1150,20 @@ async function startMarketPurchase(productId){
  const product=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
  if(!product)return;
  try{
+   // Règle d'accès : le nouveau membre doit d'abord acheter un produit
+   // que son parrain direct a déjà acheté, avant les autres produits du Marché.
+   if(!state.profile?.id)await loadProfile();
+   if(!state.profile?.id)throw new Error("Profil BuSAF introuvable. Reconnecte-toi puis réessaie.");
+   const ownSales=await api(`/rest/v1/ventes?acheteur_id=eq.${encodeURIComponent(state.profile.id)}&statut=in.(confirmee,validee)&select=id&limit=1`);
+   if(!Array.isArray(ownSales)||ownSales.length===0){
+     const sponsorId=String(state.profile.parrain_id||"");
+     if(!sponsorId)throw new Error("Ton parrain direct n'est pas associé à ton profil. Contacte l'assistance BuSAF avant de payer.");
+     const sponsorSales=await api(`/rest/v1/ventes?acheteur_id=eq.${encodeURIComponent(sponsorId)}&statut=in.(confirmee,validee)&select=produit_id`);
+     const eligible=new Set((Array.isArray(sponsorSales)?sponsorSales:[]).map(s=>String(s.produit_id||"")).filter(Boolean));
+     if(!eligible.has(String(product.id))){
+       throw new Error("Pour activer ton compte commercial, tu dois d'abord acheter un produit du Marché que ton parrain direct a déjà acheté. Après confirmation du paiement, tu pourras accéder à tous les produits du Marché BuSAF.");
+     }
+   }
    openModal('💳 Préparation du paiement',`<div class="notice">Création sécurisée de ton achat BuSAF…</div>`);
    const response=await fetch(`${SUPABASE_URL}/functions/v1/creer-achat-marche`,{
      method:'POST',
