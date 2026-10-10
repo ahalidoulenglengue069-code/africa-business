@@ -884,7 +884,6 @@ function founderHome(){
   <h2 class="founder-section-title">🛍️ COMMERCE</h2>
   <div class="founder-grid">
    ${founderApp('founderMarket','🛒','Gestion du Marché','Ajouter, modifier, supprimer')}
-   ${founderApp('founderBoutiques','🏪','Gestion des Boutiques','Supervision')}
    ${founderApp('founderStocks','📦','Gestion des Stocks','Suivi des stocks')}
    ${founderApp('founderMarket','➕','Ajouter un produit','Publier au Marché')}
   </div>
@@ -958,18 +957,17 @@ function memberHome(){
  const p10=Math.min(monthly,10);
  const p100=Math.min(total,100);
  const desc={
-  market:'Produits et revente',boutique:'Publier mes produits',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',stockBoutique:'Produits de Boutique',meetings:'Réunions BuSAF',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
+  market:'Produits et revente',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
  };
  const accent=['accent-green','accent-blue','accent-purple','accent-orange','accent-teal','accent-green','accent-purple','accent-gold','accent-gold','accent-teal','accent-blue','accent-orange','accent-pink','accent-red','accent-red','accent-blue','accent-purple','accent-teal','accent-green','accent-red'];
- const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
+ const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
  return `<div class="member-dashboard member-reference">
    <div class="member-welcome compact-welcome">
-     <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, Boutique, commandes, invitations, bénéfices et suivi.</p></div>
+     <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, commandes, invitations, bénéfices et suivi.</p></div>
      <button class="dash-profile" onclick="setScreen('account')">💼 MON COMPTE</button>
    </div>
    <div class="dashboard-stats">
      <button class="dash-stat" onclick="setScreen('profits')"><span>💰</span><small>Compte Marché</small><strong>${money(state.marketBalance)}</strong></button>
-     <button class="dash-stat" onclick="setScreen('boutique')"><span>🏪</span><small>Compte Boutique</small><strong>${money(state.boutiqueBalance)}</strong></button>
      <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes</small><strong>${state.orders.length}</strong></button>
      <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités</small><strong>${state.invites.length}</strong></button>
    </div>
