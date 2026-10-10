@@ -1304,13 +1304,19 @@ async function saveMarketProduct(editId=''){
      if(!created?.id)throw new Error('Supabase n’a pas confirmé la création. Vérifie le catalogue avant de recommencer pour éviter un doublon.');
    }
 
+   // À ce stade, Supabase a confirmé l'enregistrement. Une panne de rafraîchissement
+   // du catalogue ou des notifications ne doit pas annoncer à tort un échec de publication.
    state.marketCatalogLoaded=false;
-   await loadMarketCatalog(true);
-   if(!editId) await logSharedBusafEvent('produit_marche','🛒 Nouveau produit du Marché',{nom,prix});
+   let refreshWarning='';
+   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit enregistré, actualisation du catalogue à réessayer:',refreshError);refreshWarning=' Le produit est enregistré, mais le catalogue n’a pas pu être actualisé automatiquement.';}
+   if(!editId){
+     try{await logSharedBusafEvent('produit_marche','🛒 Nouveau produit du Marché',{nom,prix});}
+     catch(eventError){console.warn('Produit enregistré, notification non envoyée:',eventError);}
+   }
    closeModal();
    render();
    openModal(editId?'✅ Produit modifié':'✅ Produit publié',
-     `<div class="notice success"><strong>${esc(name)}</strong> est ${editId?'maintenant modifié':'maintenant enregistré'} dans le Marché BuSAF.</div><div class="notice">Prix : ${money(price)}<br>Source : Supabase / public.produits</div><button class="btn" onclick="closeModal()">OK</button>`
+     `<div class="notice success"><strong>${esc(name)}</strong> est ${editId?'maintenant modifié':'maintenant enregistré'} dans le Marché BuSAF.</div><div class="notice">Prix : ${money(price)}<br>Source : Supabase / public.produits</div>${refreshWarning?'<div class="notice warning">'+esc(refreshWarning)+'</div>':''}<button class="btn" onclick="closeModal()">OK</button>`
    );
  }catch(e){
    console.error('BuSAF saveMarketProduct:',e);
