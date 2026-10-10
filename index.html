@@ -479,7 +479,7 @@ async function restoreAuthenticatedSession(){
       state.token=oldToken;
       throw new Error("Profil BuSAF introuvable");
     }
-    state.screen=isFounder()?"member":"member";
+    state.screen=isFounder()?"founder":"member";
     return true;
   }catch(e){
     console.warn("Restauration de session BuSAF :",e.message||e);
@@ -572,6 +572,11 @@ async function signup(e){
   if(!code)throw new Error("Le code d'invitation est obligatoire.");
   if(password.length<6)throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
 
+  // Vérifier le code du parrain avant de créer un compte Auth, pour éviter les comptes orphelins.
+  const parrains=await api(`/rest/v1/profils_busaf?code_parrain=eq.${encodeURIComponent(code)}&select=id,code_parrain,nom_complet&limit=1`);
+  const parrain=Array.isArray(parrains)?parrains[0]:null;
+  if(!parrain)throw new Error("Code parrain invalide ou introuvable. Aucun compte n'a été créé.");
+
   const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville:villePays,code_invitation:code,pays}})});
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
 
@@ -584,10 +589,6 @@ async function signup(e){
     openModal("Compte créé",`<div class="notice success">Le compte a été créé. Connecte-toi maintenant avec ton e-mail et ton mot de passe.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button>`);
     return;
   }
-
-  const parrains=await api(`/rest/v1/profils_busaf?code_parrain=eq.${encodeURIComponent(code)}&select=id,code_parrain,nom_complet`);
-  const parrain=Array.isArray(parrains)?parrains[0]:null;
-  if(!parrain)throw new Error("Code parrain invalide ou introuvable.");
 
   const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
 
@@ -1148,7 +1149,7 @@ async function loadMarketCatalog(force=false){
 async function syncConfirmedMarketPurchases(){
  if(!state.userId||!state.token||!state.profile?.id)return;
  try{
-   const rows=await api(`/rest/v1/ventes?acheteur_id=eq.${encodeURIComponent(state.profile.id)}&statut=eq.confirmee&select=id,produit_id,montant,reference,date_vente&order=date_vente.asc`);
+   const rows=await api(`/rest/v1/ventes?acheteur_id=eq.${encodeURIComponent(state.profile.id)}&statut=in.(confirmee,validee)&select=id,produit_id,montant,reference,date_vente&order=date_vente.asc`);
    if(!Array.isArray(rows))return;
    let changed=false;
    for(const sale of rows){
@@ -1720,14 +1721,14 @@ async function saveProfile(){
  }
 }
 
-function memberProfits(){const seller=state.sales.reduce((a,x)=>a+Number(x.sellerProfit||0),0);return page("💰 Mes Bénéfices",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div><div class="stat">Compte Boutique<strong>${money(state.boutiqueBalance)}</strong></div></div><div class="rule"><h3>Ventes du Marché</h3><p>Bénéfices vendeur enregistrés localement : <strong>${money(seller)}</strong>.</p></div><div class="notice warning">Les soldes financiers de production doivent être calculés et protégés dans Supabase.</div><button class="btn" onclick="setScreen('money')">💳 DÉPÔT / RETRAIT</button><button class="btn alt" onclick="setScreen('commissions')">🤝 COMMISSIONS</button>`);}
+function memberProfits(){const seller=state.sales.reduce((a,x)=>a+Number(x.sellerProfit||0),0);return page("💰 Mes Bénéfices",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div></div><div class="rule"><h3>Ventes du Marché</h3><p>Bénéfices vendeur enregistrés localement : <strong>${money(seller)}</strong>.</p></div><div class="notice warning">Les soldes financiers de production doivent être calculés et protégés dans Supabase.</div><button class="btn" onclick="setScreen('money')">💳 DÉPÔT / RETRAIT</button><button class="btn alt" onclick="setScreen('commissions')">🤝 COMMISSIONS</button>`);}
 
 function memberCommissions(){const sponsor=state.sales.reduce((a,x)=>a+Number(x.sponsorCommission||0),0);return page("🤝 Mes Commissions",`<div class="stat">Commissions directes enregistrées<strong>${money(sponsor)}</strong></div><div class="rule"><h3>7 %</h3><p>La commission est destinée au parrain direct du vendeur sur les reventes validées de ses invités directs.</p></div><div class="notice">Le vendeur voit son propre bénéfice de 4,5 %. La commission de son parrain est séparée.</div><button class="btn" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
 function memberPartner(){const n=monthlySalesCount(),pct=Math.min(100,n*10),total=totalSalesCount();return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong>${n}/10</strong></div><div class="stat">Ventes totales<strong>${total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>10 ventes du Marché BuSAF dans un même mois. Les ventes personnelles et les mois cumulés ne remplacent pas la condition.</p></div><button class="btn" onclick="setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
 
 function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 4,5 % et son parrain direct reçoit 7 % sur la revente validée.</p></div>`);}
 function memberMoney(){return page("💳 Dépôt / Retrait",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div><div class="stat">Compte Boutique<strong>${money(state.boutiqueBalance)}</strong></div></div><div class="notice warning">Les dépôts et retraits réels doivent être validés côté serveur par le fournisseur de paiement.</div><button class="btn" onclick="openMoneyDeposit()">💳 DÉPÔT</button><button class="btn alt" onclick="openMoneyWithdraw()">💸 RETRAIT</button><button class="btn alt" onclick="setScreen('orders')">📜 HISTORIQUE</button>`);}
-function openMoneyDeposit(){openModal("💳 Dépôt",`<label>Compte</label><select><option>Compte Marché</option><option>Compte Boutique</option></select><label>Montant FCFA</label><input id="depAmount" type="number" min="1"><label>Mode</label><select><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option></select><button class="btn" onclick="requestMoneyDeposit()">CONTINUER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
+function openMoneyDeposit(){openModal("💳 Dépôt",`<label>Compte</label><select><option>Compte Marché</option></select><label>Montant FCFA</label><input id="depAmount" type="number" min="1"><label>Mode</label><select><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option></select><button class="btn" onclick="requestMoneyDeposit()">CONTINUER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 function requestMoneyDeposit(){const a=Number(document.getElementById("depAmount")?.value||0);if(a<=0){alert("Montant invalide.");return;}closeModal();openModal("Dépôt",`<div class="notice warning">Demande préparée. Le solde ne sera crédité qu'après confirmation du paiement côté serveur.</div><button class="btn" onclick="closeModal()">OK</button>`);}
 function openMoneyWithdraw(){openModal("💸 Retrait",`<label>Compte</label><select><option>Compte Marché</option><option>Compte Boutique</option></select><label>Montant FCFA</label><input id="wdAmount" type="number" min="1"><label>Numéro Mobile Money</label><input id="wdPhone" type="tel"><button class="btn" onclick="requestMoneyWithdraw()">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 function requestMoneyWithdraw(){const a=Number(document.getElementById("wdAmount")?.value||0),phone=document.getElementById("wdPhone")?.value.trim();if(a<=0||!phone){alert("Montant et numéro obligatoires.");return;}closeModal();openModal("Retrait",`<div class="notice warning">Demande préparée. Aucun solde n'est débité dans le navigateur. Le débit réel doit être validé côté serveur.</div><button class="btn" onclick="closeModal()">OK</button>`);}
@@ -1770,7 +1771,7 @@ function readNotification(i){if(state.notifications[i])state.notifications[i].re
 function readAllNotifications(){state.notifications.forEach(n=>n.read=true);saveState();render();}
 
 function memberRules(){return publicRules();}
-function memberHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Compte</h3><p>Créer, connecter, modifier et déconnecter le compte.</p><button class="btn alt" onclick="setScreen('account')">MON COMPTE</button></div><div class="rule"><h3>🛒 Marché</h3><p>Acheter, revendre directement ou ajouter au Stock BuSAF.</p><button class="btn alt" onclick="setScreen('market')">MARCHÉ</button></div><div class="rule"><h3>📦 Stocks</h3><p>Stock BuSAF et Stock Boutique ne sont jamais mélangés.</p><button class="btn alt" onclick="setScreen('stockMarket')">STOCK BuSAF</button><button class="btn alt" onclick="setScreen('stockBoutique')">STOCK BOUTIQUE</button></div><div class="rule"><h3>👥 Invitations</h3><p>Après un achat du Marché : PARTAGER MON INVITATION, copier lien/code et partager.</p><button class="btn alt" onclick="setScreen('invites')">MES INVITÉS</button></div><div class="rule"><h3>💰 Bénéfices / commissions</h3><p>Les montants doivent rester séparés.</p><button class="btn alt" onclick="setScreen('profits')">BÉNÉFICES</button><button class="btn alt" onclick="setScreen('commissions')">COMMISSIONS</button></div><div class="rule"><h3>⭐ Partner / 🎁 Bonus</h3><p>10 ventes dans le mois pour Partner ; 4,5 % de bénéfice vendeur sur une revente validée ; 7 % pour le parrain direct ; 100 ventes validées = 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('partner')">PARTNER</button><button class="btn alt" onclick="setScreen('memberBenefits')">AVANTAGES</button></div><div class="rule"><h3>🏪 Boutique</h3><p>Ouverture gratuite ; prélèvement BuSAF de 5 % à la publication, sans commission directe de parrainage.</p><button class="btn alt" onclick="setScreen('boutique')">MA BOUTIQUE</button></div><div class="rule"><h3>💳 Argent</h3><p>Compte Marché et Compte Boutique restent séparés.</p><button class="btn alt" onclick="setScreen('money')">DÉPÔT / RETRAIT</button></div><div class="rule"><h3>🎥 Réunions</h3><p>Réunions avec invités/clients, caméra et micro indépendants.</p><button class="btn alt" onclick="setScreen('meetings')">RÉUNIONS</button></div><button class="btn" onclick="setScreen('contact')">CONTACTER BuSAF</button>`);}
+function memberHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Compte</h3><p>Créer, connecter, modifier et déconnecter le compte.</p><button class="btn alt" onclick="setScreen('account')">MON COMPTE</button></div><div class="rule"><h3>🛒 Marché</h3><p>Acheter, revendre directement ou ajouter au Stock BuSAF.</p><button class="btn alt" onclick="setScreen('market')">MARCHÉ</button></div><div class="rule"><h3>📦 Stock BuSAF</h3><p>Consulte les produits numériques achetés et disponibles pour la revente.</p><button class="btn alt" onclick="setScreen('stockMarket')">MON STOCK BuSAF</button></div><div class="rule"><h3>👥 Invitations</h3><p>Après confirmation d’un achat du Marché, tu peux partager ton invitation.</p><button class="btn alt" onclick="setScreen('invites')">MES INVITÉS</button></div><div class="rule"><h3>💰 Bénéfices / commissions</h3><p>Les bénéfices vendeur et les commissions de parrainage sont séparés.</p><button class="btn alt" onclick="setScreen('profits')">BÉNÉFICES</button><button class="btn alt" onclick="setScreen('commissions')">COMMISSIONS</button></div><div class="rule"><h3>⭐ Partner / 🎁 Bonus</h3><p>10 ventes validées dans le mois pour Partner ; 4,5 % de bénéfice vendeur sur une revente validée ; 7 % pour le parrain direct ; 100 ventes validées = 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('partner')">PARTNER</button><button class="btn alt" onclick="setScreen('memberBenefits')">AVANTAGES</button></div><div class="rule"><h3>💳 Argent</h3><p>Les dépôts et retraits doivent être confirmés par le serveur de paiement.</p><button class="btn alt" onclick="setScreen('money')">DÉPÔT / RETRAIT</button></div><button class="btn" onclick="setScreen('contact')">CONTACTER BuSAF</button>`);}
 
 function memberPrivacy(){return publicPrivacy();}
 function memberContact(){return publicContact();}
