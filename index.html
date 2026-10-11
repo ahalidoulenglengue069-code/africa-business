@@ -305,16 +305,13 @@ const state={
   marketSales:Number(localStorage.getItem("busaf_market_sales")||0),
   marketStock:Number(localStorage.getItem("busaf_market_stock")||0),
   marketStockItems:safeJson("busaf_market_stock_items",[]),
-  boutiqueStock:Number(localStorage.getItem("busaf_boutique_stock")||0),
-  marketBalance:Number(localStorage.getItem("busaf_market_balance")||0),
-  boutiqueBalance:Number(localStorage.getItem("busaf_boutique_balance")||0),
-  orders:safeJson("busaf_orders",[]),
+    marketBalance:Number(localStorage.getItem("busaf_market_balance")||0),
+    orders:safeJson("busaf_orders",[]),
   invites:safeJson("busaf_invites",[]),
   sales:safeJson("busaf_sales",[]),
   notifications:safeJson("busaf_notifications",[]),
   meetings:safeJson("busaf_meetings",[]),
-  boutiqueProducts:safeJson("busaf_boutique_products",[]),
-  marketCatalog:[],
+    marketCatalog:[],
   marketCatalogLoaded:false
 };
 
@@ -358,16 +355,13 @@ const memberSpaces=[
 function saveState(){
  localStorage.setItem("busaf_market_sales",state.marketSales);
  localStorage.setItem("busaf_market_stock",state.marketStock);
- localStorage.setItem("busaf_boutique_stock",state.boutiqueStock);
- localStorage.setItem("busaf_market_balance",state.marketBalance);
- localStorage.setItem("busaf_boutique_balance",state.boutiqueBalance);
- localStorage.setItem("busaf_orders",JSON.stringify(state.orders));
+  localStorage.setItem("busaf_market_balance",state.marketBalance);
+  localStorage.setItem("busaf_orders",JSON.stringify(state.orders));
  localStorage.setItem("busaf_invites",JSON.stringify(state.invites));
  localStorage.setItem("busaf_sales",JSON.stringify(state.sales));
  localStorage.setItem("busaf_notifications",JSON.stringify(state.notifications));
  localStorage.setItem("busaf_meetings",JSON.stringify(state.meetings));
- localStorage.setItem("busaf_boutique_products",JSON.stringify(state.boutiqueProducts));
-}
+ }
 function esc(v){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function money(n){return Number(n||0).toLocaleString("fr-FR")+" FCFA"}
 
@@ -1391,282 +1385,12 @@ async function hasConfirmedMarketPurchase(){
 async function openBoutiqueProductForm(){openModal("Fonction retirée",`<div class="notice">La publication de produits physiques n'est plus disponible sur BuSAF.</div><button class="btn" onclick="closeModal();setScreen('market')">OUVRIR LE MARCHÉ NUMÉRIQUE</button>`);}
 
 async function saveBoutiqueProduct(){openModal("Fonction retirée",`<div class="notice">La publication de produits physiques est désactivée. Aucun produit ni solde existant n'a été supprimé.</div><button class="btn" onclick="closeModal()">OK</button>`);}
-function openBoutiqueSale(i){const p=state.boutiqueProducts[i];if(!p)return;openModal("🏪 Vente Boutique",`<div class="rule"><strong>${esc(p.name)}</strong><br>Prix : ${money(p.price)}<br>Prélèvement de publication : 5 % selon les règles BuSAF, à confirmer côté serveur.</div><label>Nom du client</label><input id="shopCustomer"><label>Mode de paiement</label><select id="shopPayment"><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option><option>Autre</option></select><button class="btn" onclick="confirmBoutiqueSale(${i})">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
-function confirmBoutiqueSale(i){
- closeModal();
- openModal("Fonction retirée",`<div class="notice warning">Ma Boutique et ses ventes sont retirées de cette version de BuSAF. Aucun solde, stock ou commande n'a été modifié.</div><button class="btn" onclick="closeModal()">COMPRIS</button>`);
-}
-
-function memberInvites(){
- const allowed=canInvite();
- return page("👥 Mes Invités",`
- <div class="statgrid"><div class="stat">Invités<strong>${state.invites.length}</strong></div><div class="stat">Limite<strong>Illimitée</strong></div></div>
- <div class="notice ${allowed?"success":"warning"}">${allowed?"Tu peux maintenant partager ton invitation.":"Tu dois d'abord acheter au moins un produit du Marché BuSAF avant de pouvoir inviter."}</div>
- <button class="btn" onclick="invite()">👥 PARTAGER MON INVITATION</button>
- <div class="rule"><h3>Comment inviter ?</h3><ol><li>Appuie sur <strong>PARTAGER MON INVITATION</strong>.</li><li>Copie ton lien ou ton code.</li><li>Envoie-le à la personne par WhatsApp, SMS ou autre moyen.</li><li>La personne ouvre le lien et crée son compte.</li><li>BuSAF rattache automatiquement son inscription à ton invitation.</li></ol></div>
- <ul class="list">${state.invites.length?state.invites.map(i=>`<li><strong>${esc(i.name)}</strong><br>${esc(i.email)}<br><span class="small">${i.date}</span></li>`).join(""):"<li>Aucune invitation enregistrée.</li>"}</ul>`);
-}
-
-function memberOrders(){return page("📦 Mes Commandes",`${state.orders.length?`<ul class="list">${state.orders.map(o=>`<li><strong>${esc(o.product)}</strong><br>${money(o.price)}<br>Mode : ${esc(o.mode)}${o.customer?`<br>Client : ${esc(o.customer)}`:""}<br><span class="small">${o.date}</span></li>`).join("")}</ul>`:`<div class="empty">Aucune commande.</div>`}<button class="btn" onclick="setScreen('market')">CONTINUER MES ACHATS</button><button class="btn alt" onclick="setScreen('stockMarket')">VOIR MON STOCK</button>`);}
-
-
-function profilePhotoHtml(){
- const url=state.profile?.photo_url||"";
- const initial=(state.profile?.nom_complet||"M").trim().charAt(0).toUpperCase()||"M";
- return url
-   ? `<img class="profile-photo" src="${esc(url)}" alt="Photo de profil">`
-   : `<div class="profile-photo-placeholder">${esc(initial)}</div>`;
-}
-
-let profilePhotoEditor=null;
-
-function openProfilePhotoForm(){
- if(!state.userId||!state.token){
-   alert("Tu dois être connecté pour modifier ta photo de profil.");
-   return;
- }
- openModal("📷 Photo de profil",`
-   <div class="photo-editor">
-     <div id="photoStage" class="photo-stage"><div class="empty">Choisis une photo pour commencer.</div></div>
-     <div class="photo-controls">
-       <button type="button" onclick="photoZoom(-0.12)">−</button>
-       <input id="photoZoomRange" type="range" min="1" max="3" step="0.01" value="1" oninput="photoZoomTo(this.value)">
-       <button type="button" onclick="photoZoom(0.12)">+</button>
-     </div>
-     <button type="button" class="btn alt" onclick="centerProfilePhoto()">↺ RECADRER AU CENTRE</button>
-     <div class="small center">Déplace la photo avec ton doigt. Utilise la barre ou − / + pour zoomer. Le cercle montre exactement la zone conservée.</div>
-     <label>Choisir une photo</label>
-     <input id="profilePhotoFile" type="file" accept="image/*" onchange="prepareProfilePhoto(this)">
-     <button class="btn" onclick="saveCroppedProfilePhoto()">✅ ENREGISTRER LA PHOTO</button>
-     <button class="btn alt" onclick="closeModal()">ANNULER</button>
-   </div>
- `);
- profilePhotoEditor=null;
-}
-
-function prepareProfilePhoto(input){
- const file=input?.files?.[0];
- if(!file)return;
- if(!file.type.startsWith("image/")){alert("Le fichier doit être une image.");input.value="";return;}
- if(file.size>10*1024*1024){alert("La photo doit faire au maximum 10 Mo.");input.value="";return;}
- const reader=new FileReader();
- reader.onload=()=>{
-   const img=new Image();
-   img.onload=()=>{
-     const stage=document.getElementById("photoStage");
-     if(!stage)return;
-     stage.innerHTML=`<img id="profilePhotoEditorImage" src="${reader.result}" alt="Prévisualisation"><div class="photo-crop-circle"></div>`;
-     profilePhotoEditor={img,scale:1,x:0,y:0,dragging:false,lastX:0,lastY:0};
-     requestAnimationFrame(()=>layoutProfilePhoto());
-     const el=document.getElementById("profilePhotoEditorImage");
-     el.addEventListener("pointerdown",photoPointerDown);
-     window.addEventListener("pointermove",photoPointerMove);
-     window.addEventListener("pointerup",photoPointerUp);
-   };
-   img.src=reader.result;
- };
- reader.readAsDataURL(file);
-}
-
-function layoutProfilePhoto(){
- const e=profilePhotoEditor,stage=document.getElementById("photoStage"),img=document.getElementById("profilePhotoEditorImage");
- if(!e||!stage||!img)return;
- const cover=Math.max(stage.clientWidth/e.img.naturalWidth,stage.clientHeight/e.img.naturalHeight);
- e.baseScale=cover;
- e.scale=1;
- e.x=0;e.y=0;
- applyProfilePhotoTransform();
- const r=document.getElementById("photoZoomRange");if(r)r.value="1";
-}
-function applyProfilePhotoTransform(){
- const e=profilePhotoEditor,img=document.getElementById("profilePhotoEditorImage");
- if(!e||!img)return;
- const scale=e.baseScale*e.scale;
- img.style.width=e.img.naturalWidth*scale+"px";
- img.style.height=e.img.naturalHeight*scale+"px";
- img.style.transform=`translate(${e.x}px,${e.y}px)`;
-}
-function photoZoom(delta){
- if(!profilePhotoEditor)return;
- photoZoomTo(Number(profilePhotoEditor.scale||1)+delta);
-}
-function photoZoomTo(value){
- if(!profilePhotoEditor)return;
- profilePhotoEditor.scale=Math.max(1,Math.min(3,Number(value)||1));
- applyProfilePhotoTransform();
- const r=document.getElementById("photoZoomRange");if(r)r.value=profilePhotoEditor.scale;
-}
-function photoPointerDown(ev){
- if(!profilePhotoEditor)return;
- profilePhotoEditor.dragging=true;profilePhotoEditor.lastX=ev.clientX;profilePhotoEditor.lastY=ev.clientY;ev.currentTarget.setPointerCapture?.(ev.pointerId);
-}
-function photoPointerMove(ev){
- const e=profilePhotoEditor;if(!e?.dragging)return;
- e.x+=ev.clientX-e.lastX;e.y+=ev.clientY-e.lastY;e.lastX=ev.clientX;e.lastY=ev.clientY;applyProfilePhotoTransform();
-}
-function photoPointerUp(){if(profilePhotoEditor)profilePhotoEditor.dragging=false;}
-function centerProfilePhoto(){
- if(!profilePhotoEditor)return;
- profilePhotoEditor.x=0;profilePhotoEditor.y=0;
- applyProfilePhotoTransform();
-}
-
-function cropProfilePhotoToSquare(){
- const e=profilePhotoEditor,stage=document.getElementById("photoStage");
- if(!e||!stage)throw new Error("Choisis d'abord une photo.");
- const img=e.img;
- const stageW=stage.clientWidth,stageH=stage.clientHeight;
- const crop=Math.min(stageW,stageH)*0.78;
- const scale=e.baseScale*e.scale;
- const displayedW=img.naturalWidth*scale,displayedH=img.naturalHeight*scale;
- const imageLeft=(stageW-displayedW)/2+e.x;
- const imageTop=(stageH-displayedH)/2+e.y;
- const cropLeft=(stageW-crop)/2;
- const cropTop=(stageH-crop)/2;
- let sx=(cropLeft-imageLeft)/scale;
- let sy=(cropTop-imageTop)/scale;
- let sw=crop/scale;
- // Le zoom de base garantit que la zone de recadrage est couverte.
- sx=Math.max(0,Math.min(img.naturalWidth-sw,sx));
- sy=Math.max(0,Math.min(img.naturalHeight-sw,sy));
- sw=Math.min(sw,img.naturalWidth,img.naturalHeight);
- const canvas=document.createElement("canvas");
- canvas.width=800;canvas.height=800;
- const ctx=canvas.getContext("2d");
- ctx.imageSmoothingEnabled=true;
- ctx.imageSmoothingQuality="high";
- ctx.clearRect(0,0,800,800);
- ctx.save();ctx.beginPath();ctx.arc(400,400,400,0,Math.PI*2);ctx.clip();
- ctx.drawImage(img,sx,sy,sw,sw,0,0,800,800);
- ctx.restore();
- return new Promise(resolve=>canvas.toBlob(resolve,"image/jpeg",.92));
-}
-async function saveCroppedProfilePhoto(){
- if(!profilePhotoEditor){alert("Choisis une photo et ajuste-la d'abord.");return;}
- if(!state.userId||!state.token){alert("Session BuSAF invalide. Reconnecte-toi.");return;}
- const btn=document.querySelector("#modalbox .btn");if(btn){btn.disabled=true;btn.textContent="ENREGISTREMENT...";}
- try{
-   const blob=await cropProfilePhotoToSquare();
-   if(!blob)throw new Error("Impossible de préparer la photo recadrée.");
-   const path=`${state.userId}/avatar-${Date.now()}.jpg`;
-   const uploadResponse=await fetch(`${SUPABASE_URL}/storage/v1/object/profils/${path}`,{
-     method:"POST",headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+state.token,"Content-Type":"image/jpeg","x-upsert":"true"},body:blob
-   });
-   const uploadText=await uploadResponse.text();let uploadData={};try{uploadData=uploadText?JSON.parse(uploadText):{};}catch(_){}
-   if(!uploadResponse.ok)throw new Error(uploadData.message||uploadData.error||uploadText||"Impossible d'envoyer la photo.");
-   const publicUrl=`${SUPABASE_URL}/storage/v1/object/public/profils/${path}`;
-   await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}`,{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({photo_url:publicUrl})});
-   if(state.profile)state.profile.photo_url=publicUrl;
-   window.removeEventListener("pointermove",photoPointerMove);window.removeEventListener("pointerup",photoPointerUp);profilePhotoEditor=null;
-   closeModal();saveState();render();
-   openModal("✅ Photo enregistrée",`<div class="notice success">Ta photo de profil a été recadrée et enregistrée avec succès.</div><button class="btn" onclick="closeModal();setScreen('account')">OK</button>`);
- }catch(e){
-   if(btn){btn.disabled=false;btn.textContent="✅ ENREGISTRER LA PHOTO";}
-   alert("❌ "+(e.message||"Erreur lors de l'enregistrement."));
- }
-}
-
-function memberAccount(){
- return page("💼 Mon Compte",`
-   <div class="info">
-     <div class="profile-photo-wrap">
-       ${profilePhotoHtml()}
-       <div class="profile-photo-info">
-         <strong>${esc(state.profile?.nom_complet||"Membre BuSAF")}</strong>
-         <div class="small">${esc(state.profile?.role||"membre")}</div>
-         <button class="btn small" onclick="openProfilePhotoForm()">📷 ${state.profile?.photo_url?"MODIFIER":"AJOUTER"} MA PHOTO</button>
-       </div>
-     </div>
-     <strong>Nom :</strong> ${esc(state.profile?.nom_complet||"—")}<br>
-     <strong>E-mail :</strong> ${esc(state.email)}<br>
-     <strong>Téléphone :</strong> ${esc(state.profile?.telephone||"—")}<br>
-     <strong>Ville :</strong> ${esc(state.profile?.Ville||"—")}<br>
-     <strong>Rôle :</strong> ${esc(state.profile?.role||"membre")}<br>
-     ${isFounder()?'<div class="notice success"><strong>👑 FONDATEUR BuSAF</strong><br>Accès aux fonctions réservées au fondateur.</div>':""}
-     <strong>Code parrain :</strong> ${esc(state.profile?.code_parrain||"—")}
-   </div>
-   <button class="btn" onclick="copyInvitation('code')">📋 COPIER MON CODE PARRAIN</button>
-   <button class="btn" onclick="editProfile()">✏️ MODIFIER MON PROFIL</button>
-   <button class="btn alt" onclick="setScreen('privacy')">🔒 CONFIDENTIALITÉ</button>
-   <button class="btn red" onclick="confirmLogout()">🚪 DÉCONNEXION</button>
- `);
-}
-
-function editProfile(){
- openModal("✏️ Modifier mon profil",`
-   <label>Nom complet</label><input id="epName" value="${esc(state.profile?.nom_complet||"")}">
-   <label>Téléphone</label><input id="epTel" value="${esc(state.profile?.telephone||"")}">
-   <label>Ville</label><input id="epCity" value="${esc(state.profile?.Ville||"")}">
-   <button class="btn" onclick="saveProfile()">VALIDER</button>
-   <button class="btn alt" onclick="closeModal()">ANNULER</button>
- `);
-}
-
-async function saveProfile(){
- if(!state.profile||!state.userId||!state.token){alert("Session BuSAF invalide.");return;}
- const nom=document.getElementById("epName")?.value.trim();
- const tel=document.getElementById("epTel")?.value.trim();
- const ville=document.getElementById("epCity")?.value.trim();
- if(!nom){alert("Le nom complet est obligatoire.");return;}
-
- try{
-   await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}`,{
-     method:"PATCH",
-     headers:{"Prefer":"return=minimal"},
-     body:JSON.stringify({nom_complet:nom,telephone:tel,Ville:ville})
-   });
-   state.profile.nom_complet=nom;
-   state.profile.telephone=tel;
-   state.profile.Ville=ville;
-   closeModal();
-   saveState();
-   render();
-   addNotification("👤 Profil","Ton profil BuSAF a été mis à jour.","profile");
- }catch(e){
-   alert("❌ "+e.message);
- }
-}
-
-function memberProfits(){const seller=state.sales.reduce((a,x)=>a+Number(x.sellerProfit||0),0);return page("💰 Mes Bénéfices",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div></div><div class="rule"><h3>Ventes du Marché</h3><p>Bénéfices vendeur enregistrés localement : <strong>${money(seller)}</strong>.</p></div><div class="notice warning">Les soldes financiers de production doivent être calculés et protégés dans Supabase.</div><button class="btn" onclick="setScreen('money')">💳 DÉPÔT / RETRAIT</button><button class="btn alt" onclick="setScreen('commissions')">🤝 COMMISSIONS</button>`);}
-
-function memberCommissions(){const sponsor=state.sales.reduce((a,x)=>a+Number(x.sponsorCommission||0),0);return page("🤝 Mes Commissions",`<div class="stat">Commissions directes enregistrées<strong>${money(sponsor)}</strong></div><div class="rule"><h3>7 %</h3><p>La commission est destinée au parrain direct du vendeur sur les reventes validées de ses invités directs.</p></div><div class="notice">Le vendeur voit son propre bénéfice de 4,5 %. La commission de son parrain est séparée.</div><button class="btn" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
-function memberPartner(){const n=monthlySalesCount(),pct=Math.min(100,n*10),total=totalSalesCount();return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong>${n}/10</strong></div><div class="stat">Ventes totales<strong>${total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>10 ventes du Marché BuSAF dans un même mois. Les ventes personnelles et les mois cumulés ne remplacent pas la condition.</p></div><button class="btn" onclick="setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
-
-function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 4,5 % et son parrain direct reçoit 7 % sur la revente validée.</p></div>`);}
-function memberMoney(){return page("💳 Dépôt / Retrait",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div></div><div class="notice warning">Les dépôts et retraits réels doivent être validés côté serveur par le fournisseur de paiement.</div><button class="btn" onclick="openMoneyDeposit()">💳 DÉPÔT</button><button class="btn alt" onclick="openMoneyWithdraw()">💸 RETRAIT</button><button class="btn alt" onclick="setScreen('orders')">📜 HISTORIQUE</button>`);}
-function openMoneyDeposit(){openModal("💳 Dépôt",`<label>Compte</label><select><option>Compte Marché</option></select><label>Montant FCFA</label><input id="depAmount" type="number" min="1"><label>Mode</label><select><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option></select><button class="btn" onclick="requestMoneyDeposit()">CONTINUER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
-function requestMoneyDeposit(){const a=Number(document.getElementById("depAmount")?.value||0);if(a<=0){alert("Montant invalide.");return;}closeModal();openModal("Dépôt",`<div class="notice warning">Demande préparée. Le solde ne sera crédité qu'après confirmation du paiement côté serveur.</div><button class="btn" onclick="closeModal()">OK</button>`);}
-function openMoneyWithdraw(){openModal("💸 Retrait",`<label>Compte</label><select id="wdAccount"><option value="marche">Compte Marché</option></select><label>Montant FCFA</label><input id="wdAmount" type="number" min="1"><label>Numéro Mobile Money</label><input id="wdPhone" type="tel"><button class="btn" onclick="requestMoneyWithdraw()">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
-function requestMoneyWithdraw(){const a=Number(document.getElementById("wdAmount")?.value||0),phone=document.getElementById("wdPhone")?.value.trim();if(a<=0||!phone){alert("Montant et numéro obligatoires.");return;}closeModal();openModal("Retrait",`<div class="notice warning">Demande préparée. Aucun solde n'est débité dans le navigateur. Le débit réel doit être validé côté serveur.</div><button class="btn" onclick="closeModal()">OK</button>`);}
-
-function sellFromStock(productId){
- const item=state.marketStockItems.find(x=>String(x.productId)===String(productId));
- if(!item||item.qty<1){alert("Ce produit n'est plus disponible dans ton Stock BuSAF.");return;}
- openModal("💰 Revendre",`<div class="rule"><h3>${esc(item.emoji||"🛒")} ${esc(item.name)}</h3><p>Quantité disponible : <strong>${item.qty}</strong></p><p>Prix de référence : <strong>${money(item.price)}</strong></p></div><label>Quantité à revendre</label><input id="sellQty" type="number" min="1" max="${item.qty}" value="1"><div class="notice warning">La quantité ne sera retirée du stock qu'après confirmation.</div><button class="btn" onclick="confirmStockSale('${String(productId).replace(/'/g,"\\'")}')">CONFIRMER LA REVENTE</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
-}
-function confirmStockSale(productId){
- const item=state.marketStockItems.find(x=>String(x.productId)===String(productId)),qty=Math.floor(Number(document.getElementById("sellQty")?.value||0));
- if(!item||qty<1||qty>item.qty){alert("Quantité invalide.");return;}
- openModal("Confirmer la vente",`<div class="rule"><strong>${esc(item.name)}</strong><br>Quantité : ${qty}<br>Total : ${money(item.price*qty)}</div><label>Nom du client</label><input id="stockCustomer"><label>Mode de paiement</label><select id="stockPayment"><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option><option>Autre</option></select><button class="btn" onclick="finalizeStockSale('${String(productId).replace(/'/g,"\\'")}',${qty})">VALIDER LA VENTE</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
-}
-function finalizeStockSale(productId,qty){
- // Sécurité financière : aucune revente ne peut être déclarée validée par le navigateur.
- // L'API serveur de validation des reventes n'est pas encore disponible dans cette version.
- closeModal();
- openModal("Revente non finalisée",`<div class="notice warning">Pour protéger ton Stock BuSAF et les commissions, cette vente n'a pas été enregistrée : la confirmation doit être faite par le serveur. Aucun stock ni solde n'a été modifié. Réessaie lorsque la validation sécurisée sera disponible.</div><button class="btn" onclick="closeModal()">COMPRIS</button>`);
-}
+function openBoutiqueSale(i){openModal("Fonction retirée",`<div class="notice">Les ventes de Boutique physique ne sont plus disponibles.</div><button class="btn" onclick="closeModal()">OK</button>`);}
+function confirmBoutiqueSale(i){openModal("Fonction retirée",`<div class="notice">Les ventes de Boutique physique ne sont plus disponibles.</div><button class="btn" onclick="closeModal()">OK</button>`);}
 
 function memberStockMarket(){return page("📦 Stock BuSAF",`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Stock BuSAF est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
 
 function memberStockBoutique(){return page("📦 Stock BuSAF",`<div class="notice success">Le stock des Boutiques physiques a été retiré. Le Stock BuSAF numérique reste disponible.</div><button class="btn" onclick="setScreen('stockMarket')">OUVRIR LE STOCK NUMÉRIQUE</button>`);}
-
-function memberStockBoutique(){
- const realProducts=filterRealProducts(state.boutiqueProducts);
- state.boutiqueProducts=realProducts;
- saveState();
- return page("🏷️ Stock Boutique",`<div class="stat">Produits<strong>${realProducts.length}</strong></div><div class="notice">Stock séparé du Marché BuSAF.</div>${realProducts.length?`<ul class="list">${realProducts.map((p,i)=>`<li><strong>${esc(p.name)}</strong><br>${money(p.price)}<br>${esc(p.description||"")}<button class="btn" onclick="openBoutiqueSale(${i})">VENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Aucun produit. Ajoute d'abord un produit dans Ma Boutique.</div>`}<button class="btn" onclick="setScreen('boutique')">GÉRER MA BOUTIQUE</button>`);
-}
-
 function memberMeetings(){const list=state.meetings.length?`<ul class="list">${state.meetings.map((x,i)=>`<li><strong>${esc(x.type)}</strong><br>${esc(x.date)} à ${esc(x.time)}<br><span class="small">${esc(x.status||"Prévue")}</span><button class="btn" onclick="joinMeeting(${i})">🎥 REJOINDRE EN DIRECT</button></li>`).join("")}</ul>`:`<div class="empty">Aucune réunion programmée.</div>`;return page("🎥 Réunions",`<div class="rule"><h3>RÉUNION GÉNÉRALE</h3><p>Créée uniquement par le fondateur et visible par les membres connectés.</p></div><div class="rule"><h3>Réunions personnelles</h3><p>Avec tes invités ou clients.</p></div><button class="btn" onclick="createMeeting()">➕ CRÉER UNE RÉUNION</button>${list}`);}
 function memberNotifications(){
  const unread=unreadNotificationCount();
@@ -1816,7 +1540,7 @@ async function start(){
       state.sales=Array.isArray(state.sales)?state.sales:[];
       state.orders=Array.isArray(state.orders)?state.orders:[];
       state.invites=Array.isArray(state.invites)?state.invites:[];
-      state.boutiqueProducts=Array.isArray(state.boutiqueProducts)?state.boutiqueProducts:[];
+      state.boutiqueProducts=[];
       render();
     }catch(renderError){
       console.error("Erreur rendu BuSAF:",renderError);
