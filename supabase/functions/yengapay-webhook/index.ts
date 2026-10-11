@@ -71,23 +71,22 @@ Deno.serve(async (req: Request) => {
       return reply(503, { error: "Configuration webhook incomplète." });
     }
 
-    // Signer exactement le corps brut reçu, avant de parser le JSON.
     const rawBody = await req.text();
-    const receivedHash = (req.headers.get("x-webhook-hash") ?? "").trim();
-    if (!receivedHash) return reply(401, { error: "Signature webhook absente." });
-
-    const expectedHash = await hmacHex(secret, rawBody);
-    const normalizedReceived = receivedHash.replace(/^sha256=/i, "");
-    if (!constantTimeEqual(expectedHash, normalizedized(normalizedReceived))) {
-      console.warn("Signature webhook invalide.");
-      return reply(401, { error: "Signature webhook invalide." });
-    }
-
     let payload: unknown;
     try {
       payload = JSON.parse(rawBody);
     } catch {
       return reply(400, { error: "Corps webhook JSON invalide." });
+    }
+
+    // YengaPay documente le HMAC-SHA256 de JSON.stringify(payload).
+    const receivedHash = (req.headers.get("x-webhook-hash") ?? "").trim();
+    if (!receivedHash) return reply(401, { error: "Signature webhook absente." });
+    const expectedHash = await hmacHex(secret, JSON.stringify(payload));
+    const normalizedReceived = receivedHash.replace(/^sha256=/i, "");
+    if (!constantTimeEqual(expectedHash, normalizedized(normalizedReceived))) {
+      console.warn("Signature webhook invalide.");
+      return reply(401, { error: "Signature webhook invalide." });
     }
 
     const eventType = findValue(payload, ["event", "eventType", "type", "status", "paymentStatus"]).toLowerCase();
@@ -128,6 +127,24 @@ Deno.serve(async (req: Request) => {
 
     const currentStatus = asText(sale.statut).toLowerCase();
     const alreadyConfirmed = ["confirmee", "confirme", "validee", "valide"].includes(currentStatus);
+
+    // Une notification de succès ne suffit pas : comparer le montant avec celui attendu.
+    // Si le payload ne contient pas de montant numérique fiable, ne jamais confirmer.
+    if (isSuccess) {
+      const amountText = findValue(payload, ["paymentAmount", "paidAmount", "amount", "montant"]);
+      const paidAmount = Number(amountText);
+      const expectedAmount = Number(sale.montant);
+      if (!amountText || !Number.isFinite(paidAmount) || !Number.isFinite(expectedAmount) ||
+          paidAmount <= 0 || Math.round(paidAmount * 100) !== Math.round(expectedAmount * 100)) {
+        console.warn("Montant webhook absent ou différent; vente non confirmée:", reference);
+        return reply(400, { error: "Montant du paiement absent ou différent. Vente non confirmée." });
+      }
+      const currency = findValue(payload, ["currency", "currencyCode", "devise"]).toUpperCase();
+      if (currency && currency !== "XOF" && currency !== "FCFA") {
+        console.warn("Devise webhook inattendue; vente non confirmée:", reference);
+        return reply(400, { error: "Devise du paiement inattendue. Vente non confirmée." });
+      }
+    }
     if (isSuccess && alreadyConfirmed) {
       return reply(200, { received: true, processed: true, duplicate: true });
     }
