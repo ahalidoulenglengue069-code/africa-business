@@ -1,0 +1,24 @@
+name: BuSAF static checks
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, "fix/busaf-stabilisation-2026-10-10"]
+
+permissions:
+  contents: read
+
+jobs:
+  deno-format:
+    name: Vérifier le format des fonctions Supabase
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le dépôt
+        uses: actions/checkout@v4
+      - name: Installer Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+      - name: Vérifier le format des fonctions
+        run: deno fmt --check supabase/functions/creer-achat-marche/index.ts supabase/functions/yengapay-webhook/index.ts
