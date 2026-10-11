@@ -81,7 +81,7 @@ Deno.serve(async (req: Request) => {
 
     const { data: product, error: productError } = await admin
       .from("produits")
-      .select("id, nom, prix, type_produit, createur_id, actif")
+      .select("id, nom, prix, type_produit, createur_id")
       .eq("id", productId)
       .maybeSingle();
 
@@ -90,7 +90,6 @@ Deno.serve(async (req: Request) => {
       return reply(500, { error: "Impossible de vérifier le produit. Le schéma de la table produits doit être contrôlé." });
     }
     if (!product) return reply(404, { error: "Produit du Marché introuvable." });
-    if (product.actif === false) return reply(409, { error: "Ce produit n'est plus disponible." });
 
     const amount = Number(product.prix);
     if (!Number.isFinite(amount) || amount <= 0) return reply(409, { error: "Le prix du produit est invalide." });
