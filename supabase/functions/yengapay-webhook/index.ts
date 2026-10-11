@@ -84,7 +84,7 @@ Deno.serve(async (req: Request) => {
     if (!receivedHash) return reply(401, { error: "Signature webhook absente." });
     const expectedHash = await hmacHex(secret, JSON.stringify(payload));
     const normalizedReceived = receivedHash.replace(/^sha256=/i, "");
-    if (!constantTimeEqual(expectedHash, normalizedized(normalizedReceived))) {
+    if (!constantTimeEqual(expectedHash, normalized(normalizedReceived))) {
       console.warn("Signature webhook invalide.");
       return reply(401, { error: "Signature webhook invalide." });
     }
@@ -155,12 +155,26 @@ Deno.serve(async (req: Request) => {
         .update({ statut: "confirmee" })
         .eq("id", sale.id)
         .eq("reference", reference)
+        .eq("statut", sale.statut)
         .select("id")
         .maybeSingle();
 
-      if (updateError || !updated) {
-        console.error("Confirmation vente impossible:", updateError?.message ?? "aucune ligne mise à jour");
+      if (updateError) {
+        console.error("Confirmation vente impossible:", updateError.message);
         return reply(500, { error: "La confirmation du paiement n'a pas pu être enregistrée." });
+      }
+      if (!updated) {
+        // Un autre webhook a pu changer le statut entre la lecture et l'écriture.
+        const { data: latest, error: latestError } = await admin
+          .from("ventes")
+          .select("statut")
+          .eq("id", sale.id)
+          .maybeSingle();
+        if (!latestError && ["confirmee", "confirme", "validee", "valide"].includes(asText(latest?.statut).toLowerCase())) {
+          return reply(200, { received: true, processed: true, duplicate: true });
+        }
+        console.warn("Conflit de statut pendant la confirmation:", reference);
+        return reply(409, { error: "Le statut du paiement a changé; nouvelle vérification nécessaire." });
       }
       // L'ajout du stock et des commissions doit être exécuté par une routine SQL transactionnelle
       // idempotente après vérification du schéma live. Ne pas créditer ces montants ici à l'aveugle.
@@ -174,10 +188,21 @@ Deno.serve(async (req: Request) => {
       .from("ventes")
       .update({ statut: "echec" })
       .eq("id", sale.id)
-      .eq("reference", reference);
+      .eq("reference", reference)
+      .eq("statut", sale.statut);
     if (failError) {
       console.error("Échec paiement impossible à enregistrer:", failError.message);
       return reply(500, { error: "Impossible d'enregistrer l'état du paiement." });
+    }
+    // Un webhook concurrent peut avoir confirmé le paiement : ne pas prétendre qu'un échec a été écrit.
+    const { data: afterFailure, error: afterFailureError } = await admin
+      .from("ventes")
+      .select("statut")
+      .eq("id", sale.id)
+      .maybeSingle();
+    if (afterFailureError) return reply(500, { error: "Impossible de vérifier l'état final du paiement." });
+    if (["confirmee", "confirme", "validee", "valide"].includes(asText(afterFailure?.statut).toLowerCase())) {
+      return reply(200, { received: true, processed: false, alreadyConfirmed: true });
     }
     return reply(200, { received: true, processed: true });
   } catch (error) {
@@ -186,6 +211,6 @@ Deno.serve(async (req: Request) => {
   }
 });
 
-function normalizedized(value: string): string {
+function normalized(value: string): string {
   return value.trim().toLowerCase();
 }
