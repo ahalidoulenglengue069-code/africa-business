@@ -143,16 +143,41 @@ Deno.serve(async (req: Request) => {
       return reply(500, { error: "Impossible de vérifier les paiements déjà commencés." });
     }
     const now = Date.now();
-    const pending = (existing ?? []).find((sale) => {
-      const status = cleanText(sale.statut, 40).toLowerCase();
-      const age = sale.created_at ? now - new Date(sale.created_at).getTime() : Number.POSITIVE_INFINITY;
-      return (status.includes("attente") || status === "pending" || status === "en_cours") && age < 20 * 60 * 1000;
+    const isPendingStatus = (value: unknown) => {
+      const status = cleanText(value, 40).toLowerCase();
+      return status.includes("attente") || status === "pending" || status === "en_cours";
+    };
+    const recentPending = (existing ?? []).find((sale) => {
+      if (!isPendingStatus(sale.statut)) return false;
+      const createdAt = sale.created_at ? new Date(sale.created_at).getTime() : Number.NaN;
+      const age = Number.isFinite(createdAt) ? now - createdAt : Number.POSITIVE_INFINITY;
+      return age >= 0 && age < 20 * 60 * 1000;
     });
-    if (pending) {
+    if (recentPending) {
       return reply(409, {
         error: "Un paiement pour ce produit est déjà en attente. Attends sa confirmation ou son expiration avant de réessayer.",
-        reference: pending.reference ?? undefined,
+        reference: recentPending.reference ?? undefined,
       });
+    }
+
+    // Une tentative abandonnée ne doit pas rester éternellement « en_attente ».
+    // À partir de 20 minutes, on marque les anciennes demandes comme expirées avant
+    // d'en créer une nouvelle. Un webhook signé tardif peut encore confirmer la référence.
+    const stalePending = (existing ?? []).filter((sale) => {
+      if (!isPendingStatus(sale.statut)) return false;
+      const createdAt = sale.created_at ? new Date(sale.created_at).getTime() : Number.NaN;
+      return !Number.isFinite(createdAt) || now - createdAt >= 20 * 60 * 1000;
+    });
+    for (const stale of stalePending) {
+      const { error: expireError } = await admin
+        .from("ventes")
+        .update({ statut: "expiree" })
+        .eq("id", stale.id)
+        .eq("statut", stale.statut);
+      if (expireError) {
+        console.error("Expiration ancienne demande impossible:", expireError.message);
+        return reply(500, { error: "Impossible de clôturer une ancienne tentative de paiement. Réessaie plus tard." });
+      }
     }
 
     // Référence unique et créée côté serveur.
@@ -211,7 +236,7 @@ Deno.serve(async (req: Request) => {
     const checkoutUrl = cleanText(providerData.checkoutPageUrlWithPaymentToken, 2000);
     if (!providerResponse.ok || !checkoutUrl || !/^https:\/\//i.test(checkoutUrl)) {
       // On n'expose jamais la réponse brute du prestataire, qui peut contenir des informations sensibles.
-      console.error("YengaPay a refusé la création du paiement:", providerResponse.status, providerData);
+      console.error("YengaPay a refusé la création du paiement:", providerResponse.status, cleanText(providerData.message ?? providerData.error ?? providerData.code, 160) || "réponse sans message exploitable");
       await admin.from("ventes").update({ statut: "echec" }).eq("id", inserted.id);
       return reply(502, {
         error: providerResponse.status === 401
