@@ -1217,7 +1217,7 @@ function openMarketProductForm(editId=''){
  if(!marketCanPublish()){openModal('🔒 Marché BuSAF',`<div class="notice warning">Seul le fondateur peut gérer les produits du Marché BuSAF.</div><button class="btn" onclick="closeModal()">OK</button>`);return;}
  const p=editId?(state.marketCatalog||[]).find(x=>String(x.id)===String(editId)):null;
  const title=p?'✏️ Modifier le produit':'➕ Ajouter un produit au Marché BuSAF';
- openModal(title,`<label>Photo du produit ${p?'(laisser vide pour conserver la photo)':'(facultative)'}</label><input id="mpPhoto" type="file" accept="image/*"><label>Nom du produit</label><input id="mpName" value="${esc(p?.nom||'')}" placeholder="Nom"><label>Prix FCFA</label><input id="mpPrice" type="number" min="1" value="${p?.prix??''}" placeholder="Prix"><label>Description</label><textarea id="mpDesc" placeholder="Description du produit numérique/business">${esc(p?.description||'')}</textarea><div class="notice">${p?'Les modifications seront enregistrées directement dans public.produits.':'La publication sera enregistrée directement dans public.produits.'} Aucun achat n'est disponible dans l'espace Fondateur.</div><button class="btn" onclick="saveMarketProduct('${String(editId||'')}')">${p?'💾 ENREGISTRER LES MODIFICATIONS':'VALIDER ET PUBLIER'}</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
+ openModal(title,`<label>Photo du produit ${p?'(laisser vide pour conserver la photo)':'(facultative)'}</label><input id="mpPhoto" type="file" accept="image/*"><label>Nom du produit</label><input id="mpName" value="${esc(p?.nom||'')}" placeholder="Nom"><label>Prix FCFA</label><input id="mpPrice" type="number" min="1" value="${p?.prix??''}" placeholder="Prix"><label>Description</label><textarea id="mpDesc" placeholder="Description du produit numérique/business">${esc(p?.description||'')}</textarea><div class="notice">${p?'Les modifications seront enregistrées directement dans public.produits.':'La publication sera enregistrée directement dans public.produits.'} Aucun achat n'est disponible dans l'espace Fondateur.</div><button class="btn" id="mpSaveBtn" onclick="saveMarketProduct('${String(editId||'')}')">${p?'💾 ENREGISTRER LES MODIFICATIONS':'VALIDER ET PUBLIER'}</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
 }
 async function saveMarketProduct(editId=''){
  if(!marketCanPublish()){
@@ -1228,6 +1228,9 @@ async function saveMarketProduct(editId=''){
    alert('Session BuSAF absente. Déconnecte-toi puis reconnecte-toi avec le compte fondateur.');
    return;
  }
+ const submitBtn=document.getElementById('mpSaveBtn');
+ const submitLabel=submitBtn?.textContent||'VALIDER ET PUBLIER';
+ if(submitBtn){submitBtn.disabled=true;submitBtn.textContent=editId?'MODIFICATION EN COURS…':'PUBLICATION EN COURS…';}
  try{
    // Recharge le profil avant l'insertion pour éviter un state.profile périmé ou vide.
    await loadProfile();
@@ -1309,6 +1312,7 @@ async function saveMarketProduct(editId=''){
    );
  }catch(e){
    console.error('BuSAF saveMarketProduct:',e);
+   if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=submitLabel;}
    alert('❌ Opération impossible : '+(e?.message||'Erreur inconnue.'));
  }
 }
