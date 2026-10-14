@@ -479,7 +479,7 @@ async function restoreAuthenticatedSession(){
       state.token=oldToken;
       throw new Error("Profil BuSAF introuvable");
     }
-    state.screen=isFounder()?"member":"member";
+    state.screen=isFounder()?"founder":"member";
     return true;
   }catch(e){
     console.warn("Session locale refusée :",e.message||e);
@@ -1807,7 +1807,7 @@ async function start(){
 
     const authenticated=await restoreAuthenticatedSession();
     if(authenticated){
-      state.screen=isFounder()?"member":"member";
+      state.screen=isFounder()?"founder":"member";
       history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
       await loadMarketCatalog().catch(e=>console.warn("Marché non chargé :",e));
       await syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
