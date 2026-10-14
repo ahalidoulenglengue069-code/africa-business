@@ -1434,6 +1434,17 @@ async function saveBoutiqueProduct(){openModal("Fonction retirée",`<div class="
 function openBoutiqueSale(i){openModal("Fonction retirée",`<div class="notice">Les ventes de Boutique physique ne sont plus disponibles.</div><button class="btn" onclick="closeModal()">OK</button>`);}
 function confirmBoutiqueSale(i){openModal("Fonction retirée",`<div class="notice">Les ventes de Boutique physique ne sont plus disponibles.</div><button class="btn" onclick="closeModal()">OK</button>`);}
 
+function sellFromStock(productId){
+ const item=(state.marketStockItems||[]).find(x=>String(x.productId)===String(productId)&&Number(x.qty)>0);
+ if(!item){
+  openModal("Stock BuSAF",'<div class="notice">Ce produit n’est plus disponible dans le stock chargé. Actualise le stock après vérification de tes achats confirmés.</div><button class="btn" onclick="closeModal()">FERMER</button>');
+  return;
+ }
+ // Ne pas créer de vente fictive : le fichier ne contient pas encore de flux de vente
+ // serveur lié à une ligne de stock. On informe clairement le membre.
+ openModal("💰 Revente du produit",`<div class="rule"><h3>${esc(item.name||"Produit BuSAF")}</h3><p>Quantité disponible : <strong>${Number(item.qty)||0}</strong></p><p>Prix de référence : <strong>${money(item.price||0)}</strong></p></div><div class="notice">Le stock est chargé, mais le flux de revente avec validation côté serveur n’est pas encore relié à ce bouton. Aucune vente ni commission ne sera créée sans confirmation réelle.</div><button class="btn" onclick="closeModal();setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
+}
+
 function memberStockMarket(){return page("📦 Stock BuSAF",`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Stock BuSAF est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
 
 function memberStockBoutique(){return page("📦 Stock BuSAF",`<div class="notice success">Le stock des Boutiques physiques a été retiré. Le Stock BuSAF numérique reste disponible.</div><button class="btn" onclick="setScreen('stockMarket')">OUVRIR LE STOCK NUMÉRIQUE</button>`);}
