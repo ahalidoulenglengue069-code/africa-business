@@ -559,6 +559,11 @@ async function signup(e){
   if(!code)throw new Error("Le code d'invitation est obligatoire.");
   if(password.length<6)throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
 
+  // Valider le parrain AVANT de créer le compte Auth : aucun compte orphelin si le code est invalide.
+  const parrains=await api(`/rest/v1/profils_busaf?code_parrain=eq.${encodeURIComponent(code)}&select=id,code_parrain,nom_complet&limit=1`);
+  const parrain=Array.isArray(parrains)?parrains[0]:null;
+  if(!parrain)throw new Error("Code parrain invalide ou introuvable. Vérifie le code avec la personne qui t'invite.");
+
   const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville,code_invitation:code}})});
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
 
@@ -571,10 +576,6 @@ async function signup(e){
     openModal("Compte créé",`<div class="notice success">Le compte a été créé. Connecte-toi maintenant avec ton e-mail et ton mot de passe.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button>`);
     return;
   }
-
-  const parrains=await api(`/rest/v1/profils_busaf?code_parrain=eq.${encodeURIComponent(code)}&select=id,code_parrain,nom_complet`);
-  const parrain=Array.isArray(parrains)?parrains[0]:null;
-  if(!parrain)throw new Error("Code parrain invalide ou introuvable.");
 
   const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
 
