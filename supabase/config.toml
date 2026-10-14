@@ -1,0 +1,8 @@
+# Configuration des Edge Functions BuSAF.
+# Le webhook est authentifié par la signature HMAC YengaPay, pas par un JWT Supabase.
+[functions.yengapay-webhook]
+verify_jwt = false
+
+# La fonction de création d'achat exige une session utilisateur vérifiée.
+[functions.creer-achat-marche]
+verify_jwt = true
