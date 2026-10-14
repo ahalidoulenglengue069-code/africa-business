@@ -369,7 +369,11 @@ function money(n){return Number(n||0).toLocaleString("fr-FR")+" FCFA"}
 function normalScreen(screen){
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
  const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings"];
- return allowed.includes(String(screen||""))?String(screen):fallback;
+ const requested=String(screen||"");
+ // Un compte déjà connecté ne doit jamais être placé sur les écrans publics
+ // par un ancien lien, le bouton Retour ou une modification manuelle du hash.
+ if(state.userId && ["public","signup","login"].includes(requested)) return fallback;
+ return allowed.includes(requested)?requested:fallback;
 }
 
 function setScreen(screen){
