@@ -506,9 +506,14 @@ async function restoreAuthenticatedSession(){
     localStorage.setItem("busaf_user_id",state.userId);
     localStorage.setItem("busaf_email",state.email);
     await loadProfile();
+    // Si l'inscription a demandé une confirmation e-mail, le profil peut ne pas encore exister.
+    // Le créer/réparer à la première connexion à partir des métadonnées Auth, sans doublon.
+    if(!state.profile){
+      await ensureMemberProfile(user);
+    }
     if(!state.profile){
       state.token=oldToken;
-      throw new Error("Profil BuSAF introuvable");
+      throw new Error("Profil BuSAF introuvable après vérification.");
     }
     state.screen=isFounder()?"founder":"member";
     return true;
