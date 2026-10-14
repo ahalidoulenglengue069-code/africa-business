@@ -956,6 +956,26 @@ function founderPlaceholder(title,desc){
  return page(title,`<div class="notice success"><strong>👑 ESPACE FONDATEUR</strong><br>${desc}</div><button class="btn" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>`);
 }
 
+function memberAccount(){
+ const p=state.profile||{};
+ const name=p.nom_complet||state.email||"—";
+ const phone=p.telephone||p.Téléphone||"—";
+ const city=p.Ville||p.ville||"—";
+ const role=p.role||"membre";
+ const code=p.code_parrain||"—";
+ return page("💼 Mon Compte",`<section class="panel">
+  <h2>👤 Mon profil BuSAF</h2>
+  <p><strong>Nom complet :</strong> ${escapeHtml(String(name))}</p>
+  <p><strong>Email :</strong> ${escapeHtml(String(state.email||"—"))}</p>
+  <p><strong>Téléphone :</strong> ${escapeHtml(String(phone))}</p>
+  <p><strong>Ville :</strong> ${escapeHtml(String(city))}</p>
+  <p><strong>Rôle :</strong> ${escapeHtml(String(role))}</p>
+  <p><strong>Code parrain :</strong> ${escapeHtml(String(code))}</p>
+  <div class="notice">Ces informations proviennent du profil enregistré dans BuSAF. Si un champ affiche « — », il n'est pas renseigné dans le profil chargé.</div>
+  <button class="btn" onclick="setScreen('${isFounder()?'founder':'member'}')">← Retour à mon espace</button>
+ </section>`);
+}
+
 function memberHome(){
  const name=state.profile?.nom_complet||state.email||"Membre";
  const monthly=monthlySalesCount();
