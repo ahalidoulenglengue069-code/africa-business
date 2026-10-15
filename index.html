@@ -710,15 +710,9 @@ function directResale(id){
 }
 function buyProduct(id,mode){
  const p=productForId(id);if(!p)return;
- if(hasBoughtProduct(id)){
-   openModal('✅ Déjà acheté',`<div class="notice success">Tu as déjà acheté <strong>${esc(p.name)}</strong>. Un même produit ne peut pas être acheté deux fois par le même membre.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);return;
- }
- if(mode==='direct'){directResale(id);return;}
- state.orders.unshift({id:Date.now(),product:p.name,productId:p.id,price:p.price,date:new Date().toLocaleString('fr-FR'),mode:'first_purchase',fromSponsor:true});
- state.marketStock++;
- const item=state.marketStockItems.find(x=>x.productId===p.id);if(item)item.qty++;else state.marketStockItems.push({productId:p.id,name:p.name,emoji:p.emoji,price:p.price,qty:1});
- saveState();
- openModal('🛒 Premier achat enregistré',`<div class="notice success"><strong>${esc(p.name)}</strong><br>Le produit est maintenant dans ton Stock BuSAF.</div><div class="notice">Pour un nouveau membre, ce premier achat est réalisé auprès de son parrain direct. Les achats suivants se font dans le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
+ // Sécurité : ne jamais enregistrer un achat ni créditer le stock côté navigateur.
+ // Seule la confirmation serveur de YengaPay (ventes.statut = confirmee) peut valider un achat.
+ openModal('💳 Achat sécurisé BuSAF',`<div class="notice warning">Aucun achat ne peut être validé directement depuis cette page. Pour éviter un achat non payé, passe par le paiement sécurisé YengaPay depuis le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('market')">ALLER AU MARCHÉ</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
 }
 
 function canInvite(){return state.orders.some(o=>o.mode==="stock"||o.mode==="direct");}
