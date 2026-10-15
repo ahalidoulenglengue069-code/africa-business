@@ -74,3 +74,29 @@ where n.nspname = 'public'
     or p.proname ilike '%paiement%'
   )
 order by p.proname;
+ 
+-- 5) Paiements en attente / bloqués (lecture seule, sans données personnelles).
+-- Permet d'identifier les références qui provoquent « paiement déjà en attente ».
+select
+  id,
+  reference,
+  produit_id,
+  acheteur_id,
+  montant,
+  statut,
+  moyen_paiement,
+  created_at,
+  now() - created_at as age
+from public.ventes
+where lower(coalesce(statut::text, '')) in ('en_attente', 'pending', 'attente', 'en attente')
+order by created_at desc
+limit 100;
+
+-- 6) Références de paiement dupliquées (une référence devrait identifier une seule vente).
+select reference, count(*) as occurrences
+from public.ventes
+where reference is not null and btrim(reference::text) <> ''
+group by reference
+having count(*) > 1
+order by occurrences desc, reference
+limit 100;
