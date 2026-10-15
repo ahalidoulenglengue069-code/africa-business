@@ -348,10 +348,10 @@ const publicSpaces=[
 ];
 
 const memberSpaces=[
- ["market","🛒","Marché BuSAF"],["boutique","🏪","Ma Boutique"],["invites","👥","Mes Invités"],["orders","📦","Mes Commandes"],
+ ["market","🛒","Marché BuSAF"],["invites","👥","Mes Invités"],["orders","📦","Mes Commandes"],
  ["account","💼","Mon Compte"],["profits","💰","Mes Bénéfices"],["commissions","🤝","Mes Commissions"],["partner","⭐","Progression Partner"],
- ["memberBenefits","🎁","Avantages membres"],["money","💳","Dépôt / Retrait"],["stockMarket","📦","Stock BuSAF"],["stockBoutique","🏷️","Stock Boutique"],
- ["meetings","🎥","Réunions"],["notifications","🔔","Notifications"],["rules","📜","Règles"],["help","❓","Aide"],
+ ["memberBenefits","🎁","Avantages membres"],["money","💳","Dépôt / Retrait"],["stockMarket","📦","Stock BuSAF"],
+ ["notifications","🔔","Notifications"],["rules","📜","Règles"],["help","❓","Aide"],
  ["privacy","🔒","Confidentialité"],["contact","📞","Contact"],["how","📖","Fonctionnement"],["logout","🚪","Déconnexion"]
 ];
 
@@ -374,7 +374,9 @@ function money(n){return Number(n||0).toLocaleString("fr-FR")+" FCFA"}
 /* ===== NAVIGATION BuSAF : historique réel du bouton Retour Android ===== */
 function normalScreen(screen){
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
- const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","boutique","invites","orders","account","partner","memberBenefits","money","stockMarket","stockBoutique","meetings","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderMembers","founderReferral","founderBoutiques","founderStocks","founderAnnouncements","founderSettings"];
+ const disabledBusinessFeatures=["boutique","stockBoutique","meetings","founderBoutiques"];
+ if(disabledBusinessFeatures.includes(String(screen||"")))return fallback;
+ const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings"];
  return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
@@ -843,7 +845,6 @@ function founderHome(){
  const products=Array.isArray(state.marketCatalog)?state.marketCatalog.length:0;
  const members=state.invites.length;
  const orders=state.orders.length;
- const meetings=state.meetings.length;
  return `<div class="founder-dashboard">
   <section class="founder-hero">
    <span class="founder-badge">👑 ESPACE FONDATEUR</span>
@@ -853,7 +854,6 @@ function founderHome(){
     <div class="founder-stat"><b>${products}</b><small>Produits Marché</small></div>
     <div class="founder-stat"><b>${members}</b><small>Invités suivis</small></div>
     <div class="founder-stat"><b>${orders}</b><small>Commandes</small></div>
-    <div class="founder-stat"><b>${meetings}</b><small>Réunions</small></div>
    </div>
   </section>
   <h2 class="founder-section-title">📊 PILOTAGE</h2>
@@ -874,13 +874,11 @@ function founderHome(){
   <h2 class="founder-section-title">🛍️ COMMERCE</h2>
   <div class="founder-grid">
    ${founderApp('founderMarket','🛒','Gestion du Marché','Ajouter, modifier, supprimer')}
-   ${founderApp('founderBoutiques','🏪','Gestion des Boutiques','Supervision')}
    ${founderApp('founderStocks','📦','Gestion des Stocks','Suivi des stocks')}
    ${founderApp('founderMarket','➕','Ajouter un produit','Publier au Marché')}
   </div>
   <h2 class="founder-section-title">📢 COMMUNICATION</h2>
   <div class="founder-grid">
-   ${founderApp('meetings','🎥','Réunions','Gestion des réunions')}
    ${founderApp('notifications','🔔','Notifications','Informations')}
    ${founderApp('founderAnnouncements','📢','Annonces','Communications')}
   </div>
@@ -949,18 +947,18 @@ function memberHome(){
  const p10=Math.min(monthly,10);
  const p100=Math.min(total,100);
  const desc={
-  market:'Produits et revente',boutique:'Publier mes produits',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',stockBoutique:'Produits de Boutique',meetings:'Réunions BuSAF',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
+  market:'Produits et revente',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
  };
  const accent=['accent-green','accent-blue','accent-purple','accent-orange','accent-teal','accent-green','accent-purple','accent-gold','accent-gold','accent-teal','accent-blue','accent-orange','accent-pink','accent-red','accent-red','accent-blue','accent-purple','accent-teal','accent-green','accent-red'];
  const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
  return `<div class="member-dashboard member-reference">
    <div class="member-welcome compact-welcome">
-     <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, Boutique, commandes, invitations, bénéfices et suivi.</p></div>
+     <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, commandes, invitations, bénéfices et suivi.</p></div>
      <button class="dash-profile" onclick="setScreen('account')">💼 MON COMPTE</button>
    </div>
    <div class="dashboard-stats">
      <button class="dash-stat" onclick="setScreen('profits')"><span>💰</span><small>Compte Marché</small><strong>${money(state.marketBalance)}</strong></button>
-     <button class="dash-stat" onclick="setScreen('boutique')"><span>🏪</span><small>Compte Boutique</small><strong>${money(state.boutiqueBalance)}</strong></button>
+
      <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes</small><strong>${state.orders.length}</strong></button>
      <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités</small><strong>${state.invites.length}</strong></button>
    </div>
@@ -1057,7 +1055,7 @@ function publicPrivacy(){return page("🔒 Confidentialité",`<div class="rule">
 function publicHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Inscription et connexion</h3><p>Découvre BuSAF avant de créer ton compte.</p><button class="btn" onclick="setScreen('signup')">CRÉER MON COMPTE</button><button class="btn alt" onclick="setScreen('login')">SE CONNECTER</button></div><div class="rule"><h3>🛒 Marché</h3><p>Consulte produits, bénéfices, règles et fonctionnement.</p><button class="btn alt" onclick="setScreen('market')">VOIR LE MARCHÉ</button></div><div class="rule"><h3>📜 Règles</h3><button class="btn alt" onclick="setScreen('rules')">LIRE LES RÈGLES</button></div><div class="rule"><h3>📞 Assistance</h3><button class="btn" onclick="setScreen('contact')">CONTACT</button></div>`);}
 
 function publicContact(){return page("📞 Contact",`<div class="notice">Cet espace est réservé aux demandes d'aide et de contact liées à BuSAF.</div><button class="btn" onclick="openModal('Demande de contact', '<label>Objet</label><input id=\"contactObjet\"><label>Message</label><textarea id=\"contactMsg\"></textarea><button class=\"btn\" onclick=\"closeModal();alert(\\'Demande préparée.\\')\">ENVOYER</button>')">CONTACTER BuSAF</button>`);}
-function publicWhy(){return page("🎯 Pourquoi devenir membre",`<div class="rule"><h3>Découvrir avant de s'inscrire</h3><p>Le visiteur peut consulter les règles, avantages, bénéfices, boutiques, stocks, comptes, réunions et programmes avant de créer son compte.</p></div><div class="rule"><h3>Une fois membre</h3><p>Le membre accède à son Marché, sa Boutique, ses invités, ses commandes, ses comptes, ses stocks, ses bénéfices, ses commissions et ses programmes.</p></div>`);}
+function publicWhy(){return page("🎯 Pourquoi devenir membre",`<div class="rule"><h3>Découvrir avant de s'inscrire</h3><p>Le visiteur peut consulter les règles, avantages, bénéfices, stocks du Marché et programmes avant de créer son compte.</p></div><div class="rule"><h3>Une fois membre</h3><p>Le membre accède à son Marché, ses invités, ses commandes, son compte, son stock du Marché, ses bénéfices, ses commissions et ses programmes.</p></div>`);}
 
 /* =========================
    PAGES MEMBRES
