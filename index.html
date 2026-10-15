@@ -1705,10 +1705,11 @@ function publicQuick(){
  </div></div>`;
 }
 function memberQuick(){
+ // La Boutique physique est suspendue : la navigation reste centrée sur le Marché numérique.
  return `<div class="bottom"><div class="bottom-inner">
  <button onclick="setScreen('member')"><span>🏠</span>Accueil</button>
  <button onclick="setScreen('market')"><span>🛒</span>Marché</button>
- <button onclick="setScreen('boutique')"><span>🏪</span>Boutique</button>
+ <button onclick="setScreen('orders')"><span>📦</span>Commandes</button>
  <button onclick="setScreen('invites')"><span>👥</span>Invités</button>
  <button onclick="setScreen('account')"><span>💼</span>Compte</button>
  </div></div>`;
