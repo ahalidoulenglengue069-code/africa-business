@@ -1149,6 +1149,17 @@ async function startMarketPurchase(productId){
    try{data=text?JSON.parse(text):{};}catch{data={};}
    if(!response.ok){
      const serverMessage=data.error||data.message||data.details?.message||'Impossible de préparer le paiement.';
+     if(response.status===403 && Array.isArray(data.sponsor_product_ids)){
+       const eligible=(state.marketCatalog||[]).filter(p=>data.sponsor_product_ids.map(String).includes(String(p.id)));
+       if(eligible.length){
+         const cards=eligible.map(p=>{
+           const img=p.image_url?'<img src="'+esc(p.image_url)+'" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px">':'<div style="font-size:30px">📦</div>';
+           return '<div class="rule" style="display:flex;align-items:center;gap:12px;margin:8px 0">'+img+'<div style="flex:1;min-width:0"><strong>'+esc(p.nom||'Produit du parrain')+'</strong><div>'+money(Number(p.prix||0))+'</div><button class="btn" style="margin-top:8px" onclick="closeModal();startMarketPurchase(\''+String(p.id).replace(/'/g,"\\'")+'\')">ACHETER CE PRODUIT</button></div></div>';
+         }).join('');
+         openModal('🛍️ Produits de ton parrain', '<div class="notice">Pour ton premier achat, choisis un produit que ton parrain direct a déjà acheté et dont le paiement est confirmé.</div>'+cards+'<button class="btn alt" onclick="closeModal()">ANNULER</button>');
+         return;
+       }
+     }
      if(response.status===409){
        throw new Error('Un paiement pour ce produit est déjà en attente. Ne relance pas plusieurs achats : vérifie d’abord ton historique de commandes. Si le paiement précédent a échoué, il faut débloquer cette attente côté serveur YengaPay avant de recommencer.');
      }
