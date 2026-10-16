@@ -1811,6 +1811,7 @@ async function start(){
   try{
     const recovery=await handlePasswordRecovery();
     if(recovery)return;
+
     const h=location.hash.replace(/^#/,"");
     if(h && ["public","market","benefits","profits","commissions","rules","signup","login"].includes(h)){
       state.screen=h;
@@ -1819,26 +1820,33 @@ async function start(){
     }
     history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
 
-    // L'interface publique ne doit jamais devenir membre simplement parce qu'une ancienne donnée locale existe.
+    // Afficher immédiatement l'interface, sans attendre le catalogue distant.
     render();
-    await loadMarketCatalog().catch(e=>console.warn("Marché public non chargé :",e));
-    render();
+
+    // Charger le catalogue en parallèle de la restauration de session.
+    // Le visiteur voit la page tout de suite; le membre retrouve son espace dès
+    // que sa session et son profil sont vérifiés.
+    const catalogPromise=loadMarketCatalog().then(()=>{
+      if(!state.userId || state.screen==="public" || state.screen==="market")render();
+    }).catch(e=>console.warn("Marché BuSAF non chargé :",e));
 
     const authenticated=await restoreAuthenticatedSession();
     if(authenticated){
       state.screen=isFounder()?"founder":"member";
       history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
-      await loadMarketCatalog().catch(e=>console.warn("Marché non chargé :",e));
-      await syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
-      initBusafRealtime();
-      await syncMeetingsFromServer().catch(e=>console.warn("Réunions non synchronisées :",e));
-      await syncSharedBusafEvents().catch(e=>console.warn("Événements non synchronisés :",e));
-      setInterval(()=>{syncMeetingsFromServer();syncSharedBusafEvents();},15000);
       render();
+
+      // Ces synchronisations ne bloquent plus l'ouverture de l'espace.
+      // Les réunions sont suspendues : aucune synchronisation/polling de réunions.
+      catalogPromise.then(()=>syncConfirmedMarketPurchases())
+        .then(()=>{if(state.userId)render();})
+        .catch(e=>console.warn("Achats non synchronisés :",e));
+      syncSharedBusafEvents()
+        .then(()=>{if(state.userId)render();})
+        .catch(e=>console.warn("Notifications non synchronisées :",e));
     }
   }catch(e){
     console.error("Erreur démarrage BuSAF:",e);
-    // En cas d'erreur de session ou de données locales, revenir proprement à l'accueil public.
     try{
       localStorage.removeItem("busaf_access_token");
       localStorage.removeItem("busaf_user_id");
