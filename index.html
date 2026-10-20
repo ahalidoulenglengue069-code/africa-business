@@ -352,7 +352,7 @@ const memberSpaces=[
  ["market","🛒","Marché BuSAF"],["invites","👥","Mes Invités"],["orders","📦","Mes Commandes"],
  ["account","💼","Mon Compte"],["profits","💰","Mes Bénéfices"],["commissions","🤝","Mes Commissions"],["partner","⭐","Progression Partner"],
  ["memberBenefits","🎁","Avantages membres"],["money","💳","Dépôt / Retrait"],["stockMarket","📦","Stock BuSAF"],
- ["notifications","🔔","Notifications"],["rules","📜","Règles"],["help","❓","Aide"],
+ ["notifications","🔔","Notifications"],["myHelp","✉️","Mes demandes d’aide"],["rules","📜","Règles"],["help","❓","Aide"],
  ["privacy","🔒","Confidentialité"],["contact","📞","Contact"],["how","📖","Fonctionnement"],["logout","🚪","Déconnexion"]
 ];
 
@@ -919,20 +919,56 @@ async function founderContactRequests(){
  if(!busafContactLoading&&busafContactRequests.length===0)loadFounderContactRequests();
  let html="";
  if(busafContactLoading)html="<div class=\"notice\">Chargement des demandes…</div>";
- else if(!busafContactRequests.length)html="<div class=\"notice\">Aucune demande de contact reçue.</div>";
- else html=busafContactRequests.map(function(r){return "<div class=\"rule\"><strong>"+esc(r.objet||"Sans objet")+"</strong><p>"+esc(r.message||"")+"</p><small>De : "+esc(r.nom||"Visiteur")+" · "+esc(r.email||"E-mail non fourni")+"<br>Reçu le : "+(r.created_at?new Date(r.created_at).toLocaleString("fr-FR"):"—")+" · Statut : "+esc(r.statut||"nouvelle")+"</small><br><button class=\"btn alt\" onclick=\"updateContactRequestStatus(\'"+r.id+"\',\'traitee\')\">MARQUER TRAITÉE</button></div>";}).join("");
- return page("✉️ Messages de contact","<div class=\"notice\">Les messages envoyés depuis le formulaire Contact de BuSAF apparaissent ici.</div><button class=\"btn alt\" onclick=\"loadFounderContactRequests()\">🔄 ACTUALISER</button>"+html+"<button class=\"btn alt\" onclick=\"setScreen(\'founder\')\">← ESPACE FONDATEUR</button>");
+ else if(!busafContactRequests.length)html="<div class=\"notice\">Aucune demande reçue.</div>";
+ else html=busafContactRequests.map(function(r){return '<div class="rule"><strong>'+esc(r.objet||"Sans objet")+'</strong><p>'+esc(r.message||"")+'</p><small>De : '+esc(r.nom||"Visiteur")+' · '+esc(r.email||"E-mail non fourni")+'<br>Reçu : '+(r.created_at?new Date(r.created_at).toLocaleString("fr-FR"):"—")+' · Statut : '+esc(r.statut||"nouvelle")+'</small><br><button class="btn" onclick="openFounderReply(\''+r.id+'\')">RÉPONDRE</button> <button class="btn alt" onclick="updateContactRequestStatus(\''+r.id+'\',\'traitee\')">MARQUER TRAITÉE</button></div>';}).join("");
+ return page("✉️ Messages de contact",'<div class="notice">Réponds ici aux demandes d’aide des membres.</div><button class="btn alt" onclick="loadFounderContactRequests()">🔄 ACTUALISER</button>'+html+'<button class="btn alt" onclick="setScreen(\'founder\')">← ESPACE FONDATEUR</button>');
 }
 async function loadFounderContactRequests(){
  if(!isFounder()||busafContactLoading)return;
  busafContactLoading=true;
- try{const rows=await api("/rest/v1/busaf_contact_requests?select=id,nom,email,objet,message,statut,created_at&order=created_at.desc&limit=100");busafContactRequests=Array.isArray(rows)?rows:[];}
+ try{const rows=await api("/rest/v1/busaf_contact_requests?select=id,profil_id,nom,email,objet,message,statut,created_at&order=created_at.desc&limit=100");busafContactRequests=Array.isArray(rows)?rows:[];}
  catch(e){alert("Impossible de charger les messages : "+e.message);}
  finally{busafContactLoading=false;if(state.screen==="founderContact")render();}
 }
 async function updateContactRequestStatus(id,statut){
  try{await api("/rest/v1/busaf_contact_requests?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({statut:statut})});busafContactRequests=busafContactRequests.map(function(r){if(r.id===id)r.statut=statut;return r;});render();}
  catch(e){alert("Impossible de mettre à jour le statut : "+e.message);}
+}
+async function loadContactReplies(id){
+ const rows=await api("/rest/v1/busaf_contact_replies?select=id,demande_id,profil_id,expediteur_role,message,created_at&demande_id=eq."+encodeURIComponent(id)+"&order=created_at.asc");
+ return Array.isArray(rows)?rows:[];
+}
+function renderContactReplies(rows){return '<div class="rule"><strong>Conversation</strong>'+(rows.length?rows.map(x=>'<p><b>'+(x.expediteur_role==="fondateur"?"BuSAF":"Membre")+'</b> · '+new Date(x.created_at).toLocaleString("fr-FR")+'<br>'+esc(x.message)+'</p>').join(""):'<p>Aucune réponse pour le moment.</p>')+'</div>';}
+async function sendContactReply(id,role){
+ const msg=document.getElementById("contactReplyText")?.value.trim()||"";const out=document.getElementById("contactReplyResult");
+ if(!msg){if(out)out.textContent="Écris un message avant l’envoi.";return;}
+ try{await api("/rest/v1/busaf_contact_replies",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({demande_id:id,profil_id:state.profile?.id||null,expediteur_role:role,message:msg})});
+ if(role==="fondateur")await api("/rest/v1/busaf_contact_requests?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({statut:"en_cours"})});
+ if(out){out.className="notice success";out.textContent="Message envoyé.";}
+ setTimeout(()=>{closeModal();if(role==="fondateur")loadFounderContactRequests();else render();},700);
+ }catch(e){if(out){out.className="notice error";out.textContent="Échec de l’envoi : "+e.message;}}
+}
+async function openFounderReply(id){
+ const r=busafContactRequests.find(x=>x.id===id);if(!r)return;
+ let replies=[];try{replies=await loadContactReplies(id);}catch(e){}
+ openModal("Répondre à "+(r.nom||"la demande"),'<div class="notice"><strong>'+esc(r.objet||"Demande")+'</strong><p>'+esc(r.message||"")+'</p></div>'+renderContactReplies(replies)+'<label>Ta réponse</label><textarea id="contactReplyText" maxlength="5000" placeholder="Écris ta réponse…"></textarea><div id="contactReplyResult" role="status"></div><button class="btn" onclick="sendContactReply(\''+id+'\',\'fondateur\')">ENVOYER LA RÉPONSE</button><button class="btn alt" onclick="closeModal()">FERMER</button>');
+}
+async function loadMyHelpRequests(){
+ const p=state.profile;if(!p?.id)return [];
+ const rows=await api("/rest/v1/busaf_contact_requests?select=id,profil_id,nom,email,objet,message,statut,created_at&profil_id=eq."+encodeURIComponent(p.id)+"&order=created_at.desc");
+ return Array.isArray(rows)?rows:[];
+}
+async function myHelpRequests(){
+ let html='<div class="notice">Tes demandes et les réponses de BuSAF.</div>';
+ try{const requests=await loadMyHelpRequests();if(!requests.length)html+='<div class="rule">Tu n’as pas encore de demande d’aide.</div>';
+ for(const r of requests){const replies=await loadContactReplies(r.id);html+='<div class="rule"><strong>'+esc(r.objet)+'</strong><p>'+esc(r.message)+'</p><small>Statut : '+esc(r.statut)+' · '+new Date(r.created_at).toLocaleString("fr-FR")+'</small>'+renderContactReplies(replies)+'<button class="btn" onclick="openMemberReply(\''+r.id+'\')">RÉPONDRE</button></div>';}}
+ catch(e){html+='<div class="notice error">Impossible de charger tes demandes : '+esc(e.message)+'</div>';}
+ return page("✉️ Mes demandes d’aide",html+'<button class="btn alt" onclick="setScreen(\'contact\')">+ NOUVELLE DEMANDE</button><button class="btn alt" onclick="setScreen(\'member\')">← ESPACE DE TRAVAIL</button>');
+}
+async function openMemberReply(id){
+ const requests=await loadMyHelpRequests();const r=requests.find(x=>x.id===id);if(!r)return;
+ let replies=[];try{replies=await loadContactReplies(id);}catch(e){}
+ openModal("Conversation BuSAF",'<div class="notice"><strong>'+esc(r.objet)+'</strong><p>'+esc(r.message)+'</p></div>'+renderContactReplies(replies)+'<label>Ta réponse</label><textarea id="contactReplyText" maxlength="5000" placeholder="Écris ton message…"></textarea><div id="contactReplyResult" role="status"></div><button class="btn" onclick="sendContactReply(\''+id+'\',\'membre\')">ENVOYER</button><button class="btn alt" onclick="closeModal()">FERMER</button>');
 }
 function founderDashboard(){
  if(!isFounder())return memberHome();
@@ -1836,7 +1872,7 @@ function render(){
      commissions:()=>founderPlaceholder('💰 Commissions','Suivi des commissions.'),
      
      
-     notifications:memberNotifications,
+     myHelp:myHelpRequests,contact:publicContact,notifications:memberNotifications,
      founderAnnouncements:()=>founderPlaceholder('📢 Annonces','Gestion des communications BuSAF.'),
      privacy:()=>founderPlaceholder('🛡️ Sécurité','Sécurité et protection de BuSAF.'),
      founderSettings:()=>founderPlaceholder('⚙️ Paramètres','Configuration générale de BuSAF.'),
