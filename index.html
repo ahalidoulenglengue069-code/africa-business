@@ -1115,7 +1115,7 @@ function memberMarket(){
  }).join('');
  const founderButton=marketCanPublish()?`<button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button>`:'';
  const empty=state.marketCatalogLoaded?`<div class="empty">Aucun produit numérique/business n'est encore publié dans le Marché BuSAF.</div>`:`<div class="empty">Chargement des produits du Marché BuSAF…</div>`;
- return page("🛒 Marché BuSAF",`<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits affichés viennent maintenant de <strong>public.produits</strong>. Les produits physiques des Boutiques sont exclus.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><button class="btn alt small" onclick="setScreen('boutique')">🏪 MA BOUTIQUE</button></div>${founderButton}<div class="productgrid">${cards||empty}</div>`);
+ return page("🛒 Marché BuSAF",`<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits affichés viennent maintenant de <strong>public.produits</strong>. Les produits physiques des Boutiques sont exclus.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button></div>${founderButton}<div class="productgrid">${cards||empty}</div>`);
 }
 async function refreshMarketCatalog(){await loadMarketCatalog(true);render();}
 function viewMarketProduct(id){
