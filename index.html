@@ -377,7 +377,7 @@ function normalScreen(screen){
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
  const disabledBusinessFeatures=["boutique","stockBoutique","meetings","founderBoutiques"];
  if(disabledBusinessFeatures.includes(String(screen||"")))return fallback;
- const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings"];
+ const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderContact","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings"];
  return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
@@ -860,6 +860,7 @@ function founderHome(){
    ${founderApp('founderStats','📊','Statistiques','Activité BuSAF')}
    ${founderApp('founderFinance','💰','Finances','Suivi financier')}
    ${founderApp('founderPayments','💳','Paiements','Transactions')}
+   ${founderApp('founderContact','✉️','Messages de contact','Demandes reçues')}
    ${founderApp('orders','📦','Commandes','Suivi des commandes')}
   </div>
   <h2 class="founder-section-title">👥 RÉSEAU</h2>
@@ -910,6 +911,28 @@ async function founderLoadStats(){
  try{const r=await api('/rest/v1/profils_busaf?select=id');out.members=Array.isArray(r)?r.length:0;}catch(e){console.warn('Founder members stats',e)}
  try{const r=await api('/rest/v1/ventes?select=id,montant,statut');if(Array.isArray(r)){out.sales=r.length;for(const v of r){const st=String(v.statut||'').toLowerCase();if(st==='confirmee'||st==='validee'){out.confirmed++;out.revenue+=Number(v.montant||0)}else if(st.includes('attente'))out.pending++;else if(st.includes('echec')||st.includes('failed'))out.failed++;}}}catch(e){console.warn('Founder sales stats',e)}
  state.founderStats=out;return out;
+}
+let busafContactRequests=[];
+let busafContactLoading=false;
+async function founderContactRequests(){
+ if(!isFounder())return memberHome();
+ if(!busafContactLoading&&busafContactRequests.length===0)loadFounderContactRequests();
+ let html="";
+ if(busafContactLoading)html="<div class=\"notice\">Chargement des demandes…</div>";
+ else if(!busafContactRequests.length)html="<div class=\"notice\">Aucune demande de contact reçue.</div>";
+ else html=busafContactRequests.map(function(r){return "<div class=\"rule\"><strong>"+esc(r.objet||"Sans objet")+"</strong><p>"+esc(r.message||"")+"</p><small>De : "+esc(r.nom||"Visiteur")+" · "+esc(r.email||"E-mail non fourni")+"<br>Reçu le : "+(r.created_at?new Date(r.created_at).toLocaleString("fr-FR"):"—")+" · Statut : "+esc(r.statut||"nouvelle")+"</small><br><button class=\"btn alt\" onclick=\"updateContactRequestStatus(\'"+r.id+"\',\'traitee\')\">MARQUER TRAITÉE</button></div>";}).join("");
+ return page("✉️ Messages de contact","<div class=\"notice\">Les messages envoyés depuis le formulaire Contact de BuSAF apparaissent ici.</div><button class=\"btn alt\" onclick=\"loadFounderContactRequests()\">🔄 ACTUALISER</button>"+html+"<button class=\"btn alt\" onclick=\"setScreen(\'founder\')\">← ESPACE FONDATEUR</button>");
+}
+async function loadFounderContactRequests(){
+ if(!isFounder()||busafContactLoading)return;
+ busafContactLoading=true;
+ try{const rows=await api("/rest/v1/busaf_contact_requests?select=id,nom,email,objet,message,statut,created_at&order=created_at.desc&limit=100");busafContactRequests=Array.isArray(rows)?rows:[];}
+ catch(e){alert("Impossible de charger les messages : "+e.message);}
+ finally{busafContactLoading=false;if(state.screen==="founderContact")render();}
+}
+async function updateContactRequestStatus(id,statut){
+ try{await api("/rest/v1/busaf_contact_requests?id=eq."+encodeURIComponent(id),{method:"PATCH",headers:{"Prefer":"return=minimal"},body:JSON.stringify({statut:statut})});busafContactRequests=busafContactRequests.map(function(r){if(r.id===id)r.statut=statut;return r;});render();}
+ catch(e){alert("Impossible de mettre à jour le statut : "+e.message);}
 }
 function founderDashboard(){
  if(!isFounder())return memberHome();
@@ -1802,6 +1825,7 @@ function render(){
     const founderMap={
      founder:founderHome,member:founderHome,founderMarket:founderMarket,market:founderMarket,
      founderDashboard:founderDashboard,
+     founderContact:founderContactRequests,
      founderStats:founderDashboard,
      founderFinance:founderFinance,
      founderPayments:founderPayments,
