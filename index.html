@@ -914,14 +914,14 @@ async function founderLoadStats(){
 }
 let busafContactRequests=[];
 let busafContactLoading=false;
-async function founderContactRequests(){
+function founderContactRequests(){
  if(!isFounder())return memberHome();
- if(!busafContactLoading&&busafContactRequests.length===0)loadFounderContactRequests();
+ if(!busafContactLoading && !busafContactRequests.length)loadFounderContactRequests();
  let html="";
- if(busafContactLoading)html="<div class=\"notice\">Chargement des demandes…</div>";
- else if(!busafContactRequests.length)html="<div class=\"notice\">Aucune demande reçue.</div>";
+ if(busafContactLoading)html='<div class="notice">Chargement des demandes…</div>';
+ else if(!busafContactRequests.length)html='<div class="notice">Aucune demande reçue pour le moment.</div>';
  else html=busafContactRequests.map(function(r){return '<div class="rule"><strong>'+esc(r.objet||"Sans objet")+'</strong><p>'+esc(r.message||"")+'</p><small>De : '+esc(r.nom||"Visiteur")+' · '+esc(r.email||"E-mail non fourni")+'<br>Reçu : '+(r.created_at?new Date(r.created_at).toLocaleString("fr-FR"):"—")+' · Statut : '+esc(r.statut||"nouvelle")+'</small><br><button class="btn" onclick="openFounderReply(\''+r.id+'\')">RÉPONDRE</button> <button class="btn alt" onclick="updateContactRequestStatus(\''+r.id+'\',\'traitee\')">MARQUER TRAITÉE</button></div>';}).join("");
- return page("✉️ Messages de contact",'<div class="notice">Réponds ici aux demandes d’aide des membres.</div><button class="btn alt" onclick="loadFounderContactRequests()">🔄 ACTUALISER</button>'+html+'<button class="btn alt" onclick="setScreen(\'founder\')">← ESPACE FONDATEUR</button>');
+ return page("✉️ Messages d’aide des membres",'<div class="notice">Les demandes d’aide des membres apparaîtront ici. Actualise pour vérifier les nouveaux messages.</div><button class="btn alt" onclick="loadFounderContactRequests()">🔄 ACTUALISER</button>'+html+'<button class="btn alt" onclick="setScreen(\'founder\')">← ESPACE FONDATEUR</button>');
 }
 async function loadFounderContactRequests(){
  if(!isFounder()||busafContactLoading)return;
@@ -958,13 +958,19 @@ async function loadMyHelpRequests(){
  const rows=await api("/rest/v1/busaf_contact_requests?select=id,profil_id,nom,email,objet,message,statut,created_at&profil_id=eq."+encodeURIComponent(p.id)+"&order=created_at.desc");
  return Array.isArray(rows)?rows:[];
 }
-async function myHelpRequests(){
+function myHelpRequests(){
+ if(!myHelpCache.loaded && !myHelpLoading)loadMyHelpRequests().then(function(){if(state.screen==="myHelp")render();});
  let html='<div class="notice">Tes demandes et les réponses de BuSAF.</div>';
- try{const requests=await loadMyHelpRequests();if(!requests.length)html+='<div class="rule">Tu n’as pas encore de demande d’aide.</div>';
- for(const r of requests){const replies=await loadContactReplies(r.id);html+='<div class="rule"><strong>'+esc(r.objet)+'</strong><p>'+esc(r.message)+'</p><small>Statut : '+esc(r.statut)+' · '+new Date(r.created_at).toLocaleString("fr-FR")+'</small>'+renderContactReplies(replies)+'<button class="btn" onclick="openMemberReply(\''+r.id+'\')">RÉPONDRE</button></div>';}}
- catch(e){html+='<div class="notice error">Impossible de charger tes demandes : '+esc(e.message)+'</div>';}
- return page("✉️ Mes demandes d’aide",html+'<button class="btn alt" onclick="setScreen(\'contact\')">+ NOUVELLE DEMANDE</button><button class="btn alt" onclick="setScreen(\'member\')">← ESPACE DE TRAVAIL</button>');
+ if(myHelpLoading)html+='<div class="rule">Chargement de tes demandes…</div>';
+ else if(myHelpError)html+='<div class="notice error">Impossible de charger tes demandes : '+esc(myHelpError)+'</div>';
+ else if(!myHelpCache.rows.length)html+='<div class="rule">Tu n’as pas encore de demande d’aide.</div>';
+ else html+=myHelpCache.rows.map(function(r){return '<div class="rule"><strong>'+esc(r.objet||"Sans objet")+'</strong><p>'+esc(r.message||"")+'</p><small>Statut : '+esc(r.statut||"nouvelle")+' · '+new Date(r.created_at).toLocaleString("fr-FR")+'</small><div id="helpReplies_'+r.id+'"><button class="btn alt" onclick="loadAndRenderMemberReplies(\''+r.id+'\')">VOIR LES RÉPONSES</button></div><button class="btn" onclick="openMemberReply(\''+r.id+'\')">RÉPONDRE</button></div>';}).join("");
+ return page("✉️ Mes demandes d’aide",html+'<button class="btn alt" onclick="refreshMyHelpRequests()">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen(\'contact\')">+ NOUVELLE DEMANDE</button><button class="btn alt" onclick="setScreen(\'member\')">← ESPACE DE TRAVAIL</button>');
 }
+let myHelpCache={loaded:false,rows:[]},myHelpLoading=false,myHelpError="";
+async function refreshMyHelpRequests(){myHelpCache.loaded=false;await loadMyHelpRequests();if(state.screen==="myHelp")render();}
+async function loadAndRenderMemberReplies(id){try{const replies=await loadContactReplies(id);const el=document.getElementById("helpReplies_"+id);if(el)el.innerHTML=renderContactReplies(replies);}catch(e){alert("Impossible de charger les réponses : "+e.message);}}
+
 async function openMemberReply(id){
  const requests=await loadMyHelpRequests();const r=requests.find(x=>x.id===id);if(!r)return;
  let replies=[];try{replies=await loadContactReplies(id);}catch(e){}
