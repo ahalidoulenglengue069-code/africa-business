@@ -256,8 +256,9 @@ async function syncSharedBusafEvents(){
  try{
   const rows=await api('/rest/v1/busaf_events?user_id=is.null&select=id,event_type,title,details,created_at&order=created_at.desc&limit=50');
   if(!Array.isArray(rows))return; let changed=false;
+  const dismissed=new Set(safeJson("busaf_dismissed_notifications",[]));
   for(const ev of rows.reverse()){
-   const sid='server-event-'+String(ev.id); if(state.notifications.some(n=>n.serverId===sid))continue;
+   const sid='server-event-'+String(ev.id); if(dismissed.has(sid)||state.notifications.some(n=>n.serverId===sid))continue;
    const d=ev.details||{}; let text=ev.title||'Nouvelle action BuSAF';
    if(ev.event_type==='reunion_creee')text=`${ev.title}${d.date?' — '+d.date:''}${d.time?' à '+d.time:''}`;
    if(ev.event_type==='produit_marche')text=`${ev.title}${d.nom?' : '+d.nom:''}${d.prix?' — '+money(d.prix):''}`;
@@ -1800,7 +1801,20 @@ function memberStockBoutique(){
 function memberMeetings(){const list=state.meetings.length?`<ul class="list">${state.meetings.map((x,i)=>`<li><strong>${esc(x.type)}</strong><br>${esc(x.date)} à ${esc(x.time)}<br><span class="small">${esc(x.status||"Prévue")}</span><button class="btn" onclick="joinMeeting(${i})">🎥 REJOINDRE EN DIRECT</button></li>`).join("")}</ul>`:`<div class="empty">Aucune réunion programmée.</div>`;return page("🎥 Réunions",`<div class="rule"><h3>RÉUNION GÉNÉRALE</h3><p>Créée uniquement par le fondateur et visible par les membres connectés.</p></div><div class="rule"><h3>Réunions personnelles</h3><p>Avec tes invités ou clients.</p></div><button class="btn" onclick="createMeeting()">➕ CRÉER UNE RÉUNION</button>${list}`);}
 function memberNotifications(){
  const unread=unreadNotificationCount();
- return page("🔔 Notifications",`<div class="statgrid"><div class="stat">Non lues<strong style="color:#ff2020">${unread}</strong></div><div class="stat">Total<strong>${state.notifications.length}</strong></div></div><div class="notice">Les nouvelles actions BuSAF apparaissent ici. Les notifications non lues sont comptées en rouge en haut de l'écran.</div>${state.notifications.length?`<ul class="list">${state.notifications.map((n,i)=>`<li style="${n.read?'opacity:.72':'border-left:4px solid #ff2020'}"><strong>${!n.read?'🆕 ':''}${esc(n.title)}</strong><br>${esc(n.text)}<br><span class="small">${esc(n.date||"")}</span>${!n.read?`<button class="btn alt" onclick="readNotification(${i})">MARQUER COMME LUE</button>`:""}</li>`).join("")}</ul>`:`<div class="empty">Aucune notification.</div>`}${unread?`<button class="btn" onclick="readAllNotifications()">TOUT MARQUER COMME LU</button>`:""}`);
+ return page("🔔 Notifications",`<div class="statgrid"><div class="stat">Non lues<strong style="color:#ff2020">${unread}</strong></div><div class="stat">Total<strong>${state.notifications.length}</strong></div></div><div class="notice">Tu peux supprimer une notification seule ou effacer toute la liste. Les notifications non lues sont comptées en rouge en haut de l'écran.</div>${state.notifications.length?`<button class="btn" onclick="clearAllNotifications()">🗑️ SUPPRIMER TOUTES LES NOTIFICATIONS</button><ul class="list">${state.notifications.map((n,i)=>`<li style="${n.read?'opacity:.72':'border-left:4px solid #ff2020'}"><strong>${!n.read?'🆕 ':''}${esc(n.title)}</strong><br>${esc(n.text)}<br><span class="small">${esc(n.date||"")}</span>${!n.read?`<button class="btn alt" onclick="readNotification(${i})">MARQUER COMME LUE</button>`:""}<button class="btn alt" onclick="deleteNotification(${i})">🗑️ SUPPRIMER</button></li>`).join("")}</ul>`:`<div class="empty">Aucune notification.</div>`}${unread?`<button class="btn alt" onclick="readAllNotifications()">TOUT MARQUER COMME LU</button>`:""}`);
+}
+function deleteNotification(i){
+ const n=state.notifications[i];if(!n)return;
+ if(n.serverId){const dismissed=safeJson("busaf_dismissed_notifications",[]);if(!dismissed.includes(n.serverId)){dismissed.push(n.serverId);localStorage.setItem("busaf_dismissed_notifications",JSON.stringify(dismissed));}}
+ state.notifications.splice(i,1);saveState();render();
+}
+function clearAllNotifications(){
+ if(!state.notifications.length)return;
+ if(!confirm("Supprimer toutes les notifications de cet espace ?"))return;
+ const dismissed=safeJson("busaf_dismissed_notifications",[]);
+ state.notifications.forEach(n=>{if(n.serverId&&!dismissed.includes(n.serverId))dismissed.push(n.serverId);});
+ localStorage.setItem("busaf_dismissed_notifications",JSON.stringify(dismissed));
+ state.notifications=[];saveState();render();
 }
 function readNotification(i){if(state.notifications[i])state.notifications[i].read=true;saveState();render();}
 function readAllNotifications(){state.notifications.forEach(n=>n.read=true);saveState();render();}
