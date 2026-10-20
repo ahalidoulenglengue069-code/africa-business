@@ -476,10 +476,12 @@ async function restoreAuthenticatedSession(){
     state.email=user.email||"";
     localStorage.setItem("busaf_user_id",state.userId);
     localStorage.setItem("busaf_email",state.email);
-    await loadProfile();
+    // Réparer automatiquement les comptes Auth qui n'ont pas encore leur profil BuSAF.
+    // ensureMemberProfile vérifie le code du parrain avant de créer un profil membre.
+    await ensureMemberProfile(user);
     if(!state.profile){
       state.token=oldToken;
-      throw new Error("Profil BuSAF introuvable");
+      throw new Error("Profil BuSAF introuvable. Reconnecte-toi pour terminer la configuration du compte.");
     }
     state.screen=isFounder()?"founder":"member";
     return true;
