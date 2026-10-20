@@ -1889,6 +1889,12 @@ function render(){
      rules:memberRules,account:memberAccount,logout:()=>{confirmLogout();return ''; }
     };
     content=(founderMap[state.screen]||founderHome)();
+    if(content && typeof content.then==="function"){
+     const requestedScreen=state.screen;
+     document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice">Chargement de la page…</div></main>'+founderQuick();
+     content.then(function(html){if(state.screen===requestedScreen){document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+founderQuick();}}).catch(function(e){if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}</div></main>`+founderQuick();});
+     return;
+    }
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+founderQuick();
     if(state.screen==='founder' && !state.founderStats){ founderLoadStats().then(()=>{ if(state.screen==='founder')render(); }).catch(()=>{}); }
    }else{
@@ -1899,6 +1905,12 @@ function render(){
      rules:memberRules,help:memberHelp,privacy:memberPrivacy,contact:memberContact,how:memberHow
     };
     content=(map[state.screen]||memberHome)();
+    if(content && typeof content.then==="function"){
+     const requestedScreen=state.screen;
+     document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice">Chargement de la page…</div></main>'+memberQuick();
+     content.then(function(html){if(state.screen===requestedScreen){document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+memberQuick();}}).catch(function(e){if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}</div></main>`+memberQuick();});
+     return;
+    }
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+memberQuick();
    }
  }
