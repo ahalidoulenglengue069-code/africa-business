@@ -954,9 +954,13 @@ async function openFounderReply(id){
  openModal("Répondre à "+(r.nom||"la demande"),'<div class="notice"><strong>'+esc(r.objet||"Demande")+'</strong><p>'+esc(r.message||"")+'</p></div>'+renderContactReplies(replies)+'<label>Ta réponse</label><textarea id="contactReplyText" maxlength="5000" placeholder="Écris ta réponse…"></textarea><div id="contactReplyResult" role="status"></div><button class="btn" onclick="sendContactReply(\''+id+'\',\'fondateur\')">ENVOYER LA RÉPONSE</button><button class="btn alt" onclick="closeModal()">FERMER</button>');
 }
 async function loadMyHelpRequests(){
- const p=state.profile;if(!p?.id)return [];
- const rows=await api("/rest/v1/busaf_contact_requests?select=id,profil_id,nom,email,objet,message,statut,created_at&profil_id=eq."+encodeURIComponent(p.id)+"&order=created_at.desc");
- return Array.isArray(rows)?rows:[];
+ const p=state.profile;if(!p?.id){myHelpCache={loaded:true,rows:[]};return [];}
+ myHelpLoading=true;myHelpError="";
+ try{
+  const rows=await api("/rest/v1/busaf_contact_requests?select=id,profil_id,nom,email,objet,message,statut,created_at&profil_id=eq."+encodeURIComponent(p.id)+"&order=created_at.desc");
+  myHelpCache={loaded:true,rows:Array.isArray(rows)?rows:[]};return myHelpCache.rows;
+ }catch(e){myHelpError=e.message||"Erreur inconnue";myHelpCache.loaded=true;throw e;}
+ finally{myHelpLoading=false;}
 }
 function myHelpRequests(){
  if(!myHelpCache.loaded && !myHelpLoading)loadMyHelpRequests().then(function(){if(state.screen==="myHelp")render();});
