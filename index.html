@@ -540,7 +540,8 @@ async function login(e){
   localStorage.setItem("busaf_email",email);
   await ensureMemberProfile(d.user);
   addNotification("🔐 Connexion",`Connexion réussie sur ton espace BuSAF.`,"login");
-  setScreen("member");
+  // Ouvrir directement le bon espace selon le rôle réellement chargé depuis Supabase.
+  setScreen(isFounder()?"founder":"member");
  }catch(err){
   msg.className="notice error";msg.textContent="❌ "+err.message;
   btn.disabled=false;btn.textContent="SE CONNECTER";
