@@ -378,7 +378,7 @@ function normalScreen(screen){
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
  const disabledBusinessFeatures=["boutique","stockBoutique","meetings","founderBoutiques"];
  if(disabledBusinessFeatures.includes(String(screen||"")))return fallback;
- const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderContact","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings","myHelp"];
+ const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderContact","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings","founderWithdrawals","myHelp"];
  return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
