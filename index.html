@@ -1786,10 +1786,11 @@ async function requestMoneyWithdraw(){
  const a=Number(document.getElementById("wdAmount")?.value||0),phone=document.getElementById("wdPhone")?.value.trim(),operateur=document.getElementById("wdOperator")?.value,compte=document.getElementById("wdAccount")?.value;
  if(!Number.isFinite(a)||a<=0||!Number.isInteger(a)||!phone||phone.length<6){alert("Vérifie le montant entier et le numéro Mobile Money.");return;}
  if(!state.profile?.id||!state.token){alert("Reconnecte-toi à ton compte BuSAF.");return;}
+ if(compte!=="Compte Marché"){alert("Les retraits du Compte Boutique sont suspendus. Seul le Compte Marché numérique est disponible.");return;}
  try{
-  await api("/rest/v1/busaf_retraits",{method:"POST",headers:{"Prefer":"return=minimal"},body:JSON.stringify({profil_id:state.profile.id,montant:a,numero_mobile_money:phone,operateur,compte,statut:"en_attente"})});
-  closeModal();openModal("Demande enregistrée",'<div class="notice success">Ta demande de retrait a été enregistrée et transmise au fondateur pour examen. Le paiement n’a pas encore été envoyé.</div><button class="btn" onclick="closeModal();setScreen(\'money\')">VOIR MES RETRAITS</button>');refreshMemberWithdrawals();
- }catch(e){alert("Impossible d’enregistrer la demande : "+(e.message||"erreur Supabase"));}
+  await api("/rest/v1/rpc/busaf_demander_retrait",{method:"POST",headers:{"Prefer":"return=representation"},body:JSON.stringify({p_montant:a,p_numero_mobile_money:phone,p_operateur:operateur,p_compte:compte})});
+  closeModal();openModal("Demande enregistrée",'<div class="notice success">Demande enregistrée après vérification du solde disponible. Le paiement Mobile Money n’est pas envoyé automatiquement pour le moment.</div><button class="btn" onclick="closeModal();setScreen(\'money\')">VOIR MES RETRAITS</button>');refreshMemberWithdrawals();
+ }catch(e){alert("Demande refusée : "+(e.message||"solde insuffisant ou erreur Supabase"));}
 }
 async function founderWithdrawals(){
  if(!isFounder())return memberHome();
