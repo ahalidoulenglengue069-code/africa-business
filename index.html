@@ -687,7 +687,12 @@ body{font-size:14px!important;zoom:1!important;transform:none!important}
 #app .founder-hero > .btn span{font-size:16px!important;line-height:1!important}
 #app .founder-stat-grid{gap:6px!important;margin-top:10px!important}
 #app .founder-hero .founder-stat{min-width:0!important;padding:8px 4px!important}
-#app .founder-hero .founder-stat .founder-stat-icon{display:block!important;font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif!important;font-size:19px!important;line-height:1.1!important;margin-bottom:4px!important;filter:none!important;text-shadow:none!important}
+/* Icônes visibles directement sur chaque carte statistique */
+#app .founder-hero .founder-stat-grid>.founder-stat:nth-child(1)::before{content:"🛍️"!important}
+#app .founder-hero .founder-stat-grid>.founder-stat:nth-child(2)::before{content:"👥"!important}
+#app .founder-hero .founder-stat-grid>.founder-stat:nth-child(3)::before{content:"🧾"!important}
+#app .founder-hero .founder-stat-grid>.founder-stat::before{display:block!important;font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif!important;font-size:21px!important;line-height:1.2!important;margin:0 auto 5px!important;visibility:visible!important;opacity:1!important;filter:none!important;text-shadow:none!important}
+#app .founder-hero .founder-stat .founder-stat-icon{display:none!important}
 #app .founder-hero .founder-stat b{font-size:15px!important;line-height:1.2!important}
 #app .founder-hero .founder-stat small{font-size:9.5px!important;line-height:1.2!important;display:block!important}
 #app .header .logo{font-size:26px!important}
