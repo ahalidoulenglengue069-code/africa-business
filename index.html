@@ -498,19 +498,46 @@ async function restoreAuthenticatedSession(){
 }
 
 async function handlePasswordRecovery(){
-  const hash=location.hash.replace(/^#/,"");
-  if(!hash)return false;
-  const params=new URLSearchParams(hash);
-  if(params.get("type")!=="recovery" || !params.get("access_token"))return false;
-  const recoveryToken=params.get("access_token");
+  // Accepte les deux formats Supabase : tokens dans le hash ou token_hash dans l'URL.
+  const hashParams=new URLSearchParams(location.hash.replace(/^#/,""));
+  const queryParams=new URLSearchParams(location.search);
+  let recoveryToken=hashParams.get("access_token")||queryParams.get("access_token")||"";
+  let recoveryType=hashParams.get("type")||queryParams.get("type")||"";
+  const tokenHash=queryParams.get("token_hash")||queryParams.get("token")||"";
+  const code=queryParams.get("code")||"";
+
+  // Si Supabase a renvoyé un code PKCE, l'échange nécessite le vérificateur créé
+  // au moment de la demande; on ne doit surtout pas effacer l'URL avant traitement.
+  if(code && !recoveryToken){
+    openModal("🔑 Lien de récupération",`<div class="notice warning">Le lien a ouvert BuSAF, mais la session de récupération n'a pas été établie. Demande un nouveau lien après la correction, puis réessaie.</div><button class="btn" onclick="closeModal();setScreen('login')">RETOUR À LA CONNEXION</button>`);
+    return true;
+  }
+
+  if(tokenHash && recoveryType==="recovery" && !recoveryToken){
+    try{
+      const verified=await api("/auth/v1/verify",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({token_hash:tokenHash,type:"recovery"})});
+      recoveryToken=verified?.access_token||"";
+      if(!recoveryToken)throw new Error("Le lien de récupération n'a pas créé de session.");
+    }catch(e){
+      openModal("❌ Lien invalide",`<div class="notice error">Le lien est expiré ou invalide. Demande un nouveau lien de récupération.</div><button class="btn" onclick="closeModal();setScreen('login')">RETOUR À LA CONNEXION</button>`);
+      return true;
+    }
+  }
+
+  if(recoveryType!=="recovery" || !recoveryToken)return false;
   state.token=recoveryToken;
   try{
     const user=await api("/auth/v1/user",{method:"GET"});
     state.userId=user?.id||""; state.email=user?.email||"";
+    // Nettoie les paramètres après détection pour éviter de les écraser par l'accueil public.
+    history.replaceState({busafScreen:"login"},"",location.pathname+"#login");
+    state.screen="login";
     openModal("🔑 Nouveau mot de passe",`<div class="notice success">Choisis maintenant un nouveau mot de passe pour ton compte BuSAF.</div><label>Nouveau mot de passe</label><div class="password-field"><input id="newPassword" type="password" minlength="6" autocomplete="new-password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('newPassword',this)" aria-label="Afficher le mot de passe" aria-pressed="false">👁️</button></div><label>Confirmer</label><div class="password-field"><input id="newPassword2" type="password" minlength="6" autocomplete="new-password"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('newPassword2',this)" aria-label="Afficher le mot de passe" aria-pressed="false">👁️</button></div><button class="btn" onclick="saveNewPassword()">ENREGISTRER LE NOUVEAU MOT DE PASSE</button>`);
     return true;
   }catch(e){
     state.token="";
+    history.replaceState({busafScreen:"login"},"",location.pathname+"#login");
+    state.screen="login";
     openModal("❌ Lien invalide",`<div class="notice error">Le lien de récupération est expiré ou invalide. Demande un nouveau lien.</div><button class="btn" onclick="closeModal();setScreen('login')">RETOUR À LA CONNEXION</button>`);
     return true;
   }
