@@ -493,11 +493,22 @@ function closeModal(){document.getElementById("modal").classList.remove("open")}
 async function api(path,options={}){
  const headers=Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json"},options.headers||{});
  if(state.token)headers.Authorization="Bearer "+state.token;
- const r=await fetch(SUPABASE_URL+path,Object.assign({},options,{headers}));
- const text=await r.text();let data={};
- try{data=text?JSON.parse(text):{}}catch{data={raw:text}}
- if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.raw||"Erreur Supabase");
- return data;
+ // Empêche les requêtes bloquées de laisser BuSAF en chargement indéfiniment.
+ const controller=new AbortController();
+ const timeoutMs=Number(options.timeoutMs)||20000;
+ const timer=setTimeout(()=>controller.abort(),timeoutMs);
+ const requestOptions=Object.assign({},options,{headers,signal:options.signal||controller.signal});
+ delete requestOptions.timeoutMs;
+ try{
+  const r=await fetch(SUPABASE_URL+path,requestOptions);
+  const responseText=await r.text();let data={};
+  try{data=responseText?JSON.parse(responseText):{}}catch{data={raw:responseText}}
+  if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.details||data.raw||"Erreur Supabase ("+r.status+")");
+  return data;
+ }catch(e){
+  if(e?.name==="AbortError")throw new Error("Délai dépassé : Supabase ne répond pas assez vite. Réessaie.");
+  throw e;
+ }finally{clearTimeout(timer);}
 }
 async function loadProfile(){
  if(!state.userId||!state.token)return;
