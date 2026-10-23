@@ -687,6 +687,7 @@ body{font-size:14px!important;zoom:1!important;transform:none!important}
 #app .founder-hero > .btn span{font-size:16px!important;line-height:1!important}
 #app .founder-stat-grid{gap:6px!important;margin-top:10px!important}
 #app .founder-hero .founder-stat{min-width:0!important;padding:8px 4px!important}
+#app .founder-hero .founder-stat .founder-stat-icon{display:block!important;font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif!important;font-size:19px!important;line-height:1.1!important;margin-bottom:4px!important;filter:none!important;text-shadow:none!important}
 #app .founder-hero .founder-stat b{font-size:15px!important;line-height:1.2!important}
 #app .founder-hero .founder-stat small{font-size:9.5px!important;line-height:1.2!important;display:block!important}
 #app .header .logo{font-size:26px!important}
@@ -1423,9 +1424,9 @@ function founderHome(){
    <button class="btn" style="width:100%;margin:12px 0;text-align:left" onclick="setScreen('founderContact')">✉️ MESSAGES D’AIDE DES MEMBRES <span style="float:right">›</span><small style="display:block;font-weight:400;margin-top:4px">Consulter les demandes et répondre aux membres</small></button>
    <button class="btn" style="width:100%;margin:0 0 12px;text-align:left;background:#087f43" onclick="setScreen('money')">👛 MON PORTEFEUILLE BuSAF <span style="float:right">›</span><small style="display:block;font-weight:400;margin-top:4px">Consulter le solde, déposer via YengaPay ou demander un retrait</small></button>
    <div class="founder-stat-grid" style="margin-top:13px">
-    <div class="founder-stat"><b>${products}</b><small>Produits Marché</small></div>
-    <div class="founder-stat"><b>${members}</b><small>Invités suivis</small></div>
-    <div class="founder-stat"><b>${orders}</b><small>Commandes</small></div>
+    <div class="founder-stat"><span class="founder-stat-icon" aria-hidden="true">🛍️</span><b>${products}</b><small>Produits Marché</small></div>
+    <div class="founder-stat"><span class="founder-stat-icon" aria-hidden="true">👥</span><b>${members}</b><small>Invités suivis</small></div>
+    <div class="founder-stat"><span class="founder-stat-icon" aria-hidden="true">🧾</span><b>${orders}</b><small>Commandes</small></div>
    </div>
   </section>
   <h2 class="founder-section-title">📊 PILOTAGE</h2>
