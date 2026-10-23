@@ -397,131 +397,7 @@ input:focus,textarea:focus,select:focus{border-color:#10a878;box-shadow:0 0 0 3p
 @media(prefers-reduced-motion:reduce){.tile:hover,.btn:hover,.founder-app:hover{transform:none}}
 
 </style>
-
-<!-- BuSAF — nouvelle identité visuelle bleu nuit / turquoise / blanc -->
-<style id="busaf-modern-theme">
-:root{
- --green:#15385b;--green2:#16aaa9;--light:#f1f6fb;--card:#ffffff;
- --text:#172b43;--muted:#66778a;--line:#dce6f0;--red:#d83b50;
- --gold:#d7a63c;--shadow:0 10px 30px rgba(21,56,91,.09);
- color-scheme:light;
-}
-html,body{background:#f1f6fb;color:#172b43;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif}
-body{background:linear-gradient(180deg,#f7faff 0%,#edf4fa 100%)}
-.header{background:linear-gradient(120deg,#102944 0%,#15385b 58%,#167e91 100%);box-shadow:0 7px 24px rgba(16,41,68,.2)}
-.logo{letter-spacing:-.7px}
-.wrap{max-width:1120px;padding-top:18px}
-.hero,.card,.info,.work-panel,.dash-stat,.reference-card,.tile,.product,.public-product,.public-info-card,.founder-app,.founder-product,.rule,.list li{
- border-color:#dce6f0;box-shadow:0 8px 24px rgba(21,56,91,.065)
-}
-.hero,.card,.info,.work-panel{border-radius:22px}
-.hero h1,.card h1,.card h2,.section-title,.work-head h2,.work-panel h2,.public-section-head h2{color:#15385b}
-.header .hbtn{border-color:rgba(255,255,255,.27);background:rgba(255,255,255,.10);border-radius:13px}
-.btn{background:linear-gradient(110deg,#15385b,#167e91);border-radius:13px;box-shadow:0 5px 13px rgba(21,56,91,.12)}
-.btn.alt,.back,.photo-controls button{background:#e3f6f5;color:#126f79}
-.btn.gold{background:#fff4d8;color:#805c13}
-.quickbar,.bottom{background:rgba(255,255,255,.94);border-top:1px solid #dce6f0;box-shadow:0 -7px 24px rgba(21,56,91,.10);backdrop-filter:blur(16px)}
-.quickbar button.active,.bottom button.active{color:#12a5a5}
-.tile,.reference-card,.work-card,.founder-app{border-radius:19px;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
-.tile:hover,.reference-card:hover,.work-card:hover,.founder-app:hover{border-color:#73cfce;box-shadow:0 12px 28px rgba(21,56,91,.12);transform:translateY(-2px)}
-.reference-card:before,.public-info-card:before{background:linear-gradient(180deg,#16aaa9,#15385b)}
-.reference-card.main-space,.work-card.primary{border:2px solid #16aaa9;background:linear-gradient(145deg,#fff,#effbfb)}
-.reference-card b,.work-card b{color:#15385b}
-.stat,.founder-app,.founder-product{background:#fff}
-.stat strong,.dash-stat strong,.founder-product .fprice{color:#147f91}
-.progress{background:#e4edf5}.progress i,.progress-panel .progress i{background:linear-gradient(90deg,#15385b,#16aaa9)}
-input,textarea,select{border-color:#d3e0ed;border-radius:13px;background:#fbfdff}
-input:focus,textarea:focus,select:focus{border-color:#16aaa9;box-shadow:0 0 0 3px rgba(22,170,169,.12);outline:none}
-.notice{background:#eaf8f8;border-color:#c7eaea;color:#245365}
-.notice.success{background:#e8f8ef;border-color:#bfe8d0;color:#17633b}
-.notice.warning{background:#fff7e6;border-color:#f0dfb4}
-.notice.error{background:#fff0f2;border-color:#f2c7ce}
-.public-hero,.member-welcome{background:linear-gradient(125deg,#102944 0%,#15385b 55%,#168c9a 100%);box-shadow:0 14px 32px rgba(21,56,91,.18);border-radius:25px}
-.public-action.primary{color:#15385b}
-.public-action.secondary{background:rgba(255,255,255,.13)}
-.public-info-card,.public-product{border-radius:17px}
-.public-product .pprice,.product h3,.product .price{color:#147f91}
-.public-product .benefit{background:#e5f8f6;color:#126f79}
-.founder-hero{background:linear-gradient(125deg,#102944,#15385b 60%,#168c9a);box-shadow:0 14px 32px rgba(21,56,91,.18)}
-.founder-stat{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.22)}
-.profile-photo{border-color:#16aaa9}
-.profile-photo-placeholder{background:#e3f6f5;border-color:#16aaa9;color:#15385b}
-.modalbox{border-radius:24px}
-.empty{border-color:#c9d9e8;background:#f9fcff}
-@media(max-width:600px){
- .wrap{padding:13px 11px 108px}
- .public-hero,.member-welcome{border-radius:22px}
- .quickbar button,.bottom button{font-size:10px}
-}
-@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
-</style>
-
-
-<style id="busaf-redesign-v2">
-/* Nouveau modèle d'interface : tableau de bord éditorial, blocs contrastés et icônes en médaillon */
-.app{background:#f3f7fc}
-.header{padding:17px 15px 16px;background:linear-gradient(115deg,#0d2038,#173d61 62%,#11a6a6)}
-.header-row{min-height:42px}
-.logo{font-size:27px;letter-spacing:-1px}
-.logo small{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78}
-.wrap{max-width:1040px;padding:18px 14px 116px}
-.member-welcome,.public-hero,.founder-hero{position:relative;overflow:hidden;border-radius:27px;padding:23px;background:linear-gradient(120deg,#0d2038 0%,#173d61 57%,#119caa 100%);box-shadow:0 16px 36px rgba(13,32,56,.2)}
-.member-welcome:after,.public-hero:after,.founder-hero:after{content:"";position:absolute;width:210px;height:210px;right:-78px;bottom:-125px;border:30px solid rgba(255,255,255,.09);border-radius:50%;pointer-events:none}
-.member-welcome>* ,.public-hero>* ,.founder-hero>*{position:relative;z-index:1}
-.member-welcome h1,.public-hero h1,.founder-hero h1{font-size:clamp(24px,5vw,34px);letter-spacing:-.8px}
-.member-badge,.founder-badge{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.26);letter-spacing:.8px}
-.dashboard-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-.dash-stat{border:0;border-radius:20px;padding:15px 13px;min-height:118px;box-shadow:0 8px 24px rgba(13,32,56,.07)}
-.dash-stat span{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;background:#e4f7f6;color:#117f89;font-size:22px;margin-bottom:9px}
-.dash-stat small{font-size:12px}
-.dash-stat strong{font-size:15px;line-height:1.3;color:#15385b}
-.work-panel{border:0;border-radius:23px;padding:18px;box-shadow:0 9px 26px rgba(13,32,56,.065)}
-.work-head h2,.work-panel h2{font-size:18px}
-.reference-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
-.reference-card{min-height:142px;border:1px solid #e0e9f2;border-radius:21px;padding:15px;box-shadow:0 8px 20px rgba(13,32,56,.055);background:linear-gradient(150deg,#fff 0%,#f9fcff 100%);gap:7px}
-.reference-card:before{left:0;width:4px;background:linear-gradient(180deg,#16b8b2,#173d61)}
-.reference-card.main-space{border:1px solid #6bd2ce;background:linear-gradient(145deg,#e8fbfa,#fff 75%)}
-.reference-icon{width:47px;height:47px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#e1f8f6,#edf2fb);font-size:25px;box-shadow:inset 0 0 0 1px rgba(17,156,170,.08)}
-.reference-card b{font-size:14px;letter-spacing:-.15px}
-.reference-card small{font-size:11px;line-height:1.35}
-.section-title,.member-section-title{font-size:15px!important;letter-spacing:1px;text-transform:uppercase;color:#62758a!important}
-.founder-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
-.founder-app{min-height:132px;padding:15px 10px;border-radius:21px;border:1px solid #e0e9f2;background:linear-gradient(150deg,#fff,#f8fbff);box-shadow:0 8px 20px rgba(13,32,56,.055)}
-.founder-app .ficon{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(145deg,#e1f8f6,#edf2fb);color:#15385b;font-size:24px}
-.founder-app b{font-size:12px;color:#15385b}
-.founder-app small{font-size:10px;line-height:1.35}
-.public-info-grid{gap:12px}
-.public-info-card{min-height:132px;border-radius:20px;padding:16px 15px 16px 19px}
-.public-info-card .pico{width:45px;height:45px;display:grid;place-items:center;background:#e4f7f6;border-radius:15px;font-size:24px}
-.public-section-head{margin-top:23px}
-.public-section-head h2{font-size:18px}
-.public-products{gap:11px}
-.public-product{padding:10px;border-radius:17px}
-.product,.founder-product{border-radius:18px}
-.bottom,.quickbar{padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.97);border-top:1px solid #dbe5ef;box-shadow:0 -8px 26px rgba(13,32,56,.1)}
-.bottom-inner,.quick-inner{padding:4px 5px 0}
-.bottom button,.quickbar button{padding:9px 2px 8px;color:#75849a;font-size:10px;letter-spacing:.1px}
-.bottom span,.quickbar span{width:34px;height:30px;display:grid;place-items:center;margin:0 auto 3px;font-size:19px;border-radius:11px}
-.bottom button.active,.quickbar button.active{color:#087f91}
-.bottom button.active span,.quickbar button.active span{background:#e0f7f5;color:#087f91}
-.btn{background:linear-gradient(110deg,#15385b,#139da6);border-radius:14px;padding:13px 15px}
-.btn.alt,.back{background:#e4f7f6;color:#126f79}
-.modalbox{border-radius:25px}
-@media(max-width:600px){
- .wrap{padding:12px 11px 112px}
- .member-welcome,.public-hero,.founder-hero{padding:19px;border-radius:23px}
- .dashboard-stats{gap:8px}
- .dash-stat{min-height:112px;padding:12px 10px}
- .dash-stat span{width:38px;height:38px;font-size:20px}
- .reference-grid,.founder-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
- .reference-card{min-height:125px;padding:12px 10px;border-radius:18px}
- .reference-icon{width:42px;height:42px;border-radius:14px;font-size:23px}
- .founder-app{min-height:118px;padding:12px 8px;border-radius:18px}
- .founder-app .ficon{width:42px;height:42px;border-radius:14px}
- .public-info-card{min-height:125px}
-}
-@media(max-width:360px){.dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.reference-card{min-height:116px}}
-</style>
+  
 </head>
 <body>
 <div id="app" class="app"></div>
@@ -1203,17 +1079,9 @@ function publicHome(){
 }
 
 
-function memberIcon(id,fallback){
- const icons={market:"▦",invites:"♧",orders:"▤",account:"◉",profits:"↗",commissions:"⇄",partner:"✦",memberBenefits:"✧",money:"◈",stockMarket:"▣",notifications:"♢",rules:"≡",help:"?",privacy:"◇",contact:"✉",how:"▷",logout:"↪",boutique:"▧"};
- return icons[id]||fallback;
-}
-function founderIcon(id,fallback){
- const icons={founderDashboard:"▥",founderStats:"▤",founderFinance:"◈",money:"◉",founderWithdrawals:"↙",founderPayments:"⇄",orders:"▤",founderMembers:"♧",founderReferral:"⌘",partner:"✦",commissions:"⇄",founderMarket:"▦",founderStocks:"▣",notifications:"♢",founderAnnouncements:"◉",privacy:"◇",founderSettings:"⚙",rules:"≡",account:"◉",logout:"↪"};
- return icons[id]||fallback;
-}
 
 function founderApp(id,ico,label,desc){
- return `<button class="founder-app" onclick="setScreen('${id}')"><span class="ficon">${founderIcon(id,ico)}</span><b>${label}</b><small>${desc||''}</small></button>`;
+ return `<button class="founder-app" onclick="setScreen('${id}')"><span class="ficon">${ico}</span><b>${label}</b><small>${desc||''}</small></button>`;
 }
 
 function founderHome(){
@@ -1398,7 +1266,7 @@ function memberHome(){
   market:'Produits et revente',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
  };
  const accent=['accent-green','accent-blue','accent-purple','accent-orange','accent-teal','accent-green','accent-purple','accent-gold','accent-gold','accent-teal','accent-blue','accent-orange','accent-pink','accent-red','accent-red','accent-blue','accent-purple','accent-teal','accent-green','accent-red'];
- const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${memberIcon(id,ico)}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
+ const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
  return `<div class="member-dashboard member-reference">
    <div class="member-welcome compact-welcome">
      <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, commandes, invitations, bénéfices et suivi.</p></div>
