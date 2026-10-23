@@ -456,6 +456,72 @@ input:focus,textarea:focus,select:focus{border-color:#16aaa9;box-shadow:0 0 0 3p
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important}}
 </style>
 
+
+<style id="busaf-redesign-v2">
+/* Nouveau modèle d'interface : tableau de bord éditorial, blocs contrastés et icônes en médaillon */
+.app{background:#f3f7fc}
+.header{padding:17px 15px 16px;background:linear-gradient(115deg,#0d2038,#173d61 62%,#11a6a6)}
+.header-row{min-height:42px}
+.logo{font-size:27px;letter-spacing:-1px}
+.logo small{font-size:11px;letter-spacing:1.3px;text-transform:uppercase;opacity:.78}
+.wrap{max-width:1040px;padding:18px 14px 116px}
+.member-welcome,.public-hero,.founder-hero{position:relative;overflow:hidden;border-radius:27px;padding:23px;background:linear-gradient(120deg,#0d2038 0%,#173d61 57%,#119caa 100%);box-shadow:0 16px 36px rgba(13,32,56,.2)}
+.member-welcome:after,.public-hero:after,.founder-hero:after{content:"";position:absolute;width:210px;height:210px;right:-78px;bottom:-125px;border:30px solid rgba(255,255,255,.09);border-radius:50%;pointer-events:none}
+.member-welcome>* ,.public-hero>* ,.founder-hero>*{position:relative;z-index:1}
+.member-welcome h1,.public-hero h1,.founder-hero h1{font-size:clamp(24px,5vw,34px);letter-spacing:-.8px}
+.member-badge,.founder-badge{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.26);letter-spacing:.8px}
+.dashboard-stats{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.dash-stat{border:0;border-radius:20px;padding:15px 13px;min-height:118px;box-shadow:0 8px 24px rgba(13,32,56,.07)}
+.dash-stat span{width:43px;height:43px;border-radius:14px;display:grid;place-items:center;background:#e4f7f6;color:#117f89;font-size:22px;margin-bottom:9px}
+.dash-stat small{font-size:12px}
+.dash-stat strong{font-size:15px;line-height:1.3;color:#15385b}
+.work-panel{border:0;border-radius:23px;padding:18px;box-shadow:0 9px 26px rgba(13,32,56,.065)}
+.work-head h2,.work-panel h2{font-size:18px}
+.reference-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.reference-card{min-height:142px;border:1px solid #e0e9f2;border-radius:21px;padding:15px;box-shadow:0 8px 20px rgba(13,32,56,.055);background:linear-gradient(150deg,#fff 0%,#f9fcff 100%);gap:7px}
+.reference-card:before{left:0;width:4px;background:linear-gradient(180deg,#16b8b2,#173d61)}
+.reference-card.main-space{border:1px solid #6bd2ce;background:linear-gradient(145deg,#e8fbfa,#fff 75%)}
+.reference-icon{width:47px;height:47px;display:grid;place-items:center;border-radius:15px;background:linear-gradient(145deg,#e1f8f6,#edf2fb);font-size:25px;box-shadow:inset 0 0 0 1px rgba(17,156,170,.08)}
+.reference-card b{font-size:14px;letter-spacing:-.15px}
+.reference-card small{font-size:11px;line-height:1.35}
+.section-title,.member-section-title{font-size:15px!important;letter-spacing:1px;text-transform:uppercase;color:#62758a!important}
+.founder-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.founder-app{min-height:132px;padding:15px 10px;border-radius:21px;border:1px solid #e0e9f2;background:linear-gradient(150deg,#fff,#f8fbff);box-shadow:0 8px 20px rgba(13,32,56,.055)}
+.founder-app .ficon{width:48px;height:48px;display:grid;place-items:center;border-radius:16px;background:linear-gradient(145deg,#e1f8f6,#edf2fb);color:#15385b;font-size:24px}
+.founder-app b{font-size:12px;color:#15385b}
+.founder-app small{font-size:10px;line-height:1.35}
+.public-info-grid{gap:12px}
+.public-info-card{min-height:132px;border-radius:20px;padding:16px 15px 16px 19px}
+.public-info-card .pico{width:45px;height:45px;display:grid;place-items:center;background:#e4f7f6;border-radius:15px;font-size:24px}
+.public-section-head{margin-top:23px}
+.public-section-head h2{font-size:18px}
+.public-products{gap:11px}
+.public-product{padding:10px;border-radius:17px}
+.product,.founder-product{border-radius:18px}
+.bottom,.quickbar{padding-bottom:env(safe-area-inset-bottom);background:rgba(255,255,255,.97);border-top:1px solid #dbe5ef;box-shadow:0 -8px 26px rgba(13,32,56,.1)}
+.bottom-inner,.quick-inner{padding:4px 5px 0}
+.bottom button,.quickbar button{padding:9px 2px 8px;color:#75849a;font-size:10px;letter-spacing:.1px}
+.bottom span,.quickbar span{width:34px;height:30px;display:grid;place-items:center;margin:0 auto 3px;font-size:19px;border-radius:11px}
+.bottom button.active,.quickbar button.active{color:#087f91}
+.bottom button.active span,.quickbar button.active span{background:#e0f7f5;color:#087f91}
+.btn{background:linear-gradient(110deg,#15385b,#139da6);border-radius:14px;padding:13px 15px}
+.btn.alt,.back{background:#e4f7f6;color:#126f79}
+.modalbox{border-radius:25px}
+@media(max-width:600px){
+ .wrap{padding:12px 11px 112px}
+ .member-welcome,.public-hero,.founder-hero{padding:19px;border-radius:23px}
+ .dashboard-stats{gap:8px}
+ .dash-stat{min-height:112px;padding:12px 10px}
+ .dash-stat span{width:38px;height:38px;font-size:20px}
+ .reference-grid,.founder-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .reference-card{min-height:125px;padding:12px 10px;border-radius:18px}
+ .reference-icon{width:42px;height:42px;border-radius:14px;font-size:23px}
+ .founder-app{min-height:118px;padding:12px 8px;border-radius:18px}
+ .founder-app .ficon{width:42px;height:42px;border-radius:14px}
+ .public-info-card{min-height:125px}
+}
+@media(max-width:360px){.dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.reference-card{min-height:116px}}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
@@ -1136,8 +1202,18 @@ function publicHome(){
  <div class="public-info-grid">${infos.map(([id,ico,title,desc,accent])=>`<button class="public-info-card ${accent}" onclick="setScreen('${id}')"><span class="pico">${ico}</span><b>${title}</b><small>${desc}</small></button>`).join('')}</div>`;
 }
 
+
+function memberIcon(id,fallback){
+ const icons={market:"▦",invites:"♧",orders:"▤",account:"◉",profits:"↗",commissions:"⇄",partner:"✦",memberBenefits:"✧",money:"◈",stockMarket:"▣",notifications:"♢",rules:"≡",help:"?",privacy:"◇",contact:"✉",how:"▷",logout:"↪",boutique:"▧"};
+ return icons[id]||fallback;
+}
+function founderIcon(id,fallback){
+ const icons={founderDashboard:"▥",founderStats:"▤",founderFinance:"◈",money:"◉",founderWithdrawals:"↙",founderPayments:"⇄",orders:"▤",founderMembers:"♧",founderReferral:"⌘",partner:"✦",commissions:"⇄",founderMarket:"▦",founderStocks:"▣",notifications:"♢",founderAnnouncements:"◉",privacy:"◇",founderSettings:"⚙",rules:"≡",account:"◉",logout:"↪"};
+ return icons[id]||fallback;
+}
+
 function founderApp(id,ico,label,desc){
- return `<button class="founder-app" onclick="setScreen('${id}')"><span class="ficon">${ico}</span><b>${label}</b><small>${desc||''}</small></button>`;
+ return `<button class="founder-app" onclick="setScreen('${id}')"><span class="ficon">${founderIcon(id,ico)}</span><b>${label}</b><small>${desc||''}</small></button>`;
 }
 
 function founderHome(){
@@ -1322,7 +1398,7 @@ function memberHome(){
   market:'Produits et revente',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
  };
  const accent=['accent-green','accent-blue','accent-purple','accent-orange','accent-teal','accent-green','accent-purple','accent-gold','accent-gold','accent-teal','accent-blue','accent-orange','accent-pink','accent-red','accent-red','accent-blue','accent-purple','accent-teal','accent-green','accent-red'];
- const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
+ const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${memberIcon(id,ico)}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
  return `<div class="member-dashboard member-reference">
    <div class="member-welcome compact-welcome">
      <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, commandes, invitations, bénéfices et suivi.</p></div>
