@@ -617,7 +617,8 @@ async function sendForgotPassword(){
  const email=document.getElementById("forgotEmail")?.value.trim();
  if(!email){alert("Adresse e-mail obligatoire.");return;}
  try{
-  await api("/auth/v1/recover",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,redirect_to:location.origin+location.pathname})});
+  const redirectTo=location.origin+location.pathname;
+  await api("/auth/v1/recover?redirect_to="+encodeURIComponent(redirectTo),{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email})});
   closeModal();
   openModal("📩 Demande envoyée",`<div class="notice success">Si cette adresse correspond à un compte BuSAF, les instructions de récupération ont été envoyées.</div><button class="btn" onclick="closeModal()">OK</button>`);
  }catch(e){alert("❌ "+e.message)}
