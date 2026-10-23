@@ -265,6 +265,58 @@ input,textarea,select{border-radius:12px}
 }
 @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
 
+
+/* BuSAF UI 2026 — cohérence visuelle et confort mobile */
+:root{--busaf-green:#087a3d;--busaf-green-dark:#075b2d;--busaf-ink:#17251d;--busaf-muted:#66756b;--busaf-line:#e1eae3;--busaf-surface:#fff;--busaf-shadow:0 8px 24px rgba(16,60,32,.07)}
+html{scroll-behavior:smooth}
+body{color:var(--busaf-ink);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.header{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid rgba(218,232,222,.9)}
+.header-row{min-height:66px}
+.logo{letter-spacing:-.45px}
+.logo small{color:var(--busaf-muted);font-weight:600;letter-spacing:0}
+.wrap{max-width:1120px}
+.card,.info,.hero,.founder-hero,.member-hero,.public-hero{box-shadow:var(--busaf-shadow)}
+.card,.info{border:1px solid var(--busaf-line)}
+h1,h2,h3{letter-spacing:-.35px}
+button,.btn,.hbtn,.back{touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:3px solid rgba(20,145,75,.35);outline-offset:3px}
+.btn{min-height:46px;border-radius:13px;font-weight:750;letter-spacing:.12px;transition:transform .15s ease,box-shadow .15s ease,filter .15s ease}
+.btn:active,button:active{transform:scale(.985)}
+input,textarea,select{min-height:45px;border:1px solid #d8e4dc;background:#fff;color:var(--busaf-ink)}
+input::placeholder,textarea::placeholder{color:#89958d}
+label{display:block;margin:12px 0 6px;font-weight:650;color:#34483b}
+.notice{border-radius:14px;line-height:1.55}
+.empty{border:1px dashed #d4e2d8;border-radius:16px;padding:22px;color:var(--busaf-muted);background:#fbfdfb}
+.public-hero,.founder-hero{overflow:hidden}
+.public-info-card,.public-product,.reference-card,.tile{transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}
+.public-info-card:active,.public-product:active,.reference-card:active,.tile:active{transform:scale(.99)}
+.public-product img{max-width:100%;object-fit:cover}
+.header-actions{gap:8px}
+.hbtn{border-radius:12px;min-height:40px}
+.quickbar,.bottom{padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(min-width:760px){
+ .wrap{padding-left:22px;padding-right:22px}
+ .public-info-grid,.public-products{gap:16px}
+ .card{padding:24px}
+}
+@media(max-width:600px){
+ body{font-size:14px}
+ .header-row{min-height:60px}
+ .logo{font-size:21px}
+ .logo small{font-size:11px}
+ .wrap{padding-top:12px;padding-left:10px;padding-right:10px}
+ .btn{width:100%;min-height:46px}
+ .header-actions .hbtn{width:auto;padding:8px 10px;font-size:12px}
+ .card h2{font-size:21px;line-height:1.25}
+ .public-hero h1{overflow-wrap:anywhere}
+ input,textarea,select{font-size:16px}
+ .quickbar button,.bottom button{min-height:48px}
+}
+@media(prefers-reduced-motion:reduce){
+ html{scroll-behavior:auto}
+ *,*::before,*::after{animation:none!important;transition:none!important}
+}
+
 </style>
 </head>
 <body>
