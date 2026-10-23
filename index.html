@@ -844,7 +844,9 @@ function closeModal(){document.getElementById("modal").classList.remove("open")}
 
 async function api(path,options={}){
  const headers=Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json"},options.headers||{});
- if(state.token)headers.Authorization="Bearer "+state.token;
+ // Respecte le jeton explicitement fourni par l'appel. Une ancienne session ne doit pas écraser
+ // le Bearer SUPABASE_KEY utilisé pour la connexion et les autres appels Auth publics.
+ if(state.token&&!headers.Authorization)headers.Authorization="Bearer "+state.token;
  // Empêche les requêtes bloquées de laisser BuSAF en chargement indéfiniment.
  const controller=new AbortController();
  const timeoutMs=Number(options.timeoutMs)||20000;
