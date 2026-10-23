@@ -398,6 +398,31 @@ input:focus,textarea:focus,select:focus{border-color:#10a878;box-shadow:0 0 0 3p
 
 </style>
   
+
+<style id="busaf-texte-net">
+/* Lisibilité mobile : texte net, sans flou visuel ni micro-écritures */
+html,body,#app{ -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; }
+body{filter:none!important;zoom:1!important}
+.header,.bottom,.quickbar,.modal,.modalbox,.founder-hero,.member-welcome,.public-hero{
+  -webkit-backdrop-filter:none!important;backdrop-filter:none!important
+}
+button, input, textarea, select, p, small, label, li, span, b, strong, h1, h2, h3{
+  text-shadow:none!important
+}
+small{font-size:max(12px, .82em)}
+.header .logo small{font-size:12px}
+.bottom button,.quickbar button{font-size:11px;line-height:1.25}
+.bottom span,.quickbar span{font-size:20px}
+.reference-card small,.founder-app small{font-size:12px;line-height:1.4}
+.founder-stat small{font-size:10px}
+@media(max-width:600px){
+  body{font-size:16px}
+  p,li,label,input,textarea,select{font-size:15px;line-height:1.45}
+  .reference-card b,.founder-app b{font-size:13px}
+  .reference-card small,.founder-app small{font-size:12px}
+}
+</style>
+
 </head>
 <body>
 <div id="app" class="app"></div>
