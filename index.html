@@ -530,6 +530,20 @@ p,li,label,.notice,.rule,.empty{color:#203729}
 *,*::before,*::after{scroll-behavior:auto!important}
 .tile,.reference-card,.btn,button{transition:none!important;animation:none!important}
 </style>
+<style id="busaf-lisibilite-finale">
+/* Lisibilite mobile prioritaire */
+#app p,#app li,#app label,#app small{font-size:16px!important;line-height:1.55!important;font-weight:600!important;color:#203729!important;opacity:1!important;text-shadow:none!important;filter:none!important}
+#app h1{font-size:clamp(25px,6vw,32px)!important;line-height:1.25!important;font-weight:900!important}
+#app h2{font-size:clamp(22px,5vw,27px)!important;line-height:1.3!important;font-weight:900!important}
+#app h3{font-size:19px!important;font-weight:850!important}
+#app button,#app .btn{font-size:15px!important;font-weight:800!important;opacity:1!important;text-shadow:none!important}
+#app .header,#app .header *,#app .hero,#app .hero *,#app .member-welcome,#app .member-welcome *,#app .founder-hero,#app .founder-hero *{color:#fff!important;-webkit-text-fill-color:#fff!important}
+#app .tile,#app .card,#app .info,#app .reference-card,#app .founder-app,#app .work-card,#app .dash-stat{background:#fff!important;opacity:1!important;filter:none!important}
+#app .tile *,#app .card *,#app .info *,#app .reference-card *,#app .founder-app *,#app .work-card *,#app .dash-stat *{color:#183523!important;-webkit-text-fill-color:#183523!important;text-shadow:none!important;opacity:1!important;filter:none!important}
+#app .tile{font-size:14px!important;min-height:112px}
+#app .tile .ico{font-size:26px!important}
+@media(max-width:600px){#app p,#app li,#app label,#app small{font-size:15px!important}#app .tile{font-size:14px!important}}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
