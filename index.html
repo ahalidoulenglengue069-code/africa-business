@@ -317,6 +317,85 @@ label{display:block;margin:12px 0 6px;font-weight:650;color:#34483b}
  *,*::before,*::after{animation:none!important;transition:none!important}
 }
 
+
+/* BuSAF — refonte visuelle distincte : édition moderne 2026 */
+:root{
+ --green:#087f5b;--green2:#10b981;--light:#f3f6f8;--card:#ffffff;
+ --text:#142b3b;--muted:#657786;--line:#dce5eb;--red:#c62828;
+ --gold:#d69e2e;--shadow:0 12px 34px rgba(19,43,59,.085)
+}
+html,body{background:#f3f6f8;color:#142b3b;font-family:Inter,"Segoe UI",Roboto,Arial,sans-serif}
+.header{background:#102b3b;padding:13px 18px;box-shadow:0 5px 22px rgba(16,43,59,.22);border-bottom:3px solid #10b981}
+.header-row{max-width:1180px}
+.logo{font-size:29px;letter-spacing:-1.1px}.logo small{font-size:11px;letter-spacing:1.7px;text-transform:uppercase;color:#b8f4df}
+.hbtn{border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.09);border-radius:13px;padding:10px 13px}
+.wrap{max-width:1180px;padding:24px 18px 112px}
+.hero{position:relative;overflow:hidden;border:0;border-radius:26px;padding:clamp(22px,4vw,42px);background:linear-gradient(125deg,#102b3b 0%,#124b4a 58%,#087f5b 100%);color:white;box-shadow:0 18px 45px rgba(16,43,59,.2)}
+.hero:after{content:"";position:absolute;width:230px;height:230px;border:38px solid rgba(255,255,255,.055);border-radius:50%;right:-55px;top:-70px;pointer-events:none}
+.hero h1,.hero h2{color:#fff;font-size:clamp(26px,4vw,42px);line-height:1.08;letter-spacing:-1px;max-width:760px}
+.hero p{color:rgba(255,255,255,.83);max-width:720px;font-size:15px;line-height:1.7}
+.card,.info{border:1px solid #e1e9ee;border-radius:22px;padding:20px;box-shadow:0 8px 26px rgba(19,43,59,.055);transition:box-shadow .2s,border-color .2s}
+.card h1,.card h2,.section-title{color:#087f5b;letter-spacing:-.35px}
+.section-title{font-size:22px;margin:26px 2px 13px}
+.grid20{gap:13px}
+.tile{position:relative;overflow:hidden;min-height:126px;border:1px solid #e0e9ed;border-radius:20px;padding:16px 9px;background:linear-gradient(155deg,#fff 0%,#f8fbfc 100%);box-shadow:0 8px 22px rgba(16,43,59,.055);font-size:13px;color:#18394a}
+.tile:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:linear-gradient(#10b981,#087f5b);opacity:.85}
+.tile:hover{border-color:#8bdac1;box-shadow:0 14px 28px rgba(16,43,59,.1);transform:translateY(-2px)}
+.tile .ico{display:grid;place-items:center;width:49px;height:49px;border-radius:16px;background:#e3f8ef;color:#087f5b;font-size:26px;margin-bottom:11px}
+.btn{background:linear-gradient(110deg,#087f5b,#10a878);border-radius:13px;padding:13px 16px;box-shadow:0 5px 12px rgba(8,127,91,.12);transition:transform .16s,filter .16s}
+.btn:hover{filter:brightness(1.04);transform:translateY(-1px)}
+.btn.alt{background:#e1f7ee;color:#087f5b;box-shadow:none}
+.back{background:#e4f5ee;color:#087f5b;border-radius:13px}
+.quickbar,.bottom{background:rgba(255,255,255,.96);border-top:1px solid #dce7eb;box-shadow:0 -8px 30px rgba(16,43,59,.09);backdrop-filter:blur(18px)}
+.quickbar button,.bottom button{color:#617582;padding:10px 3px 11px}
+.quickbar button.active,.bottom button.active{color:#087f5b}
+.quickbar button.active span,.bottom button.active span{filter:saturate(1.3)}
+.productgrid{gap:14px}
+.product{border:1px solid #e0e9ed;border-radius:18px;padding:10px;box-shadow:0 7px 20px rgba(16,43,59,.045)}
+.product img{height:130px;border-radius:12px}
+.product h3{font-size:14px;color:#16384a}
+.product .price{color:#087f5b;font-size:15px}
+.product .btn{font-size:12px;padding:10px 5px}
+.stat{background:linear-gradient(145deg,#fff,#f0faf6);border-color:#d9eee5;border-radius:17px;padding:17px}
+.stat strong{color:#087f5b}
+.rule{border-color:#e1e9ee;border-radius:17px;padding:16px}
+input,textarea,select{border-color:#d3e0e6;border-radius:13px;padding:13px;color:#142b3b}
+input:focus,textarea:focus,select:focus{border-color:#10a878;box-shadow:0 0 0 3px rgba(16,185,129,.12)}
+.notice{border-radius:15px}
+.modal{backdrop-filter:blur(5px)}
+.modalbox{border-radius:25px;padding:22px}
+.founder-hero{background:radial-gradient(circle at 90% 5%,rgba(16,185,129,.26),transparent 35%),linear-gradient(125deg,#102b3b,#124b4a 70%,#087f5b);border:1px solid rgba(255,255,255,.12);border-radius:26px;padding:24px;box-shadow:0 18px 40px rgba(16,43,59,.18)}
+.founder-hero h1{font-size:clamp(24px,3vw,34px);letter-spacing:-.6px}
+.founder-hero .founder-badge{background:rgba(16,185,129,.2);border:1px solid rgba(184,244,223,.25);color:#d5fff0}
+.founder-app{border:1px solid #e0e9ed;border-radius:19px;box-shadow:0 8px 22px rgba(16,43,59,.055);transition:transform .18s,box-shadow .18s}
+.founder-app:hover{transform:translateY(-2px);box-shadow:0 13px 28px rgba(16,43,59,.1);border-color:#9cddc7}
+.founder-app .ficon{display:grid;place-items:center;width:48px;height:48px;border-radius:15px;background:#e3f8ef;margin-bottom:10px}
+.founder-app b{font-size:12px;color:#18394a}
+.founder-stat{background:rgba(255,255,255,.09);border-color:rgba(255,255,255,.17);border-radius:15px}
+.founder-product{border-radius:18px;box-shadow:0 8px 22px rgba(16,43,59,.055)}
+.profile-photo{border-color:#10a878}
+@media(min-width:900px){
+ .wrap{padding-top:30px}
+ .productgrid{grid-template-columns:repeat(3,minmax(0,1fr));gap:16px}
+ .product img{height:170px}
+ .tile{min-height:142px}
+}
+@media(max-width:600px){
+ .header{padding:12px 12px 11px}.logo{font-size:25px}.logo small{font-size:9px;letter-spacing:1.2px}
+ .wrap{padding:14px 12px 108px}
+ .hero{border-radius:22px;padding:24px 19px}
+ .hero h1,.hero h2{font-size:28px}
+ .card,.info{padding:15px;border-radius:19px}
+ .grid20{gap:8px}
+ .tile{min-height:106px;border-radius:16px;font-size:11px;padding:10px 4px}
+ .tile .ico{width:40px;height:40px;border-radius:13px;font-size:22px;margin-bottom:8px}
+ .productgrid{gap:9px}
+ .product img{height:95px}
+ .quickbar button,.bottom button{font-size:10px}
+ .founder-hero{padding:19px;border-radius:22px}
+}
+@media(prefers-reduced-motion:reduce){.tile:hover,.btn:hover,.founder-app:hover{transform:none}}
+
 </style>
 </head>
 <body>
