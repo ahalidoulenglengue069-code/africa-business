@@ -544,6 +544,45 @@ p,li,label,.notice,.rule,.empty{color:#203729}
 #app .tile .ico{font-size:26px!important}
 @media(max-width:600px){#app p,#app li,#app label,#app small{font-size:15px!important}#app .tile{font-size:14px!important}}
 </style>
+<style id="busaf-lisibilite-tous-espaces">
+/* Regles globales de lisibilite pour chaque ecran BuSAF */
+:root{--text:#102b1a;--muted:#344b3b;--light:#f2f8f3;--line:#c6ddcc}
+html,body{color:#102b1a!important;background:#f2f8f3!important}
+#app{color:#102b1a!important}
+#app :is(p,li,label,small,summary,dt,dd,td,th,legend,.muted,.subtle,.hint,.help,.description,.empty,.notice,.rule,.form-text,.field-help){
+ color:#263b2d!important;opacity:1!important;text-shadow:none!important;filter:none!important;
+}
+#app :is(p,li,label,summary,dt,dd,td,th,legend,.muted,.subtle,.hint,.help,.description,.empty,.notice,.rule,.form-text,.field-help){
+ font-size:15px!important;line-height:1.55!important;font-weight:600!important;
+}
+#app :is(h1,h2,h3,h4,h5,h6,strong,b,.section-title,.member-section-title,.founder-section-title){
+ color:#102b1a!important;opacity:1!important;text-shadow:none!important;filter:none!important;font-weight:900!important;line-height:1.3!important;
+}
+#app h1{font-size:clamp(25px,6vw,32px)!important}
+#app h2{font-size:clamp(21px,5.2vw,27px)!important}
+#app h3{font-size:19px!important}
+#app :is(input,textarea,select){color:#14271b!important;background:#fff!important;border:1px solid #789c82!important;font-size:16px!important;opacity:1!important}
+#app input::placeholder,#app textarea::placeholder{color:#596b5e!important;opacity:1!important}
+#app :is(button,.btn,.hbtn,[role=button]){font-weight:800!important;text-shadow:none!important;filter:none!important;opacity:1!important}
+#app :is(.card,.info,.tile,.reference-card,.founder-app,.work-card,.dash-stat,.panel,.modal,.form-card){
+ background-color:#fff!important;border-color:#c6ddcc!important;
+}
+#app :is(.card,.info,.tile,.reference-card,.founder-app,.work-card,.dash-stat,.panel,.modal,.form-card) :is(p,li,label,small,span,strong,b,h1,h2,h3,h4,a,div){
+ text-shadow:none!important;filter:none!important;opacity:1!important;
+}
+#app :is(.header,.header *, .hero,.hero *, .member-welcome,.member-welcome *, .founder-hero,.founder-hero *, .public-hero,.public-hero *){
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
+#app :is(.tile,.work-card,.founder-app){min-height:110px}
+#app :is(.tile,.work-card,.founder-app) :is(span,b,strong,small){font-size:14px!important;line-height:1.4!important;font-weight:800!important}
+#app :is(.tile .ico,.work-card .ico,.founder-app .ico){font-size:25px!important}
+@media(max-width:600px){
+ #app :is(p,li,label,small,summary,dt,dd,td,th,legend,.muted,.subtle,.hint,.help,.description,.empty,.notice,.rule,.form-text,.field-help){font-size:15px!important;line-height:1.55!important}
+ #app :is(input,textarea,select){font-size:16px!important;min-height:44px}
+ #app :is(button,.btn,.hbtn,[role=button]){font-size:15px!important;min-height:42px}
+ #app :is(.tile,.work-card,.founder-app) :is(span,b,strong,small){font-size:13.5px!important}
+}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
