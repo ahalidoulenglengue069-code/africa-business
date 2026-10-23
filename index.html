@@ -407,6 +407,36 @@ input:focus,textarea:focus,select:focus{border-color:#10a878;box-shadow:0 0 0 3p
 }
 @media(prefers-reduced-motion:reduce){.tile:hover,.btn:hover,.founder-app:hover{transform:none}}
 
+
+/* Correction nette des icônes emoji : conserver le rendu couleur natif du téléphone */
+#app .founder-app .ficon,
+#app .founder-stat,
+#app .reference-icon,
+#app .dash-stat span,
+#app .work-card span,
+#app .tile .icon,
+#app .product .emoji,
+#app .product .pemoji,
+#app .public-product .pemoji,
+#app .emoji,
+#app .pemoji,
+#app .notif-top,
+#app .bottom span,
+#app .quickbar span{
+  font-family:"Noto Color Emoji","Apple Color Emoji","Segoe UI Emoji",sans-serif!important;
+  -webkit-font-smoothing:auto!important;
+  font-smooth:auto;
+  text-rendering:auto!important;
+  filter:none!important;
+  text-shadow:none!important;
+}
+#app .founder-app .ficon{
+  font-size:29px!important;
+  line-height:1!important;
+  font-weight:400!important;
+  -webkit-text-fill-color:initial!important;
+}
+
 </style>
   
 
