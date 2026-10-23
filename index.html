@@ -864,10 +864,10 @@ async function api(path,options={}){
 }
 async function loadProfile(){
  if(!state.userId||!state.token)return;
- try{
-   const rows=await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`);
-   state.profile=rows[0]||null;
- }catch(e){console.warn(e)}
+ // Ne jamais confondre une erreur de lecture avec un profil absent :
+ // sinon l'inscription automatique tente un INSERT et provoque une clé unique en doublon.
+ const rows=await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`);
+ state.profile=Array.isArray(rows)?(rows[0]||null):null;
 }
 
 async function ensureMemberProfile(user){
@@ -884,9 +884,21 @@ async function ensureMemberProfile(user){
  const parrain=Array.isArray(parrains)?parrains[0]:null;
  if(!parrain)throw new Error("Le code parrain utilisé à l'inscription est invalide ou introuvable.");
  const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
- const rows=await api("/rest/v1/profils_busaf",{method:"POST",headers:{"Prefer":"return=representation"},body:JSON.stringify({
+ let rows;
+ try{
+  rows=await api("/rest/v1/profils_busaf",{method:"POST",headers:{"Prefer":"return=representation"},body:JSON.stringify({
    user_id:state.userId,nom_complet:nom||state.email.split("@")[0],telephone:tel,Ville:ville,role:"membre",parrain_id:parrain.id,code_parrain:nouveauCode,photo_url:null
- })});
+  })});
+ }catch(err){
+  // Si un profil existe déjà, ne pas en créer un second et surtout ne pas changer son rôle.
+  if(/profils_busaf_user_id_unique|duplicate key value|23505/i.test(String(err.message||err))){
+   state.profile=null;
+   await loadProfile();
+   if(state.profile)return;
+   throw new Error("Un profil BuSAF existe déjà pour ce compte, mais il est invisible avec les règles d’accès actuelles. Aucun profil n’a été supprimé ni remplacé. Vérifie la politique SELECT de profils_busaf.");
+  }
+  throw err;
+ }
  state.profile=Array.isArray(rows)?rows[0]:rows;
  saveState();
 }
