@@ -201,6 +201,70 @@ textarea{min-height:100px;resize:vertical}
 @media(max-width:480px){.photo-lightbox{padding-top:62px}.photo-lightbox img{max-width:96vw;max-height:78vh}.photo-lightbox-tools button{width:40px;height:40px}}
 
 .password-field{position:relative;display:flex;align-items:center;width:100%;}.password-field input{width:100%;padding-right:3.2rem!important;box-sizing:border-box;}.password-toggle{position:absolute;right:.35rem;top:50%;transform:translateY(-50%);border:0;background:transparent;cursor:pointer;font-size:1.15rem;padding:.45rem;line-height:1;z-index:2;color:inherit;}
+
+/* ===== BuSAF moderne : finition mobile et lisibilité ===== */
+:root{
+  --green:#087a38;--green2:#0b9347;--light:#f3f8f4;--card:#ffffff;
+  --text:#173523;--muted:#63736a;--line:#dce9df;
+  --shadow:0 8px 26px rgba(18,65,37,.075);
+}
+html{scroll-behavior:smooth}
+body{background:linear-gradient(180deg,#f5faf6 0%,#edf6ef 100%);letter-spacing:.05px}
+.header{background:linear-gradient(125deg,#075c2b 0%,#087a38 48%,#10a052 100%);box-shadow:0 5px 22px rgba(3,67,30,.18)}
+.logo{letter-spacing:-.5px}
+.hbtn,.public-action,.btn,button{transition:transform .16s ease,box-shadow .16s ease,background-color .16s ease}
+button:active{transform:scale(.985)}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #f4bd45;outline-offset:2px}
+.wrap{max-width:1120px;padding:18px 14px 112px}
+.hero,.card,.info{border-color:#e0ebe3;border-radius:22px;box-shadow:0 8px 28px rgba(22,66,39,.065);padding:18px}
+.section-title{font-size:clamp(19px,3vw,23px);letter-spacing:-.35px}
+.tile{border-color:#e0ebe3;border-radius:19px;min-height:112px;box-shadow:0 5px 18px rgba(22,66,39,.055);padding:12px 8px}
+.tile:hover{box-shadow:0 9px 22px rgba(22,100,48,.12);transform:translateY(-2px)}
+.tile .ico{font-size:30px}
+.public-hero{padding:clamp(22px,5vw,34px);border-radius:25px;background:radial-gradient(circle at 92% 8%,rgba(255,255,255,.16),transparent 29%),linear-gradient(135deg,#075c2b 0%,#087a38 50%,#11a353 100%);box-shadow:0 12px 30px rgba(4,90,39,.16)}
+.public-hero h1{font-size:clamp(27px,5vw,38px);letter-spacing:-.8px;line-height:1.12}
+.public-hero p{font-size:15px;line-height:1.65;max-width:650px}
+.public-action{border-radius:15px;min-height:47px}
+.public-action.primary{box-shadow:0 5px 15px rgba(0,0,0,.10)}
+.public-section-head{margin-top:23px}
+.public-section-head h2{font-size:clamp(19px,3vw,23px);letter-spacing:-.3px}
+.public-info-grid{gap:12px}
+.public-info-card{border-color:#e0ebe3;border-radius:19px;padding:16px;box-shadow:0 7px 20px rgba(22,66,39,.055);transition:transform .16s ease,box-shadow .16s ease}
+.public-info-card:hover{transform:translateY(-2px);box-shadow:0 11px 24px rgba(22,100,48,.10)}
+.public-info-card .pico{font-size:30px}
+.public-info-card b{font-size:15px;line-height:1.35}
+.public-info-card small{font-size:12px;line-height:1.5}
+.public-products{gap:12px}
+.public-product{border-color:#e0ebe3;border-radius:17px;padding:13px;box-shadow:0 7px 20px rgba(22,66,39,.055)}
+.public-product .pemoji{font-size:27px}
+.public-product h3{font-size:15px;line-height:1.3;margin:8px 0 5px}
+.public-product .small{font-size:12px;line-height:1.4;white-space:normal}
+.public-product .pprice{font-size:18px;margin-top:8px}
+.public-product .benefit{font-size:11px;line-height:1.35;padding:6px 8px;border-radius:9px}
+.public-note{border-radius:16px;line-height:1.55}
+.quickbar,.bottom{background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-color:#dce9df;box-shadow:0 -7px 24px rgba(17,57,31,.08)}
+.quickbar button,.bottom button{font-size:12px}
+input,textarea,select{border-radius:12px}
+@media(max-width:600px){
+  .wrap{padding:13px 11px 105px}
+  .hero,.card,.info{padding:15px;border-radius:19px}
+  .grid20{gap:8px}
+  .tile{min-height:98px;padding:10px 5px;border-radius:16px;font-size:12px}
+  .tile .ico{font-size:26px}
+  .public-hero{padding:22px 18px;border-radius:22px}
+  .public-hero p{font-size:14px}
+  .public-actions{gap:8px}
+  .public-action{font-size:13px;padding:12px 8px}
+  .public-info-grid{gap:9px}
+  .public-info-card{padding:13px;border-radius:16px}
+  .public-products{gap:9px}
+  .public-product{padding:10px;border-radius:15px}
+  .public-product h3{font-size:14px}
+  .public-product .small{font-size:11px}
+  .public-product .pprice{font-size:16px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*,*::before,*::after{transition:none!important;animation:none!important}}
+
 </style>
 </head>
 <body>
