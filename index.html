@@ -707,22 +707,22 @@ body{font-size:14px!important;zoom:1!important;transform:none!important}
  #app .founder-app small{font-size:10px!important}
  #app .bottom button,#app .quickbar button{min-height:unset!important;font-size:11px!important;padding:7px 4px!important}
 }
-/* Gestion du Marché : fiches verticales, photo bien visible et informations sous la photo */
-#app .founder-product-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;align-items:start!important}
-#app .founder-product{display:flex!important;flex-direction:column!important;align-items:stretch!important;min-width:0!important;padding:8px!important;border-radius:13px!important;overflow:hidden!important}
-#app .founder-product img{display:block!important;width:100%!important;height:150px!important;max-width:100%!important;aspect-ratio:auto!important;object-fit:contain!important;object-position:center!important;background:#f5f8f6!important;border-radius:9px!important;margin:0 0 8px!important;cursor:zoom-in!important}
-#app .founder-product>.emoji{display:flex!important;width:100%!important;height:150px!important;align-items:center!important;justify-content:center!important;font-size:42px!important;background:#f5f8f6!important;border-radius:9px!important;margin:0 0 8px!important}
-#app .founder-product h3{display:block!important;width:100%!important;min-width:0!important;font-size:13px!important;line-height:1.4!important;white-space:normal!important;overflow-wrap:anywhere!important;margin:0 0 5px!important;text-align:left!important}
-#app .founder-product .fprice{display:block!important;width:100%!important;font-size:14px!important;line-height:1.4!important;margin:0 0 9px!important;text-align:left!important}
-#app .founder-actions{display:grid!important;grid-template-columns:1fr!important;gap:6px!important;width:100%!important;min-width:0!important;margin-top:auto!important}
-#app .founder-actions button{display:block!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;font-size:11px!important;padding:8px 5px!important;white-space:normal!important;line-height:1.25!important;min-height:0!important}
-@media(max-width:380px){
+/* Gestion du Marché : photo en haut, nom/prix et actions clairement dessous */
+#app .founder-product-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;align-items:stretch!important}
+#app .founder-product{display:flex!important;flex-direction:column!important;align-items:stretch!important;min-width:0!important;padding:8px!important;border:1px solid #dce9df!important;border-radius:14px!important;background:#fff!important;box-shadow:0 3px 10px rgba(20,80,45,.08)!important;overflow:hidden!important}
+#app .founder-product img{width:100%!important;height:132px!important;object-fit:contain!important;object-position:center!important;background:#f4f8f5!important;border-radius:10px!important;margin:0!important}
+#app .founder-product>.emoji{height:132px!important;margin:0!important}
+#app .founder-product-info{padding:9px 2px 2px!important}
+#app .founder-product-line{font-size:13px!important;line-height:1.4!important;overflow-wrap:anywhere!important;text-align:left!important}
+#app .founder-product .fprice{font-size:14px!important;line-height:1.35!important;color:#087a42!important;margin:5px 0 0!important;text-align:left!important;font-weight:800!important}
+#app .founder-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important;width:100%!important;margin-top:8px!important}
+#app .founder-actions button{display:block!important;width:100%!important;min-width:0!important;box-sizing:border-box!important;font-size:10px!important;padding:8px 3px!important;white-space:normal!important;line-height:1.2!important;min-height:0!important;margin:0!important;border-radius:8px!important}
+@media(max-width:360px){
  #app .founder-product-grid{gap:7px!important}
  #app .founder-product{padding:6px!important}
- #app .founder-product img,#app .founder-product>.emoji{height:125px!important}
- #app .founder-product h3{font-size:12px!important}
- #app .founder-product .fprice{font-size:13px!important}
- #app .founder-actions button{font-size:10px!important;padding:7px 3px!important}
+ #app .founder-product img,#app .founder-product>.emoji{height:115px!important}
+ #app .founder-product-line{font-size:12px!important}
+ #app .founder-actions button{font-size:9px!important;padding:7px 2px!important}
 }
 </style>
 
@@ -1496,8 +1496,18 @@ function founderMarket(){
  const cards=all.map(p=>{
   const name=p.nom||'Produit';
   const price=Number(p.prix||0);
-  const image=p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(name)}" onclick="openPhotoLightbox(this.src,this.alt)" style="cursor:zoom-in">`:`<div class="emoji">📦</div>`;
-  return `<div class="founder-product">${image}<h3>${esc(name)}</h3><div class="fprice">${money(price)}</div><div class="founder-actions"><button class="btn" onclick="openMarketProductForm('${String(p.id)}')">✏️ MODIFIER</button><button class="btn red" onclick="deleteMarketProduct('${String(p.id)}')">🗑️ SUPPRIMER</button></div></div>`;
+  const image=p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(name)}" onclick="openPhotoLightbox(this.src,this.alt)" style="display:block;width:100%;height:132px;object-fit:contain;object-position:center;background:#f4f8f5;border-radius:10px;cursor:zoom-in">`:`<div class="emoji" style="display:flex;width:100%;height:132px;align-items:center;justify-content:center;font-size:38px;background:#f4f8f5;border-radius:10px">📦</div>`;
+  return `<div class="founder-product" style="display:flex;flex-direction:column;min-width:0;overflow:hidden">
+    ${image}
+    <div class="founder-product-info" style="display:block;width:100%;padding:9px 2px 2px;box-sizing:border-box">
+      <div class="founder-product-line" style="font-size:13px;line-height:1.4;overflow-wrap:anywhere;color:#24352c"><strong>${esc(name)}</strong></div>
+      <div class="fprice" style="font-size:14px;font-weight:800;color:#087a42;margin-top:5px">${money(price)}</div>
+    </div>
+    <div class="founder-actions" style="display:grid;grid-template-columns:1fr 1fr;gap:5px;width:100%;margin-top:8px">
+      <button class="btn" style="min-width:0;width:100%;padding:8px 3px;font-size:10px;line-height:1.2;white-space:normal" onclick="openMarketProductForm('${String(p.id)}')">✏️ MODIFIER</button>
+      <button class="btn red" style="min-width:0;width:100%;padding:8px 3px;font-size:10px;line-height:1.2;white-space:normal" onclick="deleteMarketProduct('${String(p.id)}')">🗑️ SUPPRIMER</button>
+    </div>
+  </div>`;
  }).join('');
  return page('👑 Gestion du Marché',`<div class="notice success founder-market-note"><strong>ESPACE FONDATEUR</strong><br>Ici, tu gères les produits. Il n'y a <strong>aucun bouton Acheter</strong>.</div><button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button><button class="btn alt small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><div class="founder-product-grid" style="margin-top:10px">${cards||`<div class="empty" style="grid-column:1/-1">Aucun produit publié.</div>`}</div>`);
 }
