@@ -450,6 +450,52 @@ button,.btn,.hbtn,.back{font-size:14px}
   .reference-card small,.founder-app small,.work-card small,.public-product .small{font-size:12px!important}
   .bottom button,.quickbar button{font-size:11px!important}
 }
+
+/* BuSAF — retour au vert franc et textes très lisibles (23 octobre 2026) */
+:root{
+  --green:#087a38!important;
+  --green2:#0b9347!important;
+  --light:#f0f7f1!important;
+  --card:#ffffff!important;
+  --text:#14291b!important;
+  --muted:#405548!important;
+  --line:#cbded0!important;
+  --shadow:0 5px 18px rgba(8,70,32,.09)!important;
+  --busaf-green:#087a38!important;
+  --busaf-green-dark:#075b2d!important;
+  --busaf-ink:#14291b!important;
+  --busaf-muted:#405548!important;
+  --busaf-line:#cbded0!important;
+}
+html,body{background:#f0f7f1!important;color:#14291b!important;font-family:Arial,Helvetica,sans-serif!important;-webkit-font-smoothing:antialiased!important;text-rendering:optimizeLegibility!important}
+.header{background:linear-gradient(120deg,#075b2d 0%,#087a38 55%,#0b9347 100%)!important;color:#fff!important;border-bottom:3px solid #0b9347!important;box-shadow:0 4px 14px rgba(0,65,25,.18)!important}
+.header .logo,.header .logo small{color:#fff!important}
+.hero,.public-hero,.founder-hero,.member-welcome{background:linear-gradient(125deg,#075b2d 0%,#087a38 58%,#0b9347 100%)!important;color:#fff!important}
+.card,.info,.stat,.rule,.tile,.reference-card,.founder-app,.work-card,.public-info-card,.public-product{color:#14291b!important;background:#fff!important;border-color:#cbded0!important;box-shadow:0 4px 14px rgba(8,70,32,.07)!important}
+h1,h2,h3,.section-title,.card h1,.card h2,.rule h3,.public-section-head h2{color:#087a38!important}
+p,li,label,small,.muted,.reference-card small,.founder-app small,.work-card small{color:#263f2f}
+small{opacity:1!important}
+.stat strong,.founder-stat strong{color:#075b2d!important;font-weight:800!important;text-shadow:none!important}
+.btn,.public-action.primary{background:#087a38!important;color:#fff!important;border:1px solid #087a38!important;box-shadow:0 3px 9px rgba(8,122,56,.16)!important;font-weight:800!important;text-shadow:none!important}
+.btn.alt,.back{background:#e0f1e5!important;color:#075b2d!important;border:1px solid #a9d3b5!important;box-shadow:none!important;font-weight:800!important}
+button,.btn,input,textarea,select{filter:none!important;text-shadow:none!important}
+input,textarea,select{color:#14291b!important;background:#fff!important;border:1px solid #9dbda6!important}
+input::placeholder,textarea::placeholder{color:#52665a!important;opacity:1!important}
+.notice,.empty{color:#263f2f!important;background:#f5faf6!important;border-color:#cbded0!important}
+.quickbar,.bottom{background:#fff!important;border-color:#cbded0!important}
+.quickbar button,.bottom button{color:#263f2f!important}
+.quickbar button.active,.bottom button.active{color:#087a38!important;font-weight:800!important}
+.modalbox{color:#14291b!important;background:#fff!important}
+.modalhead h2{color:#087a38!important}
+#memberWithdrawalList .rule,#app .wrap .rule{border:1px solid #cbded0!important;border-left:4px solid #087a38!important;border-radius:14px!important;padding:14px!important;margin:10px 0!important;background:#fff!important}
+#app .wrap .rule strong{color:#14291b!important;font-weight:800!important}
+@media(max-width:600px){
+  body{font-size:16px!important}
+  p,li,label,input,textarea,select{line-height:1.5!important}
+  small,.reference-card small,.founder-app small,.work-card small{font-size:12px!important}
+  .stat strong{font-size:22px!important}
+}
+
 /* Réduit les effets coûteux sans modifier les fonctions métier. */
 *,*::before,*::after{scroll-behavior:auto!important}
 .tile,.reference-card,.btn,button{transition:none!important;animation:none!important}
