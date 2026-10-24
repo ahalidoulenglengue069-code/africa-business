@@ -1000,6 +1000,48 @@ input,textarea,select{font:inherit;max-width:100%;box-sizing:border-box;border:1
  #app .statgrid{gap:7px!important}
 }
 
+
+/* BuSAF — cohérence finale des cartes d'information et des espaces membre */
+#app .public-info-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;margin:0 0 14px!important}
+#app .public-info-card{display:flex!important;flex-direction:column!important;align-items:flex-start!important;min-width:0!important;min-height:145px!important;padding:14px 13px!important;border:1px solid #dce9e2!important;border-radius:14px!important;background:#fff!important;box-shadow:0 3px 10px rgba(16,67,46,.055)!important;text-align:left!important;white-space:normal!important}
+#app .public-info-card:before{width:4px!important;background:#087b50!important}
+#app .public-info-card .pico{font-size:27px!important;line-height:1.2!important;margin:0 0 9px!important}
+#app .public-info-card b{font-size:14px!important;line-height:1.35!important;color:#173b30!important}
+#app .public-info-card small{font-size:12px!important;line-height:1.45!important;color:#62786f!important;margin-top:7px!important;white-space:normal!important;overflow-wrap:anywhere!important}
+#app .public-note{font-size:12px!important;line-height:1.55!important;border-radius:12px!important;padding:12px!important}
+#app .member-dashboard .work-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;flex-wrap:wrap!important}
+#app .member-dashboard .work-head h2{font-size:16px!important;line-height:1.35!important;margin:0!important}
+#app .member-dashboard .work-head span{font-size:11px!important;color:#62786f!important}
+#app .member-dashboard .progress-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px!important;padding:9px 0!important}
+#app .member-dashboard .progress-row>div{min-width:0!important}
+#app .member-dashboard .progress-row b{font-size:12px!important;line-height:1.35!important}
+#app .member-dashboard .progress-row small{display:block!important;font-size:11px!important;line-height:1.4!important;color:#62786f!important;margin-top:3px!important}
+#app .member-dashboard .progress-row>strong{flex:0 0 auto!important;color:#087b50!important;font-size:13px!important}
+#app .member-dashboard .progress{height:8px!important;overflow:hidden!important;border-radius:20px!important;background:#e7f0ea!important}
+#app .member-dashboard .progress i{display:block!important;height:100%!important;border-radius:20px!important;background:linear-gradient(90deg,#087b50,#18a875)!important}
+#app .member-dashboard .reference-card{appearance:none!important;-webkit-appearance:none!important;display:flex!important;flex-direction:column!important;justify-content:flex-start!important;align-items:center!important;gap:5px!important;min-height:100px!important;padding:12px 7px!important;box-sizing:border-box!important}
+#app .member-dashboard .reference-card .reference-icon{font-size:25px!important;line-height:1.2!important;margin:0 0 3px!important}
+#app .member-dashboard .reference-card b{font-size:12px!important;line-height:1.35!important;overflow-wrap:anywhere!important}
+#app .member-dashboard .reference-card small{font-size:10px!important;line-height:1.35!important;color:#62786f!important;white-space:normal!important;overflow-wrap:anywhere!important}
+#app .member-dashboard .dash-stat{display:flex!important;flex-direction:column!important;gap:5px!important;align-items:flex-start!important;text-align:left!important;width:100%!important;box-sizing:border-box!important}
+#app .member-dashboard .dash-stat small{font-size:11px!important;line-height:1.35!important;color:#62786f!important}
+#app .member-dashboard .dash-stat strong{font-size:12px!important;line-height:1.35!important;overflow-wrap:anywhere!important}
+#app .founder-section-title{border-bottom:1px solid #dce9e2!important;padding-bottom:8px!important;letter-spacing:.15px!important}
+@media(max-width:600px){
+ #app .public-info-grid{gap:8px!important}
+ #app .public-info-card{min-height:135px!important;padding:12px 10px!important;border-radius:12px!important}
+ #app .public-info-card .pico{font-size:24px!important}
+ #app .public-info-card b{font-size:13px!important}
+ #app .public-info-card small{font-size:11px!important}
+ #app .member-dashboard .reference-card{min-height:92px!important;padding:10px 5px!important}
+ #app .member-dashboard .reference-card b{font-size:11px!important}
+ #app .member-dashboard .reference-card small{font-size:9px!important}
+}
+@media(max-width:350px){
+ #app .public-info-grid{grid-template-columns:1fr!important}
+ #app .public-info-card{min-height:0!important}
+}
+
 </style>
 
 </head>
