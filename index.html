@@ -2130,15 +2130,11 @@ function founderHome(){
  // Ne pas afficher ici les anciennes valeurs locales comme s’il s’agissait de statistiques réelles.
  return `<div class="founder-dashboard">
   <section class="founder-hero">
-   <span class="founder-badge">👑 ESPACE FONDATEUR</span>
+   <span class="founder-badge">👑 FONDATEUR</span>
    <h1>Centre de contrôle BuSAF</h1>
-   <p>Bienvenue ${esc(name)}. Ici, tu pilotes BuSAF. Cet espace est réservé à l'administration et ne reprend pas l'espace Membre.</p>
+   <p>Bienvenue ${esc(name)}. Ici, tu pilotes l’administration de BuSAF.</p>
    <button class="btn" style="width:100%;margin:12px 0;text-align:left" onclick="setScreen('founderContact')">✉️ MESSAGES D’AIDE DES MEMBRES <span style="float:right">›</span><small style="display:block;font-weight:400;margin-top:4px">Consulter les demandes et répondre aux membres</small></button>
    <button class="btn" style="width:100%;margin:0 0 12px;text-align:left;background:#087f43" onclick="setScreen('money')">👛 MON PORTEFEUILLE BuSAF <span style="float:right">›</span><small style="display:block;font-weight:400;margin-top:4px">Consulter le solde, déposer via YengaPay ou demander un retrait</small></button>
-   <div class="founder-quick-links" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px">
-    <button class="btn" style="margin:0;min-width:0" onclick="setScreen('founderDashboard')">📊 Tableau de bord</button>
-    <button class="btn" style="margin:0;min-width:0;background:#087f43" onclick="setScreen('founderMembers')">👥 Gestion des membres</button>
-   </div>
   </section>
   <h2 class="founder-section-title">📊 TABLEAU DE BORD ET FINANCES</h2>
   <div class="founder-grid">
@@ -3286,7 +3282,7 @@ function notificationTopHtml(){
  return `<button class="notif-top" onclick="setScreen('notifications')" aria-label="Notifications" title="Notifications">🔔${n>0?` <span class="notif-count">${n}</span>`:""}</button>`;
 }
 function header(member=false){
- return `<header class="header"><div class="header-row"><div class="logo">🌍 BuSAF<small>Business Africain${member?(isFounder()?" • Espace fondateur":" • Espace membre"):""}</small></div>${member?`<div class="header-actions">${notificationTopHtml()}<button class="hbtn" onclick="setScreen(isFounder()?'founderSettings':'account')">👤 Compte</button></div>`:""}</div></header>`;
+ return `<header class="header"><div class="header-row"><div class="logo">🌍 BuSAF<small>Business Africain</small></div>${member?`<div class="header-actions">${notificationTopHtml()}<button class="hbtn" onclick="setScreen(isFounder()?'founderSettings':'account')">👤 Compte</button></div>`:""}</div></header>`;
 }
 
 function render(){
