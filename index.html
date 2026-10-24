@@ -1042,6 +1042,35 @@ input,textarea,select{font:inherit;max-width:100%;box-sizing:border-box;border:1
  #app .public-info-card{min-height:0!important}
 }
 
+
+/* BuSAF — rendu lisible et stable sur téléphone, sans toucher aux fonctions métier */
+#app .card{color:#173523}
+#app .card h2,#app .card h3{line-height:1.35;overflow-wrap:anywhere}
+#app .statgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#app .stat{min-width:0;border-radius:15px;padding:14px 11px;line-height:1.45;overflow-wrap:anywhere}
+#app .stat strong{font-size:clamp(15px,4vw,22px);line-height:1.3;overflow-wrap:anywhere;white-space:normal}
+#app .button-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+#app .button-row .btn{min-width:0;width:100%;margin:0;padding:11px 8px;font-size:12px;line-height:1.35;white-space:normal;overflow-wrap:anywhere}
+#app .rule{padding:13px;border-radius:14px;overflow-wrap:anywhere}
+#app .rule p{font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+#app .rule small{font-size:11px;line-height:1.45;color:#5c7065}
+#app .notice{font-size:13px;line-height:1.55;overflow-wrap:anywhere}
+#app .btn{min-height:43px;line-height:1.35;white-space:normal}
+#app input,#app select,#app textarea{font-size:16px;line-height:1.4;min-height:44px;color:#173523}
+@media(max-width:520px){
+ #app .wrap{padding:12px 10px 100px}
+ #app .hero,#app .card,#app .info{padding:14px;border-radius:16px}
+ #app .statgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #app .stat{padding:12px 8px;font-size:12px}
+ #app .stat strong{font-size:17px}
+ #app .button-row{grid-template-columns:1fr}
+ #app .button-row .btn{font-size:13px}
+ #app .rule{margin:8px 0;padding:12px}
+}
+@media(max-width:340px){
+ #app .statgrid{grid-template-columns:1fr}
+}
+
 </style>
 
 </head>
