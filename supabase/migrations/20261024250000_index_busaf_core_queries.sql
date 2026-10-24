@@ -12,7 +12,5 @@ CREATE INDEX IF NOT EXISTS idx_busaf_retraits_profil_statut_compte
   ON public.busaf_retraits (profil_id, statut, compte);
 CREATE INDEX IF NOT EXISTS idx_busaf_depots_profil_statut
   ON public.busaf_depots (profil_id, statut);
-CREATE INDEX IF NOT EXISTS idx_busaf_transactions_portefeuille_profil_created
-  ON public.busaf_transactions_portefeuille (profil_id, created_at DESC);
 CREATE INDEX IF NOT EXISTS idx_busaf_transactions_portefeuille_portefeuille_id
   ON public.busaf_transactions_portefeuille (portefeuille_id);
