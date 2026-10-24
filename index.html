@@ -1309,7 +1309,7 @@ input,textarea,select{font-size:16px;min-height:44px}
  display:block!important;margin:0 9px 8px!important;color:#d92720!important;
  font-size:16px!important;line-height:1.3!important;font-weight:900!important;overflow-wrap:anywhere!important;
 }
-.product .product-kind,.product .product-seller{
+.product .product-kind,.product .product-seller,.public-product .product-seller{
  display:block!important;margin:0 9px 7px!important;font-size:10px!important;line-height:1.3!important;overflow-wrap:anywhere!important;
 }
 .product .product-kind{color:#66736a!important}
@@ -1320,11 +1320,11 @@ input,textarea,select{font-size:16px;min-height:44px}
  padding:8px 5px!important;border-radius:9px!important;font-size:11px!important;font-weight:800!important;
  line-height:1.2!important;white-space:normal!important;text-align:center!important;
 }
-.product .product-owner-actions{
+.product .product-owner-actions,.public-product .product-owner-actions{
  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;
  margin:7px 9px 0!important;
 }
-.product .product-owner-actions .btn{width:100%!important;min-width:0!important;margin:0!important;padding:7px 3px!important;font-size:10px!important}
+.product .product-owner-actions .btn,.public-product .product-owner-actions .btn{width:100%!important;min-width:0!important;margin:0!important;padding:7px 3px!important;font-size:10px!important}
 .founder-product-info{box-sizing:border-box!important;display:block!important;width:100%!important;padding:0!important;margin:0 0 9px!important}
 .founder-product-line{margin:0 9px 6px!important}
 .founder-product .fprice{margin:0 9px!important}
@@ -2499,18 +2499,17 @@ async function syncConfirmedMarketPurchases(){
 function memberMarket(){
  const all=marketCatalogProducts();
  const cards=all.map(p=>{
-   const name=p.nom||'Produit';
-   const desc=p.description||'Produit numérique/business du Marché BuSAF.';
-   const price=Number(p.prix||0);
+   /* Réutilise exactement la carte de l'accueil public pour garder le même affichage */
+   let card=publicProductView(p);
    const safeId=String(p.id||'');
-   const image=p.image_url
-     ? '<img src="'+esc(p.image_url)+'" alt="'+esc(name)+'" loading="lazy" onclick="openPhotoLightbox(this.src,this.alt)">'
-     : '<div class="emoji">'+marketProductEmoji(p)+'</div>';
+   const seller=String(p.createur_id||'')===String(state.profile?.id||'')?'Mon produit':'Vendeur BuSAF';
    const ownerActions=marketCanManageProduct(p)
      ? '<div class="product-owner-actions"><button class="btn alt" data-id="'+esc(safeId)+'" onclick="openMarketProductForm(this.dataset.id)">✏️ MODIFIER</button><button class="btn red" data-id="'+esc(safeId)+'" onclick="deleteMarketProduct(this.dataset.id)">🗑️ SUPPRIMER</button></div>'
      : '';
-   const seller=String(p.createur_id||'')===String(state.profile?.id||'')?'Mon produit':'Vendeur BuSAF';
-   return '<div class="product">'+image+'<h3>'+esc(name)+'</h3><p class="small">'+esc(desc)+'</p><div class="price">'+money(price)+'</div><div class="product-kind">📱 Produit numérique BuSAF</div><div class="product-seller">🏷️ '+seller+'</div><button class="btn" data-id="'+esc(safeId)+'" onclick="viewMarketProduct(this.dataset.id)">📦 VOIR / ACHETER</button>'+ownerActions+'</div>';
+   const extra='<div class="product-seller">🏷️ '+seller+'</div>'+ownerActions;
+   const close=card.lastIndexOf('</div>');
+   if(close>=0) card=card.slice(0,close)+extra+card.slice(close);
+   return card;
  }).join('');
  const publishButton=marketCanPublish()?'<button class="btn" onclick="openMarketProductForm()">➕ PUBLIER MON PRODUIT NUMÉRIQUE</button>':'';
  const empty=state.marketCatalogLoaded?'<div class="empty">Aucun produit numérique/business n’est encore publié dans le Marché BuSAF.</div>':'<div class="empty">Chargement des produits du Marché BuSAF…</div>';
