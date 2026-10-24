@@ -1274,7 +1274,7 @@ input,textarea,select{font-size:16px;min-height:44px}
 
 
 <style id="busaf-marche-cartes-rangees">
-/* Catalogue BuSAF : cartes uniformes, lisibles et alignées sur mobile comme sur ordinateur */
+/* Présentation unifiée des produits BuSAF : image, titre, description, prix et actions */
 .productgrid,.public-products,.founder-product-grid{
  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
  gap:10px!important;align-items:stretch!important;width:100%;margin:12px 0!important;
@@ -1282,68 +1282,60 @@ input,textarea,select{font-size:16px;min-height:44px}
 .product,.public-product,.founder-product{
  box-sizing:border-box!important;display:flex!important;flex-direction:column!important;
  align-self:stretch!important;min-width:0!important;height:100%!important;margin:0!important;
- padding:0 0 10px!important;border:1px solid #e1e8e3!important;border-radius:12px!important;
- background:#fff!important;box-shadow:0 2px 8px rgba(20,60,35,.07)!important;overflow:hidden!important;
+ padding:0 0 10px!important;border:1px solid #dce8df!important;border-radius:13px!important;
+ background:#fff!important;box-shadow:0 3px 10px rgba(20,60,35,.08)!important;overflow:hidden!important;
 }
-.product img,.public-product img,.founder-product img,
-.product>img,.public-product>img,.founder-product>img{
- display:block!important;width:100%!important;height:auto!important;aspect-ratio:1/1!important;
+.product img,.public-product img,.founder-product img,.product>img,.public-product>img,.founder-product>img{
+ display:block!important;box-sizing:border-box!important;width:100%!important;height:auto!important;aspect-ratio:1/1!important;
  flex:0 0 auto!important;object-fit:contain!important;object-position:center!important;
- background:#f6f8f6!important;border:0!important;border-radius:0!important;
- margin:0 0 9px!important;cursor:zoom-in;
+ background:#f5f8f5!important;border:0!important;border-radius:0!important;margin:0 0 10px!important;cursor:zoom-in;
 }
 .product .emoji,.public-product .emoji,.public-product .pemoji,.founder-product>.emoji{
- display:flex!important;align-items:center!important;justify-content:center!important;
- box-sizing:border-box!important;width:100%!important;height:auto!important;min-height:0!important;
- aspect-ratio:1/1!important;margin:0 0 9px!important;border-radius:0!important;
- background:#f1f6f2!important;font-size:36px!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;box-sizing:border-box!important;
+ width:100%!important;min-height:0!important;aspect-ratio:1/1!important;margin:0 0 10px!important;
+ border-radius:0!important;background:#edf6ef!important;font-size:36px!important;
 }
 .product h3,.public-product h3,.founder-product-line{
  display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;
- overflow:hidden!important;min-height:2.55em!important;margin:0 9px 6px!important;
- color:#26382d!important;font-size:13px!important;font-weight:700!important;line-height:1.3!important;
- overflow-wrap:anywhere!important;
+ overflow:hidden!important;min-height:2.6em!important;margin:0 9px 7px!important;
+ color:#173d27!important;font-size:13px!important;font-weight:800!important;line-height:1.3!important;overflow-wrap:anywhere!important;
 }
 .product p.small,.public-product .small{
  display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;
- overflow:hidden!important;min-height:2.8em!important;margin:0 9px 7px!important;
- color:#66736a!important;font-size:11px!important;line-height:1.35!important;overflow-wrap:anywhere!important;
+ overflow:hidden!important;min-height:2.8em!important;margin:0 9px 8px!important;
+ color:#66736a!important;font-size:11px!important;line-height:1.4!important;overflow-wrap:anywhere!important;
 }
 .product .price,.public-product .pprice,.founder-product .fprice{
- display:block!important;margin:0 9px 8px!important;color:#d92d20!important;
- font-size:16px!important;line-height:1.25!important;font-weight:800!important;overflow-wrap:anywhere!important;
+ display:block!important;margin:0 9px 8px!important;color:#d92720!important;
+ font-size:16px!important;line-height:1.3!important;font-weight:900!important;overflow-wrap:anywhere!important;
 }
-.product .small:not(p),.public-product .benefit,.public-product .small:not(.benefit){
- margin:0 9px 8px!important;color:#66736a!important;font-size:10px!important;line-height:1.3!important;
- overflow-wrap:anywhere!important;
+.product .product-kind,.product .product-seller{
+ display:block!important;margin:0 9px 7px!important;font-size:10px!important;line-height:1.3!important;overflow-wrap:anywhere!important;
 }
+.product .product-kind{color:#66736a!important}
+.product .product-seller{color:#087a38!important;font-weight:800!important}
 .product .btn,.public-product .btn{
  box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important;
- width:calc(100% - 18px)!important;min-height:36px!important;margin:auto 9px 0!important;
- padding:8px 5px!important;border-radius:8px!important;font-size:11px!important;
+ width:calc(100% - 18px)!important;min-height:37px!important;margin:auto 9px 0!important;
+ padding:8px 5px!important;border-radius:9px!important;font-size:11px!important;font-weight:800!important;
  line-height:1.2!important;white-space:normal!important;text-align:center!important;
 }
-.product .btn.red{margin:7px 9px 0!important;width:calc(100% - 18px)!important}
+.product .product-owner-actions{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;
+ margin:7px 9px 0!important;
+}
+.product .product-owner-actions .btn{width:100%!important;min-width:0!important;margin:0!important;padding:7px 3px!important;font-size:10px!important}
 .founder-product-info{box-sizing:border-box!important;display:block!important;width:100%!important;padding:0!important;margin:0 0 9px!important}
 .founder-product-line{margin:0 9px 6px!important}
-.founder-product .fprice{margin:0 9px 0!important}
-.founder-actions{
- display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;
- width:100%!important;margin-top:auto!important;padding:0 8px!important;box-sizing:border-box!important;
-}
-.founder-actions button,.founder-product .founder-actions .btn{
- box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:36px!important;
- margin:0!important;padding:7px 3px!important;border-radius:8px!important;
- font-size:10px!important;line-height:1.2!important;white-space:normal!important;
-}
+.founder-product .fprice{margin:0 9px!important}
+.founder-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:6px!important;width:100%!important;margin-top:auto!important;padding:0 8px!important;box-sizing:border-box!important}
+.founder-actions button,.founder-product .founder-actions .btn{box-sizing:border-box!important;width:100%!important;min-width:0!important;min-height:36px!important;margin:0!important;padding:7px 3px!important;border-radius:8px!important;font-size:10px!important;line-height:1.2!important;white-space:normal!important}
 @media(min-width:520px){
  .productgrid,.public-products,.founder-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important}
  .product h3,.public-product h3,.founder-product-line{font-size:14px!important}
  .product .price,.public-product .pprice,.founder-product .fprice{font-size:17px!important}
 }
-@media(min-width:900px){
- .productgrid,.public-products,.founder-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important}
-}
+@media(min-width:900px){.productgrid,.public-products,.founder-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important}}
 @media(max-width:360px){
  .productgrid,.public-products,.founder-product-grid{gap:6px!important}
  .product h3,.public-product h3,.founder-product-line{font-size:12px!important}
@@ -2510,19 +2502,20 @@ function memberMarket(){
    const name=p.nom||'Produit';
    const desc=p.description||'Produit numérique/business du Marché BuSAF.';
    const price=Number(p.prix||0);
-   const image=p.image_url?'<img src="'+esc(p.image_url)+'" alt="" onclick="openPhotoLightbox(this.src,this.alt||\'Photo produit\')" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;cursor:zoom-in">':'<div class="emoji">'+marketProductEmoji(p)+'</div>';
-   const safeId=String(p.id).replace(/'/g,"\\'");
+   const image=p.image_url
+     ? '<img src="'+esc(p.image_url)+'" alt="'+esc(name)+'" loading="lazy" onclick="openPhotoLightbox(this.src,this.alt||\\'Photo produit\\')">'
+     : '<div class="emoji">'+marketProductEmoji(p)+'</div>';
+   const safeId=String(p.id).replace(/'/g,"\\\\'");
    const ownerActions=marketCanManageProduct(p)
-     ? '<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:6px"><button class="btn alt" style="width:100%;padding:7px 3px;font-size:10px" onclick="openMarketProductForm(\''+safeId+'\')">✏️ MODIFIER</button><button class="btn red" style="width:100%;padding:7px 3px;font-size:10px" onclick="deleteMarketProduct(\''+safeId+'\')">🗑️ SUPPRIMER</button></div>'
+     ? '<div class="product-owner-actions"><button class="btn alt" onclick="openMarketProductForm(\\''+safeId+'\\')">✏️ MODIFIER</button><button class="btn red" onclick="deleteMarketProduct(\\''+safeId+'\\')">🗑️ SUPPRIMER</button></div>'
      : '';
    const seller=String(p.createur_id||'')===String(state.profile?.id||'')?'Mon produit':'Vendeur BuSAF';
-   return '<div class="product">'+image+'<h3>'+esc(name)+'</h3><p class="small">'+esc(desc)+'</p><div class="price">'+money(price)+'</div><div class="small">📱 Produit numérique/business BuSAF</div><div class="small" style="color:#087a42;font-weight:700">🏷️ '+seller+'</div><button class="btn" style="width:100%;padding:7px 4px;font-size:10px;margin-top:5px" onclick="viewMarketProduct(\''+safeId+'\')">📦 VOIR / ACHETER</button>'+ownerActions+'</div>';
+   return '<div class="product">'+image+'<h3>'+esc(name)+'</h3><p class="small">'+esc(desc)+'</p><div class="price">'+money(price)+'</div><div class="product-kind">📱 Produit numérique BuSAF</div><div class="product-seller">🏷️ '+seller+'</div><button class="btn" onclick="viewMarketProduct(\\''+safeId+'\\')">📦 VOIR / ACHETER</button>'+ownerActions+'</div>';
  }).join('');
  const publishButton=marketCanPublish()?'<button class="btn" onclick="openMarketProductForm()">➕ PUBLIER MON PRODUIT NUMÉRIQUE</button>':'';
  const empty=state.marketCatalogLoaded?'<div class="empty">Aucun produit numérique/business n’est encore publié dans le Marché BuSAF.</div>':'<div class="empty">Chargement des produits du Marché BuSAF…</div>';
  return page("🛒 Marché BuSAF",'<div class="notice success"><strong>LE MARCHÉ NUMÉRIQUE BuSAF</strong><br>Découvre les produits, consulte les prix et achète. Les membres connectés peuvent aussi publier leurs propres produits numériques/business. Les produits physiques restent exclus.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button></div>'+publishButton+'<div class="productgrid">'+(cards||empty)+'</div>');
 }
-
 function viewMarketProduct(id){
  if(isFounder()){setScreen('founderMarket');return;}
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(id));
