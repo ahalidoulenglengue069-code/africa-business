@@ -22,7 +22,7 @@ function cleanText(value: unknown, max = 180): string {
 }
 
 function isConfirmed(status: unknown): boolean {
-  return ["confirmee", "confirme", "validee", "valide", "success", "paid"].includes(
+  return ["confirmee", "confirmée", "confirme", "confirmé", "validee", "validée", "valide", "terminee", "terminée", "completed", "complete", "success", "paid"].includes(
     cleanText(status, 40).toLowerCase(),
   );
 }
@@ -35,14 +35,15 @@ Deno.serve(async (req: Request) => {
     const supabaseUrl = Deno.env.get("SUPABASE_URL");
     const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
     const yengaKey = Deno.env.get("YENGAPAY_API_KEY");
-    const yengaGroupId = Deno.env.get("YENGAPAY_GROUP_ID");
+    const yengaGroupId = Deno.env.get("YENGAPAY_ORGANIZATION_ID") || Deno.env.get("YENGAPAY_GROUP_ID");
     const yengaProjectId = Deno.env.get("YENGAPAY_PROJECT_ID");
+    const yengaBaseUrl = (Deno.env.get("YENGAPAY_BASE_URL") || "https://api.sandbox.yengapay.com/api/v1").trim().replace(/\/+$/, "");
 
     if (!supabaseUrl || !serviceKey) {
       console.error("Configuration Supabase manquante.");
       return reply(500, { error: "Configuration serveur BuSAF incomplète." });
     }
-    if (!yengaKey || !yengaGroupId || !yengaProjectId) {
+    if (!yengaKey || !yengaGroupId || !yengaProjectId || !yengaBaseUrl) {
       console.error("Secrets YengaPay manquants.");
       return reply(503, { error: "Le paiement est temporairement indisponible. Configuration YengaPay à vérifier." });
     }
@@ -83,6 +84,7 @@ Deno.serve(async (req: Request) => {
       .from("produits")
       .select("id, nom, prix, type_produit, createur_id")
       .eq("id", productId)
+      .eq("type_produit", "digital")
       .maybeSingle();
 
     if (productError) {
@@ -100,7 +102,8 @@ Deno.serve(async (req: Request) => {
       .from("ventes")
       .select("id, statut")
       .eq("acheteur_id", profile.id)
-      .limit(100);
+      .in("statut", ["confirmee", "confirmée", "confirme", "confirmé", "validee", "validée", "valide", "terminee", "terminée", "completed", "complete", "success", "paid"])
+      .limit(1);
 
     if (ownSalesError) {
       console.error("Lecture ventes acheteur impossible:", ownSalesError.message);
@@ -117,7 +120,8 @@ Deno.serve(async (req: Request) => {
         .select("id, produit_id, statut")
         .eq("acheteur_id", profile.parrain_id)
         .eq("produit_id", productId)
-        .limit(100);
+        .in("statut", ["confirmee", "confirmée", "confirme", "confirmé", "validee", "validée", "valide", "terminee", "terminée", "completed", "complete", "success", "paid"])
+        .limit(1);
 
       if (sponsorError) {
         console.error("Vérification achat parrain impossible:", sponsorError.message);
@@ -207,7 +211,7 @@ Deno.serve(async (req: Request) => {
     let providerData: Record<string, unknown> = {};
     try {
       providerResponse = await fetch(
-        `https://api.sandbox.yengapay.com/api/v1/groups/${encodeURIComponent(yengaGroupId)}/payment-intent/${encodeURIComponent(yengaProjectId)}`,
+        `${yengaBaseUrl}/groups/${encodeURIComponent(yengaGroupId)}/payment-intent/${encodeURIComponent(yengaProjectId)}`,
         {
           method: "POST",
           headers: {
