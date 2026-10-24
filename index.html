@@ -2383,6 +2383,7 @@ function memberHome(){
  const name=state.profile?.nom_complet||state.email||"Membre";
  const monthly=confirmedMonthlySalesCount()??0;
  const total=confirmedTotalSalesCount()??0;
+ if(busafMemberOrders===null&&!busafMemberOrdersLoaded)loadBusafMemberOrders();
  const p10=Math.min(monthly,10);
  const p100=Math.min(total,100);
  const desc={
@@ -2405,7 +2406,7 @@ function memberHome(){
    <div class="dashboard-stats">
      <button class="dash-stat" onclick="setScreen('money')"><span>👛</span><small>Portefeuille BuSAF</small><strong>Voir le solde réel</strong></button>
 
-     <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes</small><strong>${state.orders.length}</strong></button>
+     <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes réelles</small><strong>${busafMemberOrders===null?"…":busafMemberOrders.length}</strong></button>
      <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités</small><strong>${state.invites.length}</strong></button>
    </div>
    <div class="work-panel progress-panel">
@@ -2896,7 +2897,30 @@ function memberInvites(){
  <ul class="list">${state.invites.length?state.invites.map(i=>`<li><strong>${esc(i.name)}</strong><br>${esc(i.email)}<br><span class="small">${i.date}</span></li>`).join(""):"<li>Aucune invitation enregistrée.</li>"}</ul>`);
 }
 
-function memberOrders(){return page("📦 Mes Commandes",`${state.orders.length?`<ul class="list">${state.orders.map(o=>`<li><strong>${esc(o.product)}</strong><br>${money(o.price)}<br>Mode : ${esc(o.mode)}${o.customer?`<br>Client : ${esc(o.customer)}`:""}<br><span class="small">${o.date}</span></li>`).join("")}</ul>`:`<div class="empty">Aucune commande.</div>`}<button class="btn" onclick="setScreen('market')">CONTINUER MES ACHATS</button><button class="btn alt" onclick="setScreen('stockMarket')">VOIR MON STOCK</button>`);}
+
+let busafMemberOrders=null;
+let busafMemberOrdersLoaded=false;
+let busafMemberOrdersLoading=false;
+let busafMemberOrdersError="";
+async function loadBusafMemberOrders(){
+ if(busafMemberOrdersLoaded||busafMemberOrdersLoading||!state.profile?.id||!state.token)return;
+ busafMemberOrdersLoading=true;busafMemberOrdersError="";
+ try{
+  const rows=await api("/rest/v1/ventes?acheteur_id=eq."+encodeURIComponent(state.profile.id)+"&select=id,produit_id,montant,statut,reference,created_at,moyen_paiement,produits(nom,type_produit)&order=created_at.desc&limit=100");
+  busafMemberOrders=Array.isArray(rows)?rows:[];
+ }catch(e){busafMemberOrdersError=e.message||"Impossible de charger les commandes.";}
+ finally{busafMemberOrdersLoading=false;busafMemberOrdersLoaded=true;if(state.userId&&(state.screen==="orders"||state.screen==="member"))render();}
+}
+function memberOrders(){
+ if(!state.profile?.id||!state.token)return page("📦 Mes Commandes",'<div class="notice warning">Connecte-toi pour consulter tes commandes.</div>');
+ if(busafMemberOrders===null&&!busafMemberOrdersLoaded)loadBusafMemberOrders();
+ if(busafMemberOrdersLoading||busafMemberOrders===null&&!busafMemberOrdersError)return page("📦 Mes Commandes",'<div class="notice">Chargement des commandes enregistrées dans Supabase…</div>');
+ if(busafMemberOrdersError)return page("📦 Mes Commandes",'<div class="notice error">Impossible de charger les commandes réelles : '+esc(busafMemberOrdersError)+'</div><button class="btn alt" onclick="busafMemberOrdersLoaded=false;busafMemberOrdersError=\'\';loadBusafMemberOrders()">🔄 RÉESSAYER</button>');
+ const rows=busafMemberOrders||[];
+ const statusLabel=v=>({confirmee:"Confirmée",confirmée:"Confirmée",confirme:"Confirmée",confirmé:"Confirmée",en_attente:"En attente",pending:"En attente",expiree:"Expirée",echec:"Échec",failed:"Échec"})[String(v||"").toLowerCase()]||String(v||"État inconnu");
+ const list=rows.map(r=>'<li><strong>'+esc(r.produits?.nom||"Produit du Marché")+'</strong><br>Montant : '+money(r.montant||0)+'<br>État : <strong>'+esc(statusLabel(r.statut))+'</strong><br>Référence : '+esc(r.reference||"—")+'<br>Moyen : '+esc(r.moyen_paiement||"—")+'<br><span class="small">'+esc(r.created_at?new Date(r.created_at).toLocaleString("fr-FR"):"")+'</span></li>').join("");
+ return page("📦 Mes Commandes",'<div class="notice">Historique lu dans Supabase : les commandes locales du téléphone ne sont pas considérées comme des achats confirmés.</div>'+(list?'<ul class="list">'+list+'</ul>':'<div class="empty">Aucune commande enregistrée dans Supabase.</div>')+'<button class="btn alt" onclick="busafMemberOrders=null;busafMemberOrdersLoaded=false;busafMemberOrdersError=\'\';loadBusafMemberOrders()">🔄 ACTUALISER LES COMMANDES</button><button class="btn" onclick="setScreen(&quot;market&quot;)">CONTINUER MES ACHATS</button><button class="btn alt" onclick="setScreen(&quot;stockMarket&quot;)">VOIR MON STOCK</button>');
+}
 
 
 function profilePhotoHtml(){
