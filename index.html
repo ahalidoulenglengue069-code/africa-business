@@ -2016,8 +2016,9 @@ function buyProduct(id,mode){
  openModal('💳 Achat sécurisé BuSAF',`<div class="notice warning">Aucun achat ne peut être validé directement depuis cette page. Pour éviter un achat non payé, passe par le paiement sécurisé YengaPay depuis le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('market')">ALLER AU MARCHÉ</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
 }
 
-function canInvite(){return Array.isArray(state.orders)&&state.orders.some(o=>["yengapay_purchase","stock","direct"].includes(String(o.mode||"")));}
-function invitationCode(){return state.userId?`BUSAF-${state.userId.replace(/-/g,"").slice(0,8).toUpperCase()}`:"BUSAF-MEMBRE";}
+function canInvite(){if(busafMemberOrders===null&&!busafMemberOrdersLoaded)loadBusafMemberOrders();return Array.isArray(busafMemberOrders)&&busafMemberOrders.some(o=>["confirmee","confirmée","confirme","confirmé","validee","validée","completed","success","paid"].includes(String(o.statut||"").toLowerCase()));}
+function invitationCode(){return String(state.profile?.code_parrain||"").trim()||(state.userId?`BUSAF-${state.userId.replace(/-/g,"").slice(0,8).toUpperCase()}`:"");}
+function invitationCodeFromUrl(){const hash=location.hash.replace(/^#/,"");const query=hash.includes("?")?hash.slice(hash.indexOf("?")+1):"";return new URLSearchParams(location.search).get("invite")||new URLSearchParams(query).get("invite")||"";}
 function invitationLink(){return `${location.origin}${location.pathname}#signup?invite=${encodeURIComponent(invitationCode())}`;}
 function invitationText(){return `🌍 Rejoins BuSAF / Business Africain.\nDécouvre le Marché BuSAF et crée ton compte avec mon invitation.\n👉 ${invitationLink()}\n🔑 Code : ${invitationCode()}`;}
 async function copyInvitation(kind){
@@ -2387,6 +2388,7 @@ function memberHome(){
  const monthly=confirmedMonthlySalesCount()??0;
  const total=confirmedTotalSalesCount()??0;
  if(busafMemberOrders===null&&!busafMemberOrdersLoaded)loadBusafMemberOrders();
+ if(busafMemberInvites===null&&!busafMemberInvitesLoaded)loadBusafMemberInvites();
  const p10=Math.min(monthly,10);
  const p100=Math.min(total,100);
  const desc={
@@ -2410,7 +2412,7 @@ function memberHome(){
      <button class="dash-stat" onclick="setScreen('money')"><span>👛</span><small>Portefeuille BuSAF</small><strong>Voir le solde réel</strong></button>
 
      <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes réelles</small><strong>${busafMemberOrders===null?"…":busafMemberOrders.length}</strong></button>
-     <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités</small><strong>${state.invites.length}</strong></button>
+     <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités enregistrés</small><strong>${busafMemberInvites===null?"…":busafMemberInvites.length}</strong></button>
    </div>
    <div class="work-panel progress-panel">
      <div class="work-head"><h2>🚀 Ma progression</h2><span>${busafProgressError? "Vérification indisponible":monthly+" vente(s) confirmée(s) ce mois"}</span></div>
@@ -2454,7 +2456,7 @@ function signupPage(){
   <label>Ville</label>
   <input id="regVille" required placeholder="Votre ville">
   <label>Code d'invitation</label>
-  <input id="regCode" required placeholder="Code reçu de votre invitant">
+  <input id="regCode" required placeholder="Code reçu de votre invitant" value="${esc(invitationCodeFromUrl())}">
   <label>Mot de passe</label>
   <div class="password-field"><input id="regPassword" type="password" minlength="6" required placeholder="6 caractères minimum"><button type="button" class="password-toggle" onclick="togglePasswordVisibility('regPassword',this)" aria-label="Afficher le mot de passe" aria-pressed="false">👁️</button></div>
   <button class="btn" id="regBtn">CRÉER MON COMPTE</button>
@@ -2890,21 +2892,35 @@ async function saveBoutiqueProduct(){
 function openBoutiqueSale(i){const p=state.boutiqueProducts[i];if(!p)return;openModal("🏪 Vente Boutique",`<div class="rule"><strong>${esc(p.name)}</strong><br>Prix : ${money(p.price)}<br>Prélèvement de publication : 5 % selon les règles BuSAF, à confirmer côté serveur.</div><label>Nom du client</label><input id="shopCustomer"><label>Mode de paiement</label><select id="shopPayment"><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option><option>Autre</option></select><button class="btn" onclick="confirmBoutiqueSale(${i})">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 function confirmBoutiqueSale(i){const p=state.boutiqueProducts[i],customer=document.getElementById("shopCustomer")?.value.trim();if(!p||!customer){alert("Nom du client obligatoire.");return;}const sellerAmount=p.price;state.boutiqueBalance+=sellerAmount;state.orders.unshift({id:Date.now(),product:p.name,price:p.price,date:new Date().toLocaleString("fr-FR"),mode:"boutique",customer});addNotification("🏪 Vente boutique",`Vente de ${p.name} enregistrée. Part vendeur : ${money(sellerAmount)}.`,"boutique");saveState();closeModal();openModal("Vente enregistrée",`<div class="notice success">Vente boutique confirmée. Part vendeur : <strong>${money(sellerAmount)}</strong>.</div><div class="notice warning">En production, paiement et prélèvement 5 % doivent être sécurisés côté serveur.</div><button class="btn" onclick="closeModal();setScreen('orders')">VOIR LES COMMANDES</button>`);}
 
-function memberInvites(){
- const allowed=canInvite();
- return page("👥 Mes Invités",`
- <div class="statgrid"><div class="stat">Invités<strong>${state.invites.length}</strong></div><div class="stat">Limite<strong>Illimitée</strong></div></div>
- <div class="notice ${allowed?"success":"warning"}">${allowed?"Tu peux maintenant partager ton invitation.":"Tu dois d'abord acheter au moins un produit du Marché BuSAF avant de pouvoir inviter."}</div>
- <button class="btn" onclick="invite()">👥 PARTAGER MON INVITATION</button>
- <div class="rule"><h3>Comment inviter ?</h3><ol><li>Appuie sur <strong>PARTAGER MON INVITATION</strong>.</li><li>Copie ton lien ou ton code.</li><li>Envoie-le à la personne par WhatsApp, SMS ou autre moyen.</li><li>La personne ouvre le lien et crée son compte.</li><li>BuSAF rattache automatiquement son inscription à ton invitation.</li></ol></div>
- <ul class="list">${state.invites.length?state.invites.map(i=>`<li><strong>${esc(i.name)}</strong><br>${esc(i.email)}<br><span class="small">${i.date}</span></li>`).join(""):"<li>Aucune invitation enregistrée.</li>"}</ul>`);
+let busafMemberInvites=null;
+let busafMemberInvitesLoaded=false;
+let busafMemberInvitesLoading=false;
+let busafMemberInvitesError="";
+async function loadBusafMemberInvites(){
+ if(busafMemberInvitesLoaded||busafMemberInvitesLoading||!state.profile?.id||!state.token)return;
+ busafMemberInvitesLoading=true;busafMemberInvitesError="";
+ try{
+  const rows=await api("/rest/v1/rpc/busaf_mes_invites",{method:"POST",body:JSON.stringify({})});
+  busafMemberInvites=Array.isArray(rows)?rows:[];
+ }catch(e){busafMemberInvitesError=e.message||"Impossible de charger les invités.";}
+ finally{busafMemberInvitesLoading=false;busafMemberInvitesLoaded=true;if(state.userId&&(state.screen==="invites"||state.screen==="member"))render();}
 }
-
+function memberInvites(){
+ if(!state.profile?.id||!state.token)return page("👥 Mes Invités",'<div class="notice warning">Connecte-toi pour consulter tes invités.</div>');
+ if(busafMemberInvites===null&&!busafMemberInvitesLoaded)loadBusafMemberInvites();
+ const allowed=canInvite();
+ if(busafMemberInvitesLoading||busafMemberInvites===null&&!busafMemberInvitesError)return page("👥 Mes Invités",'<div class="notice">Chargement des invitations enregistrées dans Supabase…</div>');
+ if(busafMemberInvitesError)return page("👥 Mes Invités",'<div class="notice error">Impossible de charger tes invités réels : '+esc(busafMemberInvitesError)+'</div><button class="btn alt" onclick="busafMemberInvitesLoaded=false;busafMemberInvitesError=\'\';loadBusafMemberInvites()">🔄 RÉESSAYER</button>');
+ const rows=busafMemberInvites||[];
+ const list=rows.map(i=>'<li><strong>'+esc(i.nom_complet||"Membre BuSAF")+'</strong><br>Statut : '+esc(i.role||"membre")+'<br><span class="small">'+esc(i.created_at?new Date(i.created_at).toLocaleDateString("fr-FR"):"Date non disponible")+'</span></li>').join("");
+ return page("👥 Mes Invités",'<div class="statgrid"><div class="stat">Invités enregistrés<strong>'+rows.length+'</strong></div><div class="stat">Limite<strong>Illimitée</strong></div></div><div class="notice '+(allowed?"success":"warning")+'">'+(allowed?"Tu peux partager ton invitation : un achat numérique confirmé est enregistré sur ton compte.":"Pour activer le partage des invitations, un achat numérique doit d’abord être confirmé dans ton compte.")+'</div><button class="btn" onclick="invite()">👥 PARTAGER MON INVITATION</button><div class="rule"><h3>Comment inviter ?</h3><ol><li>Appuie sur PARTAGER MON INVITATION.</li><li>Copie ton lien ou ton code personnel.</li><li>Envoie-le par WhatsApp, SMS ou autre moyen.</li><li>La personne ouvre le lien et crée son compte.</li><li>BuSAF rattache l’inscription au bon parrain.</li></ol></div><ul class="list">'+(list||'<li>Aucun invité enregistré pour le moment.</li>')+'</ul><button class="btn alt" onclick="busafMemberInvites=null;busafMemberInvitesLoaded=false;busafMemberInvitesError=\'\';loadBusafMemberInvites()">🔄 ACTUALISER LES INVITÉS</button>');
+}
 
 function resetUserServerCaches(){
  busafConfirmedProgress=null;busafProgressLoaded=false;busafProgressLoading=false;busafProgressError="";
  busafConfirmedStock=null;busafStockLoading=false;busafStockError="";
  busafMemberOrders=null;busafMemberOrdersLoaded=false;busafMemberOrdersLoading=false;busafMemberOrdersError="";
+ busafMemberInvites=null;busafMemberInvitesLoaded=false;busafMemberInvitesLoading=false;busafMemberInvitesError="";
  busafCommissionRows=null;busafCommissionLoading=false;busafCommissionError="";
 }
 let busafMemberOrders=null;
