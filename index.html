@@ -3486,6 +3486,21 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 #app .productgrid .public-product .product-owner-actions .btn{width:100%!important;min-width:0!important;min-height:25px!important;font-size:8px!important;padding:4px 2px!important;margin:0!important}
 @media(max-width:380px){#app .productgrid{gap:6px!important}#app .productgrid .public-product{padding:4px!important}#app .productgrid .public-product>img{width:calc(100% + 8px)!important;margin:-4px -4px 4px!important}#app .productgrid .public-product .pemoji{width:calc(100% + 8px)!important;margin:-4px -4px 4px!important}}
 </style>
+
+<style id="busaf-fondateur-produits-compacts">
+/* Espace Fondateur : mêmes cartes compactes que l'accueil et l'espace membre */
+#app .founder-product-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important;width:100%!important}
+#app .founder-product-grid>.founder-product{display:flex!important;flex-direction:column!important;min-width:0!important;min-height:0!important;box-sizing:border-box!important;padding:5px!important;border:1px solid #dfe8e1!important;border-radius:10px!important;background:#fff!important;box-shadow:0 2px 6px rgba(22,70,40,.07)!important;overflow:hidden!important}
+#app .founder-product-grid>.founder-product>img,#app .founder-product-grid>.founder-product>.emoji{display:flex!important;flex:0 0 auto!important;width:calc(100% + 10px)!important;max-width:none!important;height:auto!important;aspect-ratio:4/3!important;object-fit:cover!important;object-position:center!important;box-sizing:border-box!important;margin:-5px -5px 5px!important;border:0!important;border-radius:0!important;background:#f3f7f4!important}
+#app .founder-product-grid>.founder-product>.emoji{align-items:center!important;justify-content:center!important;font-size:26px!important}
+#app .founder-product-grid .founder-product-info{display:block!important;width:100%!important;min-width:0!important;padding:0 0 2px!important;margin:0!important;box-sizing:border-box!important}
+#app .founder-product-grid .founder-product-line{font-size:10px!important;line-height:1.2!important;overflow-wrap:anywhere!important;color:#173b30!important}
+#app .founder-product-grid .fprice{font-size:12px!important;line-height:1.15!important;font-weight:900!important;color:#087b50!important;margin:3px 0 0!important}
+#app .founder-product-grid .founder-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:4px!important;width:100%!important;margin:auto 0 0!important;padding-top:5px!important}
+#app .founder-product-grid .founder-actions .btn{display:block!important;width:100%!important;min-width:0!important;min-height:25px!important;box-sizing:border-box!important;padding:4px 2px!important;margin:0!important;border-radius:6px!important;font-size:8px!important;line-height:1.1!important;white-space:normal!important}
+@media(max-width:380px){#app .founder-product-grid{gap:6px!important}#app .founder-product-grid>.founder-product{padding:4px!important}#app .founder-product-grid>.founder-product>img,#app .founder-product-grid>.founder-product>.emoji{width:calc(100% + 8px)!important;margin:-4px -4px 4px!important}}
+</style>
+
 </body>
 </html>
 
