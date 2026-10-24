@@ -1860,20 +1860,11 @@ async function signup(e){
     return;
   }
 
-  const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
-
-  const rows=await api("/rest/v1/profils_busaf",{method:"POST",body:JSON.stringify({
-    user_id:state.userId,
-    nom_complet:nom,
-    telephone:tel,
-    Ville:ville,
-    role:"membre",
-    parrain_id:parrain.id,
-    code_parrain:nouveauCode,
-    photo_url:null
-  }),headers:{"Prefer":"return=representation"}});
-
-  state.profile=Array.isArray(rows)?rows[0]:rows;
+  // Le trigger Supabase crée déjà le profil à partir de code_parrain.
+  // On le relit d’abord; on ne tente une création de secours que si le trigger n’a rien créé.
+  await loadProfile();
+  if(!state.profile)await ensureMemberProfile(d.user);
+  if(!state.profile)throw new Error("Le compte est créé, mais le profil BuSAF n’a pas pu être chargé. Reconnecte-toi pour terminer la configuration.");
   setScreen("member");
  }catch(err){
   msg.className="notice error";msg.textContent="❌ "+err.message;
