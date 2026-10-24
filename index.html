@@ -1247,6 +1247,29 @@ input,textarea,select{font-size:16px;min-height:44px}
 #app .founder-dashboard .founder-stat{background:rgba(243,223,173,.14)!important;border-color:rgba(243,223,173,.4)!important}
 #app .founder-dashboard .founder-stat b{color:#f3dfad!important}
 @media(max-width:480px){#app .founder-dashboard{padding:8px!important}#app .founder-dashboard .founder-grid{gap:7px!important}#app .founder-dashboard .founder-app{padding:11px 5px!important}}
+
+/* Actions sensibles : leurs libellés doivent être rouges */
+#app button.btn.red,
+#app .founder-dashboard .founder-app[data-danger="true"],
+#app button[onclick*="performLogout"],
+#app button[onclick*="verifyLogoutCredentials"],
+#app button[onclick*="delete"],
+#app button[onclick*="remove"],
+#app button[onclick*="supprimer"],
+#app button[onclick*="logout"]{
+ color:#b91c1c!important;
+ -webkit-text-fill-color:#b91c1c!important;
+}
+#app button.btn.red{
+ background:#fff0f0!important;
+ border:1px solid #dc2626!important;
+ box-shadow:none!important;
+}
+#app button[onclick*="delete"] .ficon,
+#app button[onclick*="remove"] .ficon,
+#app button[onclick*="supprimer"] .ficon,
+#app button[onclick*="logout"] .ficon{color:#b91c1c!important}
+
 </style>
 
 </head>
