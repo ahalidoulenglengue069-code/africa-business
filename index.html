@@ -2411,8 +2411,8 @@ function memberHome(){
    <div class="dashboard-stats">
      <button class="dash-stat" onclick="setScreen('money')"><span>👛</span><small>Portefeuille BuSAF</small><strong>Voir le solde réel</strong></button>
 
-     <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes réelles</small><strong>${busafMemberOrders===null?"…":busafMemberOrders.length}</strong></button>
-     <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités enregistrés</small><strong>${busafMemberInvites===null?"…":busafMemberInvites.length}</strong></button>
+     <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes réelles</small><strong>${busafMemberOrders===null?(busafMemberOrdersError?"—":"…"):busafMemberOrders.length}</strong></button>
+     <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités enregistrés</small><strong>${busafMemberInvites===null?(busafMemberInvitesError?"—":"…"):busafMemberInvites.length}</strong></button>
    </div>
    <div class="work-panel progress-panel">
      <div class="work-head"><h2>🚀 Ma progression</h2><span>${busafProgressError? "Vérification indisponible":monthly+" vente(s) confirmée(s) ce mois"}</span></div>
