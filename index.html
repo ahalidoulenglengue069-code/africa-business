@@ -1152,6 +1152,34 @@ input,textarea,select{font-size:16px;min-height:44px}
 #app .public-product .benefit{display:block!important;margin:0 0 3px!important;padding:2px 3px!important;border-radius:4px!important;font-size:7px!important;line-height:1.05!important}
 #app .public-product .btn{display:block!important;width:100%!important;min-height:24px!important;box-sizing:border-box!important;padding:4px 3px!important;margin:auto 0 0!important;border-radius:6px!important;font-size:9px!important;line-height:1.1!important;white-space:normal!important}
 @media(max-width:380px){#app .public-products{gap:6px!important}#app .public-product{padding:4px!important}#app .public-product>img{width:calc(100% + 8px)!important;margin:-4px -4px 4px!important}#app .public-product .pemoji{width:calc(100% + 8px)!important;margin:-4px -4px 4px!important}#app .public-product h3{font-size:10px!important}#app .public-product .small{font-size:8px!important}#app .public-product .pprice{font-size:12px!important}#app .public-product .benefit{font-size:7px!important}}
+
+/* FIX CONTRASTE ACCUEIL PUBLIC : texte lisible sur fond vert */
+.public-hero{
+  background:linear-gradient(135deg,#075c2b 0%,#087a38 52%,#12a454 100%)!important;
+  color:#ffffff!important;
+  border:0!important;
+  box-shadow:0 10px 28px rgba(4,90,39,.18)!important;
+}
+.public-hero h1,
+.public-hero p,
+.public-hero p strong{
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  opacity:1!important;
+  visibility:visible!important;
+}
+.public-hero .public-action.primary{
+  background:#ffffff!important;
+  color:#087a38!important;
+  -webkit-text-fill-color:#087a38!important;
+}
+.public-hero .public-action.secondary{
+  background:rgba(255,255,255,.16)!important;
+  color:#ffffff!important;
+  -webkit-text-fill-color:#ffffff!important;
+  border:1px solid rgba(255,255,255,.65)!important;
+}
+
 </style>
 
 </head>
