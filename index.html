@@ -437,6 +437,53 @@ input:focus,textarea:focus,select:focus{border-color:#10a878;box-shadow:0 0 0 3p
   -webkit-text-fill-color:initial!important;
 }
 
+
+/* BuSAF visual refresh — présentation inspirée de la maquette, sans modifier les fonctions */
+:root{
+ --green:#087b50;--green2:#07966a;--light:#f1f8f5;--card:#ffffff;
+ --text:#173b30;--muted:#62786f;--line:#d8e9e1;--red:#d73535;
+ --shadow:0 3px 12px rgba(8,85,57,.08)
+}
+html,body{background:#f1f7f4;color:#173b30}
+.header{background:linear-gradient(135deg,#006b50,#079a70);padding:11px 13px 12px;box-shadow:0 3px 12px rgba(0,70,48,.17)}
+.logo{font-size:25px;letter-spacing:-.5px}
+.logo small{font-size:11px;letter-spacing:0}
+.wrap{max-width:1050px;padding:12px 10px 94px}
+.hero,.card,.info{border:1px solid #dcebe4;border-radius:15px;box-shadow:0 3px 12px rgba(12,77,53,.07);padding:13px;margin-bottom:11px;background:#fff}
+.hero h1,.card h1,.card h2{color:#087b50}
+.section-title{font-size:17px;color:#087b50;margin:15px 3px 9px;font-weight:900}
+.grid20{gap:8px}
+.tile{min-height:88px;border:1px solid #e0eee7;border-radius:13px;padding:10px 5px;background:#fff;box-shadow:0 2px 8px rgba(9,80,54,.06);font-size:12px;gap:1px}
+.tile .ico{font-size:25px;margin-bottom:6px}
+.quickbar,.bottom{background:rgba(255,255,255,.98);border-top:1px solid #d9e9e1;box-shadow:0 -3px 14px rgba(0,65,43,.09)}
+.quickbar button,.bottom button{font-size:10px;padding:7px 2px 8px}
+.quickbar span,.bottom span{font-size:19px}
+.btn{border-radius:9px;padding:10px 12px;margin-top:7px;font-size:12px}
+.btn.alt{background:#e6f5ed;color:#087b50}
+.back{border-radius:9px;background:#e5f4ec;color:#087b50}
+.notice{border-radius:11px;padding:10px;line-height:1.45}
+.rule{border-radius:12px}
+input,textarea,select{border-radius:9px!important;border-color:#d5e6dd!important}
+.product,.public-product,.founder-product{border:1px solid #dcebe4!important;border-radius:12px!important;box-shadow:0 2px 9px rgba(8,80,52,.06)!important;background:#fff!important}
+.product img,.public-product img{object-fit:contain!important;background:#f5f9f7}
+.product h3,.public-product h3{font-size:13px;line-height:1.35}
+@media(max-width:600px){
+ .header{padding:10px 11px}
+ .logo{font-size:23px}
+ .wrap{padding:10px 8px 88px}
+ .hero,.card,.info{padding:11px;border-radius:13px;margin-bottom:9px}
+ .grid20{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+ .tile{min-height:82px;border-radius:11px;font-size:11px;padding:8px 3px}
+ .tile .ico{font-size:23px}
+ .section-title{font-size:16px}
+ .quickbar button,.bottom button{font-size:9px}
+ .quickbar span,.bottom span{font-size:18px}
+}
+@media(max-width:360px){
+ .grid20{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .tile{min-height:76px}
+}
+
 </style>
   
 
