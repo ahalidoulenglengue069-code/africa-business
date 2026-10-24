@@ -1272,6 +1272,74 @@ input,textarea,select{font-size:16px;min-height:44px}
 
 </style>
 
+
+<style id="busaf-marche-cartes-rangees">
+/* Cartes du Marché : images proportionnées, informations nettes, boutons alignés */
+.productgrid,.public-products{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:12px!important;align-items:stretch!important;width:100%;
+}
+.product,.public-product{
+ min-width:0;height:100%;display:flex;flex-direction:column;
+ padding:10px!important;border:1px solid #d8e8dc!important;border-radius:16px!important;
+ background:#fff!important;box-shadow:0 5px 16px rgba(15,65,35,.075)!important;overflow:hidden;
+}
+.product img,.public-product img{
+ display:block;width:100%!important;height:auto!important;aspect-ratio:4/3!important;
+ object-fit:contain!important;object-position:center!important;background:#f2f8f3;
+ border-radius:11px!important;margin:0 0 9px!important;
+}
+.product .emoji,.public-product .emoji{
+ min-height:108px;display:flex;align-items:center;justify-content:center;
+ background:linear-gradient(135deg,#e8f7ec,#f7fbf8);border-radius:11px;
+ font-size:38px;margin-bottom:9px;
+}
+.product h3,.public-product h3{
+ font-size:14px!important;line-height:1.3!important;margin:2px 0 7px!important;
+ min-height:2.5em;color:#126b37!important;overflow-wrap:anywhere;
+}
+.product p.small{font-size:12px!important;line-height:1.4!important;margin:0 0 8px!important;
+ display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.2em}
+.product .price,.public-product .pprice{
+ font-size:15px!important;font-weight:900!important;color:#087a38!important;
+ white-space:normal!important;margin:4px 0 9px!important;
+}
+.product .btn,.public-product .btn{
+ width:100%;font-size:11px!important;line-height:1.25!important;padding:9px 6px!important;
+ border-radius:10px!important;min-height:38px;margin-top:auto!important;
+}
+.founder-product-grid{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+ gap:12px!important;align-items:stretch!important;
+}
+.founder-product{
+ min-width:0;height:100%;display:flex!important;flex-direction:column!important;
+ padding:10px!important;border:1px solid #d8e8dc!important;border-radius:17px!important;
+ background:#fff!important;box-shadow:0 6px 18px rgba(15,65,35,.08)!important;overflow:hidden;
+}
+.founder-product img,.founder-product>.emoji{
+ display:flex;width:100%!important;height:auto!important;aspect-ratio:4/3!important;
+ max-height:none!important;object-fit:contain!important;object-position:center!important;
+ background:#f1f7f2!important;border-radius:11px!important;
+}
+.founder-product>.emoji{align-items:center;justify-content:center;font-size:38px}
+.founder-product-info{padding:9px 2px 2px!important}
+.founder-product-line{font-size:14px!important;line-height:1.35!important;overflow-wrap:anywhere}
+.founder-product .fprice{font-size:16px!important;font-weight:900!important;color:#087a38!important;margin:5px 2px 10px!important}
+.founder-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important;width:100%;margin-top:auto!important}
+.founder-actions button{font-size:11px!important;line-height:1.25!important;padding:9px 4px!important;min-height:38px;border-radius:10px!important}
+@media(min-width:650px){
+ .productgrid,.public-products,.founder-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:15px!important}
+ .product h3,.public-product h3,.founder-product-line{font-size:15px!important}
+}
+@media(max-width:360px){
+ .productgrid,.public-products,.founder-product-grid{gap:7px!important}
+ .product,.public-product,.founder-product{padding:7px!important}
+ .product h3,.public-product h3{font-size:12px!important}
+ .product .price,.public-product .pprice,.founder-product .fprice{font-size:13px!important}
+}
+</style>
+
 </head>
 <body>
 <div id="app" class="app"><main class="wrap" style="padding:18px 12px"><section style="background:#e8f6ec;color:#173b26;border:2px solid #087a38;border-radius:18px;padding:22px 18px;box-shadow:0 8px 22px rgba(8,122,56,.15)"><h1 style="color:#075c2b;font-size:34px;line-height:1.2;margin:0 0 8px">🌍 BuSAF</h1><p style="color:#173b26;font-size:18px;font-weight:800;margin:0 0 8px">Business Africain</p><p style="color:#243d2e;font-size:16px;line-height:1.6;margin:0">Découvre le Marché BuSAF, les produits, les avantages, les bénéfices et les règles avant de rejoindre la plateforme.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><a href="#signup" style="background:#087a38;color:#fff;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:800">📝 CRÉER MON COMPTE</a><a href="#login" style="background:#fff;color:#075c2b;border:2px solid #087a38;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:800">🔐 SE CONNECTER</a></div></section><p style="color:#173b26;text-align:center;padding:12px">BuSAF se charge…</p></main></div>
@@ -3238,6 +3306,7 @@ async function start(){
     }
     window.busafLoginScreenActive=(state.screen==="login");
     history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
+    window.busafScreenStack=[normalScreen(state.screen)];
 
     // Afficher immédiatement l'interface, sans attendre le catalogue distant.
     render();
@@ -3252,6 +3321,7 @@ async function start(){
     const authenticated=await restoreAuthenticatedSession();
     if(authenticated){
       state.screen=isFounder()?"founder":"member";
+      window.busafScreenStack=[normalScreen(state.screen)];
       history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
       render();
 
