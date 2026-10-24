@@ -1848,7 +1848,7 @@ async function signup(e){
   const parrain=Array.isArray(parrains)?parrains[0]:null;
   if(!parrain)throw new Error("Code parrain invalide ou introuvable. Vérifie le code avec la personne qui t'invite.");
 
-  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville,code_invitation:code}})});
+  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville,Ville:ville,code_parrain:code,code_invitation:code}})});
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
 
   resetUserServerCaches();
