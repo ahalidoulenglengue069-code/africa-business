@@ -1274,69 +1274,65 @@ input,textarea,select{font-size:16px;min-height:44px}
 
 
 <style id="busaf-marche-cartes-rangees">
-/* Cartes du Marché : images proportionnées, informations nettes, boutons alignés */
-.productgrid,.public-products{
+/* Marché BuSAF : grille de catalogue inspirée des places de marché comme AliExpress */
+.productgrid,.public-products,.founder-product-grid{
  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
- gap:12px!important;align-items:stretch!important;width:100%;
+ gap:9px!important;align-items:stretch!important;width:100%;margin-top:10px;
 }
-.product,.public-product{
- min-width:0;height:100%;display:flex;flex-direction:column;
- padding:10px!important;border:1px solid #d8e8dc!important;border-radius:16px!important;
- background:#fff!important;box-shadow:0 5px 16px rgba(15,65,35,.075)!important;overflow:hidden;
+.product,.public-product,.founder-product{
+ box-sizing:border-box!important;min-width:0!important;height:100%!important;
+ display:flex!important;flex-direction:column!important;
+ padding:0 0 10px!important;border:1px solid #e5e7eb!important;border-radius:10px!important;
+ background:#fff!important;box-shadow:0 2px 7px rgba(0,0,0,.055)!important;overflow:hidden!important;
 }
-.product img,.public-product img{
- display:block;width:100%!important;height:auto!important;aspect-ratio:4/3!important;
- object-fit:contain!important;object-position:center!important;background:#f2f8f3;
- border-radius:11px!important;margin:0 0 9px!important;
+.product img,.public-product img,.founder-product img{
+ display:block!important;width:100%!important;height:auto!important;aspect-ratio:1/1!important;
+ object-fit:contain!important;object-position:center!important;background:#f7f8f7!important;
+ border-radius:0!important;margin:0 0 8px!important;cursor:zoom-in;
 }
-.product .emoji,.public-product .emoji{
- min-height:108px;display:flex;align-items:center;justify-content:center;
- background:linear-gradient(135deg,#e8f7ec,#f7fbf8);border-radius:11px;
- font-size:38px;margin-bottom:9px;
+.product .emoji,.public-product .emoji,.founder-product>.emoji{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;height:auto!important;min-height:0!important;aspect-ratio:1/1!important;
+ margin:0 0 8px!important;border-radius:0!important;background:#f4f7f4!important;font-size:38px!important;
 }
-.product h3,.public-product h3{
- font-size:14px!important;line-height:1.3!important;margin:2px 0 7px!important;
- min-height:2.5em;color:#126b37!important;overflow-wrap:anywhere;
+.product h3,.public-product h3,.founder-product-line{
+ display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;
+ overflow:hidden!important;min-height:2.6em!important;margin:0 9px 5px!important;
+ color:#262626!important;font-size:13px!important;font-weight:500!important;line-height:1.3!important;
+ overflow-wrap:anywhere!important;
 }
-.product p.small{font-size:12px!important;line-height:1.4!important;margin:0 0 8px!important;
- display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;min-height:4.2em}
-.product .price,.public-product .pprice{
- font-size:15px!important;font-weight:900!important;color:#087a38!important;
- white-space:normal!important;margin:4px 0 9px!important;
+.product p.small{margin:0 9px 7px!important;font-size:11px!important;line-height:1.35!important;
+ color:#6b7280!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.product .price,.public-product .pprice,.founder-product .fprice{
+ display:block!important;margin:0 9px 8px!important;color:#e53935!important;
+ font-size:17px!important;line-height:1.2!important;font-weight:800!important;overflow-wrap:anywhere;
 }
-.product .btn,.public-product .btn{
- width:100%;font-size:11px!important;line-height:1.25!important;padding:9px 6px!important;
- border-radius:10px!important;min-height:38px;margin-top:auto!important;
+.product .small:not(p),.public-product .small{margin:0 9px 8px!important;color:#777!important;font-size:10px!important}
+.product .btn,.public-product .btn,.founder-actions button{
+ box-sizing:border-box!important;width:calc(100% - 18px)!important;min-height:36px!important;
+ margin: auto 9px 0!important;padding:8px 5px!important;border-radius:7px!important;
+ font-size:11px!important;line-height:1.2!important;white-space:normal!important;
 }
-.founder-product-grid{
- display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
- gap:12px!important;align-items:stretch!important;
+.product .btn.red{margin-top:6px!important}
+.founder-product-info{padding:0!important;margin:0 0 8px!important}
+.founder-product-line{display:-webkit-box!important;margin:0 9px 5px!important;color:#262626!important}
+.founder-product .fprice{margin:0 9px 8px!important}
+.founder-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:5px!important;
+ width:100%!important;margin-top:auto!important;padding:0 8px!important;box-sizing:border-box!important}
+.founder-actions button{width:100%!important;margin:0!important;padding:8px 3px!important}
+.founder-product .founder-actions .btn{min-width:0!important}
+@media(min-width:600px){
+ .productgrid,.public-products,.founder-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:13px!important}
+ .product h3,.public-product h3,.founder-product-line{font-size:14px!important}
+ .product .price,.public-product .pprice,.founder-product .fprice{font-size:18px!important}
 }
-.founder-product{
- min-width:0;height:100%;display:flex!important;flex-direction:column!important;
- padding:10px!important;border:1px solid #d8e8dc!important;border-radius:17px!important;
- background:#fff!important;box-shadow:0 6px 18px rgba(15,65,35,.08)!important;overflow:hidden;
-}
-.founder-product img,.founder-product>.emoji{
- display:flex;width:100%!important;height:auto!important;aspect-ratio:4/3!important;
- max-height:none!important;object-fit:contain!important;object-position:center!important;
- background:#f1f7f2!important;border-radius:11px!important;
-}
-.founder-product>.emoji{align-items:center;justify-content:center;font-size:38px}
-.founder-product-info{padding:9px 2px 2px!important}
-.founder-product-line{font-size:14px!important;line-height:1.35!important;overflow-wrap:anywhere}
-.founder-product .fprice{font-size:16px!important;font-weight:900!important;color:#087a38!important;margin:5px 2px 10px!important}
-.founder-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important;width:100%;margin-top:auto!important}
-.founder-actions button{font-size:11px!important;line-height:1.25!important;padding:9px 4px!important;min-height:38px;border-radius:10px!important}
-@media(min-width:650px){
- .productgrid,.public-products,.founder-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:15px!important}
- .product h3,.public-product h3,.founder-product-line{font-size:15px!important}
+@media(min-width:900px){
+ .productgrid,.public-products,.founder-product-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:16px!important}
 }
 @media(max-width:360px){
- .productgrid,.public-products,.founder-product-grid{gap:7px!important}
- .product,.public-product,.founder-product{padding:7px!important}
- .product h3,.public-product h3{font-size:12px!important}
- .product .price,.public-product .pprice,.founder-product .fprice{font-size:13px!important}
+ .productgrid,.public-products,.founder-product-grid{gap:6px!important}
+ .product h3,.public-product h3,.founder-product-line{font-size:12px!important}
+ .product .price,.public-product .pprice,.founder-product .fprice{font-size:15px!important}
 }
 </style>
 
