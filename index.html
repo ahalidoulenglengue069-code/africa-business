@@ -3232,7 +3232,34 @@ function finalizeStockSale(productId,qty){
  openModal("⏳ Revente en attente de paiement sécurisé",'<div class="notice warning"><strong>Aucune vente n’a été enregistrée.</strong><br>Le paiement et la validation serveur des reventes de Stock ne sont pas encore reliés. Pour protéger ton stock et ton argent, BuSAF ne retire aucune unité et ne crédite aucune commission à cette étape.</div><button class="btn" onclick="closeModal();setScreen(\'stockMarket\')">RETOUR AU STOCK</button><button class="btn alt" onclick="closeModal()">FERMER</button>');
 }
 
-function memberStockMarket(){return page("📦 Stock BuSAF",`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Stock BuSAF est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
+let busafConfirmedStock=null;
+let busafStockLoading=false;
+let busafStockError="";
+async function loadBusafConfirmedStock(){
+ if(busafConfirmedStock!==null||busafStockLoading||!state.profile?.id||!state.token)return;
+ busafStockLoading=true;busafStockError="";
+ try{
+  const rows=await api("/rest/v1/ventes?acheteur_id=eq."+encodeURIComponent(state.profile.id)+"&statut=eq.confirmee&select=id,produit_id,montant,created_at,produits(id,nom,prix,image_url,type_produit)&order=created_at.desc&limit=200");
+  busafConfirmedStock=(Array.isArray(rows)?rows:[]).filter(r=>r.produits&&String(r.produits.type_produit||"").toLowerCase()==="digital");
+ }catch(e){busafStockError=e.message||"Impossible de charger le stock confirmé.";}
+ finally{busafStockLoading=false;if(state.screen==="stockMarket"&&state.userId)render();}
+}
+function memberStockMarket(){
+ if(!state.profile?.id||!state.token)return page("📦 Stock BuSAF",'<div class="notice warning">Connecte-toi pour consulter ton stock numérique confirmé.</div>');
+ if(busafConfirmedStock===null&&!busafStockLoading)loadBusafConfirmedStock();
+ if(busafStockLoading||busafConfirmedStock===null&&!busafStockError)return page("📦 Stock BuSAF",'<div class="notice">Chargement du stock confirmé depuis Supabase…</div>');
+ if(busafStockError)return page("📦 Stock BuSAF",'<div class="notice error">Le stock réel n’a pas pu être vérifié : '+esc(busafStockError)+'</div><button class="btn alt" onclick="busafConfirmedStock=null;busafStockError=\'\';loadBusafConfirmedStock()">🔄 RÉESSAYER</button>');
+ const grouped=new Map();
+ for(const row of busafConfirmedStock||[]){
+  const p=row.produits,key=String(row.produit_id);
+  if(!grouped.has(key))grouped.set(key,{product:p,qty:0,last:row.created_at});
+  const item=grouped.get(key);item.qty+=1;
+ }
+ const entries=[...grouped.values()];
+ const total=entries.reduce((n,x)=>n+x.qty,0);
+ const cards=entries.map(x=>'<li><strong>'+esc(x.product.nom||"Produit numérique")+'</strong><br>Quantité confirmée : '+x.qty+'<br>Prix de référence : '+money(x.product.prix||0)+'<div class="notice warning">La revente automatique n’est pas activée tant que le paiement du client et le débit du stock ne sont pas sécurisés côté serveur.</div></li>').join("");
+ return page("📦 Stock BuSAF",'<div class="stat">Produits numériques confirmés<strong>'+total+'</strong></div><div class="notice">Ce stock est calculé à partir des achats confirmés enregistrés dans Supabase. Les achats en attente ou les données locales du téléphone ne sont pas comptés.</div>'+(cards?'<ul class="list">'+cards+'</ul>':'<div class="empty">Aucun achat numérique confirmé dans ton stock pour le moment.</div>')+'<button class="btn alt" onclick="busafConfirmedStock=null;busafStockError=\'\';loadBusafConfirmedStock()">🔄 ACTUALISER LE STOCK</button>');
+}
 
 function memberStockBoutique(){
  const realProducts=filterRealProducts(state.boutiqueProducts);
