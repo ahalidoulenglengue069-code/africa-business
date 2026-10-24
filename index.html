@@ -2029,6 +2029,69 @@ async function refreshFounderPayments(){if(!isFounder())return;try{state.founder
 function founderFinance(){if(!isFounder())return memberHome();const s=state.founderStats||{};return page('💰 Finances',`<div class="notice success">Montants calculés à partir des ventes confirmées chargées depuis Supabase.</div><div class="statgrid"><div class="stat">Ventes confirmées<strong>${s.confirmed??'—'}</strong></div><div class="stat">Montant confirmé<strong>${money(s.revenue||0)}</strong></div></div><button class="btn" onclick="refreshFounderData()">🔄 ACTUALISER</button>`);}
 function founderStocks(){if(!isFounder())return memberHome();const products=state.marketCatalog||[];const cards=products.map(p=>`<div class="rule"><strong>${esc(p.nom||'Produit')}</strong><br>Prix : ${money(p.prix)}<br>Type : ${esc(p.type_produit||'—')}</div>`).join('');return page('📦 Gestion des stocks',`<div class="notice">Produits réels du Marché BuSAF. Aucune quantité de stock n'est inventée.</div>${cards||'<div class="empty">Aucun produit chargé.</div>'}<button class="btn" onclick="refreshMarketCatalog()">🔄 ACTUALISER LES PRODUITS</button>`);}
 
+
+// Écrans Fondateur connectés aux données réelles. Chaque écran affiche les erreurs
+// Supabase clairement au lieu de laisser une icône ouvrir une page vide.
+function founderDataError(title,e){
+ return page(title,`<div class="notice error">Les données n'ont pas pu être chargées depuis Supabase.<br><small>${esc(e?.message||"Erreur inconnue")}</small></div><button class="btn" onclick="render()">🔄 RÉESSAYER</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
+}
+async function founderReferral(){
+ if(!isFounder())return memberHome();
+ try{
+  const rows=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,role,code_parrain,parrain_id,created_at&order=created_at.desc&limit=300');
+  const members=Array.isArray(rows)?rows:[];
+  const list=members.map(m=>`<div class="rule"><strong>${esc(m.nom_complet||'Membre sans nom')}</strong><br>Code parrain : <strong>${esc(m.code_parrain||'—')}</strong><br>Parrain direct : ${esc(m.parrain_id||'Non renseigné')}<br>Rôle : ${esc(m.role||'membre')}<br><small>Inscription : ${m.created_at?esc(new Date(m.created_at).toLocaleDateString('fr-FR')):'—'}</small></div>`).join('');
+  return page('🤝 Réseau de parrainage',`<div class="statgrid"><div class="stat">Profils chargés<strong>${members.length}</strong></div><div class="stat">Codes parrain renseignés<strong>${members.filter(m=>m.code_parrain).length}</strong></div></div><div class="notice">Liste issue de <strong>profils_busaf</strong>. Le champ « Parrain direct » affiche l'identifiant enregistré dans la base.</div>${list||'<div class="empty">Aucun profil trouvé.</div>'}<button class="btn" onclick="setScreen('founderReferral')">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
+ }catch(e){return founderDataError('🤝 Réseau de parrainage',e);}
+}
+async function founderPartner(){
+ if(!isFounder())return memberHome();
+ try{
+  const rows=await api('/rest/v1/profils_busaf?select=id,nom_complet,role,code_parrain,created_at&order=created_at.desc&limit=300');
+  const members=(Array.isArray(rows)?rows:[]).filter(m=>String(m.role||'').toLowerCase()==='partner');
+  const list=members.map(m=>`<div class="rule"><strong>${esc(m.nom_complet||'Membre sans nom')}</strong><br>Statut : <strong>${esc(m.role||'—')}</strong><br>Code parrain : ${esc(m.code_parrain||'—')}<br><small>Inscription : ${m.created_at?esc(new Date(m.created_at).toLocaleDateString('fr-FR')):'—'}</small></div>`).join('');
+  return page('⭐ Suivi Partner',`<div class="stat">Membres ayant le rôle Partner<strong>${members.length}</strong></div><div class="notice">Liste des profils dont le rôle enregistré dans Supabase est « partner ». Cette page ne déclare pas un membre Partner sur la base d'un calcul non vérifié.</div>${list||'<div class="empty">Aucun profil avec le rôle Partner trouvé.</div>'}<button class="btn" onclick="setScreen('partner')">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
+ }catch(e){return founderDataError('⭐ Suivi Partner',e);}
+}
+async function founderCommissions(){
+ if(!isFounder())return memberHome();
+ try{
+  const rows=await api('/rest/v1/busaf_commissions?select=id,beneficiaire_id,type_commission,taux,montant,statut,vente_id,created_at&order=created_at.desc&limit=300');
+  const data=Array.isArray(rows)?rows:[];
+  const confirmed=data.filter(r=>String(r.statut||'').toLowerCase()==='confirmee');
+  const total=confirmed.reduce((n,r)=>n+Number(r.montant||0),0);
+  const fmt=n=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:2}).format(n)+' FCFA';
+  const list=data.map(r=>`<div class="rule"><strong>${fmt(r.montant||0)} — ${esc(r.statut||'statut non renseigné')}</strong><br>Type : ${esc(r.type_commission||'—')} · Taux : ${esc(r.taux??'—')}<br>Bénéficiaire : ${esc(r.beneficiaire_id||'—')}<br>Vente : ${esc(r.vente_id||'—')}<br><small>${r.created_at?esc(new Date(r.created_at).toLocaleString('fr-FR')):'—'}</small></div>`).join('');
+  return page('💰 Commissions BuSAF',`<div class="statgrid"><div class="stat">Commissions confirmées<strong>${confirmed.length}</strong></div><div class="stat">Montant confirmé<strong>${fmt(total)}</strong></div></div><div class="notice warning">Montant calculé uniquement à partir des lignes confirmées chargées. Il ne signifie pas que tout a été payé ou retiré.</div>${list||'<div class="empty">Aucune commission trouvée dans busaf_commissions.</div>'}<button class="btn" onclick="setScreen('commissions')">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
+ }catch(e){return founderDataError('💰 Commissions BuSAF',e);}
+}
+async function founderAnnouncements(){
+ if(!isFounder())return memberHome();
+ try{
+  const rows=await api('/rest/v1/busaf_events?select=id,event_type,title,details,user_id,created_at&order=created_at.desc&limit=100');
+  const data=Array.isArray(rows)?rows:[];
+  const list=data.map(r=>`<div class="rule"><strong>${esc(r.title||'Événement sans titre')}</strong><br>Type : ${esc(r.event_type||'—')}<p>${esc(typeof r.details==='string'?r.details:JSON.stringify(r.details||{}))}</p><small>Portée : ${r.user_id?'Utilisateur ciblé':'Événement général'} · ${r.created_at?esc(new Date(r.created_at).toLocaleString('fr-FR')):'—'}</small></div>`).join('');
+  return page('📢 Annonces et événements',`<div class="notice">Événements enregistrés dans <strong>busaf_events</strong>. Cet écran affiche les enregistrements existants; il n'invente pas d'annonces.</div>${list||'<div class="empty">Aucun événement enregistré.</div>'}<button class="btn" onclick="setScreen('founderAnnouncements')">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
+ }catch(e){return founderDataError('📢 Annonces et événements',e);}
+}
+async function founderNotifications(){
+ if(!isFounder())return memberHome();
+ try{
+  const rows=await api('/rest/v1/busaf_events?select=id,event_type,title,details,user_id,created_at&order=created_at.desc&limit=100');
+  const data=Array.isArray(rows)?rows:[];
+  return page('🔔 Notifications BuSAF',`<div class="notice">Historique des événements partagés enregistrés dans Supabase.</div>${data.map(r=>`<div class="rule"><strong>${esc(r.title||'Notification')}</strong><br>${esc(r.event_type||'—')}<p>${esc(typeof r.details==='string'?r.details:JSON.stringify(r.details||{}))}</p><small>${r.created_at?esc(new Date(r.created_at).toLocaleString('fr-FR')):'—'}</small></div>`).join('')||'<div class="empty">Aucune notification enregistrée.</div>'}<button class="btn" onclick="setScreen('notifications')">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
+ }catch(e){return founderDataError('🔔 Notifications BuSAF',e);}
+}
+async function founderSecurity(){
+ if(!isFounder())return memberHome();
+ const p=state.profile||{};
+ return page('🛡️ Sécurité du compte Fondateur',`<div class="rule"><strong>Session active</strong><br>Compte : ${esc(state.email||'—')}<br>Profil : ${esc(p.nom_complet||'—')}<br>Rôle enregistré : ${esc(p.role||'—')}<br>Identifiant du profil : ${esc(p.id||'—')}</div><div class="notice warning">Ne partage jamais ton mot de passe ni ton jeton de connexion. Les changements d'accès et les règles de sécurité de la base doivent être vérifiés dans Supabase.</div><button class="btn" onclick="setScreen('account')">OUVRIR MON PROFIL</button><button class="btn alt" onclick="setScreen('rules')">LIRE LES RÈGLES BuSAF</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
+}
+function founderSettings(){
+ if(!isFounder())return memberHome();
+ return page('⚙️ Paramètres BuSAF',`<div class="rule"><strong>Configuration actuelle</strong><p>Marché numérique : actif dans l'interface.</p><p>Gestion des produits : <strong>Gestion du Marché</strong>.</p><p>Portefeuille et demandes de retrait : <strong>Portefeuille / Retraits</strong>.</p><p>Paiements : <strong>Paiements & ventes</strong>.</p><p>Les réunions et la boutique physique restent hors du parcours principal conformément à la direction actuelle du projet.</p></div><div class="notice warning">Cet écran présente les accès existants. Il ne modifie pas les secrets, les paramètres de paiement ou les règles Supabase sans une action dédiée et vérifiée.</div><button class="btn" onclick="setScreen('founderMarket')">GESTION DU MARCHÉ</button><button class="btn" onclick="setScreen('founderPayments')">PAIEMENTS</button><button class="btn" onclick="setScreen('founderWithdrawals')">RETRAITS</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
+}
+
 function founderPlaceholder(title,desc){
  if(!isFounder())return memberHome();
  return page(title,`<div class="notice success"><strong>👑 ESPACE FONDATEUR</strong><br>${desc}</div><button class="btn" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>`);
@@ -2972,15 +3035,13 @@ function render(){
      founderPayments:founderPayments,
      orders:founderPayments,
      founderMembers:founderMembers,
-     founderReferral:()=>founderPlaceholder('🤝 Parrainage','Gestion du réseau de parrainage et des commissions.'),
-     partner:()=>founderPlaceholder('⭐ Partner','Suivi des statuts Partner.'),
-     commissions:()=>founderPlaceholder('💰 Commissions','Suivi des commissions.'),
-     
-     
-     myHelp:myHelpRequests,contact:publicContact,notifications:memberNotifications,
-     founderAnnouncements:()=>founderPlaceholder('📢 Annonces','Gestion des communications BuSAF.'),
-     privacy:()=>founderPlaceholder('🛡️ Sécurité','Sécurité et protection de BuSAF.'),
-     founderSettings:()=>founderPlaceholder('⚙️ Paramètres','Configuration générale de BuSAF.'),
+     founderReferral:founderReferral,
+     partner:founderPartner,
+     commissions:founderCommissions,
+     myHelp:myHelpRequests,contact:publicContact,notifications:founderNotifications,
+     founderAnnouncements:founderAnnouncements,
+     privacy:founderSecurity,
+     founderSettings:founderSettings,
      rules:memberRules,account:memberAccount,logout:()=>{confirmLogout();return ''; }
     };
     content=(founderMap[state.screen]||founderHome)();
