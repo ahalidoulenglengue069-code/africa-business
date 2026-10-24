@@ -1814,6 +1814,7 @@ async function login(e){
  btn.disabled=true;btn.textContent="CONNEXION...";
  try{
   const d=await api("/auth/v1/token?grant_type=password",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
+  resetUserServerCaches();
   state.token=d.access_token||"";state.userId=d.user?.id||"";state.email=email;
   localStorage.setItem("busaf_access_token",state.token);
   localStorage.setItem("busaf_user_id",state.userId);
@@ -1850,6 +1851,7 @@ async function signup(e){
   const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville,code_invitation:code}})});
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
 
+  resetUserServerCaches();
   state.userId=d.user.id;state.email=email;state.token=d.access_token||"";
   localStorage.setItem("busaf_user_id",state.userId);
   localStorage.setItem("busaf_email",email);
@@ -1950,6 +1952,7 @@ async function performLogout(){
  localStorage.removeItem("busaf_user_id");
  localStorage.removeItem("busaf_email");
  state.token=""; state.userId=""; state.email=""; state.profile=null; state.screen="public";
+ resetUserServerCaches();
  closeModal(); render();
 }
 function addNotification(title,text,type="info"){
@@ -2898,6 +2901,12 @@ function memberInvites(){
 }
 
 
+function resetUserServerCaches(){
+ busafConfirmedProgress=null;busafProgressLoaded=false;busafProgressLoading=false;busafProgressError="";
+ busafConfirmedStock=null;busafStockLoading=false;busafStockError="";
+ busafMemberOrders=null;busafMemberOrdersLoaded=false;busafMemberOrdersLoading=false;busafMemberOrdersError="";
+ busafCommissionRows=null;busafCommissionLoading=false;busafCommissionError="";
+}
 let busafMemberOrders=null;
 let busafMemberOrdersLoaded=false;
 let busafMemberOrdersLoading=false;
