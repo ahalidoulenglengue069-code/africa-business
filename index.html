@@ -171,6 +171,16 @@ textarea{min-height:100px;resize:vertical}
   position:relative!important;z-index:3!important;box-shadow:0 3px 10px rgba(0,0,0,.16)!important;
 }
 
+/* Organisation claire des espaces membre et fondateur */
+.workspace-group{margin:18px 0 22px}
+.workspace-group-head{margin:0 2px 10px}
+.workspace-group-head h2{font-size:17px;line-height:1.3;margin:0;color:var(--green)}
+.workspace-group-head p{font-size:13px;line-height:1.4;color:var(--muted);margin:4px 0 0}
+.workspace-group .reference-grid{margin-top:10px}
+.founder-section-title{margin-top:22px}
+.founder-quick-links .btn{font-size:13px;line-height:1.25;padding:12px 8px}
+@media(max-width:380px){.founder-quick-links{grid-template-columns:1fr!important}}
+
 /* ===== Présentation visuelle BuSAF ===== */
 .public-hero{background:linear-gradient(145deg,#087a38,#0b9347 55%,#13a95a);color:#fff;border:0;overflow:hidden;position:relative;padding:22px;margin-bottom:16px}
 .public-hero:after{content:"";position:absolute;width:170px;height:170px;border-radius:50%;right:-55px;top:-65px;background:rgba(255,255,255,.10)}
@@ -1853,9 +1863,8 @@ function founderApp(id,ico,label,desc){
 
 function founderHome(){
  const name=state.profile?.nom_complet||state.email||'Fondateur';
- const products=Array.isArray(state.marketCatalog)?state.marketCatalog.length:0;
- const members=state.invites.length;
- const orders=state.orders.length;
+ // Les compteurs de l’administration sont chargés dans le tableau de bord depuis Supabase.
+ // Ne pas afficher ici les anciennes valeurs locales comme s’il s’agissait de statistiques réelles.
  return `<div class="founder-dashboard">
   <section class="founder-hero">
    <span class="founder-badge">👑 ESPACE FONDATEUR</span>
@@ -1863,13 +1872,12 @@ function founderHome(){
    <p>Bienvenue ${esc(name)}. Ici, tu pilotes BuSAF. Cet espace est réservé à l'administration et ne reprend pas l'espace Membre.</p>
    <button class="btn" style="width:100%;margin:12px 0;text-align:left" onclick="setScreen('founderContact')">✉️ MESSAGES D’AIDE DES MEMBRES <span style="float:right">›</span><small style="display:block;font-weight:400;margin-top:4px">Consulter les demandes et répondre aux membres</small></button>
    <button class="btn" style="width:100%;margin:0 0 12px;text-align:left;background:#087f43" onclick="setScreen('money')">👛 MON PORTEFEUILLE BuSAF <span style="float:right">›</span><small style="display:block;font-weight:400;margin-top:4px">Consulter le solde, déposer via YengaPay ou demander un retrait</small></button>
-   <div class="founder-stat-grid" style="margin-top:13px">
-    <div class="founder-stat"><span class="founder-stat-icon" aria-hidden="true">🛍️</span><b>${products}</b><small>Produits Marché</small></div>
-    <div class="founder-stat"><span class="founder-stat-icon" aria-hidden="true">👥</span><b>${members}</b><small>Invités suivis</small></div>
-    <div class="founder-stat"><span class="founder-stat-icon" aria-hidden="true">🧾</span><b>${orders}</b><small>Commandes</small></div>
+   <div class="founder-quick-links" style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:12px">
+    <button class="btn" style="margin:0;min-width:0" onclick="setScreen('founderDashboard')">📊 Tableau de bord</button>
+    <button class="btn" style="margin:0;min-width:0;background:#087f43" onclick="setScreen('founderMembers')">👥 Gestion des membres</button>
    </div>
   </section>
-  <h2 class="founder-section-title">📊 PILOTAGE</h2>
+  <h2 class="founder-section-title">📊 TABLEAU DE BORD ET FINANCES</h2>
   <div class="founder-grid">
    ${founderApp('founderDashboard','📈','Tableau de bord','Vue générale')}
    ${founderApp('founderStats','📊','Statistiques','Activité BuSAF')}
@@ -1879,17 +1887,16 @@ function founderHome(){
    ${founderApp('founderPayments','💳','Paiements','Transactions')}
    ${founderApp('orders','📦','Commandes','Suivi des commandes')}
   </div>
-  <h2 class="founder-section-title">👥 RÉSEAU</h2>
+  <h2 class="founder-section-title">👥 MEMBRES, PARRAINAGE ET COMMISSIONS</h2>
   <div class="founder-grid">
    ${founderApp('founderMembers','👥','Membres','Gestion des membres')}
    ${founderApp('founderReferral','🤝','Parrainage','Réseau et commissions')}
    ${founderApp('partner','⭐','Partner','Suivi Partner')}
    ${founderApp('commissions','💰','Commissions','Commissions')}
   </div>
-  <h2 class="founder-section-title">🛍️ COMMERCE</h2>
+  <h2 class="founder-section-title">🛒 MARCHÉ NUMÉRIQUE</h2>
   <div class="founder-grid">
    ${founderApp('founderMarket','🛒','Gestion du Marché','Ajouter, modifier, supprimer')}
-   ${founderApp('founderStocks','📦','Gestion des Stocks','Suivi des stocks')}
    ${founderApp('founderMarket','➕','Ajouter un produit','Publier au Marché')}
   </div>
   <h2 class="founder-section-title">📢 COMMUNICATION</h2>
@@ -1897,7 +1904,7 @@ function founderHome(){
    ${founderApp('notifications','🔔','Notifications','Informations')}
    ${founderApp('founderAnnouncements','📢','Annonces','Communications')}
   </div>
-  <h2 class="founder-section-title">⚙️ ADMINISTRATION</h2>
+  <h2 class="founder-section-title">⚙️ COMPTE ET RÈGLES</h2>
   <div class="founder-grid">
    ${founderApp('privacy','🛡️','Sécurité','Protection')}
    ${founderApp('founderSettings','⚙️','Paramètres','Configuration BuSAF')}
@@ -2107,7 +2114,14 @@ function memberHome(){
   market:'Produits et revente',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
  };
  const accent=['accent-green','accent-blue','accent-purple','accent-orange','accent-teal','accent-green','accent-purple','accent-gold','accent-gold','accent-teal','accent-blue','accent-orange','accent-pink','accent-red','accent-red','accent-blue','accent-purple','accent-teal','accent-green','accent-red'];
- const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
+ const cardFor=([id,ico,label],i)=>`<button class="reference-card ${id==='market'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`;
+ const groups=[
+  {title:'🛒 MARCHÉ ET ACTIVITÉ',hint:'Acheter des produits numériques et suivre les commandes.',ids:['market','orders','stockMarket']},
+  {title:'💰 PORTEFEUILLE ET GAINS',hint:'Consulter les gains, commissions et opérations d’argent.',ids:['money','profits','commissions']},
+  {title:'🤝 PARRAINAGE ET AVANTAGES',hint:'Inviter des membres et suivre les objectifs BuSAF.',ids:['invites','partner','memberBenefits']},
+  {title:'👤 COMPTE ET ASSISTANCE',hint:'Gérer le profil, les informations et obtenir de l’aide.',ids:['account','notifications','myHelp','rules','help','privacy','contact','how','logout']}
+ ];
+ const grouped=groups.map(g=>{const items=memberSpaces.filter(s=>g.ids.includes(s[0]));return `<section class="workspace-group"><div class="workspace-group-head"><h2>${g.title}</h2><p>${g.hint}</p></div><div class="reference-grid">${items.map(s=>cardFor(s,memberSpaces.indexOf(s))).join('')}</div></section>`;}).join('');
  return `<div class="member-dashboard member-reference">
    <div class="member-welcome compact-welcome">
      <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché, commandes, invitations, bénéfices et suivi.</p></div>
@@ -2126,8 +2140,7 @@ function memberHome(){
      <div class="progress-row"><div><b>🏆 Vers 100 ventes</b><small>${p100}/100 ventes validées</small></div><strong>${p100}/100</strong></div>
      <div class="progress"><i style="width:${p100}%"></i></div>
    </div>
-   <h2 class="section-title member-section-title">📱 MON ESPACE DE TRAVAIL</h2>
-   <div class="reference-grid">${cards}</div>
+   ${grouped}
  </div>`;
 }
 
