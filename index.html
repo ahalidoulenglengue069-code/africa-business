@@ -952,6 +952,54 @@ input,textarea,select{font:inherit;max-width:100%;box-sizing:border-box;border:1
  #app .public-product .small{font-size:11px!important}
 }
 
+
+/* BuSAF — finition des pages d'accueil, formulaires et portefeuille */
+#app .public-hero{padding:22px 18px!important;background:linear-gradient(135deg,#fff 0%,#f0faf4 100%)!important;border:1px solid #d5e9dc!important}
+#app .public-hero h1{font-size:clamp(27px,6vw,38px)!important;line-height:1.15!important;color:#087b50!important;margin:0 0 8px!important}
+#app .public-hero p{font-size:15px!important;line-height:1.55!important;color:#4e685b!important}
+#app .public-actions{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important;margin-top:16px!important}
+#app .public-action{display:flex!important;align-items:center!important;justify-content:center!important;min-height:46px!important;padding:10px!important;border-radius:11px!important;font-size:12px!important;line-height:1.35!important;font-weight:800!important;white-space:normal!important}
+#app .public-action.primary{background:#087b50!important;color:#fff!important;border:1px solid #087b50!important}
+#app .public-action.secondary{background:#fff!important;color:#087b50!important;border:1px solid #b8dbc7!important}
+#app .public-section-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin:18px 2px 10px!important;flex-wrap:wrap}
+#app .public-section-head h2{font-size:17px!important;line-height:1.35!important;margin:0!important;color:#087b50!important}
+#app .public-section-head small{color:#64766e!important;font-size:12px!important}
+#app .statgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+#app .stat{min-width:0!important;box-sizing:border-box!important;background:#fff!important;border:1px solid #dce9e2!important;border-radius:13px!important;padding:13px!important;overflow-wrap:anywhere!important;box-shadow:0 2px 9px rgba(16,67,46,.05)!important}
+#app .stat span{display:block!important;color:#64766e!important;font-size:12px!important;line-height:1.4!important}
+#app .stat strong{display:block!important;color:#087b50!important;font-size:20px!important;line-height:1.35!important;margin-top:5px!important;overflow-wrap:anywhere!important}
+#app .stat small{display:block!important;color:#64766e!important;font-size:12px!important;line-height:1.4!important;margin-top:4px!important}
+#app .notice{padding:12px!important;border:1px solid #dce9e2!important;line-height:1.5!important;overflow-wrap:anywhere!important}
+#app .notice.success{background:#edf8f1!important;color:#215b3d!important;border-color:#cce8d6!important}
+#app .notice.warning{background:#fff8e7!important;color:#74551a!important;border-color:#f0dfae!important}
+#app .notice.error{background:#fff0f0!important;color:#8d2525!important;border-color:#f0cccc!important}
+#app .empty{padding:18px 12px!important;background:#fff!important;border:1px dashed #c9ded2!important;border-radius:13px!important;text-align:center!important;color:#64766e!important;font-size:13px!important;line-height:1.5!important}
+#app .button-row{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+#app .button-row .btn{flex:1 1 140px!important;min-width:0!important}
+#app form{max-width:100%!important}
+#app label{display:block!important;font-size:13px!important;font-weight:700!important;color:#315344!important;margin:10px 0 5px!important}
+#app input,#app textarea,#app select{width:100%;min-height:42px;padding:10px 11px!important;box-sizing:border-box!important;color:#18382d!important}
+#app textarea{min-height:90px;resize:vertical}
+#app input:focus,#app textarea:focus,#app select:focus{outline:2px solid #b9dfc9!important;outline-offset:1px!important;border-color:#087b50!important}
+#app .founder-grid{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:9px!important}
+#app .founder-app{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;text-align:center!important;gap:5px!important;padding:12px 7px!important;min-height:110px!important}
+#app .founder-app .ficon{font-size:25px!important;line-height:1.2!important}
+#app .founder-section-title{font-size:16px!important;font-weight:900!important;color:#087b50!important;margin:18px 2px 9px!important}
+@media(max-width:600px){
+ #app .public-hero{padding:17px 13px!important}
+ #app .public-hero p{font-size:14px!important}
+ #app .public-actions{grid-template-columns:1fr!important}
+ #app .public-action{font-size:12px!important}
+ #app .founder-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+ #app .founder-app{min-height:100px!important;padding:10px 6px!important}
+ #app .stat{padding:11px!important}
+ #app .stat strong{font-size:18px!important}
+}
+@media(max-width:350px){
+ #app .founder-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ #app .statgrid{gap:7px!important}
+}
+
 </style>
 
 </head>
