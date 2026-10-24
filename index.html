@@ -2503,7 +2503,7 @@ function memberMarket(){
    const desc=p.description||'Produit numérique/business du Marché BuSAF.';
    const price=Number(p.prix||0);
    const image=p.image_url
-     ? '<img src="'+esc(p.image_url)+'" alt="'+esc(name)+'" loading="lazy" onclick="openPhotoLightbox(this.src,this.alt||\\'Photo produit\\')">'
+     ? '<img src="'+esc(p.image_url)+'" alt="'+esc(name)+'" loading="lazy" onclick="openPhotoLightbox(this.src,this.alt)">'
      : '<div class="emoji">'+marketProductEmoji(p)+'</div>';
    const safeId=String(p.id).replace(/'/g,"\\\\'");
    const ownerActions=marketCanManageProduct(p)
