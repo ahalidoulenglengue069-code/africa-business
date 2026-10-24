@@ -1965,15 +1965,18 @@ let busafConfirmedProgress=null;
 let busafProgressLoaded=false;
 let busafProgressLoading=false;
 let busafProgressError="";
+function busafSameMemberRequest(userId,profileId){return state.userId===userId&&String(state.profile?.id||"")===String(profileId||"");}
 async function loadBusafConfirmedProgress(){
- if(busafProgressLoaded||busafProgressLoading||!state.token||!state.userId)return;
+ if(busafProgressLoaded||busafProgressLoading||!state.token||!state.userId||!state.profile?.id)return;
+ const requestUserId=state.userId,requestProfileId=state.profile.id;
  busafProgressLoading=true;busafProgressError="";
  try{
   const result=await api("/rest/v1/rpc/busaf_progression_ventes",{method:"POST",body:JSON.stringify({})});
+  if(!busafSameMemberRequest(requestUserId,requestProfileId))return;
   if(!result||typeof result!=="object")throw new Error("Réponse de progression invalide.");
   busafConfirmedProgress={mois:Math.max(0,Number(result.mois)||0),total:Math.max(0,Number(result.total)||0)};
- }catch(e){busafProgressError=e.message||"Progression serveur indisponible.";}
- finally{busafProgressLoading=false;busafProgressLoaded=true;if(state.userId&&(state.screen==="member"||state.screen==="partner"))render();}
+ }catch(e){if(busafSameMemberRequest(requestUserId,requestProfileId))busafProgressError=e.message||"Progression serveur indisponible.";}
+ finally{if(busafSameMemberRequest(requestUserId,requestProfileId)){busafProgressLoading=false;busafProgressLoaded=true;if(state.screen==="member"||state.screen==="partner")render();}}
 }
 function confirmedMonthlySalesCount(){if(busafConfirmedProgress===null)loadBusafConfirmedProgress();return busafConfirmedProgress===null?null:busafConfirmedProgress.mois;}
 function confirmedTotalSalesCount(){if(busafConfirmedProgress===null)loadBusafConfirmedProgress();return busafConfirmedProgress===null?null:busafConfirmedProgress.total;}
@@ -2898,12 +2901,14 @@ let busafMemberInvitesLoading=false;
 let busafMemberInvitesError="";
 async function loadBusafMemberInvites(){
  if(busafMemberInvitesLoaded||busafMemberInvitesLoading||!state.profile?.id||!state.token)return;
+ const requestUserId=state.userId,requestProfileId=state.profile.id;
  busafMemberInvitesLoading=true;busafMemberInvitesError="";
  try{
   const rows=await api("/rest/v1/rpc/busaf_mes_invites",{method:"POST",body:JSON.stringify({})});
+  if(!busafSameMemberRequest(requestUserId,requestProfileId))return;
   busafMemberInvites=Array.isArray(rows)?rows:[];
- }catch(e){busafMemberInvitesError=e.message||"Impossible de charger les invités.";}
- finally{busafMemberInvitesLoading=false;busafMemberInvitesLoaded=true;if(state.userId&&(state.screen==="invites"||state.screen==="member"))render();}
+ }catch(e){if(busafSameMemberRequest(requestUserId,requestProfileId))busafMemberInvitesError=e.message||"Impossible de charger les invités.";}
+ finally{if(busafSameMemberRequest(requestUserId,requestProfileId)){busafMemberInvitesLoading=false;busafMemberInvitesLoaded=true;if(state.screen==="invites"||state.screen==="member")render();}}
 }
 function memberInvites(){
  if(!state.profile?.id||!state.token)return page("👥 Mes Invités",'<div class="notice warning">Connecte-toi pour consulter tes invités.</div>');
@@ -2929,12 +2934,14 @@ let busafMemberOrdersLoading=false;
 let busafMemberOrdersError="";
 async function loadBusafMemberOrders(){
  if(busafMemberOrdersLoaded||busafMemberOrdersLoading||!state.profile?.id||!state.token)return;
+ const requestUserId=state.userId,requestProfileId=state.profile.id;
  busafMemberOrdersLoading=true;busafMemberOrdersError="";
  try{
-  const rows=await api("/rest/v1/ventes?acheteur_id=eq."+encodeURIComponent(state.profile.id)+"&select=id,produit_id,montant,statut,reference,created_at,moyen_paiement,produits(nom,type_produit)&order=created_at.desc&limit=100");
+  const rows=await api("/rest/v1/ventes?acheteur_id=eq."+encodeURIComponent(requestProfileId)+"&select=id,produit_id,montant,statut,reference,created_at,moyen_paiement,produits(nom,type_produit)&order=created_at.desc&limit=100");
+  if(!busafSameMemberRequest(requestUserId,requestProfileId))return;
   busafMemberOrders=Array.isArray(rows)?rows:[];
- }catch(e){busafMemberOrdersError=e.message||"Impossible de charger les commandes.";}
- finally{busafMemberOrdersLoading=false;busafMemberOrdersLoaded=true;if(state.userId&&(state.screen==="orders"||state.screen==="member"||state.screen==="invites"))render();}
+ }catch(e){if(busafSameMemberRequest(requestUserId,requestProfileId))busafMemberOrdersError=e.message||"Impossible de charger les commandes.";}
+ finally{if(busafSameMemberRequest(requestUserId,requestProfileId)){busafMemberOrdersLoading=false;busafMemberOrdersLoaded=true;if(state.screen==="orders"||state.screen==="member"||state.screen==="invites")render();}}
 }
 function memberOrders(){
  if(!state.profile?.id||!state.token)return page("📦 Mes Commandes",'<div class="notice warning">Connecte-toi pour consulter tes commandes.</div>');
@@ -3174,12 +3181,14 @@ let busafCommissionLoading=false;
 let busafCommissionError="";
 async function loadBusafCommissionRows(){
  if(busafCommissionLoading || !state.profile?.id || !state.token)return;
+ const requestUserId=state.userId,requestProfileId=state.profile.id;
  busafCommissionLoading=true; busafCommissionError="";
  try{
-  const rows=await api(`/rest/v1/busaf_commissions?beneficiaire_id=eq.${encodeURIComponent(state.profile.id)}&statut=eq.confirmee&select=id,type_commission,taux,montant,created_at,vente_id&order=created_at.desc&limit=100`);
+  const rows=await api(`/rest/v1/busaf_commissions?beneficiaire_id=eq.${encodeURIComponent(requestProfileId)}&statut=eq.confirmee&select=id,type_commission,taux,montant,created_at,vente_id&order=created_at.desc&limit=100`);
+  if(!busafSameMemberRequest(requestUserId,requestProfileId))return;
   busafCommissionRows=Array.isArray(rows)?rows:[];
- }catch(e){busafCommissionError=e.message||"Impossible de charger les commissions.";}
- finally{busafCommissionLoading=false;if(state.screen==="commissions"&&state.userId)render();}
+ }catch(e){if(busafSameMemberRequest(requestUserId,requestProfileId))busafCommissionError=e.message||"Impossible de charger les commissions.";}
+ finally{if(busafSameMemberRequest(requestUserId,requestProfileId)){busafCommissionLoading=false;if(state.screen==="commissions")render();}}
 }
 function memberCommissions(){
  if(busafCommissionRows===null&&!busafCommissionLoading)loadBusafCommissionRows();
@@ -3286,12 +3295,14 @@ let busafStockLoading=false;
 let busafStockError="";
 async function loadBusafConfirmedStock(){
  if(busafConfirmedStock!==null||busafStockLoading||!state.profile?.id||!state.token)return;
+ const requestUserId=state.userId,requestProfileId=state.profile.id;
  busafStockLoading=true;busafStockError="";
  try{
-  const rows=await api("/rest/v1/ventes?acheteur_id=eq."+encodeURIComponent(state.profile.id)+"&statut=eq.confirmee&select=id,produit_id,montant,created_at,produits(id,nom,prix,image_url,type_produit)&order=created_at.desc&limit=200");
+  const rows=await api("/rest/v1/ventes?acheteur_id=eq."+encodeURIComponent(requestProfileId)+"&statut=eq.confirmee&select=id,produit_id,montant,created_at,produits(id,nom,prix,image_url,type_produit)&order=created_at.desc&limit=200");
+  if(!busafSameMemberRequest(requestUserId,requestProfileId))return;
   busafConfirmedStock=(Array.isArray(rows)?rows:[]).filter(r=>r.produits&&String(r.produits.type_produit||"").toLowerCase()==="digital");
- }catch(e){busafStockError=e.message||"Impossible de charger le stock confirmé.";}
- finally{busafStockLoading=false;if(state.screen==="stockMarket"&&state.userId)render();}
+ }catch(e){if(busafSameMemberRequest(requestUserId,requestProfileId))busafStockError=e.message||"Impossible de charger le stock confirmé.";}
+ finally{if(busafSameMemberRequest(requestUserId,requestProfileId)){busafStockLoading=false;if(state.screen==="stockMarket")render();}}
 }
 function memberStockMarket(){
  if(!state.profile?.id||!state.token)return page("📦 Stock BuSAF",'<div class="notice warning">Connecte-toi pour consulter ton stock numérique confirmé.</div>');
