@@ -22,7 +22,7 @@ Deno.serve(async (req: Request) => {
     const apiKey = Deno.env.get("YENGAPAY_API_KEY");
     const organizationId = Deno.env.get("YENGAPAY_ORGANIZATION_ID") || Deno.env.get("YENGAPAY_GROUP_ID");
     const projectId = Deno.env.get("YENGAPAY_PROJECT_ID");
-    const baseUrl = (Deno.env.get("YENGAPAY_BASE_URL") || "").trim().replace(/\/+$/, "");
+    const baseUrl = (Deno.env.get("YENGAPAY_BASE_URL") || "https://api.sandbox.yengapay.com/api/v1").trim().replace(/\/+$/, "");
 
     if (!supabaseUrl || !serviceKey) {
       return reply(503, { error: "Configuration serveur BuSAF incomplète." });
