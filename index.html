@@ -3543,6 +3543,21 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 @media(max-width:380px){#app .founder-dashboard .founder-hero{padding:15px 11px;border-radius:18px}#app .founder-dashboard .founder-hero h1{font-size:20px}#app .founder-dashboard .founder-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}#app .founder-dashboard .founder-app{min-height:101px;padding:9px 3px 8px;border-radius:13px}#app .founder-dashboard .founder-app .ficon{width:37px;height:37px;border-radius:12px;font-size:21px}#app .founder-dashboard .founder-app b{font-size:9px}#app .founder-dashboard .founder-app small{font-size:8px}}
 </style>
 
+<style id="busaf-rouge-confortable">
+/* Remplacer les textes rouge vif par des couleurs plus reposantes et lisibles */
+#app .product .price,#app .public-product .pprice,#app .founder-product .fprice,#app .productgrid .product .price{
+ color:#087a38!important;-webkit-text-fill-color:#087a38!important;
+}
+/* Actions sensibles : fond rouge foncé et texte blanc bien contrasté */
+#app button.btn.red,#app button[onclick*="performLogout"],#app button[onclick*="verifyLogoutCredentials"],#app button[onclick*="delete"],#app button[onclick*="remove"],#app button[onclick*="supprimer"],#app button[onclick*="logout"]{
+ background:#a82424!important;border:1px solid #8f1d1d!important;color:#fff!important;-webkit-text-fill-color:#fff!important;text-shadow:none!important;
+}
+#app button[onclick*="delete"] .ficon,#app button[onclick*="remove"] .ficon,#app button[onclick*="supprimer"] .ficon,#app button[onclick*="logout"] .ficon{
+ color:#fff!important;-webkit-text-fill-color:#fff!important;
+}
+#app .notif-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;min-height:20px;padding:1px 5px;border-radius:999px;background:#a82424!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:13px!important}
+</style>
+
 </body>
 </html>
 
