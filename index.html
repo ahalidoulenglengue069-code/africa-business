@@ -568,6 +568,22 @@ input,textarea,select{border-radius:9px!important;border-color:#d5e6dd!important
  #app .product p.small,#app .public-product p.small{font-size:10px!important}
 }
 
+
+/* Cohérence des actions sensibles : rouge réservé à supprimer / déconnecter / refuser */
+#app .btn.red,#app button.btn.red{
+ background:#c62828!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
+ border:1px solid #a61b1b!important;box-shadow:0 3px 9px rgba(198,40,40,.2)!important;
+}
+#app .btn.red:hover,#app button.btn.red:hover{background:#a61b1b!important;filter:brightness(1.04)}
+#app .founder-dashboard .founder-app.founder-danger{
+ background:#fff0f0!important;border-color:#d64545!important;color:#8f1717!important
+}
+#app .founder-dashboard .founder-app.founder-danger .ficon{
+ background:#ffdada!important;color:#a31818!important
+}
+#app .founder-dashboard .founder-app.founder-danger b,
+#app .founder-dashboard .founder-app.founder-danger small{color:#8f1717!important}
+
 </style>
   
 
@@ -1938,7 +1954,7 @@ function publicHome(){
 
 
 function founderApp(id,ico,label,desc){
- return `<button class="founder-app" onclick="setScreen('${id}')"><span class="ficon">${ico}</span><b>${label}</b><small>${desc||''}</small></button>`;
+ return `<button class="founder-app ${id==='logout'?'founder-danger':''}" onclick="setScreen('${id}')"><span class="ficon">${ico}</span><b>${label}</b><small>${desc||''}</small></button>`;
 }
 
 function founderHome(){
