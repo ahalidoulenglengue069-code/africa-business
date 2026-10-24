@@ -1958,6 +1958,21 @@ function addNotification(title,text,type="info"){
 }
 function monthKey(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;}
 function dayKey(d=new Date()){return d.toISOString().slice(0,10);}
+let busafConfirmedProgress=null;
+let busafProgressLoading=false;
+let busafProgressError="";
+async function loadBusafConfirmedProgress(){
+ if(busafConfirmedProgress!==null||busafProgressLoading||!state.token||!state.userId)return;
+ busafProgressLoading=true;busafProgressError="";
+ try{
+  const result=await api("/rest/v1/rpc/busaf_progression_ventes",{method:"POST",body:JSON.stringify({})});
+  if(!result||typeof result!=="object")throw new Error("Réponse de progression invalide.");
+  busafConfirmedProgress={mois:Math.max(0,Number(result.mois)||0),total:Math.max(0,Number(result.total)||0)};
+ }catch(e){busafProgressError=e.message||"Progression serveur indisponible.";}
+ finally{busafProgressLoading=false;if(state.userId&&(state.screen==="member"||state.screen==="partner"))render();}
+}
+function confirmedMonthlySalesCount(){if(busafConfirmedProgress===null)loadBusafConfirmedProgress();return busafConfirmedProgress===null?null:busafConfirmedProgress.mois;}
+function confirmedTotalSalesCount(){if(busafConfirmedProgress===null)loadBusafConfirmedProgress();return busafConfirmedProgress===null?null:busafConfirmedProgress.total;}
 function monthlySalesCount(){const k=monthKey();const rows=Array.isArray(state.sales)?state.sales:[];return rows.filter(x=>x&&monthKey(new Date(x.date))===k).reduce((a,x)=>a+Number(x.qty||0),0);}
 function dailySalesCount(){const k=dayKey();const rows=Array.isArray(state.sales)?state.sales:[];return rows.filter(x=>x&&dayKey(new Date(x.date))===k).reduce((a,x)=>a+Number(x.qty||0),0);}
 function totalSalesCount(){const rows=Array.isArray(state.sales)?state.sales:[];return rows.reduce((a,x)=>a+Number(x.qty||0),0);}
@@ -2365,8 +2380,8 @@ function founderPlaceholder(title,desc){
 
 function memberHome(){
  const name=state.profile?.nom_complet||state.email||"Membre";
- const monthly=monthlySalesCount();
- const total=totalSalesCount();
+ const monthly=confirmedMonthlySalesCount()??0;
+ const total=confirmedTotalSalesCount()??0;
  const p10=Math.min(monthly,10);
  const p100=Math.min(total,100);
  const desc={
@@ -2393,10 +2408,10 @@ function memberHome(){
      <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités</small><strong>${state.invites.length}</strong></button>
    </div>
    <div class="work-panel progress-panel">
-     <div class="work-head"><h2>🚀 Ma progression</h2><span>${monthly} vente(s) ce mois</span></div>
-     <div class="progress-row"><div><b>⭐ Vers PARTNER</b><small>${p10}/10 ventes validées dans le même mois</small></div><strong>${p10}/10</strong></div>
+     <div class="work-head"><h2>🚀 Ma progression</h2><span>${busafProgressError? "Vérification indisponible":monthly+" vente(s) confirmée(s) ce mois"}</span></div>
+     <div class="progress-row"><div><b>⭐ Vers PARTNER</b><small>${busafProgressError?"Vérification serveur indisponible":p10+"/10 ventes confirmées dans le même mois"}</small></div><strong>${p10}/10</strong></div>
      <div class="progress"><i style="width:${p10*10}%"></i></div>
-     <div class="progress-row"><div><b>🏆 Vers 100 ventes</b><small>${p100}/100 ventes validées</small></div><strong>${p100}/100</strong></div>
+     <div class="progress-row"><div><b>🏆 Vers 100 ventes</b><small>${busafProgressError?"Vérification serveur indisponible":p100+"/100 ventes confirmées au total"}</small></div><strong>${p100}/100</strong></div>
      <div class="progress"><i style="width:${p100}%"></i></div>
    </div>
    ${grouped}
@@ -3130,7 +3145,13 @@ function memberCommissions(){
     :`<div class="notice">Aucune commission confirmée n’est actuellement enregistrée pour ce compte.</div>`;
  return page("🤝 Mes Commissions",`<div class="stat">Total des commissions enregistrées<strong>${busafCommissionRows===null?"…":format(total)}</strong></div><div class="notice warning"><strong>Important :</strong> ce total correspond aux commissions enregistrées pour des ventes confirmées. Il ne signifie pas que cette somme a été versée ou qu’elle est disponible au retrait.</div>${detail}<button class="btn alt" onclick="busafCommissionRows=null;busafCommissionError='';loadBusafCommissionRows()">🔄 ACTUALISER</button><button class="btn" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);
 }
-function memberPartner(){const n=monthlySalesCount(),pct=Math.min(100,n*10),total=totalSalesCount();return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong>${n}/10</strong></div><div class="stat">Ventes totales<strong>${total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>10 ventes du Marché BuSAF dans un même mois. Les ventes personnelles et les mois cumulés ne remplacent pas la condition.</p></div><button class="btn" onclick="setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
+function memberPartner(){
+ const n=confirmedMonthlySalesCount(),total=confirmedTotalSalesCount(),pct=Math.min(100,(n||0)*10);
+ const progressHtml=busafProgressError
+  ?'<div class="notice error">Impossible de vérifier les ventes confirmées dans Supabase : '+esc(busafProgressError)+'</div>'
+  :n===null?'<div class="notice">Vérification des ventes confirmées…</div>':'';
+ return page("⭐ Progression Partner",progressHtml+`<div class="statgrid"><div class="stat">Ventes confirmées ce mois<strong>${n===null?"…":n+"/10"}</strong></div><div class="stat">Ventes confirmées totales<strong>${total===null?"…":total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>Seules les ventes numériques confirmées enregistrées dans BuSAF comptent. Les ventes locales du téléphone et les paiements en attente ne sont pas comptés.</p></div><button class="btn alt" onclick="busafConfirmedProgress=null;busafProgressError='';loadBusafConfirmedProgress()">🔄 ACTUALISER</button><button class="btn" onclick="setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);
+}
 
 function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 4,5 % et son parrain direct reçoit 7 % sur la revente validée.</p></div>`);}
 let memberWithdrawalRows=[],memberWithdrawalError="";
