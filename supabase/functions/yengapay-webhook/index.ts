@@ -301,10 +301,20 @@ const corsHeaders = {
 
  const alreadyConfirmed = [
  "confirmee",
+ "confirmée",
  "confirme",
+ "confirmé",
  "validee",
+ "validée",
  "valide",
- ].includes(currentStatus);
+ "terminee",
+ "terminée",
+ "completed",
+ "complete",
+ "success",
+ "paid",
+ "successful",
+].includes(currentStatus);
 
  if (isSuccess) {
  const amountText = findValue(payload, [
@@ -375,7 +385,7 @@ const corsHeaders = {
  .maybeSingle();
 
  if (
- ["confirmee", "confirme", "validee", "valide"].includes(
+ ["confirmee", "confirmée", "confirme", "confirmé", "validee", "validée", "valide", "terminee", "terminée", "completed", "complete", "success", "paid", "successful"].includes(
  normalize(asText(latest?.statut)),
  )
  ) {
