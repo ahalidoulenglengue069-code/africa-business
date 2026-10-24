@@ -3512,6 +3512,37 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 #app .productgrid .public-product .product-owner-actions .btn.red,#app .founder-product-grid .founder-actions .btn.red{background:#c62828!important;border-color:#a91f1f!important;color:#fff!important}
 #app .productgrid .public-product .product-owner-actions .btn.alt{background:#e5f2e9!important;border-color:#8bb99a!important;color:#164b2b!important}
 </style>
+
+<style id="busaf-fondateur-dashboard-moderne">
+/* Organisation moderne de l'accueil Fondateur uniquement */
+#app .founder-dashboard{max-width:100%;padding:4px 0 28px;color:#173523}
+#app .founder-dashboard .founder-hero{position:relative;overflow:hidden;border:1px solid #1a6243;border-radius:22px;padding:18px 15px;background:linear-gradient(140deg,#103b2a 0%,#087a38 58%,#0b9347 100%);box-shadow:0 10px 25px rgba(7,75,39,.2)}
+#app .founder-dashboard .founder-hero:after{content:"";position:absolute;right:-35px;top:-45px;width:140px;height:140px;border:1px solid rgba(255,255,255,.15);border-radius:50%;box-shadow:0 0 0 18px rgba(255,255,255,.04),0 0 0 38px rgba(255,255,255,.03);pointer-events:none}
+#app .founder-dashboard .founder-badge{position:relative;z-index:1;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.24);color:#fff;padding:7px 11px;font-size:10px;letter-spacing:.7px}
+#app .founder-dashboard .founder-hero h1{position:relative;z-index:1;font-size:23px;line-height:1.15;color:#fff;font-weight:900;margin:14px 0 7px}
+#app .founder-dashboard .founder-hero p{position:relative;z-index:1;color:#f0fff5;font-size:12px;line-height:1.55;opacity:1;max-width:540px}
+#app .founder-dashboard .founder-hero>.btn{position:relative;z-index:1;border:1px solid rgba(255,255,255,.18)!important;border-radius:13px!important;background:rgba(255,255,255,.12)!important;color:#fff!important;padding:12px!important;box-shadow:0 3px 9px rgba(0,0,0,.09);font-size:11px!important;line-height:1.35!important}
+#app .founder-dashboard .founder-hero>.btn small{color:#effff4!important;font-size:10px!important;line-height:1.4!important}
+#app .founder-dashboard .founder-quick-links{position:relative;z-index:1;gap:8px!important}
+#app .founder-dashboard .founder-quick-links .btn{border:1px solid rgba(255,255,255,.3)!important;border-radius:12px!important;padding:11px 7px!important;font-size:11px!important;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+#app .founder-dashboard .founder-section-title{display:flex;align-items:center;gap:8px;margin:22px 2px 10px;padding:0 0 8px;border-bottom:2px solid #d9e9de;color:#174c31;font-size:12px;font-weight:900;line-height:1.35;letter-spacing:.35px}
+#app .founder-dashboard .founder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+#app .founder-dashboard .founder-app{position:relative;min-width:0;min-height:108px;padding:12px 5px 10px;border:1px solid #dce9df;border-radius:16px;background:linear-gradient(160deg,#fff 0%,#f8fcf9 100%);box-shadow:0 4px 12px rgba(18,64,36,.07);color:#183b29;transition:transform .15s ease,box-shadow .15s ease,border-color .15s ease}
+#app .founder-dashboard .founder-app:active{transform:scale(.97)}
+#app .founder-dashboard .founder-app .ficon{display:flex;align-items:center;justify-content:center;width:43px;height:43px;margin:0 auto 8px;border-radius:14px;background:#e2f4e8;color:#075e32;font-size:23px;line-height:1;box-shadow:inset 0 0 0 1px rgba(7,122,56,.08)}
+#app .founder-dashboard .founder-app b{display:block;color:#183b29;font-size:10px;font-weight:900;line-height:1.25;overflow-wrap:anywhere}
+#app .founder-dashboard .founder-app small{display:block;color:#425d4d;font-size:8.5px;font-weight:600;line-height:1.3;margin-top:4px;overflow-wrap:anywhere}
+#app .founder-dashboard .founder-app:nth-child(3n+2) .ficon{background:#e5efff;color:#174b9a}
+#app .founder-dashboard .founder-app:nth-child(3n) .ficon{background:#fff0d9;color:#895300}
+#app .founder-dashboard .founder-app[onclick*="founderMarket"] .ficon{background:#d9f5e5;color:#05683a}
+#app .founder-dashboard .founder-app[onclick*="founderWithdrawals"] .ficon{background:#ffe5e3;color:#b42318}
+#app .founder-dashboard .founder-app[onclick*="logout"]{border-color:#efc9c6;background:#fff8f7}
+#app .founder-dashboard .founder-app[onclick*="logout"] .ficon{background:#ffe3e1;color:#b42318}
+#app .founder-dashboard .founder-app[onclick*="logout"] b{color:#b42318}
+@media(min-width:600px){#app .founder-dashboard .founder-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}#app .founder-dashboard .founder-app{min-height:118px;padding:14px 8px}#app .founder-dashboard .founder-app b{font-size:12px}#app .founder-dashboard .founder-app small{font-size:10px}}
+@media(max-width:380px){#app .founder-dashboard .founder-hero{padding:15px 11px;border-radius:18px}#app .founder-dashboard .founder-hero h1{font-size:20px}#app .founder-dashboard .founder-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}#app .founder-dashboard .founder-app{min-height:101px;padding:9px 3px 8px;border-radius:13px}#app .founder-dashboard .founder-app .ficon{width:37px;height:37px;border-radius:12px;font-size:21px}#app .founder-dashboard .founder-app b{font-size:9px}#app .founder-dashboard .founder-app small{font-size:8px}}
+</style>
+
 </body>
 </html>
 
