@@ -2610,7 +2610,7 @@ async function startMarketPurchase(productId){
      if(response.status===403 && Array.isArray(data.sponsor_product_ids)){
        const eligible=(state.marketCatalog||[]).filter(p=>data.sponsor_product_ids.map(String).includes(String(p.id)));
        if(!eligible.length){
-         openModal('📦 Produits du parrain', '<div class="notice warning">Ton parrain direct n’a pas encore de produit numérique publié dans le Marché BuSAF. Contacte ton parrain ou réessaie après la publication de son produit.</div><button class="btn alt" onclick="closeModal()">OK</button>');
+         openModal('📦 Produits du parrain', '<div class="notice warning">Ton parrain direct n’a pas encore d’achat numérique confirmé disponible pour ton premier achat. Demande-lui de confirmer son achat ou contacte le support BuSAF.</div><button class="btn alt" onclick="closeModal()">OK</button>');
          return;
        }
        if(eligible.length){
@@ -2618,7 +2618,7 @@ async function startMarketPurchase(productId){
            const img=p.image_url?'<img src="'+esc(p.image_url)+'" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px">':'<div style="font-size:30px">📦</div>';
            return '<div class="rule" style="display:flex;align-items:center;gap:12px;margin:8px 0">'+img+'<div style="flex:1;min-width:0"><strong>'+esc(p.nom||'Produit du parrain')+'</strong><div>'+money(Number(p.prix||0))+'</div><button class="btn" style="margin-top:8px" onclick="closeModal();startMarketPurchase(\''+String(p.id).replace(/'/g,"\\'")+'\')">ACHETER CE PRODUIT</button></div></div>';
          }).join('');
-         openModal('🛍️ Produits de ton parrain', '<div class="notice">Pour ton premier achat, choisis un produit numérique publié par ton parrain direct.</div>'+cards+'<button class="btn alt" onclick="closeModal()">ANNULER</button>');
+         openModal('🛍️ Produits de ton parrain', '<div class="notice">Pour ton premier achat, choisis un produit numérique que ton parrain direct a déjà acheté et dont le paiement est confirmé.</div>'+cards+'<button class="btn alt" onclick="closeModal()">ANNULER</button>');
          return;
        }
      }
