@@ -1130,25 +1130,6 @@ input,textarea,select{font-size:16px;min-height:44px}
 
 </style>
 
-<style id="busaf-founder-distinct-theme">
-/* Identité visuelle propre au fondateur, sans modifier l'espace membre */
-#app .founder-dashboard{padding:4px 0 90px;color:#172b3a}
-#app .founder-hero{background:linear-gradient(135deg,#102a43 0%,#123d50 48%,#08633d 100%)!important;border:1px solid rgba(255,255,255,.14);border-radius:20px;padding:17px!important;box-shadow:0 10px 26px rgba(10,35,52,.2)!important}
-#app .founder-hero h1{font-size:23px;letter-spacing:-.4px}
-#app .founder-hero .founder-badge{background:#d5a943!important;color:#102a43!important;border:0;letter-spacing:.6px}
-#app .founder-section-title{display:flex;align-items:center;gap:7px;color:#15384b;border-left:4px solid #d5a943;padding:8px 9px;margin:17px 0 9px!important;background:linear-gradient(90deg,#eaf1f4,rgba(234,241,244,0));border-radius:0 8px 8px 0;font-size:12px;letter-spacing:.45px}
-#app .founder-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:8px!important}
-#app .founder-app{background:linear-gradient(155deg,#fff,#f0f5f7)!important;border:1px solid #cbd9e0!important;border-bottom:3px solid #176b52!important;border-radius:13px!important;min-height:96px!important;padding:10px 5px!important;box-shadow:0 4px 10px rgba(16,42,67,.08)!important;color:#183346}
-#app .founder-app:nth-child(3n+2){border-bottom-color:#d5a943!important}
-#app .founder-app:nth-child(3n){border-bottom-color:#287aa0!important}
-#app .founder-app .ficon{display:flex;align-items:center;justify-content:center;width:38px;height:38px;background:#e3edf1;border-radius:12px;font-size:23px!important;margin-bottom:7px!important}
-#app .founder-app b{font-size:10px!important;line-height:1.15;color:#16364a}
-#app .founder-app small{font-size:8px!important;line-height:1.2;color:#526876}
-#app .founder-stat{background:rgba(255,255,255,.11)!important;border:1px solid rgba(255,255,255,.22)!important}
-#app .founder-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
-#app .founder-dashboard .btn{border-radius:11px}
-@media(max-width:360px){#app .founder-grid{gap:6px!important}#app .founder-app{min-height:90px!important;padding:8px 3px!important}#app .founder-app .ficon{width:33px;height:33px;font-size:21px!important}#app .founder-app b{font-size:9px!important}}
-</style>
 <style id="busaf-workspace-market-compact">
 /* Corriger les vraies cartes .product utilisées dans le Marché de l'espace de travail */
 #app .productgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important}
@@ -2060,27 +2041,7 @@ function founderPayments(){
 async function refreshFounderPayments(){if(!isFounder())return;try{state.founderPayments=await api('/rest/v1/ventes?select=id,acheteur_id,montant,moyen_paiement,reference,statut,created_at,produit_id&order=created_at.desc');render();}catch(e){alert('❌ Impossible de charger les ventes : '+e.message)}}
 function founderFinance(){if(!isFounder())return memberHome();const s=state.founderStats||{};return page('💰 Finances',`<div class="notice success">Montants calculés à partir des ventes confirmées chargées depuis Supabase.</div><div class="statgrid"><div class="stat">Ventes confirmées<strong>${s.confirmed??'—'}</strong></div><div class="stat">Montant confirmé<strong>${money(s.revenue||0)}</strong></div></div><button class="btn" onclick="refreshFounderData()">🔄 ACTUALISER</button>`);}
 function founderStocks(){if(!isFounder())return memberHome();const products=state.marketCatalog||[];const cards=products.map(p=>`<div class="rule"><strong>${esc(p.nom||'Produit')}</strong><br>Prix : ${money(p.prix)}<br>Type : ${esc(p.type_produit||'—')}</div>`).join('');return page('📦 Gestion des stocks',`<div class="notice">Produits réels du Marché BuSAF. Aucune quantité de stock n'est inventée.</div>${cards||'<div class="empty">Aucun produit chargé.</div>'}<button class="btn" onclick="refreshMarketCatalog()">🔄 ACTUALISER LES PRODUITS</button>`);}
-async function founderReferral(){
- if(!isFounder())return memberHome();
- let members=[],commissions=[],errors=[];
- try{members=await api("/rest/v1/profils_busaf?select=id,nom_complet,role,code_parrain,parrain_id,created_at&order=created_at.desc&limit=500");if(!Array.isArray(members))members=[];}catch(e){errors.push("Réseau : "+(e.message||"lecture impossible"));}
- try{commissions=await api("/rest/v1/busaf_commissions?select=id,beneficiaire_id,type_commission,montant,statut,created_at&order=created_at.desc&limit=500");if(!Array.isArray(commissions))commissions=[];}catch(e){errors.push("Commissions : "+(e.message||"lecture impossible"));}
- const direct=members.filter(m=>m.parrain_id===state.profile?.id);
- const total=commissions.filter(c=>String(c.statut||"").toLowerCase()==="confirmee").reduce((n,c)=>n+Number(c.montant||0),0);
- const rows=direct.length?direct.map(m=>'<div class="rule"><strong>'+esc(m.nom_complet||"Membre")+'</strong><p>Rôle : '+esc(m.role||"membre")+'<br>Code parrain : '+esc(m.code_parrain||"—")+'<br>Inscription : '+(m.created_at?new Date(m.created_at).toLocaleDateString("fr-FR"):"—")+'</p></div>').join(""):'<div class="empty">Aucun filleul direct trouvé pour le moment.</div>';
- return page("🤝 Réseau de parrainage BuSAF",'<div class="statgrid"><div class="stat">Membres enregistrés<strong>'+members.length+'</strong></div><div class="stat">Filleuls directs<strong>'+direct.length+'</strong></div><div class="stat">Commissions confirmées (réseau chargé)<strong>'+money(total)+'</strong></div></div>'+(errors.length?'<div class="notice warning">'+errors.map(esc).join("<br>")+'</div>':'')+'<h3>Mes filleuls directs</h3>'+rows+'<button class="btn alt" onclick="setScreen(\'founderMembers\')">GESTION DES MEMBRES</button><button class="btn" onclick="setScreen(\'founder\')">RETOUR AU CENTRE DE CONTRÔLE</button>');
-}
-async function founderAnnouncements(){
- if(!isFounder())return memberHome();
- let rows=[],error="";
- try{const data=await api("/rest/v1/busaf_events?select=id,event_type,title,details,user_id,created_at&order=created_at.desc&limit=100");rows=Array.isArray(data)?data:[];}catch(e){error=e.message||"lecture impossible";}
- const list=rows.length?rows.map(r=>'<div class="rule"><strong>'+esc(r.title||r.event_type||"Événement BuSAF")+'</strong><p>'+esc(typeof r.details==="string"?r.details:JSON.stringify(r.details||{}))+'</p><small>'+esc(r.event_type||"")+' · '+(r.created_at?new Date(r.created_at).toLocaleString("fr-FR"):"—")+'</small></div>').join(""):'<div class="empty">Aucun événement/annonce enregistré dans busaf_events.</div>';
- return page("📢 Annonces et événements BuSAF",(error?'<div class="notice warning">Lecture impossible : '+esc(error)+'</div>':'<div class="notice">Affichage des événements réellement enregistrés dans Supabase. Cette page ne crée pas de fausses annonces.</div>')+list+'<button class="btn alt" onclick="setScreen(\'founder\')">RETOUR AU CENTRE DE CONTRÔLE</button>');
-}
-function founderSettings(){
- if(!isFounder())return memberHome();
- return page("⚙️ Configuration et état du compte",'<div class="notice success">Session fondateur reconnue.</div><div class="rule"><strong>Identité</strong><p>'+esc(state.profile?.nom_complet||state.email||"Fondateur")+'<br>Rôle : '+esc(state.profile?.role||"non confirmé")+'<br>Code parrain : '+esc(state.profile?.code_parrain||"—")+'</p></div><div class="rule"><strong>Accès rapides</strong><p>Les paramètres de sécurité du compte se gèrent dans le profil et la connexion.</p><button class="btn" onclick="setScreen(\'account\')">MON PROFIL</button><button class="btn alt" onclick="setScreen(\'founderDashboard\')">ÉTAT ET STATISTIQUES</button></div><div class="notice warning">Les réglages globaux modifiables (par exemple les taux de commission) ne sont pas exposés ici tant qu’une configuration persistante dédiée n’est pas définie.</div><button class="btn alt" onclick="setScreen(\'founder\')">RETOUR AU CENTRE DE CONTRÔLE</button>');
-}
+
 function founderPlaceholder(title,desc){
  if(!isFounder())return memberHome();
  return page(title,`<div class="notice success"><strong>👑 ESPACE FONDATEUR</strong><br>${desc}</div><button class="btn" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>`);
@@ -3024,15 +2985,15 @@ function render(){
      founderPayments:founderPayments,
      orders:founderPayments,
      founderMembers:founderMembers,
-     founderReferral:founderReferral,
-     partner:memberPartner,
-     commissions:memberCommissions,
+     founderReferral:()=>founderPlaceholder('🤝 Parrainage','Gestion du réseau de parrainage et des commissions.'),
+     partner:()=>founderPlaceholder('⭐ Partner','Suivi des statuts Partner.'),
+     commissions:()=>founderPlaceholder('💰 Commissions','Suivi des commissions.'),
      
      
      myHelp:myHelpRequests,contact:publicContact,notifications:memberNotifications,
-     founderAnnouncements:founderAnnouncements,
+     founderAnnouncements:()=>founderPlaceholder('📢 Annonces','Gestion des communications BuSAF.'),
      privacy:()=>founderPlaceholder('🛡️ Sécurité','Sécurité et protection de BuSAF.'),
-     founderSettings:founderSettings,
+     founderSettings:()=>founderPlaceholder('⚙️ Paramètres','Configuration générale de BuSAF.'),
      rules:memberRules,account:memberAccount,logout:()=>{confirmLogout();return ''; }
     };
     content=(founderMap[state.screen]||founderHome)();
