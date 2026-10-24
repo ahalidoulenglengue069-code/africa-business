@@ -44,4 +44,5 @@ DROP TRIGGER IF EXISTS busaf_guard_retrait_update ON public.busaf_retraits;
 CREATE TRIGGER busaf_guard_retrait_update
 BEFORE UPDATE ON public.busaf_retraits
 FOR EACH ROW EXECUTE FUNCTION public.busaf_guard_retrait_update();
-REVOKE ALL ON FUNCTION public.busaf_guard_retrait_update() FROM PUBLIC, anon, authenticated;
+REVOKE ALL ON FUNCTION public.busaf_guard_retrait_update() FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.busaf_guard_retrait_update() TO authenticated;
