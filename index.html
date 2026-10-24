@@ -1073,6 +1073,62 @@ input,textarea,select{font:inherit;max-width:100%;box-sizing:border-box;border:1
 
 </style>
 
+<style>
+
+/* BuSAF — rapprochement visuel de la maquette : interface claire, cartes colorées et lisibles */
+:root{--green:#087a38;--green2:#079447;--light:#f2f8f4;--line:#dce9df;--shadow:0 4px 15px rgba(17,68,39,.09)}
+html,body{background:#f2f8f4;color:#173523}
+.header{background:linear-gradient(125deg,#006b3b,#07994b)}
+.hero,.card,.info,.work-panel{border-color:#e0ebe3;box-shadow:0 4px 16px rgba(15,68,39,.075)}
+.section-title{font-size:20px;font-weight:900;letter-spacing:-.2px}
+.product{border-radius:15px;padding:8px;box-shadow:0 3px 12px rgba(18,66,39,.08)}
+.product img{height:105px;border-radius:10px;object-fit:cover}
+.product h3{font-size:13px;line-height:1.35;-webkit-line-clamp:3}
+.product p.small{font-size:11px;line-height:1.4}
+.product .price{font-size:14px;color:#087a38}
+.product .btn{font-size:12px;min-height:38px;padding:9px 6px;border-radius:10px}
+.tile{border:1px solid #e1ebe4;box-shadow:0 3px 12px rgba(20,70,40,.07);border-radius:17px;min-height:100px}
+.tile .ico{display:inline-flex;align-items:center;justify-content:center;width:43px;height:43px;border-radius:14px;background:#e5f6eb;color:#087a38;font-size:25px}
+.grid20 .tile:nth-child(4n+1) .ico{background:#e1f5e8;color:#087a38}
+.grid20 .tile:nth-child(4n+2) .ico{background:#fff0d8;color:#b86b00}
+.grid20 .tile:nth-child(4n+3) .ico{background:#e5efff;color:#1768c5}
+.grid20 .tile:nth-child(4n) .ico{background:#f0e6ff;color:#7944bd}
+.work-card{border-radius:17px;box-shadow:0 3px 12px rgba(20,70,40,.07);border-color:#e0ebe3}
+.work-card span{display:flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:14px;background:#e4f6e9;font-size:25px}
+.work-card:nth-child(4n+2) span{background:#e5efff}
+.work-card:nth-child(4n+3) span{background:#fff0d8}
+.work-card:nth-child(4n) span{background:#f0e6ff}
+.dashboard-stats .dash-stat{border-radius:16px}
+.statgrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.stat{border-radius:15px;padding:13px 9px;min-width:0;overflow-wrap:anywhere}
+.stat strong{font-size:clamp(16px,4vw,21px);line-height:1.35;overflow-wrap:anywhere}
+.button-row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.button-row .btn{min-width:0;margin:0;white-space:normal;line-height:1.35}
+.rule{border-radius:15px}
+input,textarea,select{font-size:16px;min-height:44px}
+.bottom,.quickbar{background:rgba(255,255,255,.98);border-top-color:#dce9df}
+.bottom button.active,.quickbar button.active{color:#078440}
+@media(max-width:520px){
+ .wrap{padding:12px 10px 100px}
+ .hero,.card,.info,.work-panel{padding:14px;border-radius:17px}
+ .product img{height:94px}
+ .productgrid{gap:9px}
+ .product{padding:7px}
+ .product h3{font-size:12px}
+ .product .price{font-size:13px}
+ .grid20{gap:7px}
+ .tile{min-height:92px;padding:8px 3px;font-size:11px}
+ .tile .ico{width:37px;height:37px;font-size:22px;margin-bottom:6px}
+ .statgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .stat strong{font-size:17px}
+ .button-row{grid-template-columns:1fr}
+}
+@media(max-width:350px){
+ .grid20{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .productgrid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
