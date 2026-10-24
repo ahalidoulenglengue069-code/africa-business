@@ -2502,15 +2502,15 @@ function memberMarket(){
    const name=p.nom||'Produit';
    const desc=p.description||'Produit numérique/business du Marché BuSAF.';
    const price=Number(p.prix||0);
+   const safeId=String(p.id||'');
    const image=p.image_url
      ? '<img src="'+esc(p.image_url)+'" alt="'+esc(name)+'" loading="lazy" onclick="openPhotoLightbox(this.src,this.alt)">'
      : '<div class="emoji">'+marketProductEmoji(p)+'</div>';
-   const safeId=String(p.id).replace(/'/g,"\\\\'");
    const ownerActions=marketCanManageProduct(p)
-     ? '<div class="product-owner-actions"><button class="btn alt" onclick="openMarketProductForm(\\''+safeId+'\\')">✏️ MODIFIER</button><button class="btn red" onclick="deleteMarketProduct(\\''+safeId+'\\')">🗑️ SUPPRIMER</button></div>'
+     ? '<div class="product-owner-actions"><button class="btn alt" data-id="'+esc(safeId)+'" onclick="openMarketProductForm(this.dataset.id)">✏️ MODIFIER</button><button class="btn red" data-id="'+esc(safeId)+'" onclick="deleteMarketProduct(this.dataset.id)">🗑️ SUPPRIMER</button></div>'
      : '';
    const seller=String(p.createur_id||'')===String(state.profile?.id||'')?'Mon produit':'Vendeur BuSAF';
-   return '<div class="product">'+image+'<h3>'+esc(name)+'</h3><p class="small">'+esc(desc)+'</p><div class="price">'+money(price)+'</div><div class="product-kind">📱 Produit numérique BuSAF</div><div class="product-seller">🏷️ '+seller+'</div><button class="btn" onclick="viewMarketProduct(\\''+safeId+'\\')">📦 VOIR / ACHETER</button>'+ownerActions+'</div>';
+   return '<div class="product">'+image+'<h3>'+esc(name)+'</h3><p class="small">'+esc(desc)+'</p><div class="price">'+money(price)+'</div><div class="product-kind">📱 Produit numérique BuSAF</div><div class="product-seller">🏷️ '+seller+'</div><button class="btn" data-id="'+esc(safeId)+'" onclick="viewMarketProduct(this.dataset.id)">📦 VOIR / ACHETER</button>'+ownerActions+'</div>';
  }).join('');
  const publishButton=marketCanPublish()?'<button class="btn" onclick="openMarketProductForm()">➕ PUBLIER MON PRODUIT NUMÉRIQUE</button>':'';
  const empty=state.marketCatalogLoaded?'<div class="empty">Aucun produit numérique/business n’est encore publié dans le Marché BuSAF.</div>':'<div class="empty">Chargement des produits du Marché BuSAF…</div>';
