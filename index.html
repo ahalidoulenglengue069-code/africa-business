@@ -1959,17 +1959,18 @@ function addNotification(title,text,type="info"){
 function monthKey(d=new Date()){return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}`;}
 function dayKey(d=new Date()){return d.toISOString().slice(0,10);}
 let busafConfirmedProgress=null;
+let busafProgressLoaded=false;
 let busafProgressLoading=false;
 let busafProgressError="";
 async function loadBusafConfirmedProgress(){
- if(busafConfirmedProgress!==null||busafProgressLoading||!state.token||!state.userId)return;
+ if(busafProgressLoaded||busafProgressLoading||!state.token||!state.userId)return;
  busafProgressLoading=true;busafProgressError="";
  try{
   const result=await api("/rest/v1/rpc/busaf_progression_ventes",{method:"POST",body:JSON.stringify({})});
   if(!result||typeof result!=="object")throw new Error("Réponse de progression invalide.");
   busafConfirmedProgress={mois:Math.max(0,Number(result.mois)||0),total:Math.max(0,Number(result.total)||0)};
  }catch(e){busafProgressError=e.message||"Progression serveur indisponible.";}
- finally{busafProgressLoading=false;if(state.userId&&(state.screen==="member"||state.screen==="partner"))render();}
+ finally{busafProgressLoading=false;busafProgressLoaded=true;if(state.userId&&(state.screen==="member"||state.screen==="partner"))render();}
 }
 function confirmedMonthlySalesCount(){if(busafConfirmedProgress===null)loadBusafConfirmedProgress();return busafConfirmedProgress===null?null:busafConfirmedProgress.mois;}
 function confirmedTotalSalesCount(){if(busafConfirmedProgress===null)loadBusafConfirmedProgress();return busafConfirmedProgress===null?null:busafConfirmedProgress.total;}
@@ -3150,7 +3151,7 @@ function memberPartner(){
  const progressHtml=busafProgressError
   ?'<div class="notice error">Impossible de vérifier les ventes confirmées dans Supabase : '+esc(busafProgressError)+'</div>'
   :n===null?'<div class="notice">Vérification des ventes confirmées…</div>':'';
- return page("⭐ Progression Partner",progressHtml+`<div class="statgrid"><div class="stat">Ventes confirmées ce mois<strong>${n===null?"…":n+"/10"}</strong></div><div class="stat">Ventes confirmées totales<strong>${total===null?"…":total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>Seules les ventes numériques confirmées enregistrées dans BuSAF comptent. Les ventes locales du téléphone et les paiements en attente ne sont pas comptés.</p></div><button class="btn alt" onclick="busafConfirmedProgress=null;busafProgressError='';loadBusafConfirmedProgress()">🔄 ACTUALISER</button><button class="btn" onclick="setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);
+ return page("⭐ Progression Partner",progressHtml+`<div class="statgrid"><div class="stat">Ventes confirmées ce mois<strong>${n===null?"…":n+"/10"}</strong></div><div class="stat">Ventes confirmées totales<strong>${total===null?"…":total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>Seules les ventes numériques confirmées enregistrées dans BuSAF comptent. Les ventes locales du téléphone et les paiements en attente ne sont pas comptés.</p></div><button class="btn alt" onclick="busafConfirmedProgress=null;busafProgressLoaded=false;busafProgressError='';loadBusafConfirmedProgress()">🔄 ACTUALISER</button><button class="btn" onclick="setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);
 }
 
 function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 4,5 % et son parrain direct reçoit 7 % sur la revente validée.</p></div>`);}
