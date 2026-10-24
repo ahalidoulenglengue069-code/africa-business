@@ -927,6 +927,31 @@ input,textarea,select{font:inherit;max-width:100%;box-sizing:border-box;border:1
  #app .product>img,#app .public-product>img,#app .founder-product img{height:105px!important}
 }
 
+
+/* Ajustements ciblés sur les vraies classes HTML du catalogue public */
+#app .public-products{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;align-items:stretch!important}
+#app .public-product{display:flex!important;flex-direction:column!important;min-width:0!important;padding:9px!important;overflow:hidden!important}
+#app .public-product>img{width:100%!important;height:138px!important;object-fit:contain!important;object-position:center!important;background:#f5f9f6!important;border-radius:10px!important;margin:0 0 9px!important}
+#app .public-product .pemoji{display:flex!important;align-items:center!important;justify-content:center!important;width:100%!important;height:138px!important;background:#f5f9f6!important;border-radius:10px!important;margin:0 0 9px!important;font-size:38px!important}
+#app .public-product .small{font-size:12px!important;line-height:1.45!important;color:#64766e!important;overflow-wrap:anywhere!important;margin:2px 0 7px!important}
+#app .public-product .pprice{font-size:15px!important;font-weight:900!important;line-height:1.35!important;color:#087b50!important;margin:5px 0 7px!important}
+#app .public-product .benefit{font-size:11px!important;line-height:1.4!important;color:#315b47!important;background:#edf7f0!important;border-radius:8px!important;padding:7px!important;margin:0 0 8px!important}
+#app .public-product .btn{width:100%!important;box-sizing:border-box!important;font-size:11px!important;line-height:1.35!important;padding:9px 5px!important;white-space:normal!important;margin-top:auto!important}
+#app .founder-product .founder-product-info{padding:8px 2px 4px!important}
+#app .founder-product .fprice{font-size:15px!important;color:#087b50!important;font-weight:900!important}
+#app .founder-app{min-width:0!important;overflow-wrap:anywhere!important;border:1px solid #dce9e2!important;border-radius:13px!important;box-shadow:0 2px 9px rgba(16,67,46,.05)!important}
+#app .founder-app b{font-size:13px!important;line-height:1.35!important}
+#app .founder-app small{font-size:12px!important;line-height:1.4!important;color:#64766e!important}
+@media(max-width:600px){
+ #app .public-product>img,#app .public-product .pemoji{height:120px!important}
+}
+@media(max-width:360px){
+ #app .public-products{gap:7px!important}
+ #app .public-product{padding:6px!important}
+ #app .public-product>img,#app .public-product .pemoji{height:105px!important}
+ #app .public-product .small{font-size:11px!important}
+}
+
 </style>
 
 </head>
