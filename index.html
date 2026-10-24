@@ -1276,7 +1276,7 @@ function currentProducts(){
 function publicProductView(p){
  const price=Number(p?.prix||0);
  const image=p?.image_url||'';
- const img=image?`<div class="public-product-photo"><img src="${esc(image)}" alt="${esc(p?.nom||'Produit')}" onclick="openPhotoLightbox(this.querySelector?this.querySelector('img').src:this.src,this.alt)" loading="lazy"></div>`:'<div class="public-product-photo public-product-no-photo"><span>📦</span><small>Photo du produit</small></div>';
+ const img=image?`<div class="public-product-photo"><img src="${esc(image)}" alt="${esc(p?.nom||'Produit')}" onclick="openPhotoLightbox(this.querySelector('img').src,this.querySelector('img').alt)" loading="lazy"></div>`:'<div class="public-product-photo public-product-no-photo"><span>📦</span><small>Photo du produit</small></div>';
  return `<article class="public-product">${img}<div class="public-product-body"><h3>${esc(p?.nom||'Produit BuSAF')}</h3><div class="pprice">${money(price)}</div><button class="btn" onclick="viewMarketProduct('${String(p?.id||'')}')">VOIR LE PRODUIT</button></div></article>`;
 }
 function productForId(id){
