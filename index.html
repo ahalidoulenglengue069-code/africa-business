@@ -1129,6 +1129,21 @@ input,textarea,select{font-size:16px;min-height:44px}
 }
 
 </style>
+<style>
+
+/* Catalogue Marché BuSAF — cartes produits aérées, sans commission affichée publiquement */
+#app .public-products{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:13px!important;align-items:stretch!important}
+#app .public-product{display:flex!important;flex-direction:column!important;min-width:0!important;padding:9px!important;border:1px solid #dce9df!important;border-radius:17px!important;background:#fff!important;box-shadow:0 5px 17px rgba(17,68,39,.09)!important;overflow:hidden!important}
+#app .public-product>img,#app .public-product>.pemoji{width:100%!important;height:clamp(125px,36vw,190px)!important;object-fit:contain!important;object-position:center!important;background:#f5f9f6!important;border-radius:12px!important;margin:0 0 10px!important}
+#app .public-product .pemoji{display:flex!important;align-items:center!important;justify-content:center!important;font-size:42px!important}
+#app .public-product-body{display:flex!important;flex-direction:column!important;flex:1!important;align-items:stretch!important;min-width:0!important}
+#app .public-product h3{font-size:14px!important;line-height:1.4!important;color:#176b3c!important;margin:2px 0 7px!important;overflow-wrap:anywhere!important}
+#app .public-product .small{font-size:12px!important;line-height:1.5!important;color:#64766e!important;margin:0 0 9px!important;overflow-wrap:anywhere!important;display:-webkit-box!important;-webkit-line-clamp:3!important;-webkit-box-orient:vertical!important;overflow:hidden!important}
+#app .public-product .pprice{font-size:16px!important;line-height:1.4!important;font-weight:900!important;color:#087a38!important;margin:auto 0 10px!important;padding-top:4px!important;white-space:normal!important}
+#app .public-product .btn{width:100%!important;min-height:43px!important;box-sizing:border-box!important;padding:10px 7px!important;margin-top:0!important;border-radius:11px!important;font-size:11px!important;line-height:1.35!important;white-space:normal!important}
+@media(max-width:380px){#app .public-products{gap:9px!important}#app .public-product{padding:7px!important}#app .public-product>img,#app .public-product>.pemoji{height:118px!important}#app .public-product h3{font-size:12px!important}#app .public-product .pprice{font-size:14px!important}}
+
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
@@ -1262,7 +1277,7 @@ function publicProductView(p){
  const price=Number(p?.prix||0);
  const image=p?.image_url||'';
  const img=image?`<img src="${esc(image)}" alt="${esc(p?.nom||'Produit')}" onclick="openPhotoLightbox(this.src,this.alt)" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;margin-bottom:4px;cursor:zoom-in" loading="lazy">`:'<div class="pemoji">📦</div>';
- return `<div class="public-product">${img}<h3>${esc(p?.nom||'Produit BuSAF')}</h3><div class="small">${esc(p?.description||'')}</div><div class="pprice">${money(price)}</div><div class="benefit">💰 Bénéfice vendeur indicatif : ${money(Math.round(price*0.045))}</div><button class="btn" style="width:100%;padding:5px 4px;font-size:9px;margin-top:3px" onclick="viewMarketProduct('${String(p?.id||'')}')">📦 VOIR LE PRODUIT</button></div>`;
+ return `<article class="public-product">${img}<div class="public-product-body"><h3>${esc(p?.nom||'Produit BuSAF')}</h3><div class="small">${esc(p?.description||'')}</div><div class="pprice">${money(price)}</div><button class="btn" onclick="viewMarketProduct('${String(p?.id||'')}')">🛒 DÉCOUVRIR LE PRODUIT</button></div></article>`;
 }
 function productForId(id){
  return currentProducts().find(x=>String(x.id)===String(id))||null;
