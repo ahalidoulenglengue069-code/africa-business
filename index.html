@@ -1130,6 +1130,19 @@ input,textarea,select{font-size:16px;min-height:44px}
 
 </style>
 
+<style id="busaf-workspace-market-compact">
+/* Corriger les vraies cartes .product utilisées dans le Marché de l'espace de travail */
+#app .productgrid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important;align-items:stretch!important}
+#app .productgrid>.product{display:flex!important;flex-direction:column!important;min-width:0!important;box-sizing:border-box!important;padding:5px!important;gap:0!important;border-radius:9px!important;overflow:hidden!important}
+#app .productgrid>.product>img{display:block!important;width:calc(100% + 10px)!important;max-width:none!important;aspect-ratio:4/3!important;height:auto!important;object-fit:cover!important;object-position:center!important;margin:-5px -5px 5px!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent!important}
+#app .productgrid>.product>.emoji{display:flex!important;align-items:center!important;justify-content:center!important;width:calc(100% + 10px)!important;aspect-ratio:4/3!important;margin:-5px -5px 5px!important;font-size:26px!important}
+#app .productgrid>.product h3{font-size:11px!important;line-height:1.2!important;margin:0 0 3px!important;overflow-wrap:anywhere!important}
+#app .productgrid>.product p.small{display:-webkit-box!important;-webkit-line-clamp:1!important;-webkit-box-orient:vertical!important;font-size:9px!important;line-height:1.2!important;white-space:normal!important;overflow:hidden!important;text-overflow:ellipsis!important;margin:0 0 3px!important}
+#app .productgrid>.product .price{font-size:13px!important;line-height:1.15!important;margin:0 0 3px!important}
+#app .productgrid>.product .small{font-size:8px!important;line-height:1.15!important;margin:0 0 4px!important}
+#app .productgrid>.product .btn{width:100%!important;min-height:25px!important;box-sizing:border-box!important;padding:4px 3px!important;margin:2px 0 0!important;font-size:9px!important;line-height:1.15!important;white-space:normal!important}
+@media(max-width:380px){#app .productgrid{gap:6px!important}#app .productgrid>.product{padding:4px!important}#app .productgrid>.product>img,#app .productgrid>.product>.emoji{width:calc(100% + 8px)!important;margin:-4px -4px 4px!important}#app .productgrid>.product h3{font-size:10px!important}#app .productgrid>.product p.small{font-size:8px!important}#app .productgrid>.product .price{font-size:12px!important}}
+</style>
 
 <style id="busaf-market-normal-product-cards">
 /* Cartes vraiment compactes : photo carrée courte + informations resserrées */
