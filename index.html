@@ -1452,14 +1452,20 @@ function normalScreen(screen){
  return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
+/* Historique interne fiable : le bouton RETOUR revient à l'écran BuSAF précédent,
+   sans dépendre de l'historique général du navigateur ou d'une page externe. */
+window.busafScreenStack=Array.isArray(window.busafScreenStack)?window.busafScreenStack:[];
 function setScreen(screen){
  screen=normalScreen(screen);
- // Évite qu'une restauration d'ancienne session concurrence l'écran de connexion.
  window.busafLoginScreenActive=(screen==="login");
  if(screen===state.screen){
    render();
    window.scrollTo({top:0,left:0,behavior:"instant"});
    return;
+ }
+ if(state.screen && state.screen!==screen){
+   window.busafScreenStack.push(state.screen);
+   if(window.busafScreenStack.length>40)window.busafScreenStack.shift();
  }
  state.screen=screen;
  history.pushState({busafScreen:screen},"","#"+screen);
@@ -1469,16 +1475,20 @@ function setScreen(screen){
 }
 
 function goBack(){
- /* Le bouton Retour de BuSAF utilise exactement le même historique que le
-    bouton Retour physique/Android. On ne recrée jamais une nouvelle entrée. */
- if(history.length>1){
-   history.back();
-   return;
- }
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
- state.screen=fallback;
- history.replaceState({busafScreen:fallback},"","#"+fallback);
+ let previous=null;
+ while(window.busafScreenStack.length && !previous){
+   const candidate=window.busafScreenStack.pop();
+   if(candidate && candidate!==state.screen)previous=normalScreen(candidate);
+ }
+ if(!previous){
+   /* Repli si l'écran a été ouvert directement par un lien. */
+   previous=fallback;
+ }
+ state.screen=previous;
+ history.replaceState({busafScreen:previous},"","#"+previous);
  render();
+ if(previous==="market" || previous==="public" || previous==="products")loadMarketCatalog(true).then(()=>render()).catch(()=>{});
  window.scrollTo({top:0,left:0,behavior:"instant"});
 }
 
@@ -1486,6 +1496,11 @@ window.addEventListener("popstate",(event)=>{
  const fromHistory=event.state?.busafScreen;
  const fromHash=location.hash.replace(/^#/,"");
  const screen=normalScreen(fromHistory||fromHash);
+ /* Synchronise l'historique interne lorsque l'utilisateur utilise Retour Android. */
+ if(screen!==state.screen){
+   const idx=window.busafScreenStack.lastIndexOf(screen);
+   if(idx>=0)window.busafScreenStack=window.busafScreenStack.slice(0,idx);
+ }
  state.screen=screen;
  render();
  if(screen==="market" || screen==="public" || screen==="products")loadMarketCatalog(true).then(()=>render()).catch(()=>{});
