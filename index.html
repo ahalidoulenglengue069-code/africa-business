@@ -2019,7 +2019,7 @@ function buyProduct(id,mode){
 function canInvite(){if(busafMemberOrders===null&&!busafMemberOrdersLoaded)loadBusafMemberOrders();return Array.isArray(busafMemberOrders)&&busafMemberOrders.some(o=>["confirmee","confirmée","confirme","confirmé","validee","validée","completed","success","paid"].includes(String(o.statut||"").toLowerCase()));}
 function invitationCode(){return String(state.profile?.code_parrain||"").trim()||(state.userId?`BUSAF-${state.userId.replace(/-/g,"").slice(0,8).toUpperCase()}`:"");}
 function invitationCodeFromUrl(){const hash=location.hash.replace(/^#/,"");const query=hash.includes("?")?hash.slice(hash.indexOf("?")+1):"";return new URLSearchParams(location.search).get("invite")||new URLSearchParams(query).get("invite")||"";}
-function invitationLink(){return `${location.origin}${location.pathname}#signup?invite=${encodeURIComponent(invitationCode())}`;}
+function invitationLink(){return `${location.origin}${location.pathname}?invite=${encodeURIComponent(invitationCode())}#signup`;}
 function invitationText(){return `🌍 Rejoins BuSAF / Business Africain.\nDécouvre le Marché BuSAF et crée ton compte avec mon invitation.\n👉 ${invitationLink()}\n🔑 Code : ${invitationCode()}`;}
 async function copyInvitation(kind){
  const value=kind==="code"?invitationCode():invitationLink();
@@ -2934,7 +2934,7 @@ async function loadBusafMemberOrders(){
   const rows=await api("/rest/v1/ventes?acheteur_id=eq."+encodeURIComponent(state.profile.id)+"&select=id,produit_id,montant,statut,reference,created_at,moyen_paiement,produits(nom,type_produit)&order=created_at.desc&limit=100");
   busafMemberOrders=Array.isArray(rows)?rows:[];
  }catch(e){busafMemberOrdersError=e.message||"Impossible de charger les commandes.";}
- finally{busafMemberOrdersLoading=false;busafMemberOrdersLoaded=true;if(state.userId&&(state.screen==="orders"||state.screen==="member"))render();}
+ finally{busafMemberOrdersLoading=false;busafMemberOrdersLoaded=true;if(state.userId&&(state.screen==="orders"||state.screen==="member"||state.screen==="invites"))render();}
 }
 function memberOrders(){
  if(!state.profile?.id||!state.token)return page("📦 Mes Commandes",'<div class="notice warning">Connecte-toi pour consulter tes commandes.</div>');
