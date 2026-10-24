@@ -116,25 +116,51 @@ Deno.serve(async (req: Request) => {
       if (!profile.parrain_id) {
         return reply(403, { error: "Aucun parrain direct n'est associé à ce compte. Contacte le support BuSAF." });
       }
+      const confirmedStatuses = [
+        "confirmee", "confirmée", "confirme", "confirmé", "validee", "validée",
+        "valide", "terminee", "terminée", "completed", "complete", "success", "paid",
+      ];
       const { data: sponsorSales, error: sponsorError } = await admin
         .from("ventes")
-        .select("id, produit_id, statut")
+        .select("produit_id, statut")
         .eq("acheteur_id", profile.parrain_id)
-        .eq("produit_id", productId)
-        .in("statut", ["confirmee", "confirmée", "confirme", "confirmé", "validee", "validée", "valide", "terminee", "terminée", "completed", "complete", "success", "paid"])
-        .limit(1);
+        .in("statut", confirmedStatuses)
+        .limit(200);
 
       if (sponsorError) {
-        console.error("Vérification achat parrain impossible:", sponsorError.message);
-        return reply(500, { error: "Impossible de vérifier l'achat du parrain. Réessaie plus tard." });
+        console.error("Vérification des achats confirmés du parrain impossible:", sponsorError.message);
+        return reply(500, { error: "Impossible de vérifier les achats confirmés du parrain." });
       }
-      if (!(sponsorSales ?? []).some((sale) => isConfirmed(sale.statut))) {
+
+      const purchasedProductIds = Array.from(new Set(
+        (sponsorSales ?? [])
+          .filter((sale) => isConfirmed(sale.statut))
+          .map((sale) => String(sale.produit_id ?? ""))
+          .filter(Boolean),
+      ));
+      let sponsorProductIds: string[] = [];
+      if (purchasedProductIds.length) {
+        const { data: eligibleProducts, error: eligibleError } = await admin
+          .from("produits")
+          .select("id")
+          .in("id", purchasedProductIds)
+          .eq("type_produit", "digital")
+          .not("nom", "ilike", "%test%")
+          .limit(100);
+        if (eligibleError) {
+          console.error("Lecture des produits éligibles du parrain impossible:", eligibleError.message);
+          return reply(500, { error: "Impossible de charger les produits éligibles du parrain." });
+        }
+        sponsorProductIds = (eligibleProducts ?? []).map((p) => String(p.id));
+      }
+
+      if (!sponsorProductIds.includes(String(productId))) {
         return reply(403, {
-          error: "Pour ton premier achat, choisis un produit du Marché que ton parrain direct a déjà acheté et dont le paiement est confirmé.",
+          error: "Pour ton premier achat, choisis un produit numérique que ton parrain direct a déjà acheté et dont le paiement est confirmé.",
+          sponsor_product_ids: sponsorProductIds,
         });
       }
     }
-
     // Évite deux paiements simultanés du même produit par le même membre.
     const { data: existing, error: existingError } = await admin
       .from("ventes")
