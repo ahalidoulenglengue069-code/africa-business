@@ -85,6 +85,7 @@ Deno.serve(async (req: Request) => {
       .select("id, nom, prix, type_produit, createur_id")
       .eq("id", productId)
       .eq("type_produit", "digital")
+      .not("nom", "ilike", "%test%")
       .maybeSingle();
 
     if (productError) {
