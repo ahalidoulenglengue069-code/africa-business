@@ -3558,6 +3558,14 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 #app .notif-count{display:inline-flex;align-items:center;justify-content:center;min-width:20px;min-height:20px;padding:1px 5px;border-radius:999px;background:#a82424!important;color:#fff!important;-webkit-text-fill-color:#fff!important;font-size:13px!important}
 </style>
 
+<style id="busaf-deconnexion-visible">
+/* Garder le libellé Déconnexion entier et lisible sur petit écran */
+#app .founder-dashboard .founder-app[onclick*="logout"]{min-width:0!important;overflow:visible!important;padding-left:3px!important;padding-right:3px!important}
+#app .founder-dashboard .founder-app[onclick*="logout"] b{font-size:10px!important;line-height:1.25!important;overflow-wrap:normal!important;word-break:normal!important;hyphens:none!important;white-space:normal!important;text-align:center!important}
+#app .founder-dashboard .founder-app[onclick*="logout"] small{overflow-wrap:normal!important;word-break:normal!important}
+@media(max-width:380px){#app .founder-dashboard .founder-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}#app .founder-dashboard .founder-app[onclick*="logout"] b{font-size:11px!important}}
+</style>
+
 </body>
 </html>
 
