@@ -1942,7 +1942,6 @@ async function sendForgotPassword(){
  }catch(e){alert("❌ "+e.message)}
 }
 function confirmLogout(){
- if(!state.token || !state.userId){ setScreen("public"); return; }
  openModal("🔐 Déconnexion sécurisée", `
   <div class="notice warning">Voulez-vous vraiment vous déconnecter ?</div>
   <div class="notice">Pour protéger ton compte, BuSAF va vérifier ton <strong>e-mail</strong> et ton <strong>mot de passe</strong> avant de fermer la session.</div>
@@ -1968,7 +1967,7 @@ async function verifyLogoutCredentials(){
  const msg=document.getElementById("logoutMsg");
  const btn=document.getElementById("logoutVerifyBtn");
  if(!email||!password){msg.className="notice error";msg.textContent="❌ E-mail et mot de passe obligatoires.";return;}
- if(email.toLowerCase()!==(state.email||"").toLowerCase()){msg.className="notice error";msg.textContent="❌ Cet e-mail ne correspond pas au compte actuellement connecté.";return;}
+ if(state.email && email.toLowerCase()!==state.email.toLowerCase()){msg.className="notice error";msg.textContent="❌ Cet e-mail ne correspond pas au compte actuellement connecté.";return;}
  btn.disabled=true; btn.textContent="VÉRIFICATION...";
  try{
   await api("/auth/v1/token?grant_type=password",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
