@@ -1652,7 +1652,8 @@ function goBack(){
  try{history.replaceState({busafScreen:previous},"","#"+previous);}catch(e){}
  busafRenderAfterNavigation();
  if(previous==="market" || previous==="public" || previous==="products"){
-   loadMarketCatalog(true).then(()=>{if(state.screen===previous)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   // Réutilise le catalogue en mémoire au retour pour éviter une requête Supabase inutile.
+   loadMarketCatalog().then(()=>{if(state.screen===previous)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 }
