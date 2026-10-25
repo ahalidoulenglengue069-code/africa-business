@@ -1686,11 +1686,18 @@ async function refreshBusafSession(){
  if(!state.refreshToken)return false;
  if(busafRefreshPromise)return busafRefreshPromise;
  busafRefreshPromise=(async()=>{
-  const response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=refresh_token",{
-   method:"POST",
-   headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},
-   body:JSON.stringify({refresh_token:state.refreshToken})
-  });
+  // Le renouvellement de session ne doit jamais laisser BuSAF attendre indéfiniment.
+  const refreshController=new AbortController();
+  const refreshTimeout=setTimeout(()=>refreshController.abort(),8000);
+  let response;
+  try{
+   response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=refresh_token",{
+    method:"POST",
+    headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},
+    body:JSON.stringify({refresh_token:state.refreshToken}),
+    signal:refreshController.signal
+   });
+  }finally{clearTimeout(refreshTimeout);}
   const raw=await response.text();let data={};
   try{data=raw?JSON.parse(raw):{}}catch{data={raw}}
   if(!response.ok||!data.access_token)throw new Error(data.msg||data.message||data.error_description||"Session expirée. Reconnecte-toi.");
