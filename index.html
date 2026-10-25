@@ -3087,28 +3087,44 @@ async function saveCroppedProfilePhoto(){
 }
 
 function memberAccount(){
- return page("💼 Mon Compte",`
-   <div class="info">
-     <div class="profile-photo-wrap">
-       ${profilePhotoHtml()}
-       <div class="profile-photo-info">
-         <strong>${esc(state.profile?.nom_complet||"Membre BuSAF")}</strong>
-         <div class="small">${esc(state.profile?.role||"membre")}</div>
-         <button class="btn small" onclick="openProfilePhotoForm()">📷 ${state.profile?.photo_url?"MODIFIER":"AJOUTER"} MA PHOTO</button>
+ const profile=state.profile||{};
+ const role=String(profile.role||"membre").toLowerCase();
+ const roleLabel=role==="fondateur"?"Fondateur":role==="partner"?"Partner":"Membre";
+ const field=(icon,label,value,kind="")=>`<div class="busaf-account-field ${kind}"><span class="busaf-account-field-icon">${icon}</span><div><small>${label}</small><strong>${esc(value||"À compléter")}</strong></div></div>`;
+ return page("👤 Mon Compte",`
+ <section class="busaf-account-modern">
+   <div class="busaf-account-hero">
+     <div class="busaf-account-hero-glow"></div>
+     <div class="busaf-account-profile">
+       <div class="busaf-account-avatar">${profilePhotoHtml()}</div>
+       <div class="busaf-account-identity">
+         <span class="busaf-account-eyebrow">MON ESPACE PERSONNEL</span>
+         <h2>${esc(profile.nom_complet||"Membre BuSAF")}</h2>
+         <span class="busaf-account-role ${role==="fondateur"?"is-founder":role==="partner"?"is-partner":""}">${role==="fondateur"?"👑":role==="partner"?"⭐":"✓"} ${roleLabel}</span>
        </div>
      </div>
-     <strong>Nom :</strong> ${esc(state.profile?.nom_complet||"—")}<br>
-     <strong>E-mail :</strong> ${esc(state.email)}<br>
-     <strong>Téléphone :</strong> ${esc(state.profile?.telephone||"—")}<br>
-     <strong>Ville :</strong> ${esc(state.profile?.Ville||"—")}<br>
-     <strong>Rôle :</strong> ${esc(state.profile?.role||"membre")}<br>
-     ${isFounder()?'<div class="notice success"><strong>👑 FONDATEUR BuSAF</strong><br>Accès aux fonctions réservées au fondateur.</div>':""}
-     <strong>Code parrain :</strong> ${esc(state.profile?.code_parrain||"—")}
+     <button class="busaf-account-photo-btn" onclick="openProfilePhotoForm()">📷 ${profile.photo_url?"Modifier ma photo":"Ajouter ma photo"}</button>
    </div>
-   <button class="btn" onclick="copyInvitation('code')">📋 COPIER MON CODE PARRAIN</button>
-   <button class="btn" onclick="editProfile()">✏️ MODIFIER MON PROFIL</button>
-   <button class="btn alt" onclick="setScreen('privacy')">🔒 CONFIDENTIALITÉ</button>
-   <button class="btn red" onclick="confirmLogout()">🚪 DÉCONNEXION</button>
+   <div class="busaf-account-section-title"><span>▦</span><div><h3>Mes informations</h3><p>Les informations liées à ton compte BuSAF.</p></div></div>
+   <div class="busaf-account-fields">
+     ${field("👤","Nom complet",profile.nom_complet)}
+     ${field("✉️","Adresse e-mail",state.email||"—")}
+     ${field("📱","Téléphone",profile.telephone)}
+     ${field("📍","Ville",profile.Ville||profile.ville)}
+   </div>
+   ${isFounder()?'<div class="busaf-account-founder-note">👑 <div><strong>Compte Fondateur</strong><small>Les accès d’administration sont activés pour ce compte.</small></div></div>':""}
+   <div class="busaf-account-section-title"><span>🤝</span><div><h3>Mon parrainage</h3><p>Ton code personnel pour inviter de nouveaux membres.</p></div></div>
+   <div class="busaf-account-code">
+     <div><small>MON CODE PARRAIN</small><strong>${esc(profile.code_parrain||"Non disponible")}</strong></div>
+     <button onclick="copyInvitation('code')" aria-label="Copier mon code parrain">📋 Copier</button>
+   </div>
+   <div class="busaf-account-section-title"><span>⚙️</span><div><h3>Gestion du compte</h3><p>Modifie tes informations ou protège ta session.</p></div></div>
+   <div class="busaf-account-actions">
+     <button class="busaf-account-action" onclick="editProfile()"><span>✏️</span><div><strong>Modifier mon profil</strong><small>Nom, téléphone et ville</small></div><b>›</b></button>
+     <button class="busaf-account-action" onclick="setScreen('privacy')"><span>🔐</span><div><strong>Confidentialité et sécurité</strong><small>Consulter les options de protection</small></div><b>›</b></button>
+     <button class="busaf-account-action is-danger" onclick="confirmLogout()"><span>🚪</span><div><strong>DÉCONNEXION</strong><small>Quitter ton compte BuSAF</small></div><b>›</b></button>
+   </div>
+ </section>
  `);
 }
 
@@ -3663,6 +3679,43 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
  font-size:13px!important;line-height:1.3!important;text-align:left!important;
 }
 #app .founder-dashboard .founder-grid .founder-app[onclick*="logout"] small{display:block!important}
+
+/* BuSAF — espace Compte moderne, limité à cet écran */
+.busaf-account-modern{display:grid;gap:17px;margin:4px 0 24px;color:var(--text,#17372b)}
+.busaf-account-hero{position:relative;overflow:hidden;padding:22px 18px 17px;border-radius:24px;background:linear-gradient(135deg,#073f2c 0%,#08734b 58%,#13a36b 100%);color:#fff;box-shadow:0 12px 30px rgba(3,73,47,.19)}
+.busaf-account-hero-glow{position:absolute;width:190px;height:190px;right:-65px;top:-90px;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none}
+.busaf-account-profile{position:relative;display:flex;align-items:center;gap:14px;min-width:0}
+.busaf-account-avatar{flex:0 0 76px;width:76px;height:76px;border:3px solid rgba(255,255,255,.78);border-radius:23px;overflow:hidden;background:rgba(255,255,255,.15);display:grid;place-items:center}
+.busaf-account-avatar .profile-photo-wrap{margin:0;padding:0;border:0;background:transparent;display:block;width:100%;height:100%}
+.busaf-account-avatar .profile-photo-wrap img,.busaf-account-avatar img{width:100%;height:100%;object-fit:cover;border-radius:18px}
+.busaf-account-avatar .profile-photo-info,.busaf-account-avatar button,.busaf-account-avatar .btn{display:none!important}
+.busaf-account-identity{min-width:0;position:relative}
+.busaf-account-eyebrow{font-size:10px;letter-spacing:1.5px;font-weight:800;color:#d7fbe8}
+.busaf-account-identity h2{font-size:clamp(18px,5vw,24px);line-height:1.2;margin:7px 0 9px;color:#fff;overflow-wrap:anywhere}
+.busaf-account-role{display:inline-flex;align-items:center;gap:5px;padding:5px 10px;border-radius:999px;background:#e2f8eb;color:#075b3b;font-size:11px;font-weight:900}
+.busaf-account-role.is-founder{background:#fff0c2;color:#784900}.busaf-account-role.is-partner{background:#dbeafe;color:#174b91}
+.busaf-account-photo-btn{position:relative;margin-top:17px;width:100%;border:1px solid rgba(255,255,255,.38);border-radius:13px;padding:11px;background:rgba(255,255,255,.13);color:#fff;font-weight:800;font-size:13px}
+.busaf-account-section-title{display:flex;align-items:center;gap:11px;margin:2px 1px -6px}
+.busaf-account-section-title>span{width:39px;height:39px;display:grid;place-items:center;flex:0 0 39px;border-radius:13px;background:#e0f7e9;color:#087347;font-size:19px}
+.busaf-account-section-title h3{font-size:15px;margin:0 0 3px;color:var(--text,#17372b)}
+.busaf-account-section-title p{font-size:11px;line-height:1.45;margin:0;color:var(--muted,#66786f)}
+.busaf-account-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.busaf-account-field{display:flex;align-items:flex-start;gap:9px;min-width:0;padding:13px 11px;border:1px solid #e1eee6;border-radius:16px;background:linear-gradient(145deg,#fff,#f5fbf7);box-shadow:0 3px 10px rgba(20,70,45,.035)}
+.busaf-account-field-icon{display:grid;place-items:center;flex:0 0 32px;width:32px;height:32px;border-radius:11px;background:#e2f6e9;font-size:15px}
+.busaf-account-field>div{min-width:0;display:grid;gap:5px}
+.busaf-account-field small,.busaf-account-code small{font-size:10px;font-weight:800;color:#657a6e;letter-spacing:.35px}
+.busaf-account-field strong{font-size:12px;line-height:1.45;overflow-wrap:anywhere;color:#183c2d}
+.busaf-account-founder-note{display:flex;align-items:center;gap:10px;padding:13px 14px;border:1px solid #f0d58b;border-radius:15px;background:#fff8df;color:#795000}
+.busaf-account-founder-note div{display:grid;gap:3px}.busaf-account-founder-note strong{font-size:13px}.busaf-account-founder-note small{font-size:11px;line-height:1.4}
+.busaf-account-code{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:15px;border-radius:17px;border:1px dashed #7ac59c;background:#effbf3}
+.busaf-account-code>div{min-width:0;display:grid;gap:6px}.busaf-account-code strong{font-size:16px;letter-spacing:.5px;overflow-wrap:anywhere;color:#075c3b}
+.busaf-account-code button{flex:0 0 auto;border:0;border-radius:12px;padding:10px 12px;background:#087347;color:#fff;font-size:12px;font-weight:900}
+.busaf-account-actions{display:grid;gap:9px}
+.busaf-account-action{display:flex;align-items:center;gap:12px;width:100%;padding:13px;border:1px solid #e0ebe4;border-radius:16px;background:#fff;text-align:left;color:#183c2d;box-shadow:0 4px 12px rgba(20,70,45,.045)}
+.busaf-account-action>span{display:grid;place-items:center;width:42px;height:42px;flex:0 0 42px;border-radius:13px;background:#e4f6eb;font-size:19px}
+.busaf-account-action>div{display:grid;gap:4px;flex:1;min-width:0}.busaf-account-action strong{font-size:13px}.busaf-account-action small{font-size:11px;color:#68796f;line-height:1.35}.busaf-account-action>b{font-size:24px;color:#84958a}
+.busaf-account-action.is-danger{border-color:#f2caca;background:#fff8f8;color:#a81717}.busaf-account-action.is-danger>span{background:#ffe4e4}.busaf-account-action.is-danger strong,.busaf-account-action.is-danger>b{color:#b51f1f}
+@media(max-width:360px){.busaf-account-fields{grid-template-columns:1fr}.busaf-account-avatar{flex-basis:64px;width:64px;height:64px}.busaf-account-code{align-items:flex-start;flex-direction:column}.busaf-account-code button{width:100%}}
 </style>
 
 </body>
