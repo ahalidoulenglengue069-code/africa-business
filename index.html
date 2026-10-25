@@ -1810,17 +1810,22 @@ async function login(e){
  const email=document.getElementById("loginEmail").value.trim();
  const password=document.getElementById("loginPassword").value;
  const msg=document.getElementById("loginMsg"),btn=document.getElementById("loginBtn");
- btn.disabled=true;btn.textContent="CONNEXION...";
+ btn.disabled=true;btn.textContent="VÉRIFICATION...";
+ msg.className="notice";msg.textContent="Vérification sécurisée de tes identifiants…";
  try{
   const d=await api("/auth/v1/token?grant_type=password",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
+  if(!d?.access_token||!d?.user?.id)throw new Error("Supabase n’a pas retourné une session valide. Réessaie.");
   resetUserServerCaches();
-  state.token=d.access_token||"";state.userId=d.user?.id||"";state.email=email;
+  state.token=d.access_token;state.userId=d.user.id;state.email=d.user.email||email;
   localStorage.setItem("busaf_access_token",state.token);
   localStorage.setItem("busaf_user_id",state.userId);
-  localStorage.setItem("busaf_email",email);
+  localStorage.setItem("busaf_email",state.email);
+  btn.textContent="CHARGEMENT DU PROFIL...";
+  msg.textContent="Identifiants validés. Chargement de ton profil BuSAF…";
   await ensureMemberProfile(d.user);
+  if(!state.profile)throw new Error("Connexion validée, mais le profil BuSAF n’a pas pu être chargé. Réessaie.");
   addNotification("🔐 Connexion",`Connexion réussie sur ton espace BuSAF.`,"login");
-  // Ouvrir directement le bon espace selon le rôle réellement chargé depuis Supabase.
+  msg.className="notice success";msg.textContent="Connexion réussie. Ouverture de ton espace…";
   setScreen(isFounder()?"founder":"member");
  }catch(err){
   msg.className="notice error";msg.textContent="❌ "+err.message;
@@ -2208,13 +2213,18 @@ function founderMarket(){
  return page('👑 Gestion du Marché',`<div class="notice success founder-market-note"><strong>ESPACE FONDATEUR</strong><br>Ici, tu gères les produits. Il n'y a <strong>aucun bouton Acheter</strong>.</div><button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button><button class="btn alt small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><div class="founder-product-grid" style="margin-top:10px">${cards||`<div class="empty" style="grid-column:1/-1">Aucun produit publié.</div>`}</div>`);
 }
 
+let busafFounderStatsLoading=false;
 async function founderLoadStats(){
- if(!isFounder()||!state.token)return;
+ if(!isFounder()||!state.token||state.founderStats||busafFounderStatsLoading)return state.founderStats||null;
+ busafFounderStatsLoading=true;
  const out={products:0,members:0,sales:0,confirmed:0,pending:0,failed:0,revenue:0};
- try{const r=await api('/rest/v1/produits?select=id');out.products=Array.isArray(r)?r.length:0;}catch(e){console.warn('Founder products stats',e)}
- try{const r=await api('/rest/v1/profils_busaf?select=id');out.members=Array.isArray(r)?r.length:0;}catch(e){console.warn('Founder members stats',e)}
- try{const r=await api('/rest/v1/ventes?select=id,montant,statut');if(Array.isArray(r)){out.sales=r.length;for(const v of r){const st=String(v.statut||'').toLowerCase();if(st==='confirmee'||st==='validee'){out.confirmed++;out.revenue+=Number(v.montant||0)}else if(st.includes('attente'))out.pending++;else if(st.includes('echec')||st.includes('failed'))out.failed++;}}}catch(e){console.warn('Founder sales stats',e)}
- state.founderStats=out;return out;
+ try{
+  try{const r=await api('/rest/v1/produits?select=id');out.products=Array.isArray(r)?r.length:0;}catch(e){console.warn('Founder products stats',e)}
+  try{const r=await api('/rest/v1/profils_busaf?select=id');out.members=Array.isArray(r)?r.length:0;}catch(e){console.warn('Founder members stats',e)}
+  try{const r=await api('/rest/v1/ventes?select=id,montant,statut');if(Array.isArray(r)){out.sales=r.length;for(const v of r){const st=String(v.statut||'').toLowerCase();if(st==='confirmee'||st==='validee'){out.confirmed++;out.revenue+=Number(v.montant||0)}else if(st.includes('attente'))out.pending++;else if(st.includes('echec')||st.includes('failed'))out.failed++;}}}catch(e){console.warn('Founder sales stats',e)}
+  state.founderStats=out;
+  return out;
+ }finally{busafFounderStatsLoading=false;}
 }
 let busafContactRequests=[];
 let busafContactLoading=false;
