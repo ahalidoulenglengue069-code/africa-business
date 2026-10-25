@@ -3617,7 +3617,22 @@ function render(){
     if(content && typeof content.then==="function"){
      const requestedScreen=state.screen;
      document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice">Chargement de la page…</div></main>'+founderQuick();
-     content.then(function(html){if(state.screen===requestedScreen){document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+founderQuick();}}).catch(function(e){if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}</div></main>`+founderQuick();});
+     let founderRenderDone=false;
+     const founderRenderTimeout=setTimeout(function(){
+      if(!founderRenderDone && state.screen===requestedScreen){
+       founderRenderDone=true;
+       document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice error"><strong>Cette page prend trop de temps.</strong><br>Le chargement est bloqué. Réessaie ou retourne à l’espace fondateur.<br><button class="btn" onclick="setScreen(\''+requestedScreen+'\')">RÉESSAYER</button> <button class="btn" onclick="setScreen(\'founder\')">ESPACE FONDATEUR</button></div></main>'+founderQuick();
+      }
+     },12000);
+     content.then(function(html){
+      if(founderRenderDone)return;
+      founderRenderDone=true;clearTimeout(founderRenderTimeout);
+      if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+founderQuick();
+     }).catch(function(e){
+      if(founderRenderDone)return;
+      founderRenderDone=true;clearTimeout(founderRenderTimeout);
+      if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}<br><button class="btn" onclick="setScreen('${requestedScreen}')">RÉESSAYER</button></div></main>`+founderQuick();
+     });
      return;
     }
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+founderQuick();
@@ -3633,7 +3648,22 @@ function render(){
     if(content && typeof content.then==="function"){
      const requestedScreen=state.screen;
      document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice">Chargement de la page…</div></main>'+memberQuick();
-     content.then(function(html){if(state.screen===requestedScreen){document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+memberQuick();}}).catch(function(e){if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}</div></main>`+memberQuick();});
+     let memberRenderDone=false;
+     const memberRenderTimeout=setTimeout(function(){
+      if(!memberRenderDone && state.screen===requestedScreen){
+       memberRenderDone=true;
+       document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice error"><strong>Cette page prend trop de temps.</strong><br>Le chargement est bloqué. Réessaie ou retourne à ton espace.<br><button class="btn" onclick="setScreen(\''+requestedScreen+'\')">RÉESSAYER</button> <button class="btn" onclick="setScreen(\'member\')">MON ESPACE</button></div></main>'+memberQuick();
+      }
+     },12000);
+     content.then(function(html){
+      if(memberRenderDone)return;
+      memberRenderDone=true;clearTimeout(memberRenderTimeout);
+      if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+memberQuick();
+     }).catch(function(e){
+      if(memberRenderDone)return;
+      memberRenderDone=true;clearTimeout(memberRenderTimeout);
+      if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}<br><button class="btn" onclick="setScreen('${requestedScreen}')">RÉESSAYER</button></div></main>`+memberQuick();
+     });
      return;
     }
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+memberQuick();
