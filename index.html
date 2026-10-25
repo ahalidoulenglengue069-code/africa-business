@@ -1635,7 +1635,7 @@ function setScreen(screen){
  try{history.pushState({busafScreen:screen},"","#"+screen);}catch(e){console.warn("Historique BuSAF indisponible :",e);}
  busafRenderAfterNavigation();
  if(screen==="market" || screen==="public" || screen==="products"){
-   loadMarketCatalog(true).then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   loadMarketCatalog().then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 }
