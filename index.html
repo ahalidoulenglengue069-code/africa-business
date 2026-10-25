@@ -1635,7 +1635,7 @@ function setScreen(screen){
  try{history.pushState({busafScreen:screen},"","#"+screen);}catch(e){console.warn("Historique BuSAF indisponible :",e);}
  busafRenderAfterNavigation();
  if(screen==="market" || screen==="public" || screen==="products"){
-   loadMarketCatalog().then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   loadMarketCatalog(true).then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 }
@@ -1652,7 +1652,7 @@ function goBack(){
  try{history.replaceState({busafScreen:previous},"","#"+previous);}catch(e){}
  busafRenderAfterNavigation();
  if(previous==="market" || previous==="public" || previous==="products"){
-   loadMarketCatalog().then(()=>{if(state.screen===previous)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   loadMarketCatalog(true).then(()=>{if(state.screen===previous)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 }
@@ -1668,7 +1668,7 @@ window.addEventListener("popstate",(event)=>{
  state.screen=screen;
  busafRenderAfterNavigation();
  if(screen==="market" || screen==="public" || screen==="products"){
-   loadMarketCatalog().then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   loadMarketCatalog(true).then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 });
@@ -1686,18 +1686,11 @@ async function refreshBusafSession(){
  if(!state.refreshToken)return false;
  if(busafRefreshPromise)return busafRefreshPromise;
  busafRefreshPromise=(async()=>{
-  // Le renouvellement de session ne doit jamais laisser BuSAF attendre indéfiniment.
-  const refreshController=new AbortController();
-  const refreshTimeout=setTimeout(()=>refreshController.abort(),8000);
-  let response;
-  try{
-   response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=refresh_token",{
-    method:"POST",
-    headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},
-    body:JSON.stringify({refresh_token:state.refreshToken}),
-    signal:refreshController.signal
-   });
-  }finally{clearTimeout(refreshTimeout);}
+  const response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=refresh_token",{
+   method:"POST",
+   headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},
+   body:JSON.stringify({refresh_token:state.refreshToken})
+  });
   const raw=await response.text();let data={};
   try{data=raw?JSON.parse(raw):{}}catch{data={raw}}
   if(!response.ok||!data.access_token)throw new Error(data.msg||data.message||data.error_description||"Session expirée. Reconnecte-toi.");
@@ -1718,15 +1711,16 @@ async function refreshBusafSession(){
 }
 async function api(path,options={}){
  const headers=Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json"},options.headers||{});
+ // Les appels avec Authorization explicite (connexion/inscription) gardent leur jeton fourni.
  const usesSessionToken=!options.headers?.Authorization&&!!state.token;
  if(state.token&&!headers.Authorization)headers.Authorization="Bearer "+state.token;
- const timeoutMs=Math.max(1000,Number(options.timeoutMs)||12000);
+ const timeoutMs=Math.max(1000,Number(options.timeoutMs)||15000);
  const externalSignal=options.signal||null;
  const requestOptions=Object.assign({},options,{headers});
  delete requestOptions.timeoutMs;
  delete requestOptions.signal;
  const publicAuthPath=/^\/auth\/v1\/(token\?grant_type=(password|refresh_token)|signup|verify|recover|logout)/.test(path);
- async function timedRequest(){
+ async function timedFetch(){
   const controller=new AbortController();
   let timedOut=false;
   const timer=setTimeout(()=>{timedOut=true;controller.abort();},timeoutMs);
@@ -1737,33 +1731,32 @@ async function api(path,options={}){
   }
   try{
    const response=await fetch(SUPABASE_URL+path,Object.assign({},requestOptions,{signal:controller.signal}));
-   // Le délai couvre aussi la lecture du corps : certains appels restent bloqués après les en-têtes.
-   const responseText=await response.text();
-   let data={};
-   try{data=responseText?JSON.parse(responseText):{}}catch{data={raw:responseText}}
-   return {ok:response.ok,status:response.status,data};
+   return response;
   }catch(e){
-   if(timedOut)throw new Error("Délai dépassé : le serveur BuSAF ne répond pas. Réessaie.");
-   if(externalSignal?.aborted)throw new Error("Requête annulée. Réessaie.");
+   if(timedOut)throw new Error("Délai dépassé : Supabase ne répond pas assez vite. Réessaie.");
    throw e;
   }finally{
    clearTimeout(timer);
    if(externalSignal)externalSignal.removeEventListener("abort",abortFromCaller);
   }
  }
- let result=await timedRequest();
- if((result.status===401||result.status===403)&&usesSessionToken&&!publicAuthPath&&state.refreshToken){
-  const refreshed=await refreshBusafSession();
-  if(refreshed){
-   headers.Authorization="Bearer "+state.token;
-   result=await timedRequest();
+ try{
+  let r=await timedFetch();
+  if((r.status===401||r.status===403)&&usesSessionToken&&!publicAuthPath&&state.refreshToken){
+   const refreshed=await refreshBusafSession();
+   if(refreshed){
+    headers.Authorization="Bearer "+state.token;
+    r=await timedFetch();
+   }
   }
+  const responseText=await r.text();let data={};
+  try{data=responseText?JSON.parse(responseText):{}}catch{data={raw:responseText}}
+  if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.details||data.raw||"Erreur Supabase ("+r.status+")");
+  return data;
+ }catch(e){
+  if(e?.name==="AbortError")throw new Error("Requête annulée. Réessaie.");
+  throw e;
  }
- if(!result.ok){
-  const data=result.data||{};
-  throw new Error(data.msg||data.message||data.error_description||data.details||data.raw||"Erreur Supabase ("+result.status+")");
- }
- return result.data;
 }
 async function loadProfile(){
  if(!state.userId||!state.token)return;
@@ -1828,15 +1821,13 @@ async function restoreAuthenticatedSession(){
     state.email=user.email||"";
     localStorage.setItem("busaf_user_id",state.userId);
     localStorage.setItem("busaf_email",state.email);
-    // Le profil est chargé séparément de l'authentification : une panne de profils_busaf
-    // ne doit pas déconnecter l'utilisateur ni empêcher l'ouverture de son espace.
-    try{
-      await ensureMemberProfile(user);
-    }catch(profileError){
-      console.error("Profil BuSAF indisponible; session conservée :",profileError.message||profileError);
-      state.profile=state.profile||null;
+    // Réparer automatiquement les comptes Auth qui n'ont pas encore leur profil BuSAF.
+    // ensureMemberProfile vérifie le code du parrain avant de créer un profil membre.
+    await ensureMemberProfile(user);
+    if(!state.profile){
+      state.token=oldToken;
+      throw new Error("Profil BuSAF introuvable. Reconnecte-toi pour terminer la configuration du compte.");
     }
-    if(window.busafLoginScreenActive)return false;
     state.screen=isFounder()?"founder":"member";
     return true;
   }catch(e){
@@ -2838,7 +2829,7 @@ async function deleteMarketProduct(id){
    if(!outcome||outcome.success!==true)throw new Error(outcome?.message||'Supabase n’a pas confirmé le retrait du produit.');
    state.marketCatalog=(state.marketCatalog||[]).filter(x=>String(x.id)!==String(id));
    state.marketCatalogLoaded=true;
-   try{await loadMarketCatalog();}catch(refreshError){console.warn('Produit retiré; actualisation à refaire:',refreshError);}
+   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit retiré; actualisation à refaire:',refreshError);}
    try{render();}catch(renderError){console.warn('Produit retiré; affichage à actualiser:',renderError);}
    const detail=outcome.action==='archived'
      ? 'Le produit a été retiré du Marché. Son historique de ventes et de commandes est conservé.'
@@ -2946,7 +2937,7 @@ async function saveMarketProduct(editId=''){
    // Actualisation et journalisation sont secondaires : elles ne doivent jamais
    // transformer une écriture déjà confirmée en faux message d'échec.
    state.marketCatalogLoaded=false;
-   try{await loadMarketCatalog();}catch(refreshError){console.warn('Produit enregistré; actualisation du catalogue à refaire:',refreshError);}
+   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit enregistré; actualisation du catalogue à refaire:',refreshError);}
    try{await logSharedBusafEvent('produit_marche',editId?'🛒 Produit du Marché modifié':'🛒 Nouveau produit du Marché',{nom,prix:price});}catch(eventError){console.warn('Produit enregistré; événement non journalisé:',eventError);}
    try{closeModal();}catch(uiError){console.warn('Fermeture du formulaire:',uiError);}
    try{render();}catch(renderError){console.warn('Produit enregistré; affichage à actualiser:',renderError);}
@@ -3048,7 +3039,7 @@ async function saveBoutiqueProduct(){
      addNotification('🏪 Produit publié',`${name} est maintenant publié. Le prélèvement de publication de 5 % doit être confirmé côté serveur en production.`,'boutique_publish');
      saveState();
      state.marketCatalogLoaded=false;
-     await loadMarketCatalog();
+     await loadMarketCatalog(true);
      closeModal();render();
      openModal('✅ Produit publié',`<div class="notice success"><strong>${esc(name)}</strong> est maintenant publié dans ta <strong>🏪 Boutique</strong> pour les autres membres.</div><div class="notice">Prix public : ${money(price)}<br>Prélèvement BuSAF à la publication : ${money(fee)} (5 %).</div><button class="btn" onclick="closeModal();setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="closeModal()">OK</button>`);
    }catch(e){
@@ -3619,22 +3610,7 @@ function render(){
     if(content && typeof content.then==="function"){
      const requestedScreen=state.screen;
      document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice">Chargement de la page…</div></main>'+founderQuick();
-     let founderRenderDone=false;
-     const founderRenderTimeout=setTimeout(function(){
-      if(!founderRenderDone && state.screen===requestedScreen){
-       founderRenderDone=true;
-       document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice error"><strong>Cette page prend trop de temps.</strong><br>Le chargement est bloqué. Réessaie ou retourne à l’espace fondateur.<br><button class="btn" onclick="setScreen(\''+requestedScreen+'\')">RÉESSAYER</button> <button class="btn" onclick="setScreen(\'founder\')">ESPACE FONDATEUR</button></div></main>'+founderQuick();
-      }
-     },12000);
-     content.then(function(html){
-      if(founderRenderDone)return;
-      founderRenderDone=true;clearTimeout(founderRenderTimeout);
-      if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+founderQuick();
-     }).catch(function(e){
-      if(founderRenderDone)return;
-      founderRenderDone=true;clearTimeout(founderRenderTimeout);
-      if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}<br><button class="btn" onclick="setScreen('${requestedScreen}')">RÉESSAYER</button></div></main>`+founderQuick();
-     });
+     content.then(function(html){if(state.screen===requestedScreen){document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+founderQuick();}}).catch(function(e){if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}</div></main>`+founderQuick();});
      return;
     }
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+founderQuick();
@@ -3650,22 +3626,7 @@ function render(){
     if(content && typeof content.then==="function"){
      const requestedScreen=state.screen;
      document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice">Chargement de la page…</div></main>'+memberQuick();
-     let memberRenderDone=false;
-     const memberRenderTimeout=setTimeout(function(){
-      if(!memberRenderDone && state.screen===requestedScreen){
-       memberRenderDone=true;
-       document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice error"><strong>Cette page prend trop de temps.</strong><br>Le chargement est bloqué. Réessaie ou retourne à ton espace.<br><button class="btn" onclick="setScreen(\''+requestedScreen+'\')">RÉESSAYER</button> <button class="btn" onclick="setScreen(\'member\')">MON ESPACE</button></div></main>'+memberQuick();
-      }
-     },12000);
-     content.then(function(html){
-      if(memberRenderDone)return;
-      memberRenderDone=true;clearTimeout(memberRenderTimeout);
-      if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+memberQuick();
-     }).catch(function(e){
-      if(memberRenderDone)return;
-      memberRenderDone=true;clearTimeout(memberRenderTimeout);
-      if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}<br><button class="btn" onclick="setScreen('${requestedScreen}')">RÉESSAYER</button></div></main>`+memberQuick();
-     });
+     content.then(function(html){if(state.screen===requestedScreen){document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+memberQuick();}}).catch(function(e){if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}</div></main>`+memberQuick();});
      return;
     }
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+memberQuick();
@@ -3683,9 +3644,9 @@ async function start(){
   try{
     const incomingInvite=new URLSearchParams(location.search).get("invite");
     if(incomingInvite)window.busafIncomingInvite=incomingInvite;
+    const recovery=await handlePasswordRecovery();
+    if(recovery)return;
 
-    // Déterminer et afficher l'écran tout de suite : aucun appel réseau ne doit
-    // empêcher l'interface de démarrer, notamment avec un ancien lien de récupération.
     const h=location.hash.replace(/^#/,"");
     if(h && ["public","market","benefits","profits","commissions","rules","signup","login","contact"].includes(h)){
       state.screen=h;
@@ -3693,14 +3654,11 @@ async function start(){
       state.screen="public";
     }
     window.busafLoginScreenActive=(state.screen==="login");
-    window.busafScreenStack=[normalScreen(state.screen)];
-    render();
-
-    // Traiter ensuite la récupération de mot de passe, une fois l'interface visible.
-    const recovery=await handlePasswordRecovery();
-    if(recovery)return;
-
     history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
+    window.busafScreenStack=[normalScreen(state.screen)];
+
+    // Afficher immédiatement l'interface, sans attendre le catalogue distant.
+    render();
 
     // Ne pas lancer de requête Marché sur les écrans Connexion/Inscription :
     // cela évite du trafic Supabase inutile pendant l'authentification.
