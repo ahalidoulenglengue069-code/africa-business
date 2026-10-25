@@ -2635,28 +2635,37 @@ async function startMarketPurchase(productId){
 async function deleteMarketProduct(id){
  if(!marketCanPublish()){alert('Connecte-toi à ton compte BuSAF.');return;}
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(id));
- if(!p)return;
+ if(!p){alert('Produit introuvable dans la liste actuelle. Actualise le Marché puis réessaie.');return;}
  if(!marketCanManageProduct(p)){alert('Tu peux supprimer uniquement tes propres produits.');return;}
  if(!confirm(`Supprimer « ${p.nom||'ce produit'} » du Marché ?`))return;
+ let deleteConfirmed=false;
  try{
-   await api(`/rest/v1/produits?id=eq.${encodeURIComponent(id)}`,{
+   const deleted=await api(`/rest/v1/produits?id=eq.${encodeURIComponent(id)}&select=id`,{
      method:'DELETE',
-     headers:{'Prefer':'return=minimal'}
+     headers:{'Prefer':'return=representation'}
    });
-
-   // On retire immédiatement le produit de la mémoire locale.
-   // Puis on recharge obligatoirement depuis Supabase afin qu'il ne réapparaisse
-   // ni dans l'espace Fondateur, ni dans le Marché public, ni sur un autre écran.
+   if(Array.isArray(deleted)&&deleted.some(row=>String(row.id)===String(id))){
+     deleteConfirmed=true;
+   }else{
+     // PostgREST peut répondre sans ligne si aucune ligne n'a été supprimée.
+     const remaining=await api(`/rest/v1/produits?id=eq.${encodeURIComponent(id)}&select=id&limit=1`);
+     if(Array.isArray(remaining)&&remaining.length===0)deleteConfirmed=true;
+     else throw new Error('Supabase n’a confirmé aucune suppression. Vérifie les droits du compte.');
+   }
+   // Dès que la suppression est confirmée, les erreurs de rafraîchissement ne doivent
+   // plus être présentées comme un échec de suppression.
    state.marketCatalog=(state.marketCatalog||[]).filter(x=>String(x.id)!==String(id));
    state.marketCatalogLoaded=true;
-   render();
-
-   // Vérification réelle auprès de Supabase.
-   state.marketCatalogLoaded=false;
-   await loadMarketCatalog(true);
-   render();
+   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit supprimé, actualisation du catalogue à refaire:',refreshError);}
+   try{render();}catch(renderError){console.warn('Produit supprimé; affichage à actualiser:',renderError);}
+   openModal('✅ Produit supprimé',`<div class="notice success"><strong>${esc(p.nom||'Le produit')}</strong> a été supprimé du Marché BuSAF.</div><div class="notice">La suppression est confirmée. Si la liste ne se met pas à jour immédiatement, utilise ACTUALISER.</div><button class="btn" onclick="closeModal()">OK</button>`);
  }catch(e){
-   alert('❌ Suppression impossible : '+e.message);
+   console.error('BuSAF deleteMarketProduct:',e);
+   if(deleteConfirmed){
+     openModal('✅ Produit supprimé',`<div class="notice success"><strong>${esc(p.nom||'Le produit')}</strong> a été supprimé. L’affichage doit être actualisé.</div><button class="btn" onclick="closeModal()">OK</button>`);
+   }else{
+     alert('❌ Suppression non confirmée : '+(e?.message||'Erreur inconnue.'));
+   }
  }
 }
 function requestPhysicalPurchase(id){
@@ -2702,11 +2711,12 @@ async function saveMarketProduct(editId=''){
  const submitBtn=document.getElementById('mpSaveBtn');
  const submitLabel=submitBtn?.textContent||'VALIDER ET PUBLIER';
  if(submitBtn){submitBtn.disabled=true;submitBtn.textContent=editId?'MODIFICATION EN COURS…':'PUBLICATION EN COURS…';}
+ let databaseWriteConfirmed=false;
+ let savedProduct=null;
  try{
-   // Recharge le profil avant l'insertion pour éviter un state.profile périmé ou vide.
    await loadProfile();
    const creatorId=isFounder()?founderProfileId():String(state.profile?.id||'');
-   if(!creatorId){throw new Error('Profil BuSAF introuvable.');}
+   if(!creatorId)throw new Error('Profil BuSAF introuvable.');
    const editingProduct=editId?(state.marketCatalog||[]).find(x=>String(x.id)===String(editId)):null;
    if(editId&&(!editingProduct||!marketCanManageProduct(editingProduct)))throw new Error('Tu peux modifier uniquement tes propres produits.');
 
@@ -2714,7 +2724,7 @@ async function saveMarketProduct(editId=''){
    const name=document.getElementById('mpName')?.value.trim();
    const price=Number(document.getElementById('mpPrice')?.value||0);
    const desc=document.getElementById('mpDesc')?.value.trim()||'';
-   if(!name||price<=0){throw new Error('Nom et prix valides obligatoires.');}
+   if(!name||price<=0)throw new Error('Nom et prix valides obligatoires.');
 
    let image_url=editId
      ? ((state.marketCatalog||[]).find(x=>String(x.id)===String(editId))?.image_url||null)
@@ -2727,66 +2737,51 @@ async function saveMarketProduct(editId=''){
      const path=`${state.userId}/product-${Date.now()}.${ext}`;
      const r=await fetch(`${SUPABASE_URL}/storage/v1/object/marche/${path}`,{
        method:'POST',
-       headers:{
-         apikey:SUPABASE_KEY,
-         Authorization:'Bearer '+state.token,
-         'Content-Type':f.type,
-         'x-upsert':'true'
-       },
+       headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+state.token,'Content-Type':f.type,'x-upsert':'true'},
        body:f
      });
      const txt=await r.text();
      if(!r.ok)throw new Error(txt||'Upload image impossible.');
-     // Le bucket réel est "marche".
      image_url=`${SUPABASE_URL}/storage/v1/object/public/marche/${path}`;
    }
 
    if(editId){
-     const body={
-       Produits:name,
-       nom:name,
-       description:desc,
-       prix:price,
-       type_produit:'digital',
-       image_url
-     };
+     const body={Produits:name,nom:name,description:desc,prix:price,type_produit:'digital',image_url};
      const rows=await api(`/rest/v1/produits?id=eq.${encodeURIComponent(editId)}&select=id,nom,description,prix,type_produit,createur_id,created_at,image_url`,{
-       method:'PATCH',
-       headers:{'Prefer':'return=representation'},
-       body:JSON.stringify(body)
+       method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(body)
      });
-     if(!Array.isArray(rows)||!rows[0]?.id)throw new Error('La modification du produit n’a pas été confirmée par Supabase.');
+     savedProduct=Array.isArray(rows)?rows[0]:null;
+     if(!savedProduct?.id)throw new Error('Supabase n’a retourné aucun produit modifié. Vérifie les droits du compte.');
    }else{
-     const body={
-       Produits:name,
-       nom:name,
-       description:desc,
-       prix:price,
-       type_produit:'digital',
-       createur_id:creatorId,
-       image_url
-     };
+     const body={Produits:name,nom:name,description:desc,prix:price,type_produit:'digital',createur_id:creatorId,image_url};
      const rows=await api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url',{
-       method:'POST',
-       headers:{'Prefer':'return=representation'},
-       body:JSON.stringify(body)
+       method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify(body)
      });
-     const created=Array.isArray(rows)?rows[0]:rows;
-     if(!created?.id)throw new Error('Supabase n’a pas confirmé la création du produit.');
+     savedProduct=Array.isArray(rows)?rows[0]:null;
+     if(!savedProduct?.id)throw new Error('Supabase n’a retourné aucun produit créé.');
    }
+   databaseWriteConfirmed=true;
 
+   // Actualisation et journalisation sont secondaires : elles ne doivent jamais
+   // transformer une écriture déjà confirmée en faux message d'échec.
    state.marketCatalogLoaded=false;
-   await loadMarketCatalog(true);
-   if(!editId) await logSharedBusafEvent('produit_marche','🛒 Nouveau produit du Marché',{nom,prix});
-   closeModal();
-   render();
+   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit enregistré; actualisation du catalogue à refaire:',refreshError);}
+   try{await logSharedBusafEvent('produit_marche',editId?'🛒 Produit du Marché modifié':'🛒 Nouveau produit du Marché',{nom,prix:price});}catch(eventError){console.warn('Produit enregistré; événement non journalisé:',eventError);}
+   try{closeModal();}catch(uiError){console.warn('Fermeture du formulaire:',uiError);}
+   try{render();}catch(renderError){console.warn('Produit enregistré; affichage à actualiser:',renderError);}
    openModal(editId?'✅ Produit modifié':'✅ Produit publié',
-     `<div class="notice success"><strong>${esc(name)}</strong> est ${editId?'maintenant modifié':'maintenant enregistré'} dans le Marché BuSAF.</div><div class="notice">Prix : ${money(price)}<br>Source : Supabase / public.produits</div><button class="btn" onclick="closeModal()">OK</button>`
+     `<div class="notice success"><strong>${esc(name)}</strong> a bien été ${editId?'modifié':'enregistré'} dans le Marché BuSAF.</div><div class="notice">Prix : ${money(price)}<br>Enregistrement confirmé par Supabase.</div><button class="btn" onclick="closeModal()">OK</button>`
    );
  }catch(e){
    console.error('BuSAF saveMarketProduct:',e);
-   if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=submitLabel;}
-   alert('❌ Opération impossible : '+(e?.message||'Erreur inconnue.'));
+   if(databaseWriteConfirmed){
+     // Sécurité de dernier recours si une opération d'interface échoue après l'enregistrement.
+     try{closeModal();}catch(_){}
+     openModal(editId?'✅ Produit modifié':'✅ Produit publié',`<div class="notice success">L’enregistrement dans Supabase est confirmé. L’affichage peut nécessiter une actualisation.</div><button class="btn" onclick="closeModal()">OK</button>`);
+   }else{
+     if(submitBtn){submitBtn.disabled=false;submitBtn.textContent=submitLabel;}
+     alert('❌ Enregistrement non confirmé : '+(e?.message||'Erreur inconnue.'));
+   }
  }
 }
 function memberBoutique(){
