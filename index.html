@@ -2180,7 +2180,7 @@ function publicHome(){
  <div class="public-note">ℹ️ Les montants de bénéfice affichés ici sont une présentation indicative selon les règles BuSAF. Les opérations d'achat, de revente, de stock et de commission nécessitent un compte.</div>
  <div class="public-section-head"><h2>📚 Découvrir BuSAF</h2><small>5 espaces accessibles</small></div>
  <div class="public-info-grid">${infos.map(([id,ico,title,desc,accent])=>`<button class="public-info-card ${accent}" onclick="setScreen('${id}')"><span class="pico">${ico}</span><b>${title}</b><small>${desc}</small></button>`).join('')}</div>
- <section class="rule" style="margin-top:16px;border:2px solid #087a38;background:linear-gradient(135deg,#e8f7ed,#fff);border-radius:16px;padding:16px;text-align:center"><div style="font-size:28px">💬</div><h2 style="margin:5px 0;color:#075c2b">Besoin de plus d’informations ?</h2><p style="margin:6px 0 12px">Tu peux contacter l’équipe BuSAF même si tu n’as pas encore créé ton compte. Pose ta question et nous pourrons te répondre.</p><button class="btn" style="width:100%;background:#087a38;color:#fff" onclick="setScreen('contact')">📩 CONTACTER BuSAF</button></section>`;
+ <section class="rule" style="margin-top:16px;border:2px solid #087a38;background:linear-gradient(135deg,#e8f7ed,#fff);border-radius:16px;padding:16px;text-align:center"><h2 style="margin:5px 0;color:#075c2b">Besoin de plus d’informations ?</h2><p style="margin:6px 0 12px">Tu peux contacter l’équipe BuSAF même si tu n’as pas encore créé ton compte. Pose ta question et nous pourrons te répondre.</p><button class="btn" style="width:100%;background:#087a38;color:#fff" onclick="setScreen('contact')">📩 CONTACTER BuSAF</button></section>`;
 }
 
 
