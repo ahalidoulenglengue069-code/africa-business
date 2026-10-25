@@ -1635,7 +1635,7 @@ function setScreen(screen){
  try{history.pushState({busafScreen:screen},"","#"+screen);}catch(e){console.warn("Historique BuSAF indisponible :",e);}
  busafRenderAfterNavigation();
  if(screen==="market" || screen==="public" || screen==="products"){
-   loadMarketCatalog(true).then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   loadMarketCatalog().then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 }
@@ -1652,7 +1652,7 @@ function goBack(){
  try{history.replaceState({busafScreen:previous},"","#"+previous);}catch(e){}
  busafRenderAfterNavigation();
  if(previous==="market" || previous==="public" || previous==="products"){
-   loadMarketCatalog(true).then(()=>{if(state.screen===previous)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   loadMarketCatalog().then(()=>{if(state.screen===previous)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 }
@@ -1668,7 +1668,7 @@ window.addEventListener("popstate",(event)=>{
  state.screen=screen;
  busafRenderAfterNavigation();
  if(screen==="market" || screen==="public" || screen==="products"){
-   loadMarketCatalog(true).then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   loadMarketCatalog().then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 });
@@ -2829,7 +2829,7 @@ async function deleteMarketProduct(id){
    if(!outcome||outcome.success!==true)throw new Error(outcome?.message||'Supabase n’a pas confirmé le retrait du produit.');
    state.marketCatalog=(state.marketCatalog||[]).filter(x=>String(x.id)!==String(id));
    state.marketCatalogLoaded=true;
-   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit retiré; actualisation à refaire:',refreshError);}
+   try{await loadMarketCatalog();}catch(refreshError){console.warn('Produit retiré; actualisation à refaire:',refreshError);}
    try{render();}catch(renderError){console.warn('Produit retiré; affichage à actualiser:',renderError);}
    const detail=outcome.action==='archived'
      ? 'Le produit a été retiré du Marché. Son historique de ventes et de commandes est conservé.'
@@ -2937,7 +2937,7 @@ async function saveMarketProduct(editId=''){
    // Actualisation et journalisation sont secondaires : elles ne doivent jamais
    // transformer une écriture déjà confirmée en faux message d'échec.
    state.marketCatalogLoaded=false;
-   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit enregistré; actualisation du catalogue à refaire:',refreshError);}
+   try{await loadMarketCatalog();}catch(refreshError){console.warn('Produit enregistré; actualisation du catalogue à refaire:',refreshError);}
    try{await logSharedBusafEvent('produit_marche',editId?'🛒 Produit du Marché modifié':'🛒 Nouveau produit du Marché',{nom,prix:price});}catch(eventError){console.warn('Produit enregistré; événement non journalisé:',eventError);}
    try{closeModal();}catch(uiError){console.warn('Fermeture du formulaire:',uiError);}
    try{render();}catch(renderError){console.warn('Produit enregistré; affichage à actualiser:',renderError);}
@@ -3039,7 +3039,7 @@ async function saveBoutiqueProduct(){
      addNotification('🏪 Produit publié',`${name} est maintenant publié. Le prélèvement de publication de 5 % doit être confirmé côté serveur en production.`,'boutique_publish');
      saveState();
      state.marketCatalogLoaded=false;
-     await loadMarketCatalog(true);
+     await loadMarketCatalog();
      closeModal();render();
      openModal('✅ Produit publié',`<div class="notice success"><strong>${esc(name)}</strong> est maintenant publié dans ta <strong>🏪 Boutique</strong> pour les autres membres.</div><div class="notice">Prix public : ${money(price)}<br>Prélèvement BuSAF à la publication : ${money(fee)} (5 %).</div><button class="btn" onclick="closeModal();setScreen('market')">VOIR LE MARCHÉ</button><button class="btn alt" onclick="closeModal()">OK</button>`);
    }catch(e){
