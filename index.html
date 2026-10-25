@@ -1525,7 +1525,7 @@ function currentProducts(){
 
 function publicProductView(p){
  const price=Number(p?.prix||0);
- const sellerBenefit=Math.round(price*0.05);
+ const sellerBenefit=Math.round(price*0.10);
  const image=p?.image_url||'';
  const safeId=String(p?.id||'').replace(/'/g,"\\'");
  const img=image
@@ -2030,12 +2030,12 @@ function recordMarketSale(productId,qty,customer,paymentMethod){
  const productPrice=Number(p.prix||0);
  const now=new Date();
  const resaleTotal=productPrice*qty;
- const sellerProfit=resaleTotal*0.05;
+ const sellerProfit=resaleTotal*0.10;
  const sponsorCommission=resaleTotal*0.07;
  state.sales.unshift({id:Date.now(),productId:p.id,product:productName,qty,customer,paymentMethod,date:now.toISOString(),sellerProfit,sponsorCommission,total:resaleTotal,validated:true});
  state.marketSales=totalSalesCount();
  state.marketBalance+=sellerProfit;
- addNotification('💰 Revente validée',`${qty} × ${productName} : bénéfice vendeur 5 % = ${money(sellerProfit)}.`,`market_sale`);
+ addNotification('💰 Revente validée',`${qty} × ${productName} : bénéfice vendeur 10 % = ${money(sellerProfit)}.`,`market_sale`);
  addNotification('🤝 Parrain direct',`La commission de 7 % est réservée au parrain direct du vendeur : ${money(sponsorCommission)}.`,`sponsor_commission`);
  const after=totalSalesCount();
  const before=after-qty;
@@ -2164,7 +2164,7 @@ function publicHome(){
  const infos=[
   ['market','🛒','Produits du Marché','Découvrir les produits, leurs prix et le principe de revente.','accent-green'],
   ['benefits','🎁','Avantages BuSAF','Comprendre les avantages réservés aux membres.','accent-gold'],
-  ['profits','💰','Bénéfices possibles','Voir comment le bénéfice vendeur de 5 % est calculé sur une revente validée.','accent-blue'],
+  ['profits','💰','Bénéfices possibles','Voir comment le bénéfice vendeur de 10 % est calculé sur une revente validée.','accent-blue'],
   ['commissions','🤝','Commissions possibles','Comprendre la commission de 7 % du parrain direct sur une revente validée.','accent-purple'],
   ['rules','📜','Conditions & règlements','Lire les conditions avant de créer un compte.','accent-red']
  ];
@@ -2538,12 +2538,12 @@ function publicProducts(){
 function publicBenefits(){return page("⭐ Avantages",`
 <div class="rule"><h3>🛒 Plusieurs produits différents</h3><p>Un membre peut acheter plusieurs produits du Marché BuSAF, mais un même produit ne peut être acheté qu'une seule fois par le même membre.</p></div>
 <div class="rule"><h3>🔄 Revente</h3><p>Après son achat, le membre peut revendre le produit directement ou l'ajouter à son Stock BuSAF.</p></div>
-<div class="rule"><h3>💰 Bénéfice vendeur</h3><p>Chaque revente validée donne au vendeur un bénéfice de <strong>5 %</strong>.</p></div>
+<div class="rule"><h3>💰 Bénéfice vendeur</h3><p>Chaque revente validée donne au vendeur un bénéfice de <strong>10 %</strong>.</p></div>
 <div class="rule"><h3>🤝 Commission du parrain direct</h3><p>Le parrain direct du vendeur reçoit <strong>7 %</strong> sur la revente validée. La commission ne vient pas du simple achat et ne concerne pas les filleuls indirects.</p></div>
 <div class="rule"><h3>⭐ Partner</h3><p>10 ventes validées du Marché BuSAF dans le même mois donnent le statut Partner.</p></div>
 <div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées donnent 25 000 FCFA par mois pendant 3 mois, selon la règle BuSAF définie.</p></div>`);}
-function publicProfits(){return page("💰 Bénéfices",`<div class="rule"><h3>💰 Revente du Marché</h3><p>Le vendeur reçoit <strong>5 %</strong> de bénéfice sur chaque revente validée d'un produit du Marché BuSAF.</p></div><div class="rule"><h3>🤝 Parrain direct</h3><p>Le parrain direct du vendeur reçoit <strong>7 %</strong> sur cette revente validée.</p></div><div class="notice">La commission de 7 % n'est pas déclenchée par l'achat initial et ne concerne pas les filleuls indirects.</div><div class="rule"><h3>🏪 Boutique</h3><p>Les ventes personnelles de Boutique sont séparées du Marché et ne donnent pas la commission directe de 7 %.</p></div>`);}
-function publicEarn(){return page("📈 Comment gagner",`<div class="rule"><h3>1. Acheter</h3><p>Le nouveau membre effectue son premier achat auprès de son parrain direct. Ensuite, il peut acheter d'autres produits différents dans le Marché BuSAF.</p></div><div class="rule"><h3>2. Revendre</h3><p>Après achat, il peut revendre le produit directement ou l'ajouter à son Stock BuSAF.</p></div><div class="rule"><h3>3. Bénéfice vendeur</h3><p>Chaque revente validée donne <strong>5 %</strong> au vendeur.</p></div><div class="rule"><h3>4. Parrainage</h3><p>Le parrain direct reçoit <strong>7 %</strong> sur les reventes validées de ses invités directs.</p></div><div class="rule"><h3>5. Progression</h3><p>10 ventes validées dans le même mois → Partner. 100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p></div>`);}
+function publicProfits(){return page("💰 Bénéfices",`<div class="rule"><h3>💰 Revente du Marché</h3><p>Le vendeur reçoit <strong>10 %</strong> de bénéfice sur chaque revente validée d'un produit du Marché BuSAF.</p></div><div class="rule"><h3>🤝 Parrain direct</h3><p>Le parrain direct du vendeur reçoit <strong>7 %</strong> sur cette revente validée.</p></div><div class="notice">La commission de 7 % n'est pas déclenchée par l'achat initial et ne concerne pas les filleuls indirects.</div><div class="rule"><h3>🏪 Boutique</h3><p>Les ventes personnelles de Boutique sont séparées du Marché et ne donnent pas la commission directe de 7 %.</p></div>`);}
+function publicEarn(){return page("📈 Comment gagner",`<div class="rule"><h3>1. Acheter</h3><p>Le nouveau membre effectue son premier achat auprès de son parrain direct. Ensuite, il peut acheter d'autres produits différents dans le Marché BuSAF.</p></div><div class="rule"><h3>2. Revendre</h3><p>Après achat, il peut revendre le produit directement ou l'ajouter à son Stock BuSAF.</p></div><div class="rule"><h3>3. Bénéfice vendeur</h3><p>Chaque revente validée donne <strong>10 %</strong> au vendeur.</p></div><div class="rule"><h3>4. Parrainage</h3><p>Le parrain direct reçoit <strong>7 %</strong> sur les reventes validées de ses invités directs.</p></div><div class="rule"><h3>5. Progression</h3><p>10 ventes validées dans le même mois → Partner. 100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p></div>`);}
 function publicBoutiques(){return page("🏪 Boutiques",`<div class="rule"><h3>Boutiques physiques des membres</h3><p>Les produits physiques publiés par les membres sont regroupés dans l'espace BOUTIQUES. Ils restent séparés des produits numériques du Marché BuSAF.</p></div><div class="rule"><h3>Publication</h3><p>La création de la Boutique est <strong>gratuite</strong>. Lorsqu'un produit physique est publié, BuSAF prélève immédiatement <strong>5 %</strong> du prix indiqué. Le produit reste affiché à son prix exact.</p></div><div class="rule"><h3>Achat et contact</h3><p>Le client peut acheter, envoyer un message ou utiliser WhatsApp selon les possibilités prévues. Le vendeur et l'acheteur peuvent organiser la remise du produit.</p></div><div class="notice">Les commissions de parrainage du Marché ne s'appliquent pas aux ventes personnelles des Boutiques.</div>`);}
 function publicHow(){return page("📖 Fonctionnement",`
 <div class="rule"><h3>Deux activités séparées</h3><p>Le Marché BuSAF et la Boutique personnelle sont deux espaces distincts. Les produits, stocks, ventes, comptes et opérations ne doivent pas être mélangés.</p></div>
@@ -2566,8 +2566,8 @@ function aidePage(){
 }
 function aideAnswer(q){
  const t=String(q||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"");
- if(/commission|parrain|parrainage|invite/.test(t))return "Selon les règles actuelles de BuSAF, le parrain direct peut recevoir une commission de 7 % sur une revente validée. Le bénéfice vendeur est de 5 %. Les montants ne doivent pas être considérés comme acquis avant validation de la vente.";
- if(/benefice|gain|gagner|revenu|vendeur|5\s*%/.test(t))return "Le bénéfice vendeur prévu est de 5 % sur une revente validée. Exemple : pour une revente à 7 000 FCFA, 5 % représentent 350 FCFA. Ce calcul n’est pas une promesse de revenu et dépend d’une vente validée.";
+ if(/commission|parrain|parrainage|invite/.test(t))return "Selon les règles actuelles de BuSAF, le parrain direct peut recevoir une commission de 7 % sur une revente validée. Le bénéfice vendeur est de 10 %. Les montants ne doivent pas être considérés comme acquis avant validation de la vente.";
+ if(/benefice|gain|gagner|revenu|vendeur|5\s*%/.test(t))return "Le bénéfice vendeur prévu est de 10 % sur une revente validée. Exemple : pour une revente à 7 000 FCFA, 10 % représentent 700 FCFA. Ce calcul n’est pas une promesse de revenu et dépend d’une vente validée.";
  if(/acheter|achat|produit|marche|stock|revente|numerique/.test(t))return "Le Marché BuSAF est consacré aux produits numériques. Pour acheter, connecte-toi, ouvre le Marché et suis les étapes affichées. Pour un premier achat, le produit doit respecter la règle BuSAF liée à l’achat confirmé de ton parrain direct. Si un produit n’est pas éligible, ne tente pas de contourner cette règle.";
  if(/yengapay|paiement|payer|orange money|moov|transaction|en attente|attente/.test(t))return "Pour un achat, suis les instructions YengaPay affichées dans BuSAF. Après le paiement, vérifie l’état dans tes commandes. Si un paiement est indiqué « en attente », ne relance pas plusieurs paiements pour le même produit : demande une vérification au support. AIDE ne peut pas confirmer elle-même qu’un paiement a réussi.";
  if(/connexion|connecter|mot de passe|oublie|compte bloque|inscription|inscrire|code parrain|code invitation/.test(t))return "Pour te connecter, utilise l’adresse e-mail et le mot de passe de ton compte. Si tu as oublié ton mot de passe, utilise « MOT DE PASSE OUBLIÉ ? » sur l’écran de connexion. Pour t’inscrire, renseigne les champs demandés et le code de parrainage valide. Ne partage jamais ton mot de passe.";
