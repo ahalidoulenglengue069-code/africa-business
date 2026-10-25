@@ -2087,10 +2087,10 @@ function isFounder(){
    || String(state.userId||"")===BUSAF_FOUNDER_AUTH_ID;
 }
 function marketCanPublish(){
- return !!(state.userId&&state.token&&state.profile&&['membre','partner','fondateur'].includes(String(state.profile.role||'').toLowerCase()));
+ return !!(state.userId&&state.token&&isFounder());
 }
 function marketCanManageProduct(p){
- return !!p&&(isFounder()||!!(state.profile?.id&&String(p.createur_id||'')===String(state.profile.id)));
+ return !!p&&isFounder();
 }
 function founderProfileId(){
  return String(state.profile?.id||"")===BUSAF_FOUNDER_PROFILE_ID
@@ -2628,7 +2628,7 @@ function memberMarket(){
  }).join('');
  const publishButton=marketCanPublish()?'<button class="btn" onclick="openMarketProductForm()">➕ PUBLIER MON PRODUIT NUMÉRIQUE</button>':'';
  const empty=state.marketCatalogLoaded?'<div class="empty">Aucun produit numérique/business n’est encore publié dans le Marché BuSAF.</div>':'<div class="empty">Chargement des produits du Marché BuSAF…</div>';
- return page("🛒 Marché BuSAF",'<div class="notice success"><strong>LE MARCHÉ NUMÉRIQUE BuSAF</strong><br>Découvre les produits, consulte les prix et achète. Les membres connectés peuvent aussi publier leurs propres produits numériques/business. Les produits physiques restent exclus.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button></div>'+publishButton+'<div class="productgrid">'+(cards||empty)+'</div>');
+ return page("🛒 Marché BuSAF",'<div class="notice success"><strong>LE MARCHÉ NUMÉRIQUE BuSAF</strong><br>Découvre les produits, consulte les prix et achète. La publication et la gestion des produits sont réservées au fondateur. Les produits physiques restent exclus.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button></div>'+publishButton+'<div class="productgrid">'+(cards||empty)+'</div>');
 }
 function viewMarketProduct(id){
  if(isFounder()){setScreen('founderMarket');return;}
@@ -2740,9 +2740,9 @@ function sendSellerMessage(id){
  saveState(); closeModal(); openModal('Message',`<div class="notice success">Ton message concernant <strong>${esc(p.nom)}</strong> est enregistré dans tes demandes.</div><button class="btn" onclick="closeModal()">OK</button>`);
 }
 function openMarketProductForm(editId=''){
- if(!marketCanPublish()){openModal('🔒 Marché BuSAF',`<div class="notice warning">Connecte-toi à ton compte BuSAF pour publier un produit numérique.</div><button class="btn" onclick="closeModal()">OK</button>`);return;}
+ if(!marketCanPublish()){openModal('🔒 Publication réservée',`<div class="notice warning">Seul le fondateur peut ajouter des produits au Marché BuSAF. Tu peux consulter les produits et effectuer tes achats.</div><button class="btn" onclick="closeModal()">OK</button>`);return;}
  const p=editId?(state.marketCatalog||[]).find(x=>String(x.id)===String(editId)):null;
- if(editId&&(!p||!marketCanManageProduct(p))){openModal('🔒 Modification refusée',`<div class="notice warning">Tu peux modifier uniquement tes propres produits. Le fondateur peut gérer tous les produits du Marché.</div><button class="btn" onclick="closeModal()">OK</button>`);return;}
+ if(editId&&(!p||!marketCanManageProduct(p))){openModal('🔒 Modification refusée',`<div class="notice warning">Seul le fondateur peut modifier les produits du Marché BuSAF.</div><button class="btn" onclick="closeModal()">OK</button>`);return;}
  const title=p?'✏️ Modifier le produit':'➕ Ajouter un produit au Marché BuSAF';
  openModal(title,`<label>Photo du produit ${p?'(laisser vide pour conserver la photo)':'(facultative)'}</label><input id="mpPhoto" type="file" accept="image/*"><label>Nom du produit</label><input id="mpName" value="${esc(p?.nom||'')}" placeholder="Nom"><label>Prix FCFA</label><input id="mpPrice" type="number" min="1" value="${p?.prix??''}" placeholder="Prix"><label>Description</label><textarea id="mpDesc" placeholder="Description du produit numérique/business">${esc(p?.description||'')}</textarea><div class="notice">${p?'Les modifications seront enregistrées directement dans public.produits.':'Ton produit numérique sera publié dans le Marché BuSAF et visible aux visiteurs.'} Les produits physiques ne sont pas autorisés dans ce Marché.</div><button class="btn" id="mpSaveBtn" onclick="saveMarketProduct('${String(editId||'')}')">${p?'💾 ENREGISTRER LES MODIFICATIONS':'VALIDER ET PUBLIER'}</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
 }
