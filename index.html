@@ -3010,8 +3010,8 @@ function memberInvites(){
  if(busafMemberInvitesLoading||busafMemberInvites===null&&!busafMemberInvitesError)return page("👥 Mes Invités",'<div class="notice">Chargement des invitations enregistrées dans Supabase…</div>');
  if(busafMemberInvitesError)return page("👥 Mes Invités",'<div class="notice error">Impossible de charger tes invités réels : '+esc(busafMemberInvitesError)+'</div><button class="btn alt" onclick="busafMemberInvitesLoaded=false;busafMemberInvitesError=\'\';loadBusafMemberInvites()">🔄 RÉESSAYER</button>');
  const rows=busafMemberInvites||[];
- const list=rows.map(i=>'<li><strong>'+esc(i.nom_complet||"Membre BuSAF")+'</strong><br>Statut : '+esc(i.role||"membre")+'<br><span class="small">'+esc(i.created_at?new Date(i.created_at).toLocaleDateString("fr-FR"):"Date non disponible")+'</span></li>').join("");
- return page("👥 Mes Invités",'<div class="statgrid"><div class="stat">Invités enregistrés<strong>'+rows.length+'</strong></div><div class="stat">Limite<strong>Illimitée</strong></div></div><div class="notice '+(allowed?"success":"warning")+'">'+(allowed?"Tu peux partager ton invitation : un achat numérique confirmé est enregistré sur ton compte.":"Pour activer le partage des invitations, un achat numérique doit d’abord être confirmé dans ton compte.")+'</div><button class="btn" onclick="invite()">👥 PARTAGER MON INVITATION</button><div class="rule"><h3>Comment inviter ?</h3><ol><li>Appuie sur PARTAGER MON INVITATION.</li><li>Copie ton lien ou ton code personnel.</li><li>Envoie-le par WhatsApp, SMS ou autre moyen.</li><li>La personne ouvre le lien et crée son compte.</li><li>BuSAF rattache l’inscription au bon parrain.</li></ol></div><ul class="list">'+(list||'<li>Aucun invité enregistré pour le moment.</li>')+'</ul><button class="btn alt" onclick="busafMemberInvites=null;busafMemberInvitesLoaded=false;busafMemberInvitesError=\'\';loadBusafMemberInvites()">🔄 ACTUALISER LES INVITÉS</button>');
+ const list=rows.map(i=>{const name=i.nom_complet||"Membre BuSAF";const initial=name.trim().charAt(0).toUpperCase()||"M";const avatar=i.photo_url?'<img src="'+esc(i.photo_url)+'" alt="Photo de '+esc(name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'is-empty\')">':'';return '<article class="invite-profile-card"><div class="invite-profile-avatar '+(i.photo_url?'':'is-empty')+'">'+avatar+'<span>'+esc(initial)+'</span></div><div class="invite-profile-info"><strong>'+esc(name)+'</strong><span class="invite-profile-role">'+esc(i.role||"membre")+'</span><small>Inscrit(e) le '+esc(i.created_at?new Date(i.created_at).toLocaleDateString("fr-FR"):"Date non disponible")+'</small></div></article>';}).join("");
+ return page("👥 Mes Invités",'<div class="statgrid"><div class="stat">Invités enregistrés<strong>'+rows.length+'</strong></div><div class="stat">Limite<strong>Illimitée</strong></div></div><div class="notice '+(allowed?"success":"warning")+'">'+(allowed?"Tu peux partager ton invitation : un achat numérique confirmé est enregistré sur ton compte.":"Pour activer le partage des invitations, un achat numérique doit d’abord être confirmé dans ton compte.")+'</div><button class="btn" onclick="invite()">👥 PARTAGER MON INVITATION</button><div class="rule"><h3>Comment inviter ?</h3><ol><li>Appuie sur PARTAGER MON INVITATION.</li><li>Copie ton lien ou ton code personnel.</li><li>Envoie-le par WhatsApp, SMS ou autre moyen.</li><li>La personne ouvre le lien et crée son compte.</li><li>BuSAF rattache l’inscription au bon parrain.</li></ol></div><div class="invite-profile-list">'+(list||'<div class="notice">👥 Aucun invité direct enregistré pour le moment.</div>')+'</div><button class="btn alt" onclick="busafMemberInvites=null;busafMemberInvitesLoaded=false;busafMemberInvitesError=\'\';loadBusafMemberInvites()">🔄 ACTUALISER LES INVITÉS</button>');
 }
 
 function resetUserServerCaches(){
@@ -3848,6 +3848,19 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 .busaf-account-action>div{display:grid;gap:4px;flex:1;min-width:0}.busaf-account-action strong{font-size:13px}.busaf-account-action small{font-size:11px;color:#68796f;line-height:1.35}.busaf-account-action>b{font-size:24px;color:#84958a}
 .busaf-account-action.is-danger{border-color:#f2caca;background:#fff8f8;color:#a81717}.busaf-account-action.is-danger>span{background:#ffe4e4}.busaf-account-action.is-danger strong,.busaf-account-action.is-danger>b{color:#b51f1f}
 @media(max-width:360px){.busaf-account-fields{grid-template-columns:1fr}.busaf-account-avatar{flex-basis:64px;width:64px;height:64px}.busaf-account-code{align-items:flex-start;flex-direction:column}.busaf-account-code button{width:100%}}
+
+/* Profils des invités directs */
+.invite-profile-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,250px),1fr));gap:12px;margin:14px 0}
+.invite-profile-card{display:flex;align-items:center;gap:13px;min-width:0;padding:13px;border:1px solid #d7e9dc;border-radius:17px;background:linear-gradient(145deg,#fff,#f2fbf5);box-shadow:0 5px 16px rgba(5,92,42,.07)}
+.invite-profile-avatar{position:relative;flex:0 0 62px;width:62px;height:62px;border-radius:50%;overflow:hidden;border:2px solid #0b9347;background:#e3f5e8;display:grid;place-items:center}
+.invite-profile-avatar img{width:100%;height:100%;object-fit:cover;display:block}
+.invite-profile-avatar span{display:none;width:100%;height:100%;place-items:center;color:#087a38;font-size:24px;font-weight:900}
+.invite-profile-avatar.is-empty span{display:grid}
+.invite-profile-info{display:flex;flex-direction:column;gap:5px;min-width:0}
+.invite-profile-info strong{font-size:15px;color:#153b26;overflow-wrap:anywhere}
+.invite-profile-role{align-self:flex-start;padding:3px 8px;border-radius:20px;background:#d9f5e2;color:#087a38;font-size:11px;font-weight:800;text-transform:capitalize}
+.invite-profile-info small{color:#637568;font-size:11px}
+@media(max-width:380px){.invite-profile-card{padding:10px;gap:10px}.invite-profile-avatar{flex-basis:52px;width:52px;height:52px}}
 </style>
 
 </body>
