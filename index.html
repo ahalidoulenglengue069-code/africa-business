@@ -3524,7 +3524,7 @@ async function start(){
     if(recovery)return;
 
     const h=location.hash.replace(/^#/,"");
-    if(h && ["public","market","benefits","profits","commissions","rules","signup","login"].includes(h)){
+    if(h && ["public","market","benefits","profits","commissions","rules","signup","login","contact"].includes(h)){
       state.screen=h;
     }else{
       state.screen="public";
@@ -3561,6 +3561,12 @@ async function start(){
       syncSharedBusafEvents()
         .then(()=>{if(state.userId)render();})
         .catch(e=>console.warn("Notifications non synchronisées :",e));
+      if(isFounder()){
+        if(window.busafFounderNotificationTimer)clearInterval(window.busafFounderNotificationTimer);
+        window.busafFounderNotificationTimer=setInterval(()=>{
+          if(state.userId && isFounder())syncSharedBusafEvents().catch(e=>console.warn("Actualisation des notifications :",e));
+        },30000);
+      }
     }
   }catch(e){
     console.error("Erreur démarrage BuSAF:",e);
