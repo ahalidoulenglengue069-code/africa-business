@@ -117,7 +117,8 @@ textarea{min-height:100px;resize:vertical}
   position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:200;
   display:none;align-items:flex-end;justify-content:center;padding:12px
 }
-.modal.open{display:flex}
+.modal.open{display:flex;pointer-events:auto}
+.modal:not(.open){pointer-events:none!important}
 .modalbox{
   width:min(680px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:20px;
   padding:16px;box-shadow:0 15px 45px rgba(0,0,0,.25)
@@ -212,7 +213,8 @@ textarea{min-height:100px;resize:vertical}
 
 
 /* Visionneuse universelle des photos BuSAF */
-.photo-lightbox{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:56px 12px 24px;touch-action:none}
+.photo-lightbox{position:fixed;inset:0;z-index:10000;background:rgba(0,0,0,.92);display:none;align-items:center;justify-content:center;padding:56px 12px 24px;touch-action:none;pointer-events:none}
+.photo-lightbox.open{display:flex;pointer-events:auto}
 .photo-lightbox.open{display:flex}
 .photo-lightbox img{max-width:94vw;max-height:82vh;width:auto;height:auto;object-fit:contain;border-radius:10px;user-select:none;-webkit-user-drag:none;transform-origin:center center;will-change:transform;box-shadow:0 8px 35px rgba(0,0,0,.35)}
 .photo-lightbox-close{position:absolute;right:12px;top:12px;width:44px;height:44px;border:0;border-radius:50%;background:#fff;color:#111;font-size:25px;font-weight:800;z-index:2}
@@ -1608,11 +1610,11 @@ function busafScrollTop(){
 function busafClearBlockingOverlays(){
  try{
   const modal=document.getElementById("modal");
-  if(modal)modal.classList.remove("open");
+  if(modal){modal.classList.remove("open");modal.style.pointerEvents="none";}
   const photoBox=document.getElementById("photoLightbox");
-  if(photoBox){photoBox.classList.remove("open");photoBox.setAttribute("aria-hidden","true");}
+  if(photoBox){photoBox.classList.remove("open");photoBox.setAttribute("aria-hidden","true");photoBox.style.pointerEvents="none";}
   const editor=document.getElementById("profilePhotoEditor");
-  if(editor)editor.classList.remove("open");
+  if(editor){editor.classList.remove("open");editor.style.pointerEvents="none";}
   document.body.style.overflow="";
  }catch(e){console.warn("Nettoyage interface BuSAF :",e);}
 }
@@ -1673,9 +1675,11 @@ window.addEventListener("popstate",(event)=>{
 function openModal(title,html){
  document.getElementById("modalbox").innerHTML=
  `<div class="modalhead"><h2 style="color:var(--green);margin:0">${title}</h2><button class="close" onclick="closeModal()">✕</button></div>${html}`;
- document.getElementById("modal").classList.add("open");
+ const modal=document.getElementById("modal");
+ modal.style.pointerEvents="auto";
+ modal.classList.add("open");
 }
-function closeModal(){document.getElementById("modal").classList.remove("open")}
+function closeModal(){const modal=document.getElementById("modal");if(modal)modal.classList.remove("open");document.body.style.overflow="";}
 
 let busafRefreshPromise=null;
 async function refreshBusafSession(){
