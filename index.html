@@ -2351,10 +2351,10 @@ async function refreshFounderData(){openModal('🔄 Actualisation',`<div class="
 function founderMembers(){
  if(!isFounder())return memberHome();
  const rows=state.founderMembers||[];
- const list=rows.length?`<div class="list">${rows.map(m=>`<div class="rule"><strong>${esc(m.nom_complet||'Membre sans nom')}</strong><br>Ville : ${esc(m.Ville||m.ville||'—')}<br>Téléphone : ${esc(m.telephone||'—')}<br>Rôle : ${esc(m.role||'membre')}<br>Code parrain : <strong>${esc(m.code_parrain||'—')}</strong><br>Parrain ID : ${esc(m.parrain_id||'—')}</div>`).join('')}</div>`:`<div class="empty">Aucun membre chargé. Appuie sur Actualiser.</div>`;
- return page('👥 Membres BuSAF',`<div class="notice">Liste réelle de <strong>profils_busaf</strong>.</div>${list}<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER LES MEMBRES</button>`);
+ const list=rows.length?'<div class="invite-profile-list">'+rows.map(m=>{const name=m.nom_complet||"Membre BuSAF";const initial=name.trim().charAt(0).toUpperCase()||"M";const avatar=m.photo_url?'<img src="'+esc(m.photo_url)+'" alt="Photo de '+esc(name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'is-empty\')">':'';return '<article class="invite-profile-card"><div class="invite-profile-avatar '+(m.photo_url?'':'is-empty')+'">'+avatar+'<span>'+esc(initial)+'</span></div><div class="invite-profile-info"><strong>'+esc(name)+'</strong></div></article>';}).join('')+'</div>':'<div class="empty">Aucun invité direct chargé pour le fondateur.</div>';
+ return page('👥 Invités du fondateur','<div class="notice">Les profils des invités directs : photo et nom uniquement.</div>'+list+'<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER LES INVITÉS</button>');
 }
-async function refreshFounderMembers(){if(!isFounder())return;try{state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,role,parrain_id,code_parrain,created_at&order=created_at.desc');render();}catch(e){alert('❌ Impossible de charger les membres : '+e.message)}}
+async function refreshFounderMembers(){if(!isFounder())return;try{const founderId=state.profile?.id;if(!founderId)throw new Error('Profil fondateur introuvable.');state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,photo_url,parrain_id,created_at&parrain_id=eq.'+encodeURIComponent(founderId)+'&order=created_at.desc');render();}catch(e){alert('❌ Impossible de charger les invités : '+e.message)}}
 function founderPayments(){
  if(!isFounder())return memberHome();
  const rows=state.founderPayments||[];
