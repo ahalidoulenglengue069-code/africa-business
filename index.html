@@ -1571,13 +1571,11 @@ function money(n){return Number(n||0).toLocaleString("fr-FR")+" FCFA"}
 
 /* ===== NAVIGATION BuSAF : historique réel du bouton Retour Android ===== */
 function normalScreen(screen){
- const target=String(screen||"");
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
  const disabledBusinessFeatures=["boutique","stockBoutique","meetings","founderBoutiques"];
- if(disabledBusinessFeatures.includes(target))return fallback;
- if(target==="logout"){if(state.userId){logout();}else return "public";return fallback;}
- const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","aide","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderContact","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings","founderWithdrawals","myHelp"];
- return allowed.includes(target)?target:fallback;
+ if(disabledBusinessFeatures.includes(String(screen||"")))return fallback;
+ const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","aide","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderContact","founderMembers","founderReferral","founderStocks","founderAnnouncements","founderSettings","founderWithdrawals","myHelp","logout"];
+ return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
 /* Historique interne fiable : le bouton RETOUR revient à l'écran BuSAF précédent,
@@ -2352,12 +2350,12 @@ function founderDashboard(){
 async function refreshFounderData(){openModal('🔄 Actualisation',`<div class="notice">Chargement des données réelles depuis Supabase…</div>`);try{await founderLoadStats();closeModal();render();}catch(e){closeModal();alert('❌ Impossible de charger les données : '+e.message)}}
 function founderMembers(){
  if(!isFounder())return memberHome();
- if(!Array.isArray(state.founderMembers)||!state.founderMembersLoaded){refreshFounderMembers();state.founderMembersLoaded=true;}
+ if(!state.founderMembersLoadStarted){state.founderMembersLoadStarted=true;refreshFounderMembers();}
  const rows=state.founderMembers||[];
  const list=rows.length?'<div class="invite-profile-list">'+rows.map(m=>{const name=m.nom_complet||"Membre BuSAF";const initial=name.trim().charAt(0).toUpperCase()||"M";const avatar=m.photo_url?'<img src="'+esc(m.photo_url)+'" alt="Photo de '+esc(name)+'" loading="lazy" onerror="this.style.display=\'none\';this.parentElement.classList.add(\'is-empty\')">':'';return '<article class="invite-profile-card"><div class="invite-profile-avatar '+(m.photo_url?'':'is-empty')+'">'+avatar+'<span>'+esc(initial)+'</span></div><div class="invite-profile-info"><strong>'+esc(name)+'</strong></div></article>';}).join('')+'</div>':'<div class="empty">Aucun invité direct chargé pour le fondateur.</div>';
  return page('👥 Invités du fondateur','<div class="notice">Les profils des invités directs : photo et nom uniquement.</div>'+list+'<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER LES INVITÉS</button>');
 }
-async function refreshFounderMembers(){if(!isFounder())return;try{const founderId=state.profile?.id;if(!founderId)throw new Error('Profil fondateur introuvable.');state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,photo_url,parrain_id,created_at&parrain_id=eq.'+encodeURIComponent(founderId)+'&order=created_at.desc');state.founderMembersLoaded=true;render();}catch(e){state.founderMembersLoaded=false;alert('❌ Impossible de charger les invités : '+e.message)}}
+async function refreshFounderMembers(){if(!isFounder())return;try{const founderId=state.profile?.id;if(!founderId)throw new Error('Profil fondateur introuvable.');state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,photo_url,parrain_id,created_at&parrain_id=eq.'+encodeURIComponent(founderId)+'&order=created_at.desc');state.founderMembersLoadStarted=true;render();}catch(e){state.founderMembersLoadStarted=false;alert('❌ Impossible de charger les invités : '+e.message)}}
 function founderPayments(){
  if(!isFounder())return memberHome();
  const rows=state.founderPayments||[];
