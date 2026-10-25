@@ -1605,7 +1605,19 @@ function busafRecoverWorkspace(){
 function busafScrollTop(){
  try{window.scrollTo(0,0);}catch(e){}
 }
+function busafClearBlockingOverlays(){
+ try{
+  const modal=document.getElementById("modal");
+  if(modal)modal.classList.remove("open");
+  const photoBox=document.getElementById("photoLightbox");
+  if(photoBox){photoBox.classList.remove("open");photoBox.setAttribute("aria-hidden","true");}
+  const editor=document.getElementById("profilePhotoEditor");
+  if(editor)editor.classList.remove("open");
+  document.body.style.overflow="";
+ }catch(e){console.warn("Nettoyage interface BuSAF :",e);}
+}
 function setScreen(screen){
+ busafClearBlockingOverlays();
  screen=normalScreen(screen);
  window.busafLoginScreenActive=(screen==="login");
  if(screen===state.screen){
@@ -3698,6 +3710,7 @@ function initUniversalPhotoViewer(){
   box.addEventListener("click",e=>{if(e.target===box)close();});
   document.addEventListener("keydown",e=>{if(!box.classList.contains("open"))return;if(e.key==="Escape")close();if(e.key==="+")setZoom(scale+.5);if(e.key==="-")setZoom(scale-.5);});
   document.addEventListener("click",e=>{
+    if(!(e.target instanceof Element))return;
     const target=e.target.closest("img");
     if(!target||target===img)return;
     if(target.closest(".photo-lightbox")||target.closest("#profilePhotoEditorImage"))return;
