@@ -3486,12 +3486,15 @@ async function start(){
     // Afficher immédiatement l'interface, sans attendre le catalogue distant.
     render();
 
-    // Charger le catalogue en parallèle de la restauration de session.
-    // Le visiteur voit la page tout de suite; le membre retrouve son espace dès
-    // que sa session et son profil sont vérifiés.
-    const catalogPromise=loadMarketCatalog().then(()=>{
-      if(!state.userId || state.screen==="public" || state.screen==="market")render();
-    }).catch(e=>console.warn("Marché BuSAF non chargé :",e));
+    // Ne pas lancer de requête Marché sur les écrans Connexion/Inscription :
+    // cela évite du trafic Supabase inutile pendant l'authentification.
+    // Le catalogue est chargé uniquement sur les écrans qui en ont besoin.
+    const needsCatalog = state.screen==="public" || state.screen==="market";
+    const catalogPromise = needsCatalog
+      ? loadMarketCatalog().then(()=>{
+          if(!state.userId || state.screen==="public" || state.screen==="market")render();
+        }).catch(e=>console.warn("Marché BuSAF non chargé :",e))
+      : Promise.resolve();
 
     const authenticated=await restoreAuthenticatedSession();
     if(authenticated){
