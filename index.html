@@ -2637,35 +2637,26 @@ async function deleteMarketProduct(id){
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(id));
  if(!p){alert('Produit introuvable dans la liste actuelle. Actualise le Marché puis réessaie.');return;}
  if(!marketCanManageProduct(p)){alert('Tu peux supprimer uniquement tes propres produits.');return;}
- if(!confirm(`Supprimer « ${p.nom||'ce produit'} » du Marché ?`))return;
- let deleteConfirmed=false;
+ if(!confirm(`Retirer « ${p.nom||'ce produit'} » du Marché BuSAF ?`))return;
  try{
-   const deleted=await api(`/rest/v1/produits?id=eq.${encodeURIComponent(id)}&select=id`,{
-     method:'DELETE',
-     headers:{'Prefer':'return=representation'}
+   const result=await api('/rest/v1/rpc/busaf_supprimer_produit_marche',{
+     method:'POST',
+     headers:{'Prefer':'return=representation'},
+     body:JSON.stringify({p_produit_id:id})
    });
-   if(Array.isArray(deleted)&&deleted.some(row=>String(row.id)===String(id))){
-     deleteConfirmed=true;
-   }else{
-     // PostgREST peut répondre sans ligne si aucune ligne n'a été supprimée.
-     const remaining=await api(`/rest/v1/produits?id=eq.${encodeURIComponent(id)}&select=id&limit=1`);
-     if(Array.isArray(remaining)&&remaining.length===0)deleteConfirmed=true;
-     else throw new Error('Supabase n’a confirmé aucune suppression. Vérifie les droits du compte.');
-   }
-   // Dès que la suppression est confirmée, les erreurs de rafraîchissement ne doivent
-   // plus être présentées comme un échec de suppression.
+   const outcome=Array.isArray(result)?result[0]:result;
+   if(!outcome||outcome.success!==true)throw new Error(outcome?.message||'Supabase n’a pas confirmé le retrait du produit.');
    state.marketCatalog=(state.marketCatalog||[]).filter(x=>String(x.id)!==String(id));
    state.marketCatalogLoaded=true;
-   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit supprimé, actualisation du catalogue à refaire:',refreshError);}
-   try{render();}catch(renderError){console.warn('Produit supprimé; affichage à actualiser:',renderError);}
-   openModal('✅ Produit supprimé',`<div class="notice success"><strong>${esc(p.nom||'Le produit')}</strong> a été supprimé du Marché BuSAF.</div><div class="notice">La suppression est confirmée. Si la liste ne se met pas à jour immédiatement, utilise ACTUALISER.</div><button class="btn" onclick="closeModal()">OK</button>`);
+   try{await loadMarketCatalog(true);}catch(refreshError){console.warn('Produit retiré; actualisation à refaire:',refreshError);}
+   try{render();}catch(renderError){console.warn('Produit retiré; affichage à actualiser:',renderError);}
+   const detail=outcome.action==='archived'
+     ? 'Le produit a été retiré du Marché. Son historique de ventes et de commandes est conservé.'
+     : 'Le produit a été supprimé. Aucune vente historique ne dépendait de ce produit.';
+   openModal('✅ Produit retiré du Marché',`<div class="notice success"><strong>${esc(p.nom||'Le produit')}</strong></div><div class="notice">${detail}</div><button class="btn" onclick="closeModal()">OK</button>`);
  }catch(e){
    console.error('BuSAF deleteMarketProduct:',e);
-   if(deleteConfirmed){
-     openModal('✅ Produit supprimé',`<div class="notice success"><strong>${esc(p.nom||'Le produit')}</strong> a été supprimé. L’affichage doit être actualisé.</div><button class="btn" onclick="closeModal()">OK</button>`);
-   }else{
-     alert('❌ Suppression non confirmée : '+(e?.message||'Erreur inconnue.'));
-   }
+   alert('❌ Retrait impossible : '+(e?.message||'Erreur inconnue.'));
  }
 }
 function requestPhysicalPurchase(id){
