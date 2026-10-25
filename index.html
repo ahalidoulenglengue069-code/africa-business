@@ -1493,6 +1493,7 @@ const state={
   userId:"",
   email:"",
   token:"",
+  refreshToken:localStorage.getItem("busaf_refresh_token")||"",
   profile:null,
   screen:"public",
   marketSales:Number(localStorage.getItem("busaf_market_sales")||0),
@@ -1637,19 +1638,54 @@ function openModal(title,html){
 }
 function closeModal(){document.getElementById("modal").classList.remove("open")}
 
+let busafRefreshPromise=null;
+async function refreshBusafSession(){
+ if(!state.refreshToken)return false;
+ if(busafRefreshPromise)return busafRefreshPromise;
+ busafRefreshPromise=(async()=>{
+  const response=await fetch(SUPABASE_URL+"/auth/v1/token?grant_type=refresh_token",{
+   method:"POST",
+   headers:{"apikey":SUPABASE_KEY,"Authorization":"Bearer "+SUPABASE_KEY,"Content-Type":"application/json"},
+   body:JSON.stringify({refresh_token:state.refreshToken})
+  });
+  const raw=await response.text();let data={};
+  try{data=raw?JSON.parse(raw):{}}catch{data={raw}}
+  if(!response.ok||!data.access_token)throw new Error(data.msg||data.message||data.error_description||"Session expirée. Reconnecte-toi.");
+  state.token=data.access_token;
+  state.refreshToken=data.refresh_token||state.refreshToken;
+  if(data.user?.id)state.userId=data.user.id;
+  if(data.user?.email)state.email=data.user.email;
+  localStorage.setItem("busaf_access_token",state.token);
+  localStorage.setItem("busaf_refresh_token",state.refreshToken);
+  if(state.userId)localStorage.setItem("busaf_user_id",state.userId);
+  if(state.email)localStorage.setItem("busaf_email",state.email);
+  return true;
+ })().catch(error=>{
+  console.warn("Renouvellement de session BuSAF impossible:",error.message||error);
+  return false;
+ }).finally(()=>{busafRefreshPromise=null;});
+ return busafRefreshPromise;
+}
 async function api(path,options={}){
  const headers=Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json"},options.headers||{});
- // Respecte le jeton explicitement fourni par l'appel. Une ancienne session ne doit pas écraser
- // le Bearer SUPABASE_KEY utilisé pour la connexion et les autres appels Auth publics.
+ // Les appels avec Authorization explicite (connexion/inscription) gardent leur jeton fourni.
+ const usesSessionToken=!options.headers?.Authorization&&!!state.token;
  if(state.token&&!headers.Authorization)headers.Authorization="Bearer "+state.token;
- // Empêche les requêtes bloquées de laisser BuSAF en chargement indéfiniment.
  const controller=new AbortController();
  const timeoutMs=Number(options.timeoutMs)||20000;
  const timer=setTimeout(()=>controller.abort(),timeoutMs);
  const requestOptions=Object.assign({},options,{headers,signal:options.signal||controller.signal});
  delete requestOptions.timeoutMs;
+ const publicAuthPath=/^\/auth\/v1\/(token\?grant_type=(password|refresh_token)|signup|verify|recover|logout)/.test(path);
  try{
-  const r=await fetch(SUPABASE_URL+path,requestOptions);
+  let r=await fetch(SUPABASE_URL+path,requestOptions);
+  if((r.status===401||r.status===403)&&usesSessionToken&&!publicAuthPath&&state.refreshToken){
+   const refreshed=await refreshBusafSession();
+   if(refreshed){
+    headers.Authorization="Bearer "+state.token;
+    r=await fetch(SUPABASE_URL+path,requestOptions);
+   }
+  }
   const responseText=await r.text();let data={};
   try{data=responseText?JSON.parse(responseText):{}}catch{data={raw:responseText}}
   if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.details||data.raw||"Erreur Supabase ("+r.status+")");
@@ -1702,7 +1738,12 @@ async function ensureMemberProfile(user){
 async function restoreAuthenticatedSession(){
   // Si l'utilisateur demande la connexion, ne pas bloquer ni modifier son état avec une ancienne session.
   if(window.busafLoginScreenActive)return false;
-  const storedToken=localStorage.getItem("busaf_access_token")||"";
+  let storedToken=localStorage.getItem("busaf_access_token")||"";
+  state.refreshToken=localStorage.getItem("busaf_refresh_token")||state.refreshToken||"";
+  if(!storedToken&&state.refreshToken){
+    state.token="";
+    if(await refreshBusafSession())storedToken=state.token;
+  }
   if(!storedToken){
     state.userId=""; state.email=""; state.token=""; state.profile=null;
     return false;
@@ -1730,9 +1771,10 @@ async function restoreAuthenticatedSession(){
     if(window.busafLoginScreenActive)return false;
     console.warn("Session locale refusée :",e.message||e);
     localStorage.removeItem("busaf_access_token");
+    localStorage.removeItem("busaf_refresh_token");
     localStorage.removeItem("busaf_user_id");
     localStorage.removeItem("busaf_email");
-    state.userId=""; state.email=""; state.token=""; state.profile=null; state.screen="public";
+    state.userId=""; state.email=""; state.token=""; state.refreshToken=""; state.profile=null; state.screen="public";
     return false;
   }
 }
@@ -1798,8 +1840,8 @@ async function saveNewPassword(){
   if(a!==b){alert("Les deux mots de passe ne correspondent pas.");return;}
   try{
     await api("/auth/v1/user",{method:"PUT",body:JSON.stringify({password:a})});
-    localStorage.removeItem("busaf_access_token"); localStorage.removeItem("busaf_user_id"); localStorage.removeItem("busaf_email");
-    state.token="";state.userId="";state.email="";state.profile=null;
+    localStorage.removeItem("busaf_access_token"); localStorage.removeItem("busaf_refresh_token"); localStorage.removeItem("busaf_user_id"); localStorage.removeItem("busaf_email");
+    state.token="";state.refreshToken="";state.userId="";state.email="";state.profile=null;
     closeModal(); history.replaceState({busafScreen:"login"},"",location.pathname+"#login"); state.screen="login"; render();
     openModal("✅ Mot de passe modifié",`<div class="notice success">Ton mot de passe a été modifié. Connecte-toi avec le nouveau mot de passe.</div><button class="btn" onclick="closeModal()">OK</button>`);
   }catch(e){alert("❌ "+(e.message||"Impossible de modifier le mot de passe."));}
@@ -1816,8 +1858,10 @@ async function login(e){
   const d=await api("/auth/v1/token?grant_type=password",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
   if(!d?.access_token||!d?.user?.id)throw new Error("Supabase n’a pas retourné une session valide. Réessaie.");
   resetUserServerCaches();
-  state.token=d.access_token;state.userId=d.user.id;state.email=d.user.email||email;
+  state.token=d.access_token;state.refreshToken=d.refresh_token||"";state.userId=d.user.id;state.email=d.user.email||email;
   localStorage.setItem("busaf_access_token",state.token);
+  if(state.refreshToken)localStorage.setItem("busaf_refresh_token",state.refreshToken);
+  else localStorage.removeItem("busaf_refresh_token");
   localStorage.setItem("busaf_user_id",state.userId);
   localStorage.setItem("busaf_email",state.email);
   btn.textContent="CHARGEMENT DU PROFIL...";
@@ -1855,10 +1899,11 @@ async function signup(e){
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
 
   resetUserServerCaches();
-  state.userId=d.user.id;state.email=email;state.token=d.access_token||"";
+  state.userId=d.user.id;state.email=email;state.token=d.access_token||"";state.refreshToken=d.refresh_token||"";
   localStorage.setItem("busaf_user_id",state.userId);
   localStorage.setItem("busaf_email",email);
   if(state.token)localStorage.setItem("busaf_access_token",state.token);
+  if(state.refreshToken)localStorage.setItem("busaf_refresh_token",state.refreshToken);
 
   if(!state.token){
     openModal("Compte créé",`<div class="notice success">Le compte a été créé. Connecte-toi maintenant avec ton e-mail et ton mot de passe.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button>`);
@@ -3734,5 +3779,4 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 
 </body>
 </html>
-
 
