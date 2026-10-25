@@ -3564,7 +3564,10 @@ async function start(){
       if(isFounder()){
         if(window.busafFounderNotificationTimer)clearInterval(window.busafFounderNotificationTimer);
         window.busafFounderNotificationTimer=setInterval(()=>{
-          if(state.userId && isFounder())syncSharedBusafEvents().catch(e=>console.warn("Actualisation des notifications :",e));
+          if(state.userId && isFounder()){
+            syncSharedBusafEvents().catch(e=>console.warn("Actualisation des notifications :",e));
+            if(state.screen==="founderContact")loadFounderContactRequests();
+          }
         },30000);
       }
     }
