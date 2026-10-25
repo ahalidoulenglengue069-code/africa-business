@@ -1581,12 +1581,36 @@ function normalScreen(screen){
 /* Historique interne fiable : le bouton RETOUR revient à l'écran BuSAF précédent,
    sans dépendre de l'historique général du navigateur ou d'une page externe. */
 window.busafScreenStack=Array.isArray(window.busafScreenStack)?window.busafScreenStack:[];
+function busafRenderAfterNavigation(){
+ try{
+   render();
+   return true;
+ }catch(err){
+   console.error("Erreur de navigation BuSAF :",err);
+   const app=document.getElementById("app");
+   if(app){
+     const msg=esc(err&&err.message?err.message:"Erreur inattendue");
+     app.innerHTML='<main class="wrap"><section class="notice error"><strong>Un espace BuSAF n’a pas pu s’ouvrir.</strong><br>'+msg+'<br><button class="btn" onclick="busafRecoverWorkspace()">REVENIR À MON ESPACE</button></section></main>';
+   }
+   return false;
+ }
+}
+function busafRecoverWorkspace(){
+ const fallback=state.userId?(isFounder()?"founder":"member"):"public";
+ state.screen=fallback;
+ window.busafLoginScreenActive=false;
+ try{history.replaceState({busafScreen:fallback},"","#"+fallback);}catch(e){}
+ busafRenderAfterNavigation();
+}
+function busafScrollTop(){
+ try{window.scrollTo(0,0);}catch(e){}
+}
 function setScreen(screen){
  screen=normalScreen(screen);
  window.busafLoginScreenActive=(screen==="login");
  if(screen===state.screen){
-   render();
-   window.scrollTo({top:0,left:0,behavior:"instant"});
+   busafRenderAfterNavigation();
+   busafScrollTop();
    return;
  }
  if(state.screen && state.screen!==screen){
@@ -1594,10 +1618,12 @@ function setScreen(screen){
    if(window.busafScreenStack.length>40)window.busafScreenStack.shift();
  }
  state.screen=screen;
- history.pushState({busafScreen:screen},"","#"+screen);
- render();
- if(screen==="market" || screen==="public" || screen==="products")loadMarketCatalog(true).then(()=>render()).catch(()=>{});
- window.scrollTo({top:0,left:0,behavior:"instant"});
+ try{history.pushState({busafScreen:screen},"","#"+screen);}catch(e){console.warn("Historique BuSAF indisponible :",e);}
+ busafRenderAfterNavigation();
+ if(screen==="market" || screen==="public" || screen==="products"){
+   loadMarketCatalog(true).then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+ }
+ busafScrollTop();
 }
 
 function goBack(){
@@ -1607,30 +1633,30 @@ function goBack(){
    const candidate=window.busafScreenStack.pop();
    if(candidate && candidate!==state.screen)previous=normalScreen(candidate);
  }
- if(!previous){
-   /* Repli si l'écran a été ouvert directement par un lien. */
-   previous=fallback;
- }
+ if(!previous)previous=fallback;
  state.screen=previous;
- history.replaceState({busafScreen:previous},"","#"+previous);
- render();
- if(previous==="market" || previous==="public" || previous==="products")loadMarketCatalog(true).then(()=>render()).catch(()=>{});
- window.scrollTo({top:0,left:0,behavior:"instant"});
+ try{history.replaceState({busafScreen:previous},"","#"+previous);}catch(e){}
+ busafRenderAfterNavigation();
+ if(previous==="market" || previous==="public" || previous==="products"){
+   loadMarketCatalog(true).then(()=>{if(state.screen===previous)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+ }
+ busafScrollTop();
 }
 
 window.addEventListener("popstate",(event)=>{
  const fromHistory=event.state?.busafScreen;
  const fromHash=location.hash.replace(/^#/,"");
  const screen=normalScreen(fromHistory||fromHash);
- /* Synchronise l'historique interne lorsque l'utilisateur utilise Retour Android. */
  if(screen!==state.screen){
    const idx=window.busafScreenStack.lastIndexOf(screen);
    if(idx>=0)window.busafScreenStack=window.busafScreenStack.slice(0,idx);
  }
  state.screen=screen;
- render();
- if(screen==="market" || screen==="public" || screen==="products")loadMarketCatalog(true).then(()=>render()).catch(()=>{});
- window.scrollTo({top:0,left:0,behavior:"instant"});
+ busafRenderAfterNavigation();
+ if(screen==="market" || screen==="public" || screen==="products"){
+   loadMarketCatalog(true).then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+ }
+ busafScrollTop();
 });
 function openModal(title,html){
  document.getElementById("modalbox").innerHTML=
