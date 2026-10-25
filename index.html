@@ -3644,9 +3644,9 @@ async function start(){
   try{
     const incomingInvite=new URLSearchParams(location.search).get("invite");
     if(incomingInvite)window.busafIncomingInvite=incomingInvite;
-    const recovery=await handlePasswordRecovery();
-    if(recovery)return;
 
+    // Déterminer et afficher l'écran tout de suite : aucun appel réseau ne doit
+    // empêcher l'interface de démarrer, notamment avec un ancien lien de récupération.
     const h=location.hash.replace(/^#/,"");
     if(h && ["public","market","benefits","profits","commissions","rules","signup","login","contact"].includes(h)){
       state.screen=h;
@@ -3654,11 +3654,14 @@ async function start(){
       state.screen="public";
     }
     window.busafLoginScreenActive=(state.screen==="login");
-    history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
     window.busafScreenStack=[normalScreen(state.screen)];
-
-    // Afficher immédiatement l'interface, sans attendre le catalogue distant.
     render();
+
+    // Traiter ensuite la récupération de mot de passe, une fois l'interface visible.
+    const recovery=await handlePasswordRecovery();
+    if(recovery)return;
+
+    history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
 
     // Ne pas lancer de requête Marché sur les écrans Connexion/Inscription :
     // cela évite du trafic Supabase inutile pendant l'authentification.
