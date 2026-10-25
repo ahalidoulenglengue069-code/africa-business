@@ -1669,7 +1669,8 @@ window.addEventListener("popstate",(event)=>{
  state.screen=screen;
  busafRenderAfterNavigation();
  if(screen==="market" || screen==="public" || screen==="products"){
-   loadMarketCatalog(true).then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
+   // Au retour navigateur, conserver le catalogue déjà chargé pour éviter un rechargement réseau systématique.
+   loadMarketCatalog().then(()=>{if(state.screen===screen)busafRenderAfterNavigation();}).catch(e=>console.warn("Catalogue BuSAF :",e));
  }
  busafScrollTop();
 });
