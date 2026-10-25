@@ -1943,9 +1943,10 @@ async function performLogout(){
  }catch(e){console.warn("Déconnexion serveur BuSAF:",e);}
  try{ if(typeof logBusafEvent==="function") logBusafEvent("logout","Déconnexion",{email:oldEmail}); }catch(e){}
  localStorage.removeItem("busaf_access_token");
+ localStorage.removeItem("busaf_refresh_token");
  localStorage.removeItem("busaf_user_id");
  localStorage.removeItem("busaf_email");
- state.token=""; state.userId=""; state.email=""; state.profile=null; state.screen="public";
+ state.token=""; state.refreshToken=""; state.userId=""; state.email=""; state.profile=null; state.screen="public";
  resetUserServerCaches();
  closeModal(); render();
 }
@@ -3733,6 +3734,5 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 
 </body>
 </html>
-
 
 
