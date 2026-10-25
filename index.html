@@ -3522,7 +3522,8 @@ function render(){
    // Nettoyage visuel des anciens produits de démonstration dans tous les espaces locaux.
    state.boutiqueProducts=filterRealProducts(state.boutiqueProducts);
    state.marketStockItems=filterRealProducts(state.marketStockItems);
-   saveState();
+   /* Ne pas réécrire tout le stockage local à chaque changement d'espace :
+      cette opération synchrone peut bloquer l'interface sur Android. */
    if(isFounder()){
     const founderMap={
      founder:founderHome,member:founderHome,founderMarket:founderMarket,market:founderMarket,
