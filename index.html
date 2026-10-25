@@ -1610,11 +1610,11 @@ function busafScrollTop(){
 function busafClearBlockingOverlays(){
  try{
   const modal=document.getElementById("modal");
-  if(modal){modal.classList.remove("open");modal.style.pointerEvents="none";}
+  if(modal){modal.classList.remove("open");modal.style.removeProperty("pointer-events");}
   const photoBox=document.getElementById("photoLightbox");
-  if(photoBox){photoBox.classList.remove("open");photoBox.setAttribute("aria-hidden","true");photoBox.style.pointerEvents="none";}
+  if(photoBox){photoBox.classList.remove("open");photoBox.setAttribute("aria-hidden","true");photoBox.style.removeProperty("pointer-events");}
   const editor=document.getElementById("profilePhotoEditor");
-  if(editor){editor.classList.remove("open");editor.style.pointerEvents="none";}
+  if(editor){editor.classList.remove("open");editor.style.removeProperty("pointer-events");}
   document.body.style.overflow="";
  }catch(e){console.warn("Nettoyage interface BuSAF :",e);}
 }
