@@ -911,6 +911,7 @@ function founderHome(){
    ${founderApp('founderDashboard','📈','Tableau de bord','Vue générale')}
    ${founderApp('founderStats','📊','Statistiques','Activité BuSAF')}
    ${founderApp('founderFinance','💰','Finances','Suivi financier')}
+   ${founderApp('founderWallet','👛','Mon portefeuille','Soldes et retraits')}
    ${founderApp('founderPayments','💳','Paiements','Transactions')}
    ${founderApp('orders','📦','Commandes','Suivi des commandes')}
   </div>
@@ -982,6 +983,20 @@ function founderPayments(){
  return page('💳 Paiements & ventes',`<div class="notice">Données réelles de la table <strong>ventes</strong>.</div>${list}<button class="btn" onclick="refreshFounderPayments()">🔄 ACTUALISER LES PAIEMENTS</button>`);
 }
 async function refreshFounderPayments(){if(!isFounder())return;try{state.founderPayments=await api('/rest/v1/ventes?select=id,acheteur_id,montant,moyen_paiement,reference,statut,created_at,produit_id&order=created_at.desc');render();}catch(e){alert('❌ Impossible de charger les ventes : '+e.message)}}
+function founderWallet(){
+ if(!isFounder())return memberHome();
+ return page("👛 Portefeuille Fondateur",`
+  <div class="notice success"><strong>Portefeuille du fondateur</strong><br>Voici les soldes affichés actuellement par BuSAF.</div>
+  <div class="statgrid">
+   <div class="stat">Compte Marché<strong>${money(state.marketBalance||0)}</strong></div>
+   <div class="stat">Compte Boutique<strong>${money(state.boutiqueBalance||0)}</strong></div>
+  </div>
+  <div class="rule"><h3>💰 Bénéfices et commissions</h3><p>Les soldes financiers réels et les commissions du fondateur doivent être confirmés depuis Supabase. Cette page n'invente aucun montant.</p></div>
+  <button class="btn" onclick="setScreen('founderFinance')">📊 VOIR LES FINANCES</button>
+  <button class="btn alt" onclick="setScreen('founderPayments')">📜 VOIR LES PAIEMENTS</button>
+  <button class="btn alt" onclick="openMoneyWithdraw()">💸 DEMANDE DE RETRAIT</button>
+ `);
+}
 function founderFinance(){if(!isFounder())return memberHome();const s=state.founderStats||{};return page('💰 Finances',`<div class="notice success">Montants calculés à partir des ventes confirmées chargées depuis Supabase.</div><div class="statgrid"><div class="stat">Ventes confirmées<strong>${s.confirmed??'—'}</strong></div><div class="stat">Montant confirmé<strong>${money(s.revenue||0)}</strong></div></div><button class="btn" onclick="refreshFounderData()">🔄 ACTUALISER</button>`);}
 function founderStocks(){if(!isFounder())return memberHome();const products=state.marketCatalog||[];const cards=products.map(p=>`<div class="rule"><strong>${esc(p.nom||'Produit')}</strong><br>Prix : ${money(p.prix)}<br>Type : ${esc(p.type_produit||'—')}</div>`).join('');return page('📦 Gestion des stocks',`<div class="notice">Produits réels du Marché BuSAF. Aucune quantité de stock n'est inventée.</div>${cards||'<div class="empty">Aucun produit chargé.</div>'}<button class="btn" onclick="refreshMarketCatalog()">🔄 ACTUALISER LES PRODUITS</button>`);}
 function founderPlaceholder(title,desc){
@@ -1864,6 +1879,7 @@ function render(){
      founderDashboard:founderDashboard,
      founderStats:founderDashboard,
      founderFinance:founderFinance,
+     founderWallet:founderWallet,
      founderPayments:founderPayments,
      orders:founderPayments,
      founderMembers:founderMembers,
