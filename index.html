@@ -1754,7 +1754,7 @@ function render(){
    // Nettoyage visuel des anciens produits de démonstration dans tous les espaces locaux.
    state.boutiqueProducts=filterRealProducts(state.boutiqueProducts);
    state.marketStockItems=filterRealProducts(state.marketStockItems);
-   saveState();
+   // Ne pas sauvegarder tout l'état synchroniquement à chaque affichage : cela peut figer les touches sur Android.
    if(isFounder()){
     const founderMap={
      founder:founderHome,member:founderHome,founderMarket:founderMarket,market:founderMarket,
