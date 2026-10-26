@@ -1033,7 +1033,41 @@ function founderFinance(){if(!isFounder())return memberHome();const s=state.foun
 function founderStocks(){if(!isFounder())return memberHome();const products=state.marketCatalog||[];const cards=products.map(p=>`<div class="rule"><strong>${esc(p.nom||'Produit')}</strong><br>Prix : ${money(p.prix)}<br>Type : ${esc(p.type_produit||'—')}</div>`).join('');return page('📦 Gestion des stocks',`<div class="notice">Produits réels du Marché BuSAF. Aucune quantité de stock n'est inventée.</div>${cards||'<div class="empty">Aucun produit chargé.</div>'}<button class="btn" onclick="refreshMarketCatalog()">🔄 ACTUALISER LES PRODUITS</button>`);}
 function founderPlaceholder(title,desc){
  if(!isFounder())return memberHome();
- return page(title,`<div class="notice success"><strong>👑 ESPACE FONDATEUR</strong><br>${desc}</div><button class="btn" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>`);
+ const key=String(title||'').toLowerCase();
+ let body='<div class="notice success"><strong>👑 ESPACE FONDATEUR</strong><br>'+esc(desc||'Gestion BuSAF')+'</div>';
+ if(key.includes('parrainage')){
+  body+=`<div class="statgrid"><div class="stat">Membres<strong id="frMembers">…</strong></div><div class="stat">Codes parrain<strong id="frCodes">…</strong></div></div><div class="rule"><h3>🤝 Réseau de parrainage</h3><div id="frList">Chargement des membres…</div></div><button class="btn" onclick="loadFounderReferral()">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen('commissions')">💰 VOIR LES COMMISSIONS</button>`;
+ }else if(key.includes('partner')){
+  body+=`<div class="rule"><h3>⭐ Suivi PARTNER</h3><p>Objectif BuSAF : 10 ventes validées dans le même mois. Les données ci-dessous affichent le rôle réellement enregistré, sans attribuer automatiquement un statut.</p><div id="fpList">Chargement…</div></div><button class="btn" onclick="loadFounderPartner()">🔄 ACTUALISER</button>`;
+ }else if(key.includes('commission')){
+  body+=`<div class="statgrid"><div class="stat">Nombre<strong id="fcCount">…</strong></div><div class="stat">Montant total<strong id="fcTotal">…</strong></div></div><div class="rule"><h3>💰 Historique des commissions</h3><div id="fcList">Chargement…</div></div><button class="btn" onclick="loadFounderCommissions()">🔄 ACTUALISER</button>`;
+ }else if(key.includes('annonce')){
+  body+=`<div class="rule"><h3>📢 Nouvelle annonce</h3><label>Titre</label><input id="faTitle" maxlength="120" placeholder="Titre de l’annonce"><label>Message</label><textarea id="faBody" rows="5" maxlength="3000" placeholder="Message destiné aux membres"></textarea><button class="btn" onclick="publishFounderAnnouncement()">ENREGISTRER L’ANNONCE</button></div><div class="rule"><h3>📚 Annonces récentes</h3><div id="faList">Chargement…</div></div><button class="btn alt" onclick="loadFounderAnnouncements()">🔄 ACTUALISER</button>`;
+ }else if(key.includes('paramètre')){
+  body+=`<div class="rule"><h3>⚙️ Configuration du compte</h3><p><b>Nom :</b> ${esc(state.profile?.nom_complet||'—')}</p><p><b>Email :</b> ${esc(state.email||'—')}</p><p><b>Rôle :</b> ${esc(state.profile?.role||'—')}</p><p><b>Code :</b> ${esc(state.profile?.code_parrain||'BUSAF-FONDATEUR')}</p><button class="btn" onclick="setScreen('account')">GÉRER MON PROFIL</button></div>`;
+ }else if(key.includes('sécurité')){
+  body+=`<div class="rule"><h3>🛡️ Sécurité</h3><p>Session : ${state.userId?'Connectée':'Non connectée'}</p><p>Rôle reconnu : ${esc(state.profile?.role||'—')}</p><p>Ne partage jamais ton mot de passe ni les clés privées de paiement.</p><button class="btn" onclick="setScreen('founderSettings')">⚙️ PARAMÈTRES</button></div>`;
+ }else{
+  body+=`<div class="rule"><h3>📋 Détails de cet espace</h3><p>Compte : ${esc(state.profile?.nom_complet||state.email||'Fondateur')}</p><p>Rôle : ${esc(state.profile?.role||'fondateur')}</p><p>Les informations sont affichées à partir des données disponibles dans BuSAF.</p></div>`;
+ }
+ body+='<button class="btn alt" onclick="setScreen(\'founder\')">← RETOUR AU CENTRE DE CONTRÔLE</button>';
+ return page(title,body);
+}
+async function loadFounderReferral(){
+ try{const rows=await api('/rest/v1/profils_busaf?select=id,nom_complet,role,code_parrain,parrain_id,created_at&order=created_at.desc');const e=id=>document.getElementById(id);if(e('frMembers'))e('frMembers').textContent=rows.length;if(e('frCodes'))e('frCodes').textContent=rows.filter(x=>x.code_parrain).length;if(e('frList'))e('frList').innerHTML=rows.length?rows.map(x=>'<div class="rule"><strong>'+esc(x.nom_complet||'Membre')+'</strong><br>Rôle : '+esc(x.role||'membre')+'<br>Code : '+esc(x.code_parrain||'—')+'<br>Parrain ID : '+esc(x.parrain_id||'—')+'</div>').join(''):'<div class="empty">Aucun membre.</div>';}catch(e){const n=document.getElementById('frList');if(n)n.innerHTML='<div class="notice warning">'+esc(e.message)+'</div>';}
+}
+async function loadFounderPartner(){
+ try{const rows=await api('/rest/v1/profils_busaf?select=id,nom_complet,role,code_parrain,created_at&order=created_at.desc');const n=document.getElementById('fpList');if(n)n.innerHTML=rows.length?rows.map(x=>'<div class="rule"><strong>'+esc(x.nom_complet||'Membre')+'</strong><br>Rôle enregistré : '+esc(x.role||'membre')+'<br>Code : '+esc(x.code_parrain||'—')+'</div>').join(''):'<div class="empty">Aucun membre.</div>';}catch(e){const n=document.getElementById('fpList');if(n)n.innerHTML='<div class="notice warning">'+esc(e.message)+'</div>';}
+}
+async function loadFounderCommissions(){
+ try{const rows=await api('/rest/v1/busaf_commissions?select=*&order=created_at.desc&limit=100');let total=0;rows.forEach(x=>total+=Number(x.montant||x.montant_commission||0));const e=id=>document.getElementById(id);if(e('fcCount'))e('fcCount').textContent=rows.length;if(e('fcTotal'))e('fcTotal').textContent=money(total);if(e('fcList'))e('fcList').innerHTML=rows.length?rows.map(x=>'<div class="rule"><strong>'+money(x.montant||x.montant_commission||0)+'</strong><br>Statut : '+esc(x.statut||'—')+'<br>Bénéficiaire : '+esc(x.beneficiaire_id||'—')+'</div>').join(''):'<div class="empty">Aucune commission enregistrée.</div>';}catch(e){const n=document.getElementById('fcList');if(n)n.innerHTML='<div class="notice warning">Chargement impossible : '+esc(e.message)+'</div>';}
+}
+async function loadFounderAnnouncements(){
+ try{const rows=await api('/rest/v1/busaf_events?select=id,event_type,title,details,created_at&order=created_at.desc&limit=50');const n=document.getElementById('faList');if(n)n.innerHTML=rows.length?rows.map(x=>'<div class="rule"><strong>'+esc(x.title||x.event_type||'Événement')+'</strong><br>'+esc(typeof x.details==='string'?x.details:JSON.stringify(x.details||{}))+'<br><small>'+esc(x.created_at||'')+'</small></div>').join(''):'<div class="empty">Aucune annonce.</div>';}catch(e){const n=document.getElementById('faList');if(n)n.innerHTML='<div class="notice warning">'+esc(e.message)+'</div>';}
+}
+async function publishFounderAnnouncement(){
+ const title=(document.getElementById('faTitle')?.value||'').trim(),message=(document.getElementById('faBody')?.value||'').trim();if(!isFounder()||!title||!message){alert('Renseigne le titre et le message.');return;}
+ try{await api('/rest/v1/busaf_events',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({event_type:'annonce_fondateur',title,details:{message},user_id:state.userId})});alert('Annonce enregistrée si Supabase l’accepte.');await loadFounderAnnouncements();}catch(e){alert('Annonce non enregistrée : '+(e.message||'erreur Supabase'));}
 }
 
 function memberHome(){
@@ -1927,6 +1961,10 @@ function render(){
      rules:memberRules,account:memberAccount,logout:()=>{confirmLogout();return ''; }
     };
     content=(founderMap[state.screen]||founderHome)();
+     if(state.screen==='founderReferral')setTimeout(()=>loadFounderReferral().catch(()=>{}),0);
+     if(state.screen==='partner')setTimeout(()=>loadFounderPartner().catch(()=>{}),0);
+     if(state.screen==='commissions')setTimeout(()=>loadFounderCommissions().catch(()=>{}),0);
+     if(state.screen==='founderAnnouncements')setTimeout(()=>loadFounderAnnouncements().catch(()=>{}),0);
      if(state.screen==='founderWallet')setTimeout(()=>loadFounderWallet().catch(()=>{}),0);
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+founderQuick();
     if(state.screen==='founder' && !state.founderStats){ founderLoadStats().then(()=>{ if(state.screen==='founder')render(); }).catch(()=>{}); }
