@@ -1721,7 +1721,7 @@ async function api(path,options={}){
  // Les appels avec Authorization explicite (connexion/inscription) gardent leur jeton fourni.
  const usesSessionToken=!options.headers?.Authorization&&!!state.token;
  if(state.token&&!headers.Authorization)headers.Authorization="Bearer "+state.token;
- const timeoutMs=Math.max(1000,Number(options.timeoutMs)||15000);
+ const timeoutMs=Math.max(1000,Number(options.timeoutMs)||8000);
  const externalSignal=options.signal||null;
  const requestOptions=Object.assign({},options,{headers});
  delete requestOptions.timeoutMs;
@@ -3619,6 +3619,15 @@ function header(member=false){
  return `<header class="header"><div class="header-row"><div class="logo">🌍 BuSAF<small>Business Africain</small></div>${member?`<div class="header-actions">${notificationTopHtml()}<button class="hbtn" onclick="setScreen(isFounder()?'founderSettings':'account')">👤 Compte</button></div>`:""}</div></header>`;
 }
 
+function busafNavigationWatchdog(screen){
+ const app=document.getElementById('app'); if(!app)return;
+ const requested=normalScreen(screen);
+ window.setTimeout(function(){
+  if(state.screen!==requested)return;
+  const main=app.querySelector('main'); if(!main)return;
+  if((main.innerText||'').toLowerCase().includes('chargement de la page')) main.innerHTML="<div class=\"notice error\"><strong>Le chargement de cet espace est trop long.</strong><br>La connexion au serveur ne répond pas. Tu peux réessayer ou revenir à ton espace.<br><button class=\"btn\" type=\"button\" onclick=\"busafRenderAfterNavigation()\">RÉESSAYER</button> <button class=\"btn alt\" type=\"button\" onclick=\"setScreen('founder')\">RETOUR À MON ESPACE</button></div>";
+ },9000);
+}
 function render(){
  let content="";
  if(!state.userId){
@@ -3666,6 +3675,7 @@ function render(){
     if(content && typeof content.then==="function"){
      const requestedScreen=state.screen;
      document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice">Chargement de la page…</div></main>'+founderQuick();
+     busafNavigationWatchdog(requestedScreen);
      content.then(function(html){if(state.screen===requestedScreen){document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+founderQuick();}}).catch(function(e){if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}</div></main>`+founderQuick();});
      return;
     }
@@ -3682,6 +3692,7 @@ function render(){
     if(content && typeof content.then==="function"){
      const requestedScreen=state.screen;
      document.getElementById("app").innerHTML=header(true)+'<main class="wrap"><div class="notice">Chargement de la page…</div></main>'+memberQuick();
+     busafNavigationWatchdog(requestedScreen);
      content.then(function(html){if(state.screen===requestedScreen){document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${html}</main>`+memberQuick();}}).catch(function(e){if(state.screen===requestedScreen)document.getElementById("app").innerHTML=header(true)+`<main class="wrap"><div class="notice error">Erreur d’affichage : ${esc(e.message||"chargement impossible")}</div></main>`+memberQuick();});
      return;
     }
