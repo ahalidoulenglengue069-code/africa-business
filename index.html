@@ -357,7 +357,8 @@ const state={
   meetings:safeJson("busaf_meetings",[]),
   boutiqueProducts:safeJson("busaf_boutique_products",[]),
   marketCatalog:[],
-  marketCatalogLoaded:false
+  marketCatalogLoaded:false,
+  marketCatalogPromise:null
 };
 
 // Produits de démonstration/test : ils ne doivent jamais apparaître dans BuSAF réel.
@@ -1126,18 +1127,28 @@ function marketCatalogProducts(){
  return db.length?db:[];
 }
 async function loadMarketCatalog(force=false){
- if(state.marketCatalogLoaded&&!force)return;
- try{
+ if(state.marketCatalogLoaded&&!force)return state.marketCatalog;
+ // Partager la même requête si l'accueil public et la session se chargent ensemble.
+ if(state.marketCatalogPromise&&!force)return state.marketCatalogPromise;
+ const request=(async()=>{
+  try{
    // Cette requête fonctionne aussi pour un visiteur non connecté grâce à la policy anon SELECT.
    // Les produits physiques sont exclus du Marché et aucun produit n'est filtré par son nom.
    const rows=await api('/rest/v1/produits?type_produit=neq.physical&select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
    state.marketCatalog=Array.isArray(rows)?rows:[];
    state.marketCatalogLoaded=true;
- }catch(e){
+   return state.marketCatalog;
+  }catch(e){
    console.warn('Marché BuSAF public:',e);
    state.marketCatalogLoaded=false;
    state.marketCatalog=[];
- }
+   return [];
+  }finally{
+   if(state.marketCatalogPromise===request)state.marketCatalogPromise=null;
+  }
+ })();
+ state.marketCatalogPromise=request;
+ return request;
 }
 async function syncConfirmedMarketPurchases(){
  if(!state.userId||!state.token||!state.profile?.id)return;
