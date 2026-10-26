@@ -138,6 +138,34 @@ textarea{min-height:100px;resize:vertical}
 .photo-controls input{padding:7px}
 
 
+
+/* Profil BuSAF : présentation organisée et adaptée au mobile */
+.profile-dashboard{max-width:850px;margin:0 auto;padding-bottom:12px}
+.profile-cover{position:relative;overflow:hidden;border-radius:22px;padding:18px;background:linear-gradient(135deg,#075b32,#0a9148 65%,#22ad62);color:#fff;box-shadow:0 10px 25px rgba(0,80,40,.18);margin-bottom:12px}
+.profile-cover-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.profile-status,.profile-role{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border:1px solid rgba(255,255,255,.32);border-radius:99px;background:rgba(255,255,255,.13);font-size:10px;font-weight:900}
+.profile-status i{width:7px;height:7px;border-radius:50%;background:#8dffb1;display:inline-block}
+.profile-identity{display:flex;align-items:center;gap:14px;margin:22px 0 14px;min-width:0}
+.profile-avatar{position:relative;flex:0 0 88px;width:88px;height:88px;border-radius:50%;border:3px solid #fff;background:#e6f4ea;display:flex;align-items:center;justify-content:center;color:#087a38;font-size:27px;font-weight:900;overflow:hidden;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.profile-avatar .profile-photo{width:100%;height:100%;border:0;border-radius:50%;object-fit:cover}
+.profile-avatar .profile-photo-placeholder{width:100%;height:100%;border:0;border-radius:50%;font-size:27px}
+.profile-avatar>b{position:absolute;right:0;bottom:0;background:#fff;color:#087a38;font-size:13px;border-radius:10px 0 0 0;padding:4px}
+.profile-identity-text{min-width:0;overflow-wrap:anywhere}.profile-identity-text h2{color:#fff;font-size:21px;margin:0 0 5px}.profile-identity-text p{margin:0 0 5px;font-weight:800}.profile-identity-text small{font-size:12px;opacity:.9}
+.profile-edit-cover{border:1px solid rgba(255,255,255,.55);background:#fff;color:#087a38;border-radius:11px;padding:10px 12px;font-weight:900;width:100%}
+.profile-summary-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-bottom:12px}
+.profile-summary-card{min-width:0;background:#fff;border:1px solid var(--line);border-radius:15px;padding:12px 10px;box-shadow:var(--shadow)}
+.profile-summary-card>span{font-size:22px;display:block;margin-bottom:6px}.profile-summary-card small{display:block;color:var(--muted);font-size:11px;margin-bottom:5px}.profile-summary-card strong{display:block;font-size:12px;overflow-wrap:anywhere;color:#17442c}
+.profile-section-card{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:var(--shadow)}
+.profile-section-heading{display:flex;align-items:center;gap:10px;margin-bottom:10px}.profile-section-heading>span{display:flex;align-items:center;justify-content:center;flex:0 0 40px;height:40px;background:#e7f6ec;border-radius:12px;font-size:21px}.profile-section-heading h3{margin:0;color:var(--green);font-size:16px}.profile-section-heading p{margin:3px 0 0;font-size:12px;color:var(--muted)}
+.profile-detail-row{display:flex;justify-content:space-between;gap:12px;padding:11px 0;border-top:1px solid #edf2ee;font-size:13px}.profile-detail-row>span{color:var(--muted);flex:0 0 40%}.profile-detail-row>strong{text-align:right;overflow-wrap:anywhere;min-width:0}.profile-detail-row .profile-email{font-size:12px}
+.profile-code-box{background:#f0faf3;border:1px dashed #83bf97;border-radius:14px;padding:13px;text-align:center;margin:8px 0}.profile-code-box span{display:block;font-size:10px;font-weight:900;color:#53715e;letter-spacing:.7px}.profile-code-box strong{display:block;font-size:21px;color:#087a38;overflow-wrap:anywhere;margin:7px 0 10px}.profile-code-box button{border:0;border-radius:10px;padding:10px 13px;background:#087a38;color:#fff;font-weight:900}
+.profile-actions-title{font-size:18px;color:var(--green);margin:18px 2px 10px}.profile-actions-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.profile-action-card{min-width:0;border:1px solid var(--line);border-radius:15px;background:#fff;padding:13px 11px;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:5px;box-shadow:0 4px 13px rgba(0,70,40,.06)}
+.profile-action-card>span{font-size:24px}.profile-action-card b{font-size:13px;color:#17442c}.profile-action-card small{font-size:11px;line-height:1.3;color:var(--muted)}
+.profile-logout{margin-top:12px}
+@media(min-width:650px){.profile-identity{margin:25px 0 17px}.profile-edit-cover{width:auto;min-width:200px}.profile-actions-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:360px){.profile-cover{padding:14px}.profile-identity{gap:10px}.profile-avatar{flex-basis:72px;width:72px;height:72px}.profile-identity-text h2{font-size:18px}.profile-summary-grid{gap:5px}.profile-summary-card{padding:10px 7px}.profile-summary-card strong{font-size:11px}.profile-detail-row{font-size:12px}}
+
 /* ===== ESPACE FONDATEUR : interface d'administration distincte ===== */
 .founder-dashboard{padding-bottom:24px}.founder-hero{background:linear-gradient(135deg,#102a43,#0b5d3b);color:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 10px 28px rgba(0,0,0,.12)}.founder-hero .founder-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.14);font-size:10px;font-weight:900;letter-spacing:.5px}.founder-hero h1{margin:9px 0 4px;font-size:22px}.founder-hero p{margin:0;opacity:.88;font-size:12px;line-height:1.35}.founder-section-title{font-size:13px;font-weight:900;margin:16px 2px 8px}.founder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.founder-app{border:1px solid #dfe7ed;background:#fff;border-radius:16px;padding:13px 8px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 5px 14px rgba(0,0,0,.06);cursor:pointer}.founder-app .ficon{font-size:27px;line-height:1;margin-bottom:7px}.founder-app b{font-size:11px;line-height:1.15}.founder-app small{font-size:8.5px;line-height:1.15;color:#6b7280;margin-top:4px}.founder-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.founder-stat{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.1);border-radius:13px;padding:9px 5px;text-align:center;color:#fff}.founder-stat b{display:block;font-size:15px}.founder-stat small{font-size:8px;opacity:.85}.founder-product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.founder-product{border:1px solid #dfe7ed;border-radius:15px;background:#fff;padding:7px;overflow:hidden;box-shadow:0 5px 14px rgba(0,0,0,.05)}.founder-product img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px}.founder-product h3{font-size:12px;margin:6px 2px 2px;line-height:1.15}.founder-product .fprice{font-size:14px;font-weight:900;color:#0b7a43;margin:3px 2px 5px}.founder-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}.founder-actions button{font-size:9px!important;padding:7px 4px!important;margin:0!important}.founder-market-note{margin-bottom:9px}.founder-back{margin-bottom:9px}
 @media(max-width:420px){.founder-grid{gap:7px}.founder-app{min-height:88px;padding:10px 5px}.founder-app .ficon{font-size:24px}.founder-stat-grid{gap:5px}.founder-stat{padding:8px 3px}.founder-product-grid{gap:7px}}
@@ -1584,28 +1612,51 @@ async function saveCroppedProfilePhoto(){
 }
 
 function memberAccount(){
- return page("💼 Mon Compte",`
-   <div class="info">
-     <div class="profile-photo-wrap">
-       ${profilePhotoHtml()}
-       <div class="profile-photo-info">
-         <strong>${esc(state.profile?.nom_complet||"Membre BuSAF")}</strong>
-         <div class="small">${esc(state.profile?.role||"membre")}</div>
-         <button class="btn small" onclick="openProfilePhotoForm()">📷 ${state.profile?.photo_url?"MODIFIER":"AJOUTER"} MA PHOTO</button>
+ const profile=state.profile||{};
+ const fullName=profile.nom_complet||"Membre BuSAF";
+ const role=isFounder()?"Fondateur BuSAF":(profile.role||"Membre");
+ const code=profile.code_parrain||"—";
+ const initials=String(fullName).trim().split(/\\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase()||"M";
+ return page("👤 Mon Profil",`
+   <section class="profile-dashboard">
+     <div class="profile-cover">
+       <div class="profile-cover-top"><span class="profile-status"><i></i> COMPTE BuSAF</span><span class="profile-role">${isFounder()?"👑 FONDATEUR":"🌱 MEMBRE"}</span></div>
+       <div class="profile-identity">
+         <div class="profile-avatar" onclick="openProfilePhotoForm()" role="button" aria-label="Modifier la photo">${profile.photo_url?profilePhotoHtml():`<span>${esc(initials)}</span>`}<b>📷</b></div>
+         <div class="profile-identity-text"><h2>${esc(fullName)}</h2><p>${esc(role)}</p><small>${esc(state.email||"Adresse e-mail non disponible")}</small></div>
        </div>
+       <button class="profile-edit-cover" onclick="editProfile()">✏️ Modifier le profil</button>
      </div>
-     <strong>Nom :</strong> ${esc(state.profile?.nom_complet||"—")}<br>
-     <strong>E-mail :</strong> ${esc(state.email)}<br>
-     <strong>Téléphone :</strong> ${esc(state.profile?.telephone||"—")}<br>
-     <strong>Ville :</strong> ${esc(state.profile?.Ville||"—")}<br>
-     <strong>Rôle :</strong> ${esc(state.profile?.role||"membre")}<br>
-     ${isFounder()?'<div class="notice success"><strong>👑 FONDATEUR BuSAF</strong><br>Accès aux fonctions réservées au fondateur.</div>':""}
-     <strong>Code parrain :</strong> ${esc(state.profile?.code_parrain||"—")}
-   </div>
-   <button class="btn" onclick="copyInvitation('code')">📋 COPIER MON CODE PARRAIN</button>
-   <button class="btn" onclick="editProfile()">✏️ MODIFIER MON PROFIL</button>
-   <button class="btn alt" onclick="setScreen('privacy')">🔒 CONFIDENTIALITÉ</button>
-   <button class="btn red" onclick="confirmLogout()">🚪 DÉCONNEXION</button>
+     <div class="profile-summary-grid">
+       <div class="profile-summary-card"><span>📱</span><small>Téléphone</small><strong>${esc(profile.telephone||"À renseigner")}</strong></div>
+       <div class="profile-summary-card"><span>📍</span><small>Ville</small><strong>${esc(profile.Ville||"À renseigner")}</strong></div>
+       <div class="profile-summary-card"><span>🪪</span><small>Identifiant</small><strong>${esc(code)}</strong></div>
+     </div>
+     <div class="profile-section-card">
+       <div class="profile-section-heading"><span>🧾</span><div><h3>Mes informations</h3><p>Les informations liées à ton compte BuSAF.</p></div></div>
+       <div class="profile-detail-row"><span>Nom complet</span><strong>${esc(fullName)}</strong></div>
+       <div class="profile-detail-row"><span>E-mail de connexion</span><strong class="profile-email">${esc(state.email||"—")}</strong></div>
+       <div class="profile-detail-row"><span>Téléphone</span><strong>${esc(profile.telephone||"Non renseigné")}</strong></div>
+       <div class="profile-detail-row"><span>Ville</span><strong>${esc(profile.Ville||"Non renseignée")}</strong></div>
+       <div class="profile-detail-row"><span>Statut</span><strong>${esc(role)}</strong></div>
+     </div>
+     ${isFounder()?'<div class="notice success"><strong>👑 Espace Fondateur</strong><br>Ce compte dispose des accès de gestion du Marché BuSAF.</div>':""}
+     <div class="profile-section-card">
+       <div class="profile-section-heading"><span>🤝</span><div><h3>Mon parrainage</h3><p>Ton code personnel pour rattacher tes invitations.</p></div></div>
+       <div class="profile-code-box"><span>CODE PARRAIN</span><strong>${esc(code)}</strong><button onclick="copyInvitation('code')">📋 COPIER LE CODE</button></div>
+       <button class="btn alt" onclick="setScreen('invites')">👥 Voir mes invités</button>
+     </div>
+     <h3 class="profile-actions-title">Gérer mon espace</h3>
+     <div class="profile-actions-grid">
+       <button class="profile-action-card" onclick="editProfile()"><span>✏️</span><b>Modifier mes infos</b><small>Nom, téléphone et ville</small></button>
+       <button class="profile-action-card" onclick="openProfilePhotoForm()"><span>📸</span><b>Ma photo</b><small>Ajouter ou recadrer</small></button>
+       <button class="profile-action-card" onclick="setScreen('money')"><span>💳</span><b>Portefeuille</b><small>Dépôts et retraits</small></button>
+       <button class="profile-action-card" onclick="setScreen('notifications')"><span>🔔</span><b>Notifications</b><small>Messages BuSAF</small></button>
+       <button class="profile-action-card" onclick="setScreen('privacy')"><span>🔐</span><b>Confidentialité</b><small>Informations et sécurité</small></button>
+       <button class="profile-action-card" onclick="setScreen('help')"><span>❓</span><b>Aide et assistance</b><small>Obtenir de l'aide</small></button>
+     </div>
+     <button class="btn red profile-logout" onclick="confirmLogout()">🚪 DÉCONNEXION</button>
+   </section>
  `);
 }
 
