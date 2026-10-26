@@ -586,6 +586,15 @@ input,textarea,select{border-radius:9px!important;border-color:#d5e6dd!important
 #app .founder-dashboard .founder-app.founder-danger b,
 #app .founder-dashboard .founder-app.founder-danger small{color:#8f1717!important}
 
+
+/* Sécurité tactile globale : les panneaux fermés ne doivent jamais recouvrir l'application. */
+#modal:not(.open),#photoLightbox:not(.open),#profilePhotoEditor:not(.open){
+ display:none!important;visibility:hidden!important;pointer-events:none!important;
+}
+#app{position:relative;z-index:1;pointer-events:auto!important}
+#app button,#app a,#app input,#app select,#app textarea{pointer-events:auto;touch-action:manipulation}
+#app .founder-app,#app .tile,#app .bottom button,#app .quickbar button{position:relative;pointer-events:auto!important;touch-action:manipulation}
+#photoLightbox.open,#modal.open,#profilePhotoEditor.open{z-index:10000;pointer-events:auto}
 </style>
   
 
