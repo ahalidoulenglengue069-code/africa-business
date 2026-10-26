@@ -166,6 +166,20 @@ textarea{min-height:100px;resize:vertical}
 @media(min-width:650px){.profile-identity{margin:25px 0 17px}.profile-edit-cover{width:auto;min-width:200px}.profile-actions-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:360px){.profile-cover{padding:14px}.profile-identity{gap:10px}.profile-avatar{flex-basis:72px;width:72px;height:72px}.profile-identity-text h2{font-size:18px}.profile-summary-grid{gap:5px}.profile-summary-card{padding:10px 7px}.profile-summary-card strong{font-size:11px}.profile-detail-row{font-size:12px}}
 
+
+/* Invités directs : photos, noms et partage */
+.invite-page{max-width:820px;margin:0 auto;padding-bottom:14px}
+.invite-hero{background:linear-gradient(135deg,#075b32,#0b9347);color:#fff;border-radius:20px;padding:18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.invite-hero>span{font-size:10px;font-weight:900;letter-spacing:.7px;opacity:.9}.invite-hero h2{color:#fff;margin:8px 0 5px}.invite-hero p{margin:0;font-size:13px;line-height:1.45}
+.invite-share-button{background:#087a38;min-height:48px;font-size:15px}
+.invite-list-title{color:var(--green);font-size:18px;margin:18px 2px 10px}
+.invitee-list{display:flex;flex-direction:column;gap:9px}
+.invitee-card{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;box-shadow:0 4px 13px rgba(0,70,40,.06);min-width:0}
+.invitee-avatar,.invitee-avatar-fallback{width:58px;height:58px;flex:0 0 58px;border-radius:50%;object-fit:cover;border:2px solid #d7ecdf;background:#e6f4ea}
+.invitee-avatar-fallback{display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:900;color:#087a38}
+.invitee-details{display:flex;flex-direction:column;gap:4px;min-width:0}.invitee-details strong{font-size:14px;color:#173523;overflow-wrap:anywhere}.invitee-details span,.invitee-details small{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+@media(max-width:380px){.invitee-card{padding:9px;gap:9px}.invitee-avatar,.invitee-avatar-fallback{width:50px;height:50px;flex-basis:50px}}
+
 /* ===== ESPACE FONDATEUR : interface d'administration distincte ===== */
 .founder-dashboard{padding-bottom:24px}.founder-hero{background:linear-gradient(135deg,#102a43,#0b5d3b);color:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 10px 28px rgba(0,0,0,.12)}.founder-hero .founder-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.14);font-size:10px;font-weight:900;letter-spacing:.5px}.founder-hero h1{margin:9px 0 4px;font-size:22px}.founder-hero p{margin:0;opacity:.88;font-size:12px;line-height:1.35}.founder-section-title{font-size:13px;font-weight:900;margin:16px 2px 8px}.founder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.founder-app{border:1px solid #dfe7ed;background:#fff;border-radius:16px;padding:13px 8px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 5px 14px rgba(0,0,0,.06);cursor:pointer}.founder-app .ficon{font-size:27px;line-height:1;margin-bottom:7px}.founder-app b{font-size:11px;line-height:1.15}.founder-app small{font-size:8.5px;line-height:1.15;color:#6b7280;margin-top:4px}.founder-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.founder-stat{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.1);border-radius:13px;padding:9px 5px;text-align:center;color:#fff}.founder-stat b{display:block;font-size:15px}.founder-stat small{font-size:8px;opacity:.85}.founder-product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.founder-product{border:1px solid #dfe7ed;border-radius:15px;background:#fff;padding:7px;overflow:hidden;box-shadow:0 5px 14px rgba(0,0,0,.05)}.founder-product img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px}.founder-product h3{font-size:12px;margin:6px 2px 2px;line-height:1.15}.founder-product .fprice{font-size:14px;font-weight:900;color:#0b7a43;margin:3px 2px 5px}.founder-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}.founder-actions button{font-size:9px!important;padding:7px 4px!important;margin:0!important}.founder-market-note{margin-bottom:9px}.founder-back{margin-bottom:9px}
 @media(max-width:420px){.founder-grid{gap:7px}.founder-app{min-height:88px;padding:10px 5px}.founder-app .ficon{font-size:24px}.founder-stat-grid{gap:5px}.founder-stat{padding:8px 3px}.founder-product-grid{gap:7px}}
@@ -1442,14 +1456,47 @@ async function saveBoutiqueProduct(){
 function openBoutiqueSale(i){const p=state.boutiqueProducts[i];if(!p)return;openModal("🏪 Vente Boutique",`<div class="rule"><strong>${esc(p.name)}</strong><br>Prix : ${money(p.price)}<br>Prélèvement de publication : 5 % selon les règles BuSAF, à confirmer côté serveur.</div><label>Nom du client</label><input id="shopCustomer"><label>Mode de paiement</label><select id="shopPayment"><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option><option>Autre</option></select><button class="btn" onclick="confirmBoutiqueSale(${i})">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 function confirmBoutiqueSale(i){const p=state.boutiqueProducts[i],customer=document.getElementById("shopCustomer")?.value.trim();if(!p||!customer){alert("Nom du client obligatoire.");return;}const sellerAmount=p.price;state.boutiqueBalance+=sellerAmount;state.orders.unshift({id:Date.now(),product:p.name,price:p.price,date:new Date().toLocaleString("fr-FR"),mode:"boutique",customer});addNotification("🏪 Vente boutique",`Vente de ${p.name} enregistrée. Part vendeur : ${money(sellerAmount)}.`,"boutique");saveState();closeModal();openModal("Vente enregistrée",`<div class="notice success">Vente boutique confirmée. Part vendeur : <strong>${money(sellerAmount)}</strong>.</div><div class="notice warning">En production, paiement et prélèvement 5 % doivent être sécurisés côté serveur.</div><button class="btn" onclick="closeModal();setScreen('orders')">VOIR LES COMMANDES</button>`);}
 
+async function loadDirectInvites(){
+ if(!state.userId||!state.token||!state.profile?.id)return [];
+ if(state.directInvitesLoading)return state.directInvites||[];
+ state.directInvitesLoading=true;
+ try{
+   const rows=await api(`/rest/v1/profils_busaf?parrain_id=eq.${encodeURIComponent(state.profile.id)}&select=id,user_id,nom_complet,telephone,Ville,role,code_parrain,photo_url,created_at&order=created_at.desc`);
+   state.directInvites=Array.isArray(rows)?rows:[];
+   state.directInvitesError="";
+ }catch(e){
+   state.directInvitesError=e.message||"Chargement des invités impossible.";
+   console.warn("Invités directs BuSAF :",e);
+ }finally{state.directInvitesLoading=false;}
+ return state.directInvites||[];
+}
+function inviteeAvatarHtml(m){
+ const name=String(m?.nom_complet||"Membre BuSAF").trim();
+ const initials=name.split(/\\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase()||"M";
+ const photo=m?.photo_url;
+ return photo
+  ? `<img class="invitee-avatar" src="${esc(photo)}" alt="Photo de ${esc(name)}" loading="lazy" onerror="this.outerHTML='<span class=&quot;invitee-avatar-fallback&quot;>${esc(initials)}</span>'">`
+  : `<span class="invitee-avatar-fallback">${esc(initials)}</span>`;
+}
 function memberInvites(){
  const allowed=canInvite();
- return page("👥 Mes Invités",`
- <div class="statgrid"><div class="stat">Invités<strong>${state.invites.length}</strong></div><div class="stat">Limite<strong>Illimitée</strong></div></div>
- <div class="notice ${allowed?"success":"warning"}">${allowed?"Tu peux maintenant partager ton invitation.":"Tu dois d'abord acheter au moins un produit du Marché BuSAF avant de pouvoir inviter."}</div>
- <button class="btn" onclick="invite()">👥 PARTAGER MON INVITATION</button>
- <div class="rule"><h3>Comment inviter ?</h3><ol><li>Appuie sur <strong>PARTAGER MON INVITATION</strong>.</li><li>Copie ton lien ou ton code.</li><li>Envoie-le à la personne par WhatsApp, SMS ou autre moyen.</li><li>La personne ouvre le lien et crée son compte.</li><li>BuSAF rattache automatiquement son inscription à ton invitation.</li></ol></div>
- <ul class="list">${state.invites.length?state.invites.map(i=>`<li><strong>${esc(i.name)}</strong><br>${esc(i.email)}<br><span class="small">${i.date}</span></li>`).join(""):"<li>Aucune invitation enregistrée.</li>"}</ul>`);
+ const members=Array.isArray(state.directInvites)?state.directInvites:[];
+ if(!state.directInvitesLoaded && !state.directInvitesLoading){
+   state.directInvitesLoaded=true;
+   loadDirectInvites().then(()=>{if(state.screen==="invites")render();});
+ }
+ return page("👥 Mes Invités Directs",`
+ <div class="invite-page">
+   <div class="invite-hero"><span>🤝 MON RÉSEAU DIRECT</span><h2>Mes invités</h2><p>Retrouve les personnes inscrites directement avec ton code de parrainage.</p></div>
+   <div class="statgrid"><div class="stat">Invités directs<strong>${members.length}</strong></div><div class="stat">Limite<strong>Illimitée</strong></div></div>
+   <button class="btn invite-share-button" onclick="invite()">📲 PARTAGER / INVITER UN AMI</button>
+   <button class="btn alt" onclick="state.directInvitesLoaded=false;loadDirectInvites().then(()=>render())">🔄 ACTUALISER MES INVITÉS</button>
+   ${state.directInvitesError?`<div class="notice error">Impossible de charger les invités : ${esc(state.directInvitesError)}</div>`:""}
+   ${!allowed?`<div class="notice warning">Pour activer le partage de ton invitation, achète d'abord un produit du Marché BuSAF. Le bouton reste disponible pour t'indiquer la marche à suivre.</div>`:`<div class="notice success">Tu peux partager ton lien personnel pour inviter directement une personne.</div>`}
+   <div class="rule"><h3>📋 Comment inviter ?</h3><ol><li>Appuie sur <strong>PARTAGER / INVITER UN AMI</strong>.</li><li>Choisis WhatsApp ou une autre application de partage.</li><li>Ton invité s'inscrit avec ton lien personnel.</li><li>Son profil apparaîtra ici après son inscription et le rattachement du parrainage.</li></ol></div>
+   <h3 class="invite-list-title">👥 Liste de mes invités directs</h3>
+   ${state.directInvitesLoading?`<div class="empty">Chargement des invités…</div>`:members.length?`<div class="invitee-list">${members.map(m=>`<article class="invitee-card">${inviteeAvatarHtml(m)}<div class="invitee-details"><strong>${esc(m.nom_complet||"Nom non renseigné")}</strong><span>${esc(m.Ville||m.ville||"Ville non renseignée")}</span><small>Inscription : ${esc(m.created_at?new Date(m.created_at).toLocaleDateString("fr-FR"):"Date non disponible")}</small><small>Statut : ${esc(m.role||"membre")}</small></div></article>`).join("")}</div>`:`<div class="empty">Aucun invité direct trouvé pour le moment. Les nouveaux inscrits apparaîtront ici dès que leur compte sera lié à ton code de parrainage.</div>`}
+ </div>`);
 }
 
 function memberOrders(){return page("📦 Mes Commandes",`${state.orders.length?`<ul class="list">${state.orders.map(o=>`<li><strong>${esc(o.product)}</strong><br>${money(o.price)}<br>Mode : ${esc(o.mode)}${o.customer?`<br>Client : ${esc(o.customer)}`:""}<br><span class="small">${o.date}</span></li>`).join("")}</ul>`:`<div class="empty">Aucune commande.</div>`}<button class="btn" onclick="setScreen('market')">CONTINUER MES ACHATS</button><button class="btn alt" onclick="setScreen('stockMarket')">VOIR MON STOCK</button>`);}
