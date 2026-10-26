@@ -57,9 +57,10 @@ a{text-decoration:none;color:inherit}
   background:rgba(255,255,255,.97);backdrop-filter:blur(8px);
   border-top:1px solid var(--line);box-shadow:0 -5px 20px rgba(0,0,0,.08)
 }
-.quick-inner,.bottom-inner{
-  max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(5,1fr)
-}
+.quick-inner,.bottom-inner{max-width:1100px;margin:auto;display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}
+.member-bottom .bottom-inner{grid-template-columns:repeat(4,minmax(0,1fr))}
+.bottom button{min-width:0;white-space:nowrap}
+.bottom button span{line-height:1.15}
 .quickbar button,.bottom button{
   border:0;background:transparent;color:var(--text);padding:9px 3px 10px;
   font-size:11px;font-weight:800
@@ -443,11 +444,7 @@ function normalScreen(screen){
 
 function setScreen(screen){
  screen=normalScreen(screen);
- if(screen===state.screen){
-   render();
-   window.scrollTo({top:0,left:0,behavior:"instant"});
-   return;
- }
+ if(screen===state.screen){ return; }
  state.screen=screen;
  history.pushState({busafScreen:screen},"","#"+screen);
  render();
@@ -1916,7 +1913,7 @@ function publicQuick(){
  </div></div>`;
 }
 function memberQuick(){
- return `<div class="bottom"><div class="bottom-inner">
+ return `<div class="bottom member-bottom"><div class="bottom-inner">
  <button onclick="setScreen('member')"><span>🏠</span>Accueil</button>
  <button onclick="setScreen('market')"><span>🛒</span>Marché</button>
  <button onclick="setScreen('invites')"><span>👥</span>Invités</button>
