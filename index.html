@@ -417,7 +417,7 @@ function money(n){return Number(n||0).toLocaleString("fr-FR")+" FCFA"}
 /* ===== NAVIGATION BuSAF : historique réel du bouton Retour Android ===== */
 function normalScreen(screen){
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
- const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","boutique","invites","orders","account","partner","memberBenefits","money","stockMarket","stockBoutique","meetings","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderPayments","founderMembers","founderReferral","founderBoutiques","founderStocks","founderAnnouncements","founderSettings"];
+ const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","boutique","invites","orders","account","partner","memberBenefits","money","stockMarket","stockBoutique","meetings","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderWallet","founderPayments","founderMembers","founderReferral","founderBoutiques","founderStocks","founderAnnouncements","founderSettings"];
  return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
