@@ -1395,6 +1395,11 @@ input,textarea,select{font-size:16px;min-height:44px}
  .productgrid .public-product .pprice{font-size:12px!important}
 }</style>
 
+<style id="busaf-founder-tactile-fix">
+.founder-dashboard{position:relative;isolation:isolate}
+.founder-dashboard .founder-grid{position:relative;z-index:2}
+.founder-dashboard .founder-app{position:relative;z-index:3;pointer-events:auto!important;touch-action:manipulation;cursor:pointer;-webkit-tap-highlight-color:rgba(0,120,65,.18)}
+</style>
 </head>
 <body>
 <div id="app" class="app"><main class="wrap" style="padding:18px 12px"><section style="background:#e8f6ec;color:#173b26;border:2px solid #087a38;border-radius:18px;padding:22px 18px;box-shadow:0 8px 22px rgba(8,122,56,.15)"><h1 style="color:#075c2b;font-size:34px;line-height:1.2;margin:0 0 8px">🌍 BuSAF</h1><p style="color:#173b26;font-size:18px;font-weight:800;margin:0 0 8px">Business Africain</p><p style="color:#243d2e;font-size:16px;line-height:1.6;margin:0">Découvre le Marché BuSAF, les produits, les avantages, les bénéfices et les règles avant de rejoindre la plateforme.</p><div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:18px"><a href="#signup" style="background:#087a38;color:#fff;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:800">📝 CRÉER MON COMPTE</a><a href="#login" style="background:#fff;color:#075c2b;border:2px solid #087a38;padding:12px 16px;border-radius:12px;text-decoration:none;font-weight:800">🔐 SE CONNECTER</a></div></section><p style="color:#173b26;text-align:center;padding:12px">BuSAF se charge…</p></main></div>
@@ -2257,7 +2262,19 @@ function publicHome(){
 
 
 function founderApp(id,ico,label,desc){
- return `<button class="founder-app ${id==='logout'?'founder-danger':''}" onclick="setScreen('${id}')"><span class="ficon">${ico}</span><b>${label}</b><small>${desc||''}</small></button>`;
+ return `<button type="button" class="founder-app ${id==='logout'?'founder-danger':''}" data-busaf-screen="${id}" onclick="setScreen('${id}')"><span class="ficon">${ico}</span><b>${label}</b><small>${desc||''}</small></button>`;
+}
+/* Sécurise les appuis tactiles sur les tuiles du Centre de contrôle Android. */
+if(!window.busafFounderTileHandlerInstalled){
+ window.busafFounderTileHandlerInstalled=true;
+ document.addEventListener("click",function(ev){
+  const tile=ev.target instanceof Element?ev.target.closest(".founder-app[data-busaf-screen]"):null;
+  if(!tile)return;
+  ev.preventDefault();
+  ev.stopImmediatePropagation();
+  const target=tile.getAttribute("data-busaf-screen");
+  if(target)setScreen(target);
+ },true);
 }
 
 function founderHome(){
