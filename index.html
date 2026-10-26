@@ -2724,6 +2724,35 @@ async function loadMarketCatalog(force=false){
    state.marketCatalog=[];
  }
 }
+
+/* Bouton ACTUALISER utilisé dans les espaces Marché et Fondateur. */
+async function refreshMarketCatalog(){
+  const buttons=[...document.querySelectorAll('button[onclick*="refreshMarketCatalog"]')];
+  buttons.forEach(b=>{b.disabled=true;b.dataset.busafOldText=b.textContent;b.textContent="ACTUALISATION…";});
+  try{
+    await loadMarketCatalog(true);
+    render();
+  }catch(e){
+    console.error("Actualisation du Marché BuSAF :",e);
+    alert("Impossible d’actualiser le Marché pour le moment. Réessaie.");
+  }finally{
+    buttons.forEach(b=>{b.disabled=false;if(b.dataset.busafOldText){b.textContent=b.dataset.busafOldText;delete b.dataset.busafOldText;}});
+  }
+}
+/* Compatibilité des boutons photo existants avec la visionneuse universelle. */
+function openPhotoLightbox(src,alt){
+  const box=document.getElementById("photoLightbox");
+  const img=document.getElementById("photoLightboxImage");
+  if(!box||!img||!src)return;
+  img.src=src;img.alt=alt||"Photo BuSAF";
+  img.style.transform="translate3d(0px,0px,0) scale(1)";
+  const reset=document.getElementById("photoZoomReset");
+  if(reset)reset.textContent="100%";
+  box.classList.add("open");
+  box.setAttribute("aria-hidden","false");
+  document.body.style.overflow="hidden";
+}
+
 async function syncConfirmedMarketPurchases(){
  if(!state.userId||!state.token||!state.profile?.id)return;
  try{
