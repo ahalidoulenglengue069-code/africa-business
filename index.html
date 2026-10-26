@@ -986,17 +986,49 @@ async function refreshFounderPayments(){if(!isFounder())return;try{state.founder
 function founderWallet(){
  if(!isFounder())return memberHome();
  return page("👛 Portefeuille Fondateur",`
-  <div class="notice success"><strong>Portefeuille du fondateur</strong><br>Voici les soldes affichés actuellement par BuSAF.</div>
-  <div class="statgrid">
-   <div class="stat">Compte Marché<strong>${money(state.marketBalance||0)}</strong></div>
-   <div class="stat">Compte Boutique<strong>${money(state.boutiqueBalance||0)}</strong></div>
-  </div>
-  <div class="rule"><h3>💰 Bénéfices et commissions</h3><p>Les soldes financiers réels et les commissions du fondateur doivent être confirmés depuis Supabase. Cette page n'invente aucun montant.</p></div>
-  <button class="btn" onclick="setScreen('founderFinance')">📊 VOIR LES FINANCES</button>
-  <button class="btn alt" onclick="setScreen('founderPayments')">📜 VOIR LES PAIEMENTS</button>
-  <button class="btn alt" onclick="openMoneyWithdraw()">💸 DEMANDE DE RETRAIT</button>
+  <div class="notice success"><strong>Portefeuille financier BuSAF</strong><br>Soldes calculés à partir des opérations confirmées dans Supabase.</div>
+  <div class="statgrid"><div class="stat">Solde disponible<strong id="fwAvailable">Chargement…</strong></div><div class="stat">Total crédité<strong id="fwCredits">—</strong></div><div class="stat">Total débité<strong id="fwDebits">—</strong></div><div class="stat">Retraits en attente<strong id="fwPending">—</strong></div></div>
+  <div class="rule"><h3>📱 Demander un retrait</h3><label>Montant (FCFA)</label><input id="fwAmount" type="number" min="1" inputmode="numeric" placeholder="Ex. 5000"><label>Compte</label><select id="fwAccount"><option value="Fonds BuSAF">Fonds BuSAF</option><option value="Commissions de parrainage">Commissions de parrainage</option></select><label>Opérateur</label><select id="fwOperator"><option>Orange Money</option><option>Moov Money</option><option>Telecel Money</option><option>Wave</option></select><label>Numéro Mobile Money</label><input id="fwPhone" type="tel" inputmode="tel" placeholder="Numéro de réception"><button class="btn" onclick="submitFounderWithdrawal()">ENVOYER LA DEMANDE</button><p class="small">La demande attend une validation. Aucun paiement n'est déclenché automatiquement.</p></div>
+  <div class="rule"><h3>🧾 Historique du portefeuille</h3><div id="fwTransactions"><div class="empty">Chargement des opérations…</div></div></div>
+  <div class="rule"><h3>💸 Mes demandes de retrait</h3><div id="fwWithdrawals"><div class="empty">Chargement des demandes…</div></div></div>
+  <button class="btn alt" onclick="loadFounderWallet()">🔄 ACTUALISER LE PORTEFEUILLE</button>
  `);
 }
+async function loadFounderWallet(){
+ if(!isFounder()||!state.profile?.id)return;
+ const id=state.profile.id,fmt=n=>money(Number(n||0)),el=k=>document.getElementById(k);
+ try{
+  const [txs,withdrawals]=await Promise.all([
+   api('/rest/v1/busaf_transactions_portefeuille?select=id,type_operation,montant,sens,statut,reference_interne,created_at&profil_id=eq.'+encodeURIComponent(id)+'&order=created_at.desc&limit=50'),
+   api('/rest/v1/busaf_retraits?select=id,montant,numero_mobile_money,operateur,compte,statut,created_at&profil_id=eq.'+encodeURIComponent(id)+'&order=created_at.desc&limit=30')
+  ]);
+  const confirmed=(txs||[]).filter(x=>x.statut==='confirmee');
+  const credits=confirmed.filter(x=>x.sens==='credit').reduce((s,x)=>s+Number(x.montant||0),0);
+  const debits=confirmed.filter(x=>x.sens==='debit').reduce((s,x)=>s+Number(x.montant||0),0);
+  const pending=(withdrawals||[]).filter(x=>x.statut==='en_attente').reduce((s,x)=>s+Number(x.montant||0),0);
+  if(el('fwAvailable'))el('fwAvailable').textContent=fmt(credits-debits);
+  if(el('fwCredits'))el('fwCredits').textContent=fmt(credits);
+  if(el('fwDebits'))el('fwDebits').textContent=fmt(debits);
+  if(el('fwPending'))el('fwPending').textContent=fmt(pending);
+  if(el('fwTransactions'))el('fwTransactions').innerHTML=(txs||[]).length?(txs||[]).map(x=>'<div class="rule"><strong>'+esc(x.type_operation||'Opération')+'</strong> — '+fmt(x.montant)+'<br>'+esc(x.sens||'')+' · '+esc(x.statut||'')+'<br><small>'+esc(x.created_at||'')+' · '+esc(x.reference_interne||'')+'</small></div>').join(''):'<div class="empty">Aucune opération enregistrée.</div>';
+  if(el('fwWithdrawals'))el('fwWithdrawals').innerHTML=(withdrawals||[]).length?(withdrawals||[]).map(x=>'<div class="rule"><strong>'+fmt(x.montant)+'</strong> — '+esc(x.statut||'')+'<br>'+esc(x.compte||'')+' · '+esc(x.operateur||'')+' · '+esc(x.numero_mobile_money||'')+'<br><small>'+esc(x.created_at||'')+'</small></div>').join(''):'<div class="empty">Aucune demande de retrait.</div>';
+ }catch(e){
+  ['fwAvailable','fwCredits','fwDebits','fwPending'].forEach(k=>{if(el(k))el(k).textContent='Indisponible';});
+  if(el('fwTransactions'))el('fwTransactions').innerHTML='<div class="notice warning">Chargement impossible : '+esc(e.message||'erreur Supabase')+'.</div>';
+ }
+}
+async function submitFounderWithdrawal(){
+ if(!isFounder()||!state.profile?.id)return;
+ const amount=Number(document.getElementById('fwAmount')?.value||0),phone=(document.getElementById('fwPhone')?.value||'').trim(),operator=document.getElementById('fwOperator')?.value||'',account=document.getElementById('fwAccount')?.value||'Fonds BuSAF';
+ if(!Number.isFinite(amount)||amount<=0||phone.length<6||phone.length>30){alert('Entre un montant positif et un numéro Mobile Money valide.');return;}
+ if(!confirm('Envoyer une demande de retrait de '+money(amount)+' FCFA vers '+phone+' ? Elle devra être validée par BuSAF.'))return;
+ try{
+  await api('/rest/v1/busaf_retraits',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({profil_id:state.profile.id,montant:amount,numero_mobile_money:phone,operateur,compte:account,statut:'en_attente'})});
+  alert('Demande enregistrée si Supabase l’a acceptée. Aucun argent n’a encore été envoyé.');
+  await loadFounderWallet();
+ }catch(e){alert('Demande non enregistrée : '+(e.message||'erreur Supabase'));}
+}
+
 function founderFinance(){if(!isFounder())return memberHome();const s=state.founderStats||{};return page('💰 Finances',`<div class="notice success">Montants calculés à partir des ventes confirmées chargées depuis Supabase.</div><div class="statgrid"><div class="stat">Ventes confirmées<strong>${s.confirmed??'—'}</strong></div><div class="stat">Montant confirmé<strong>${money(s.revenue||0)}</strong></div></div><button class="btn" onclick="refreshFounderData()">🔄 ACTUALISER</button>`);}
 function founderStocks(){if(!isFounder())return memberHome();const products=state.marketCatalog||[];const cards=products.map(p=>`<div class="rule"><strong>${esc(p.nom||'Produit')}</strong><br>Prix : ${money(p.prix)}<br>Type : ${esc(p.type_produit||'—')}</div>`).join('');return page('📦 Gestion des stocks',`<div class="notice">Produits réels du Marché BuSAF. Aucune quantité de stock n'est inventée.</div>${cards||'<div class="empty">Aucun produit chargé.</div>'}<button class="btn" onclick="refreshMarketCatalog()">🔄 ACTUALISER LES PRODUITS</button>`);}
 function founderPlaceholder(title,desc){
@@ -1895,6 +1927,7 @@ function render(){
      rules:memberRules,account:memberAccount,logout:()=>{confirmLogout();return ''; }
     };
     content=(founderMap[state.screen]||founderHome)();
+     if(state.screen==='founderWallet')setTimeout(()=>loadFounderWallet().catch(()=>{}),0);
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+founderQuick();
     if(state.screen==='founder' && !state.founderStats){ founderLoadStats().then(()=>{ if(state.screen==='founder')render(); }).catch(()=>{}); }
    }else{
