@@ -242,6 +242,45 @@ textarea{min-height:100px;resize:vertical}
 .photo-lightbox-tools .photo-zoom-value{width:auto;min-width:62px;border-radius:14px;font-size:13px}
 @media(max-width:480px){.photo-lightbox{padding-top:62px}.photo-lightbox img{max-width:96vw;max-height:78vh}.photo-lightbox-tools button{width:40px;height:40px}}
 
+/* Thèmes distincts par rôle : administration fondateur vs espace personnel membre */
+#app.founder-mode{--green:#17365d;--green2:#2463a6;--light:#eef3f9;--card:#fff;--text:#172b45;--muted:#61738a;--line:#d4dfec;--red:#bd2626;--shadow:0 8px 24px rgba(20,45,78,.10)}
+#app.founder-mode .header{background:linear-gradient(130deg,#10233f,#245b91);border-bottom:3px solid #d6a94f}
+#app.founder-mode .logo:after{content:"ADMINISTRATION";display:block;font-size:9px;letter-spacing:1.5px;color:#f4d58b;margin-top:7px}
+#app.founder-mode .wrap{background:linear-gradient(180deg,#edf3fa 0%,#f7f9fc 240px)}
+#app.founder-mode .hero,#app.founder-mode .card,#app.founder-mode .info{border-color:#d4dfec;box-shadow:0 8px 24px rgba(20,45,78,.08)}
+#app.founder-mode .hero h1,#app.founder-mode .card h1,#app.founder-mode .card h2,#app.founder-mode .section-title{color:#17365d}
+#app.founder-mode .btn:not(.red){background:#1c4d7c}
+#app.founder-mode .btn.alt{background:#e5edf7;color:#17365d}
+#app.founder-mode .back{background:#e5edf7;color:#17365d}
+#app.founder-mode .quickbar,#app.founder-mode .bottom{border-top:2px solid #d6a94f;background:rgba(247,249,252,.98)}
+#app.founder-mode .quickbar button.active,#app.founder-mode .bottom button.active{color:#1c5a94}
+#app.founder-mode .founder-hero{background:linear-gradient(135deg,#10233f,#1b4e7d 72%,#2c6da7);border:1px solid #42658d;box-shadow:0 12px 28px rgba(16,35,63,.2)}
+#app.founder-mode .founder-badge{color:#ffdf91;border-color:rgba(255,223,145,.45)}
+#app.founder-mode .founder-section-title{color:#17365d;letter-spacing:.65px}
+#app.founder-mode .founder-app{border-color:#d3deeb;background:linear-gradient(155deg,#fff,#f2f6fb);box-shadow:0 5px 16px rgba(19,48,83,.08)}
+#app.founder-mode .founder-app .ficon{display:flex;align-items:center;justify-content:center;width:43px;height:43px;border-radius:13px;background:#e1ebf7;color:#17365d}
+#app.founder-mode .founder-app b{color:#17365d;font-size:12px}
+#app.founder-mode .founder-app small{font-size:10px;color:#60748c}
+#app.founder-mode .founder-stat{background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.25)}
+#app.founder-mode .stat{background:#f0f5fb;border-color:#d4dfec}
+#app.founder-mode .stat strong{color:#1c5a94}
+#app.founder-mode .rule,#app.founder-mode .list li{border-color:#d4dfec}
+#app.founder-mode .rule h3{color:#17365d}
+#app.founder-mode .notice{background:#edf4fc;border-color:#cbdcf0;color:#244a70}
+#app.founder-mode .notice.warning{background:#fff7e4;border-color:#ead49a;color:#704d00}
+#app.founder-mode .notice.error{background:#fff0ef;border-color:#efc4c1;color:#8f1e18}
+#app.founder-mode .notice.success{background:#edf9f0;border-color:#bde2c6;color:#14672e}
+#app.founder-mode .founder-product .fprice{color:#1c5a94}
+#app.member-mode .header{background:linear-gradient(135deg,#087a38,#0b9347)}
+#app.member-mode .member-welcome{background:linear-gradient(135deg,#087a38,#0b9347 70%,#22ad62)}
+#app.member-mode .reference-card{border-radius:17px;box-shadow:0 5px 15px rgba(0,100,48,.09)}
+@media(max-width:600px){
+ #app.founder-mode .founder-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+ #app.founder-mode .founder-app{min-height:96px;padding:9px 4px;border-radius:14px}
+ #app.founder-mode .founder-app .ficon{width:37px;height:37px;font-size:22px;margin-bottom:5px}
+ #app.founder-mode .founder-app b{font-size:10px}
+ #app.founder-mode .founder-app small{font-size:8px}
+}
 </style>
 </head>
 <body>
@@ -1920,6 +1959,11 @@ function header(member=false){
 }
 
 function render(){
+  const appRoot=document.getElementById("app");
+  if(appRoot){
+    appRoot.classList.toggle("founder-mode",!!state.userId&&isFounder());
+    appRoot.classList.toggle("member-mode",!!state.userId&&!isFounder());
+  }
  let content="";
  if(!state.userId){
    const map={
