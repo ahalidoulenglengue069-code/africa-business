@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
 <title>BuSAF — Business Africain</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 :root{
   --green:#087a38;--green2:#0b9347;--light:#eef8f1;--card:#fff;
@@ -448,7 +448,7 @@ function setScreen(screen){
  state.screen=screen;
  history.pushState({busafScreen:screen},"","#"+screen);
  render();
- if(screen==="market" || screen==="public" || screen==="products")loadMarketCatalog(true).then(()=>render()).catch(()=>{});
+ if((screen==="market" || screen==="public" || screen==="products")&&!state.marketCatalogLoaded)loadMarketCatalog().then(()=>{if(state.screen===screen)render();}).catch(()=>{});
  window.scrollTo({top:0,left:0,behavior:"instant"});
 }
 
