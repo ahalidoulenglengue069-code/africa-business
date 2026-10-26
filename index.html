@@ -472,7 +472,7 @@ window.addEventListener("popstate",(event)=>{
  const screen=normalScreen(fromHistory||fromHash);
  state.screen=screen;
  render();
- if(screen==="market" || screen==="public" || screen==="products")loadMarketCatalog(true).then(()=>render()).catch(()=>{});
+ if((screen==="market" || screen==="public" || screen==="products")&&!state.marketCatalogLoaded)loadMarketCatalog().then(()=>{if(state.screen===screen)render();}).catch(()=>{});
  window.scrollTo({top:0,left:0,behavior:"instant"});
 });
 function openModal(title,html){
