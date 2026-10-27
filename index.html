@@ -721,9 +721,7 @@ async function verifyLogoutCredentials(){
   btn.disabled=false; btn.textContent="VÉRIFIER ET ME DÉCONNECTER";
  }
 }
-function logout(){
- openModal('Déconnexion',`<div class="notice">Veux-tu vraiment te déconnecter de ton espace BuSAF ?</div><div class="video-controls"><button class="btn alt" onclick="closeModal()">ANNULER</button><button class="btn red" onclick="performLogout()">OUI, ME DÉCONNECTER</button></div>`);
-}
+function logout(){ confirmLogout(); }
 async function performLogout(){
  const oldToken=state.token, oldEmail=state.email;
  try{
