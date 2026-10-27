@@ -1123,6 +1123,7 @@ function founderMembers(){
 async function refreshFounderMembers(){
  if(!isFounder()||state.founderMembersLoading)return;
  state.founderMembersLoading=true;state.founderMembersError='';
+ if(state.screen==='founderMembers')render();
  try{
   state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc');
   state.founderMembersLoaded=true;
@@ -1138,6 +1139,7 @@ function founderPayments(){
 async function refreshFounderPayments(){
  if(!isFounder()||state.founderPaymentsLoading)return;
  state.founderPaymentsLoading=true;
+ if(state.screen==='founderPayments')render();
  try{
   state.founderPayments=await api('/rest/v1/ventes?select=id,acheteur_id,montant,moyen_paiement,reference,statut,created_at,produit_id&order=created_at.desc');
   state.founderPaymentsLoaded=true;
@@ -1786,8 +1788,7 @@ function inviteeAvatarHtml(m){
 function founderDirectInvites(){
  const members=Array.isArray(state.directInvites)?state.directInvites:[];
  if(!state.directInvitesLoaded && !state.directInvitesLoading){
-   state.directInvitesLoading=true;
-   loadDirectInvites().then(()=>{if(state.screen==="founderDirectInvites")render();}).finally(()=>{state.directInvitesLoading=false;});
+   loadDirectInvites().then(()=>{if(state.screen==="founderDirectInvites")render();});
  }
  return page("👥 MES INVITÉS DIRECTS",`
   <div class="invite-page">
