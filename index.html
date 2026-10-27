@@ -121,6 +121,22 @@ a{text-decoration:none;color:inherit}
 @media(max-width:600px){.founder-wallet-balances{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.founder-wallet-balances .stat{padding:10px 6px}.founder-wallet-balances .stat strong{font-size:16px}.founder-wallet-panel{padding:10px}.founder-wallet-panel h3{font-size:14px}.founder-withdraw-form{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.founder-wallet-list{grid-template-columns:1fr}.founder-wallet-panel .btn{font-size:12px;padding:10px 8px}}
 .stat{background:#f7fbf8;border:1px solid var(--line);border-radius:14px;padding:13px;text-align:center}
 .stat strong{display:block;font-size:20px;color:var(--green);margin-top:5px}
+.profit-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:12px 0}
+.profit-card{border-radius:16px;padding:14px 12px;border:1px solid transparent;min-width:0;box-shadow:0 3px 10px rgba(20,50,30,.06)}
+.profit-card .profit-label{display:block;font-size:13px;font-weight:800;margin-bottom:9px}
+.profit-card strong{display:block;font-size:clamp(16px,4vw,22px);overflow-wrap:anywhere}
+.profit-market{background:#e6f7eb;border-color:#a8dfb8;color:#176b35}
+.profit-market strong{color:#176b35}
+.profit-boutique{background:#e8f2ff;border-color:#b7d4fb;color:#1855a5}
+.profit-boutique strong{color:#1855a5}
+.profit-sales{background:#fff1df;border-color:#f3d0a0;color:#9a4b08}
+.profit-sales strong{color:#9a4b08}
+.profit-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:10px 0}
+.profit-actions .btn{margin-top:0;min-width:0;padding:11px 7px;font-size:13px}
+.profit-actions .deposit-action{background:#1769c2;color:#fff}
+.profit-actions .withdraw-action{background:#c62828;color:#fff}
+.profit-actions .commission-action{grid-column:1/-1;background:#5b3a9b;color:#fff}
+@media(max-width:360px){.profit-cards{gap:7px}.profit-card{padding:11px 8px}.profit-actions .btn{font-size:12px}}
 .productgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start;width:100%}
 .product{border:1px solid var(--line);border-radius:14px;padding:7px;background:#fff;min-width:0;overflow:hidden}
 .product img{display:block;width:100%;height:78px;object-fit:cover;border-radius:8px;margin-bottom:6px}
@@ -2332,7 +2348,21 @@ async function saveProfile(){
  }
 }
 
-function memberProfits(){const seller=state.sales.reduce((a,x)=>a+Number(x.sellerProfit||0),0);return page("💰 Mes Bénéfices",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div><div class="stat">Compte Boutique<strong>${money(state.boutiqueBalance)}</strong></div></div><div class="rule"><h3>Ventes du Marché</h3><p>Bénéfices vendeur enregistrés localement : <strong>${money(seller)}</strong>.</p></div><div class="notice warning">Les soldes financiers de production doivent être calculés et protégés dans Supabase.</div><button class="btn" onclick="setScreen('money')">💳 DÉPÔT / RETRAIT</button><button class="btn alt" onclick="setScreen('commissions')">🤝 COMMISSIONS</button>`);}
+function memberProfits(){
+ const seller=state.sales.reduce((a,x)=>a+Number(x.sellerProfit||0),0);
+ return page("💰 Mes Bénéfices",`
+ <div class="profit-cards">
+  <div class="profit-card profit-market"><span class="profit-label">🟢 Compte Marché</span><strong>${money(state.marketBalance)}</strong></div>
+  <div class="profit-card profit-boutique"><span class="profit-label">🔵 Compte Boutique</span><strong>${money(state.boutiqueBalance)}</strong></div>
+  <div class="profit-card profit-sales"><span class="profit-label">🟠 Ventes du Marché</span><strong>${money(seller)}</strong></div>
+ </div>
+ <div class="notice warning">⚠️ Les bénéfices des ventes affichés ici sont enregistrés localement. Les soldes financiers officiels doivent être calculés et protégés dans Supabase.</div>
+ <div class="profit-actions">
+  <button class="btn deposit-action" onclick="setScreen('money')">💙 DÉPÔT</button>
+  <button class="btn withdraw-action" onclick="setScreen('money')">🔴 RETRAIT</button>
+  <button class="btn commission-action" onclick="setScreen('commissions')">🤝 MES COMMISSIONS</button>
+ </div>`);
+}
 
 function memberCommissions(){const sponsor=state.sales.reduce((a,x)=>a+Number(x.sponsorCommission||0),0);return page("🤝 Mes Commissions",`<div class="stat">Commissions directes enregistrées<strong>${money(sponsor)}</strong></div><div class="rule"><h3>7 %</h3><p>La commission est destinée au parrain direct du vendeur sur les reventes validées de ses invités directs.</p></div><div class="notice">Le vendeur voit son propre bénéfice de 12 %. La commission de son parrain est séparée.</div><button class="btn" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
 function memberPartner(){const n=monthlySalesCount(),pct=Math.min(100,n*10),total=totalSalesCount();return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong>${n}/10</strong></div><div class="stat">Ventes totales<strong>${total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>10 ventes du Marché BuSAF dans un même mois. Les ventes personnelles et les mois cumulés ne remplacent pas la condition.</p></div><button class="btn" onclick="setScreen('login')">SE CONNECTER</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
