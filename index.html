@@ -1359,7 +1359,7 @@ function countryFlag(country){const flags={"Burkina Faso":"🇧🇫","Bénin":"�
 function founderMembers(){
  if(!isFounder())return memberHome();
  const rows=state.founderMembers||[];
- const list=state.founderMembersLoading?`<div class="empty">Chargement automatique des membres…</div>`:state.founderMembersError?`<div class="notice error">Impossible de charger les membres : ${esc(state.founderMembersError)}. Vérifie la connexion puis réessaie.</div>`:rows.length?`<div class="list">${rows.map(m=>`<div class="rule" style="display:flex;align-items:center;gap:14px;padding:12px"><div>${inviteeAvatarHtml(m)}</div><div style="flex:1;min-width:0"><strong style="display:block;font-size:15px;overflow-wrap:anywhere">${esc(m.nom_complet||'Membre sans nom')}</strong><div class="small" style="margin-top:5px;overflow-wrap:anywhere">📱 Téléphone : ${esc(m.telephone||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🎟️ Code : ${esc(m.code_parrain||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🌍 Pays : ${esc(m.pays?countryFlag(m.pays)+" "+m.pays:(m.country?countryFlag(m.country)+" "+m.country:"Non renseigné"))}</div></div></div>`).join('')}</div>`:`<div class="empty">Aucun membre inscrit trouvé.</div>`;
+ const list=(state.founderMembersLoading&&!state.founderMembersLoaded)?`<div class="empty">Chargement automatique des membres…</div>`:state.founderMembersError?`<div class="notice error">Impossible de charger les membres : ${esc(state.founderMembersError)}. Vérifie la connexion puis réessaie.</div>`:rows.length?`<div class="list">${rows.map(m=>`<div class="rule" style="display:flex;align-items:center;gap:14px;padding:12px"><div>${inviteeAvatarHtml(m)}</div><div style="flex:1;min-width:0"><strong style="display:block;font-size:15px;overflow-wrap:anywhere">${esc(m.nom_complet||'Membre sans nom')}</strong><div class="small" style="margin-top:5px;overflow-wrap:anywhere">📱 Téléphone : ${esc(m.telephone||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🎟️ Code : ${esc(m.code_parrain||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🌍 Pays : ${esc(m.pays?countryFlag(m.pays)+" "+m.pays:(m.country?countryFlag(m.country)+" "+m.country:"Non renseigné"))}</div></div></div>`).join('')}</div>`:`<div class="empty">Aucun membre inscrit trouvé.</div>`;
  return page('🌍 Tous les membres inscrits sur BuSAF',`<div class="notice success"><strong>ESPACE RÉSERVÉ AU FONDATEUR</strong><br>Cette liste est différente de « Mes Invités » : elle regroupe tous les profils BuSAF, même ceux qui ne sont pas tes invités directs.</div>${state.founderMembersLoading?'<div class="notice">Chargement des membres...</div>':''}${list}<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER TOUS LES MEMBRES</button><button class="btn alt" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>`);
 }
 async function refreshFounderMembers(){
@@ -1370,6 +1370,7 @@ async function refreshFounderMembers(){
   const rows=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc&limit=100');
   state.founderMembers=Array.isArray(rows)?rows:[];
   state.founderMembersLoaded=true;
+  state.founderMembersLoadedAt=Date.now();
  }catch(e){
   state.founderMembersError=e.message||'Erreur de chargement';
   console.error('Chargement des membres BuSAF :',e);
@@ -2010,6 +2011,7 @@ async function loadDirectInvites(){
    const rows=await api("/rest/v1/rpc/busaf_mes_invites_directs",{method:"POST",body:"{}"});
    state.directInvites=Array.isArray(rows)?rows:[];
    state.directInvitesLoaded=true;
+   state.directInvitesLoadedAt=Date.now();
  }catch(e){
    state.directInvitesError=e.message||"Chargement des invités impossible.";
    state.directInvitesLoaded=false;
@@ -2047,7 +2049,7 @@ function founderDirectInvites(){
    <div class="statgrid"><div class="stat">Invités directs<strong>${members.length}</strong></div></div>
    <button class="btn alt" onclick="retryDirectInvites()">🔄 RÉESSAYER / ACTUALISER</button>
    ${state.directInvitesError?`<div class="notice error">Chargement impossible : ${esc(state.directInvitesError)}</div>`:""}
-   ${state.directInvitesLoading?`<div class="empty">Chargement des invités…</div>`:members.length?`<div class="invitee-list">${members.map(m=>`<article class="invitee-card">${inviteeAvatarHtml(m)}<div class="invitee-details"><strong>${esc(m.nom_complet||"Nom non renseigné")}</strong>${m.telephone?`<div>${esc(m.telephone)}</div>`:""}${m.code_parrain?`<small>Code : ${esc(m.code_parrain)}</small>`:""}${m.pays?`<div>${esc(countryFlag(m.pays))} ${esc(m.pays)}</div>`:""}</div></article>`).join("")}</div>`:`<div class="empty">Aucun invité direct enregistré pour ce compte.</div>`}
+   ${(state.directInvitesLoading&&!state.directInvitesLoaded)?`<div class="empty">Chargement des invités…</div>`:members.length?`<div class="invitee-list">${members.map(m=>`<article class="invitee-card">${inviteeAvatarHtml(m)}<div class="invitee-details"><strong>${esc(m.nom_complet||"Nom non renseigné")}</strong>${m.telephone?`<div>${esc(m.telephone)}</div>`:""}${m.code_parrain?`<small>Code : ${esc(m.code_parrain)}</small>`:""}${m.pays?`<div>${esc(countryFlag(m.pays))} ${esc(m.pays)}</div>`:""}</div></article>`).join("")}</div>`:`<div class="empty">Aucun invité direct enregistré pour ce compte.</div>`}
    <button class="btn alt" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>
   </div>`);
 }
@@ -2522,9 +2524,9 @@ async function refreshVisibleBusafData(){
  }
  if(state.userId){
   syncSharedBusafEvents().catch(e=>console.warn("Actualisation notifications:",e));
-  if(screen==="founderMembers")refreshFounderMembers().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation membres:",e));
+  if(screen==="founderMembers"&&(!state.founderMembersLoaded||now-(state.founderMembersLoadedAt||0)>60000))refreshFounderMembers().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation membres:",e));
   if(screen==="founderPayments")refreshFounderPayments().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation paiements:",e));
-  if(screen==="founderDirectInvites")loadDirectInvites().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation invités:",e));
+  if(screen==="founderDirectInvites"&&(!state.directInvitesLoaded||now-(state.directInvitesLoadedAt||0)>60000))loadDirectInvites().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation invités:",e));
  }
 }
 window.addEventListener("online",()=>{refreshVisibleBusafData().catch(e=>console.warn("Reconnexion BuSAF:",e));});
