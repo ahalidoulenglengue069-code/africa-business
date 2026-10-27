@@ -316,6 +316,33 @@ html,body{width:100%;max-width:100%;overflow-x:hidden}
  .profile-identity{align-items:flex-start}
  .profile-avatar{flex:0 0 64px;width:64px;height:64px}
 }
+
+/* Thèmes visuels distincts selon l'espace BuSAF ouvert */
+html[data-busaf-theme="public"]{--green:#087a38;--green2:#0b9347;--light:#eef8f1;--line:#d6e7da;--text:#173523;--muted:#63736a}
+html[data-busaf-theme="market"]{--green:#1769aa;--green2:#2589d8;--light:#edf6ff;--line:#c8def2;--text:#173653;--muted:#5b7187}
+html[data-busaf-theme="orders"]{--green:#b65a13;--green2:#e17a20;--light:#fff5e9;--line:#f1d7b8;--text:#573516;--muted:#866b50}
+html[data-busaf-theme="invites"]{--green:#7040a6;--green2:#925fd0;--light:#f6efff;--line:#dfcef3;--text:#382451;--muted:#78658b}
+html[data-busaf-theme="account"]{--green:#087f8c;--green2:#0ca6b4;--light:#eafafb;--line:#c5e8eb;--text:#16454a;--muted:#5d7e81}
+html[data-busaf-theme="profits"]{--green:#9a6900;--green2:#c58a08;--light:#fff9e8;--line:#f0dfaa;--text:#4e3c0e;--muted:#827044}
+html[data-busaf-theme="commissions"]{--green:#b02d68;--green2:#d64786;--light:#fff0f6;--line:#f0c9dc;--text:#54203a;--muted:#896579}
+html[data-busaf-theme="partner"]{--green:#4b55b5;--green2:#6e78dc;--light:#f0f1ff;--line:#d1d4f5;--text:#292e65;--muted:#686c98}
+html[data-busaf-theme="money"]{--green:#087b61;--green2:#10a27f;--light:#eaf9f4;--line:#c7e9dd;--text:#16483b;--muted:#5d8176}
+html[data-busaf-theme="notifications"]{--green:#b3261e;--green2:#e04b40;--light:#fff1f0;--line:#f0c9c6;--text:#4e211f;--muted:#8b6663}
+html[data-busaf-theme="rules"]{--green:#65513c;--green2:#8d7255;--light:#f7f2eb;--line:#e3d7c6;--text:#413427;--muted:#827463}
+html[data-busaf-theme="help"]{--green:#246c9b;--green2:#378fbe;--light:#eef8ff;--line:#cce4f2;--text:#183b50;--muted:#607b8a}
+html[data-busaf-theme="privacy"]{--green:#475569;--green2:#64748b;--light:#f1f5f9;--line:#d5dde7;--text:#263445;--muted:#687789}
+html[data-busaf-theme="contact"]{--green:#0b8290;--green2:#17a8b7;--light:#eafcff;--line:#c7edf1;--text:#17464b;--muted:#5c8085}
+html[data-busaf-theme="how"]{--green:#3d6b37;--green2:#62964e;--light:#f1f8ed;--line:#d3e6ca;--text:#294329;--muted:#6a8065}
+html[data-busaf-theme="founder"]{--green:#4d388c;--green2:#7257b8;--light:#f3f0ff;--line:#d8d0f1;--text:#30264c;--muted:#71688b}
+html[data-busaf-theme="founderMarket"]{--green:#1769aa;--green2:#2589d8;--light:#edf6ff;--line:#c8def2;--text:#173653;--muted:#5b7187}
+html[data-busaf-theme="founderDashboard"]{--green:#4d388c;--green2:#7257b8;--light:#f3f0ff;--line:#d8d0f1;--text:#30264c;--muted:#71688b}
+html[data-busaf-theme="founderFinance"]{--green:#9a6900;--green2:#c58a08;--light:#fff9e8;--line:#f0dfaa;--text:#4e3c0e;--muted:#827044}
+html[data-busaf-theme="founderWallet"]{--green:#087b61;--green2:#10a27f;--light:#eaf9f4;--line:#c7e9dd;--text:#16483b;--muted:#5d8176}
+html[data-busaf-theme="founderPayments"]{--green:#b65a13;--green2:#e17a20;--light:#fff5e9;--line:#f1d7b8;--text:#573516;--muted:#866b50}
+html[data-busaf-theme="founderMembers"]{--green:#087f8c;--green2:#0ca6b4;--light:#eafafb;--line:#c5e8eb;--text:#16454a;--muted:#5d7e81}
+html[data-busaf-theme="founderStocks"]{--green:#1769aa;--green2:#2589d8;--light:#edf6ff;--line:#c8def2;--text:#173653;--muted:#5b7187}
+html[data-busaf-theme="founderSettings"]{--green:#475569;--green2:#64748b;--light:#f1f5f9;--line:#d5dde7;--text:#263445;--muted:#687789}
+
 </style>
 </head>
 <body>
@@ -2009,6 +2036,18 @@ function header(member=false){
 }
 
 function render(){
+  const themeByScreen = {
+   public:"public",member:"public",founder:"founder",founderMarket:"founderMarket",market:"market",
+   founderDashboard:"founderDashboard",founderStats:"founderDashboard",founderFinance:"founderFinance",
+   founderWallet:"founderWallet",money:"money",founderPayments:"founderPayments",orders:"orders",
+   founderMembers:"founderMembers",invites:"invites",account:"account",profits:"profits",commissions:"commissions",
+   partner:"partner",memberBenefits:"profits",stockMarket:"market",stockBoutique:"orders",
+   notifications:"notifications",rules:"rules",help:"help",privacy:"privacy",contact:"contact",how:"how",
+   founderStocks:"founderStocks",founderSettings:"founderSettings",founderReferral:"invites",
+   founderAnnouncements:"contact",founderBoutiques:"orders",founderStats:"founderDashboard",
+   meetings:"partner",boutique:"orders",signup:"account",login:"account",benefits:"profits"
+  };
+  document.documentElement.setAttribute("data-busaf-theme",themeByScreen[state.screen]||"public");
   const appRoot=document.getElementById("app");
   if(appRoot){
     appRoot.classList.toggle("founder-mode",!!state.userId&&isFounder());
