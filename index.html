@@ -1117,7 +1117,7 @@ function countryFlag(country){const flags={"Burkina Faso":"🇧🇫","Bénin":"�
 function founderMembers(){
  if(!isFounder())return memberHome();
  const rows=state.founderMembers||[];
- const list=state.founderMembersLoading?`<div class="empty">Chargement automatique des membres…</div>`:state.founderMembersError?`<div class="notice error">${esc(state.founderMembersError)}</div>`:rows.length?`<div class="list">${rows.map(m=>`<div class="rule" style="display:flex;align-items:center;gap:14px;padding:12px"><div>${inviteeAvatarHtml(m)}</div><div style="flex:1;min-width:0"><strong style="display:block;font-size:15px;overflow-wrap:anywhere">${esc(m.nom_complet||'Membre sans nom')}</strong><div class="small" style="margin-top:5px;overflow-wrap:anywhere">📱 Téléphone : ${esc(m.telephone||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🎟️ Code : ${esc(m.code_parrain||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🌍 Pays : ${esc(m.pays?countryFlag(m.pays)+" "+m.pays:(m.country?countryFlag(m.country)+" "+m.country:"Non renseigné"))}</div></div></div>`).join('')}</div>`:`<div class="empty">Aucun membre inscrit trouvé.</div>`;
+ const list=state.founderMembersLoading?`<div class="empty">Chargement automatique des membres…</div>`:state.founderMembersError?`<div class="notice error">Impossible de charger les membres : ${esc(state.founderMembersError)}. Vérifie la connexion puis réessaie.</div>`:rows.length?`<div class="list">${rows.map(m=>`<div class="rule" style="display:flex;align-items:center;gap:14px;padding:12px"><div>${inviteeAvatarHtml(m)}</div><div style="flex:1;min-width:0"><strong style="display:block;font-size:15px;overflow-wrap:anywhere">${esc(m.nom_complet||'Membre sans nom')}</strong><div class="small" style="margin-top:5px;overflow-wrap:anywhere">📱 Téléphone : ${esc(m.telephone||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🎟️ Code : ${esc(m.code_parrain||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🌍 Pays : ${esc(m.pays?countryFlag(m.pays)+" "+m.pays:(m.country?countryFlag(m.country)+" "+m.country:"Non renseigné"))}</div></div></div>`).join('')}</div>`:`<div class="empty">Aucun membre inscrit trouvé.</div>`;
  return page('🌍 Tous les membres inscrits sur BuSAF',`<div class="notice success"><strong>ESPACE RÉSERVÉ AU FONDATEUR</strong><br>Cette liste est différente de « Mes Invités » : elle regroupe tous les profils BuSAF, même ceux qui ne sont pas tes invités directs.</div>${state.founderMembersLoading?'<div class="notice">Chargement des membres...</div>':''}${list}<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER TOUS LES MEMBRES</button><button class="btn alt" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>`);
 }
 async function refreshFounderMembers(){
@@ -1125,10 +1125,16 @@ async function refreshFounderMembers(){
  state.founderMembersLoading=true;state.founderMembersError='';
  if(state.screen==='founderMembers')render();
  try{
-  state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc');
+  const rows=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc&limit=100');
+  state.founderMembers=Array.isArray(rows)?rows:[];
   state.founderMembersLoaded=true;
- }catch(e){state.founderMembersError=e.message||'Erreur de chargement';console.error('Chargement des membres BuSAF :',e);}
- finally{state.founderMembersLoading=false;if(state.screen==='founderMembers')render();}
+ }catch(e){
+  state.founderMembersError=e.message||'Erreur de chargement';
+  console.error('Chargement des membres BuSAF :',e);
+ }finally{
+  state.founderMembersLoading=false;
+  if(state.screen==='founderMembers')render();
+ }
 }
 function founderPayments(){
  if(!isFounder())return memberHome();
