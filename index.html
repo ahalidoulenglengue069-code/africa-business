@@ -1688,17 +1688,26 @@ function openBoutiqueSale(i){const p=state.boutiqueProducts[i];if(!p)return;open
 function confirmBoutiqueSale(i){const p=state.boutiqueProducts[i],customer=document.getElementById("shopCustomer")?.value.trim();if(!p||!customer){alert("Nom du client obligatoire.");return;}const sellerAmount=p.price;state.boutiqueBalance+=sellerAmount;state.orders.unshift({id:Date.now(),product:p.name,price:p.price,date:new Date().toLocaleString("fr-FR"),mode:"boutique",customer});addNotification("🏪 Vente boutique",`Vente de ${p.name} enregistrée. Part vendeur : ${money(sellerAmount)}.`,"boutique");saveState();closeModal();openModal("Vente enregistrée",`<div class="notice success">Vente boutique confirmée. Part vendeur : <strong>${money(sellerAmount)}</strong>.</div><div class="notice warning">En production, paiement et prélèvement 5 % doivent être sécurisés côté serveur.</div><button class="btn" onclick="closeModal();setScreen('orders')">VOIR LES COMMANDES</button>`);}
 
 async function loadDirectInvites(){
- if(!state.userId||!state.token||!state.profile?.id)return [];
+ if(!state.userId||!state.token||!state.profile?.id){
+   state.directInvites=[];
+   state.directInvitesError="Connecte-toi pour consulter tes invités directs.";
+   state.directInvitesLoaded=true;
+   return [];
+ }
  if(state.directInvitesLoading)return state.directInvites||[];
  state.directInvitesLoading=true;
+ state.directInvitesLoaded=true;
+ state.directInvitesError="";
  try{
-   const rows=await api(`/rest/v1/profils_busaf?parrain_id=eq.${encodeURIComponent(state.profile.id)}&select=id,user_id,nom_complet,telephone,Ville,role,code_parrain,photo_url,created_at&order=created_at.desc`);
+   // RPC sécurisé : un membre ne lit que les champs publics de ses propres invités directs.
+   const rows=await api("/rest/v1/rpc/busaf_mes_invites_directs",{method:"POST",body:"{}"});
    state.directInvites=Array.isArray(rows)?rows:[];
-   state.directInvitesError="";
  }catch(e){
    state.directInvitesError=e.message||"Chargement des invités impossible.";
    console.warn("Invités directs BuSAF :",e);
- }finally{state.directInvitesLoading=false;}
+ }finally{
+   state.directInvitesLoading=false;
+ }
  return state.directInvites||[];
 }
 function inviteeAvatarHtml(m){
