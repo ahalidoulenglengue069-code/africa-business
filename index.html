@@ -12,6 +12,14 @@
   --gold:#a86b00;--shadow:0 7px 24px rgba(0,0,0,.08)
 }
 *{box-sizing:border-box}
+html,body,#app{max-width:100%;min-width:0;overflow-x:clip}
+.wrap,.founder-dashboard,.profile-page,.profile-cover,.founder-hero{min-width:0;max-width:100%}
+button,.card,.hero,.rule,.profile-section-card,.founder-app{min-width:0}
+.founder-grid>*{min-width:0}
+.founder-app{overflow-wrap:anywhere;word-break:normal;transition:none}
+#app.founder-mode .founder-app:active{transform:none}
+.profile-actions-grid>*{min-width:0;overflow-wrap:anywhere}
+.profile-summary-grid>*{min-width:0}
 html,body{margin:0;padding:0;background:var(--light);color:var(--text);font-family:Arial,Helvetica,sans-serif}
 body{min-height:100vh}
 button,input,textarea,select{font:inherit}
