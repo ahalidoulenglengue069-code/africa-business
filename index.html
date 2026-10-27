@@ -343,6 +343,25 @@ html[data-busaf-theme="founderMembers"]{--green:#087f8c;--green2:#0ca6b4;--light
 html[data-busaf-theme="founderStocks"]{--green:#1769aa;--green2:#2589d8;--light:#edf6ff;--line:#c8def2;--text:#173653;--muted:#5b7187}
 html[data-busaf-theme="founderSettings"]{--green:#475569;--green2:#64748b;--light:#f1f5f9;--line:#d5dde7;--text:#263445;--muted:#687789}
 
+
+/* Présentation Dépôt / Retrait : deux comptes côte à côte, détails en dessous */
+.money-balances{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:14px 0 18px}
+.money-balance-card{min-width:0;box-sizing:border-box;border-radius:16px;padding:15px 10px;text-align:center;border:1px solid var(--line);box-shadow:0 5px 15px rgba(0,0,0,.07);display:flex;flex-direction:column;align-items:center;gap:7px}
+.money-balance-card.market-balance{background:linear-gradient(145deg,#e5f0ff,#fff);border-color:#7ba8ef;color:#174a91}
+.money-balance-card.boutique-balance{background:linear-gradient(145deg,#fff0df,#fff);border-color:#efa75b;color:#8c4a09}
+.money-balance-card>span{font-size:24px}
+.money-balance-card small{font-weight:800;font-size:11px;letter-spacing:.3px}
+.money-balance-card strong{font-size:clamp(15px,3.8vw,21px);overflow-wrap:anywhere}
+.money-details{margin-top:8px}
+.money-section-title{margin:18px 0 10px;font-size:17px}
+.money-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.money-actions .btn{width:100%;min-width:0;margin:0;padding:12px 7px;font-size:13px}
+.money-actions .btn:last-child{grid-column:1/-1}
+.money-actions .btn.danger{background:#b3261e;color:#fff}
+.money-help{margin-top:16px}
+.money-help p{margin:8px 0}
+@media(max-width:360px){.money-balances{gap:6px}.money-balance-card{padding:12px 5px}.money-balance-card small{font-size:10px}.money-actions .btn{font-size:12px}}
+
 </style>
 </head>
 <body>
@@ -1939,7 +1958,7 @@ function memberCommissions(){const sponsor=state.sales.reduce((a,x)=>a+Number(x.
 function memberPartner(){const n=monthlySalesCount(),pct=Math.min(100,n*10),total=totalSalesCount();return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong>${n}/10</strong></div><div class="stat">Ventes totales<strong>${total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>10 ventes du Marché BuSAF dans un même mois. Les ventes personnelles et les mois cumulés ne remplacent pas la condition.</p></div><button class="btn" onclick="setScreen('login')">SE CONNECTER</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
 
 function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 4,5 % et son parrain direct reçoit 7 % sur la revente validée.</p></div>`);}
-function memberMoney(){return page("💳 Dépôt / Retrait",`<div class="statgrid"><div class="stat">Compte Marché<strong>${money(state.marketBalance)}</strong></div><div class="stat">Compte Boutique<strong>${money(state.boutiqueBalance)}</strong></div></div><div class="notice warning">Les dépôts et retraits réels doivent être validés côté serveur par le fournisseur de paiement.</div><button class="btn" onclick="openMoneyDeposit()">💳 DÉPÔT</button><button class="btn alt" onclick="openMoneyWithdraw()">💸 RETRAIT</button><button class="btn alt" onclick="setScreen('orders')">📜 HISTORIQUE</button>`);}
+function memberMoney(){return page("💳 Dépôt / Retrait",`<div class="money-balances"><div class="money-balance-card market-balance"><span>💼</span><small>COMPTE MARCHÉ</small><strong>${money(state.marketBalance)}</strong></div><div class="money-balance-card boutique-balance"><span>🛍️</span><small>COMPTE BOUTIQUE</small><strong>${money(state.boutiqueBalance)}</strong></div></div><div class="money-details"><div class="notice warning">🔐 Les dépôts et retraits réels doivent être validés côté serveur par le fournisseur de paiement. Aucun solde ne sera modifié avant confirmation.</div><h3 class="money-section-title">💳 Gérer mon argent</h3><div class="money-actions"><button class="btn" onclick="openMoneyDeposit()">💳 DÉPÔT</button><button class="btn danger" onclick="openMoneyWithdraw()">💸 RETRAIT</button><button class="btn alt" onclick="setScreen('orders')">📜 HISTORIQUE</button></div><div class="rule money-help"><h3>ℹ️ Informations</h3><p><strong>Dépôt :</strong> choisis le compte, le montant et ton moyen de paiement.</p><p><strong>Retrait :</strong> indique le compte, le montant et le numéro Mobile Money.</p><p><strong>Historique :</strong> consulte les opérations liées à ton activité BuSAF.</p></div></div>`);}
 function openMoneyDeposit(){openModal("💳 Dépôt",`<label>Compte</label><select><option>Compte Marché</option><option>Compte Boutique</option></select><label>Montant FCFA</label><input id="depAmount" type="number" min="1"><label>Mode</label><select><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option></select><button class="btn" onclick="requestMoneyDeposit()">CONTINUER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 function requestMoneyDeposit(){const a=Number(document.getElementById("depAmount")?.value||0);if(a<=0){alert("Montant invalide.");return;}closeModal();openModal("Dépôt",`<div class="notice warning">Demande préparée. Le solde ne sera crédité qu'après confirmation du paiement côté serveur.</div><button class="btn" onclick="closeModal()">OK</button>`);}
 function openMoneyWithdraw(){openModal("💸 Retrait",`<label>Compte</label><select><option>Compte Marché</option><option>Compte Boutique</option></select><label>Montant FCFA</label><input id="wdAmount" type="number" min="1"><label>Numéro Mobile Money</label><input id="wdPhone" type="tel"><button class="btn" onclick="requestMoneyWithdraw()">CONFIRMER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
