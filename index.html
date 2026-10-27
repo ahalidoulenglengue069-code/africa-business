@@ -560,7 +560,7 @@ function money(n){return Number(n||0).toLocaleString("fr-FR")+" FCFA"}
 /* ===== NAVIGATION BuSAF : historique réel du bouton Retour Android ===== */
 function normalScreen(screen){
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
- const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","boutique","invites","orders","account","partner","memberBenefits","money","stockMarket","stockBoutique","meetings","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderWallet","founderPayments","founderMembers","founderReferral","founderBoutiques","founderStocks","founderAnnouncements","founderSettings"];
+ const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","boutique","invites","orders","account","partner","memberBenefits","money","stockMarket","stockBoutique","meetings","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderWallet","founderPayments","founderMembers","founderDirectInvites","founderReferral","founderBoutiques","founderStocks","founderAnnouncements","founderSettings"];
  return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
@@ -1061,7 +1061,7 @@ function founderHome(){
   <h2 class="founder-section-title">👥 RÉSEAU</h2>
   <div class="founder-grid">
    ${founderApp('founderMembers','🌍','TOUS LES MEMBRES','Tous les inscrits sur BuSAF')}
-   ${founderApp('invites','👥','MES INVITÉS','Tes invités directs uniquement')}
+   ${founderApp('founderDirectInvites','👥','MES INVITÉS','Tes invités directs uniquement')}
    ${founderApp('founderReferral','🤝','Parrainage','Réseau et commissions')}
    ${founderApp('partner','⭐','Partner','Suivi des statuts Partner')}
    ${founderApp('commissions','💰','Commissions','Commissions')}
@@ -1762,6 +1762,22 @@ function inviteeAvatarHtml(m){
   ? `<img class="invitee-avatar" src="${esc(photo)}" alt="Photo de ${esc(name)}" loading="lazy" onerror="this.outerHTML='<span class=&quot;invitee-avatar-fallback&quot;>${esc(initials)}</span>'">`
   : `<span class="invitee-avatar-fallback">${esc(initials)}</span>`;
 }
+function founderDirectInvites(){
+ const members=Array.isArray(state.directInvites)?state.directInvites:[];
+ if(!state.directInvitesLoaded && !state.directInvitesLoading){
+   loadDirectInvites().then(()=>{if(state.screen==="founderDirectInvites")render();});
+ }
+ return page("👥 MES INVITÉS DIRECTS",`
+  <div class="invite-page">
+   <div class="invite-hero"><span>👑 ESPACE FONDATEUR</span><h2>Mes invités directs</h2><p>Cette liste contient uniquement les personnes directement parrainées par le compte Fondateur.</p></div>
+   <div class="statgrid"><div class="stat">Invités directs<strong>${members.length}</strong></div></div>
+   <button class="btn alt" onclick="state.directInvitesLoaded=false;loadDirectInvites().then(()=>render())">🔄 ACTUALISER</button>
+   ${state.directInvitesError?`<div class="notice error">Chargement impossible : ${esc(state.directInvitesError)}</div>`:""}
+   ${state.directInvitesLoading?`<div class="empty">Chargement des invités…</div>`:members.length?`<div class="invitee-list">${members.map(m=>`<article class="invitee-card">${inviteeAvatarHtml(m)}<div class="invitee-details"><strong>${esc(m.nom_complet||"Nom non renseigné")}</strong>${m.telephone?`<div>${esc(m.telephone)}</div>`:""}${m.code_parrain?`<small>Code : ${esc(m.code_parrain)}</small>`:""}${m.pays?`<div>${esc(countryFlag(m.pays))} ${esc(m.pays)}</div>`:""}</div></article>`).join("")}</div>`:`<div class="empty">Aucun invité direct trouvé pour le moment.</div>`}
+   <button class="btn alt" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>
+  </div>`);
+}
+
 function memberInvites(){
  const allowed=canInvite();
  const members=Array.isArray(state.directInvites)?state.directInvites:[];
@@ -2133,7 +2149,7 @@ function render(){
    public:"public",member:"public",founder:"founder",founderMarket:"founderMarket",market:"market",
    founderDashboard:"founderDashboard",founderStats:"founderDashboard",founderFinance:"founderFinance",
    founderWallet:"founderWallet",money:"money",founderPayments:"founderPayments",orders:"orders",
-   founderMembers:"founderMembers",invites:"invites",account:"account",profits:"profits",commissions:"commissions",
+   founderMembers:"founderMembers",founderDirectInvites:"invites",invites:"invites",account:"account",profits:"profits",commissions:"commissions",
    partner:"partner",memberBenefits:"profits",stockMarket:"market",stockBoutique:"orders",
    notifications:"notifications",rules:"rules",help:"help",privacy:"privacy",contact:"contact",how:"how",
    founderStocks:"founderStocks",founderSettings:"founderSettings",founderReferral:"invites",
@@ -2175,6 +2191,7 @@ function render(){
      founderPayments:founderPayments,
      orders:founderPayments,
      founderMembers:founderMembers,
+     founderDirectInvites:founderDirectInvites,
      invites:memberInvites,
      founderReferral:()=>founderPlaceholder('🤝 Parrainage','Gestion du réseau de parrainage et des commissions.'),
      partner:()=>founderPlaceholder('⭐ Partner','Suivi des statuts Partner.'),
