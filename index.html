@@ -755,7 +755,7 @@ async function signup(e){
   if(!code)throw new Error("Le code d'invitation est obligatoire.");
   if(password.length<6)throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
 
-  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville,code_invitation:code}})});
+  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,pays,code_invitation:code}})});
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
 
   state.userId=d.user.id;state.email=email;state.token=d.access_token||"";
@@ -1112,10 +1112,11 @@ function founderDashboard(){
  return page('📈 Tableau de bord',`<div class="notice success"><strong>📊 Tableau de bord réel</strong><br>Ces chiffres sont chargés depuis les tables Supabase de BuSAF.</div><div class="statgrid"><div class="stat">Produits<strong>${s.products??'—'}</strong></div><div class="stat">Membres<strong>${s.members??'—'}</strong></div><div class="stat">Ventes<strong>${s.sales??'—'}</strong></div><div class="stat">Confirmées<strong>${s.confirmed??'—'}</strong></div><div class="stat">En attente<strong>${s.pending??'—'}</strong></div><div class="stat">Échecs<strong>${s.failed??'—'}</strong></div><div class="stat" style="grid-column:1/-1">Montant confirmé<strong>${money(s.revenue||0)}</strong></div></div><button class="btn" onclick="refreshFounderData()">🔄 ACTUALISER LES DONNÉES</button><button class="btn alt" onclick="setScreen('founder')">← ESPACE FONDATEUR</button>`);
 }
 async function refreshFounderData(){openModal('🔄 Actualisation',`<div class="notice">Chargement des données réelles depuis Supabase…</div>`);try{await founderLoadStats();closeModal();render();}catch(e){closeModal();alert('❌ Impossible de charger les données : '+e.message)}}
+function countryFlag(country){const flags={"Burkina Faso":"🇧🇫","Bénin":"🇧🇯","Côte d’Ivoire":"🇨🇮","Ghana":"🇬🇭","Guinée":"🇬🇳","Mali":"🇲🇱","Niger":"🇳🇪","Nigeria":"🇳🇬","Sénégal":"🇸🇳","Togo":"🇹🇬","Cameroun":"🇨🇲","Tchad":"🇹🇩","République démocratique du Congo":"🇨🇩","République du Congo":"🇨🇬","Gabon":"🇬🇦","Mauritanie":"🇲🇷","Guinée-Bissau":"🇬🇼","Gambie":"🇬🇲","Liberia":"🇱🇷","Sierra Leone":"🇸🇱","Afrique du Sud":"🇿🇦","Algérie":"🇩🇿","Maroc":"🇲🇦","Tunisie":"🇹🇳","Égypte":"🇪🇬","France":"🇫🇷","Belgique":"🇧🇪","Canada":"🇨🇦","États-Unis":"🇺🇸","Royaume-Uni":"🇬🇧","Allemagne":"🇩🇪","Italie":"🇮🇹","Espagne":"🇪🇸","Arabie saoudite":"🇸🇦","Émirats arabes unis":"🇦🇪","Chine":"🇨🇳","Inde":"🇮🇳"};return flags[String(country||"").trim()]||"🌍";}
 function founderMembers(){
  if(!isFounder())return memberHome();
  const rows=state.founderMembers||[];
- const list=rows.length?`<div class="list">${rows.map(m=>`<div class="rule" style="display:flex;align-items:center;gap:14px;padding:12px"><div>${inviteeAvatarHtml(m)}</div><div style="flex:1;min-width:0"><strong style="display:block;font-size:15px;overflow-wrap:anywhere">${esc(m.nom_complet||'Membre sans nom')}</strong><div class="small" style="margin-top:5px;overflow-wrap:anywhere">📱 Téléphone : ${esc(m.telephone||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🎟️ Code : ${esc(m.code_parrain||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🌍 Pays : ${esc(m.pays||m.country||'Non renseigné')}</div></div></div>`).join('')}</div>`:`<div class="empty">Aucun membre chargé. Appuie sur Actualiser.</div>`;
+ const list=rows.length?`<div class="list">${rows.map(m=>`<div class="rule" style="display:flex;align-items:center;gap:14px;padding:12px"><div>${inviteeAvatarHtml(m)}</div><div style="flex:1;min-width:0"><strong style="display:block;font-size:15px;overflow-wrap:anywhere">${esc(m.nom_complet||'Membre sans nom')}</strong><div class="small" style="margin-top:5px;overflow-wrap:anywhere">📱 Téléphone : ${esc(m.telephone||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🎟️ Code : ${esc(m.code_parrain||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🌍 Pays : ${esc(m.pays?countryFlag(m.pays)+" "+m.pays:(m.country?countryFlag(m.country)+" "+m.country:"Non renseigné"))}</div></div></div>`).join('')}</div>`:`<div class="empty">Aucun membre chargé. Appuie sur Actualiser.</div>`;
  return page('👥 Membres BuSAF',`<div class="notice">Tous les inscrits : photo, nom, téléphone, code et pays lorsqu’ils sont renseignés.</div>${list}<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER LES MEMBRES</button>`);
 }
 async function refreshFounderMembers(){if(!isFounder())return;try{state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc');render();}catch(e){alert('❌ Impossible de charger les membres : '+e.message)}}
@@ -1274,10 +1275,48 @@ function signupPage(){
   <input id="regEmail" type="email" required placeholder="exemple@email.com">
   <label>Téléphone</label>
   <input id="regTel" required placeholder="Numéro de téléphone">
-  <label>Ville</label>
-  <input id="regVille" required placeholder="Votre ville">
-  <label>Pays</label>
-  <input id="regPays" required placeholder="Votre pays (ex. Burkina Faso)">
+  <label>Pays de résidence</label>
+  <select id="regPays" required>
+   <option value="">🌍 Sélectionnez votre pays</option>
+   <option value="Burkina Faso">🇧🇫 Burkina Faso</option>
+   <option value="Bénin">🇧🇯 Bénin</option>
+   <option value="Côte d’Ivoire">🇨🇮 Côte d’Ivoire</option>
+   <option value="Ghana">🇬🇭 Ghana</option>
+   <option value="Guinée">🇬🇳 Guinée</option>
+   <option value="Mali">🇲🇱 Mali</option>
+   <option value="Niger">🇳🇪 Niger</option>
+   <option value="Nigeria">🇳🇬 Nigeria</option>
+   <option value="Sénégal">🇸🇳 Sénégal</option>
+   <option value="Togo">🇹🇬 Togo</option>
+   <option value="Cameroun">🇨🇲 Cameroun</option>
+   <option value="Tchad">🇹🇩 Tchad</option>
+   <option value="République démocratique du Congo">🇨🇩 République démocratique du Congo</option>
+   <option value="République du Congo">🇨🇬 République du Congo</option>
+   <option value="Gabon">🇬🇦 Gabon</option>
+   <option value="Mauritanie">🇲🇷 Mauritanie</option>
+   <option value="Guinée-Bissau">🇬🇼 Guinée-Bissau</option>
+   <option value="Gambie">🇬🇲 Gambie</option>
+   <option value="Liberia">🇱🇷 Liberia</option>
+   <option value="Sierra Leone">🇸🇱 Sierra Leone</option>
+   <option value="Afrique du Sud">🇿🇦 Afrique du Sud</option>
+   <option value="Algérie">🇩🇿 Algérie</option>
+   <option value="Maroc">🇲🇦 Maroc</option>
+   <option value="Tunisie">🇹🇳 Tunisie</option>
+   <option value="Égypte">🇪🇬 Égypte</option>
+   <option value="France">🇫🇷 France</option>
+   <option value="Belgique">🇧🇪 Belgique</option>
+   <option value="Canada">🇨🇦 Canada</option>
+   <option value="États-Unis">🇺🇸 États-Unis</option>
+   <option value="Royaume-Uni">🇬🇧 Royaume-Uni</option>
+   <option value="Allemagne">🇩🇪 Allemagne</option>
+   <option value="Italie">🇮🇹 Italie</option>
+   <option value="Espagne">🇪🇸 Espagne</option>
+   <option value="Arabie saoudite">🇸🇦 Arabie saoudite</option>
+   <option value="Émirats arabes unis">🇦🇪 Émirats arabes unis</option>
+   <option value="Chine">🇨🇳 Chine</option>
+   <option value="Inde">🇮🇳 Inde</option>
+   <option value="Autre pays">🌐 Autre pays</option>
+  </select>
   <label>Code d'invitation</label>
   <input id="regCode" required placeholder="Code reçu de votre invitant">
   <label>Mot de passe</label>
