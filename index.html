@@ -611,17 +611,30 @@ function closeModal(){document.getElementById("modal").classList.remove("open")}
 async function api(path,options={}){
  const headers=Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json"},options.headers||{});
  if(state.token)headers.Authorization="Bearer "+state.token;
- // Timeout réseau : aucune requête ne doit bloquer BuSAF indéfiniment.
+ // Un seul délai couvre la réponse complète, y compris la lecture du corps.
  const controller=new AbortController();
- const timeout=setTimeout(()=>controller.abort(),12000);
- let r;
+ const timeout=setTimeout(()=>controller.abort(),10000);
+ const externalSignal=options.signal;
+ const abortFromCaller=()=>controller.abort();
+ if(externalSignal){
+  if(externalSignal.aborted)controller.abort();
+  else externalSignal.addEventListener("abort",abortFromCaller,{once:true});
+ }
+ let r,text;
  try{
-  r=await fetch(SUPABASE_URL+path,Object.assign({},options,{headers,signal:options.signal||controller.signal}));
+  const requestOptions=Object.assign({},options,{headers,signal:controller.signal});
+  delete requestOptions.signal;
+  requestOptions.signal=controller.signal;
+  r=await fetch(SUPABASE_URL+path,requestOptions);
+  text=await r.text();
  }catch(e){
-  if(e&&e.name==="AbortError")throw new Error("Le serveur met trop de temps à répondre. Vérifie Internet puis réessaie.");
+  if(e&&e.name==="AbortError")throw new Error("Le serveur met trop de temps à répondre (10 s). Vérifie Internet puis réessaie.");
   throw new Error("Connexion au serveur impossible. Vérifie Internet puis réessaie.");
- }finally{clearTimeout(timeout);}
- const text=await r.text();let data={};
+ }finally{
+  clearTimeout(timeout);
+  if(externalSignal)externalSignal.removeEventListener("abort",abortFromCaller);
+ }
+ let data={};
  try{data=text?JSON.parse(text):{}}catch{data={raw:text}}
  if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.raw||"Erreur Supabase");
  return data;
@@ -1102,9 +1115,15 @@ function founderMarket(){
 async function founderLoadStats(){
  if(!isFounder()||!state.token)return;
  const out={products:0,members:0,sales:0,confirmed:0,pending:0,failed:0,revenue:0};
- try{const r=await api('/rest/v1/produits?select=id');out.products=Array.isArray(r)?r.length:0;}catch(e){console.warn('Founder products stats',e)}
- try{const r=await api('/rest/v1/profils_busaf?select=id');out.members=Array.isArray(r)?r.length:0;}catch(e){console.warn('Founder members stats',e)}
- try{const r=await api('/rest/v1/ventes?select=id,montant,statut');if(Array.isArray(r)){out.sales=r.length;for(const v of r){const st=String(v.statut||'').toLowerCase();if(st==='confirmee'||st==='validee'){out.confirmed++;out.revenue+=Number(v.montant||0)}else if(st.includes('attente'))out.pending++;else if(st.includes('echec')||st.includes('failed'))out.failed++;}}}catch(e){console.warn('Founder sales stats',e)}
+ // Les trois compteurs partent ensemble : un appel lent ne bloque plus les deux autres.
+ const [products,members,sales]=await Promise.all([
+  api('/rest/v1/produits?select=id').catch(e=>{console.warn('Founder products stats',e);return null;}),
+  api('/rest/v1/profils_busaf?select=id').catch(e=>{console.warn('Founder members stats',e);return null;}),
+  api('/rest/v1/ventes?select=id,montant,statut').catch(e=>{console.warn('Founder sales stats',e);return null;})
+ ]);
+ if(Array.isArray(products))out.products=products.length;
+ if(Array.isArray(members))out.members=members.length;
+ if(Array.isArray(sales)){out.sales=sales.length;for(const v of sales){const st=String(v.statut||'').toLowerCase();if(st==='confirmee'||st==='validee'){out.confirmed++;out.revenue+=Number(v.montant||0)}else if(st.includes('attente'))out.pending++;else if(st.includes('echec')||st.includes('failed'))out.failed++;}}
  state.founderStats=out;return out;
 }
 function founderDashboard(){
