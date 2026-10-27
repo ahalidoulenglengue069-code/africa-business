@@ -863,11 +863,13 @@ async function api(path,options={}){
  return data;
 }
 async function loadProfile(){
- if(!state.userId||!state.token)return;
- try{
-   const rows=await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`);
-   state.profile=rows[0]||null;
- }catch(e){console.warn(e)}
+ if(!state.userId||!state.token){state.profile=null;return null;}
+ const rows=await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`,{
+   method:"GET",
+   headers:{"Cache-Control":"no-cache","Pragma":"no-cache"}
+ });
+ state.profile=Array.isArray(rows)?(rows.find(p=>String(p.user_id)===String(state.userId))||rows[0]||null):null;
+ return state.profile;
 }
 
 async function ensureMemberProfile(user){
@@ -975,7 +977,12 @@ async function login(e){
   localStorage.setItem("busaf_access_token",state.token);
   localStorage.setItem("busaf_user_id",state.userId);
   localStorage.setItem("busaf_email",email);
-  await ensureMemberProfile(d.user);
+  // À la connexion, on récupère le profil existant. On ne crée jamais de profil ici.
+  const profil=await loadProfile();
+  if(!profil?.id){
+   throw new Error("Connexion acceptée, mais ton profil BuSAF existant n'a pas été retourné par Supabase. Aucun profil n'a été recréé. Réessaie dans quelques instants.");
+  }
+  saveState();
   addNotification("🔐 Connexion",`Connexion réussie sur ton espace BuSAF.`,"login");
   setScreen("member");
  }catch(err){
