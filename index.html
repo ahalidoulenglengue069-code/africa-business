@@ -746,6 +746,7 @@ async function signup(e){
  const email=document.getElementById("regEmail").value.trim();
  const tel=document.getElementById("regTel").value.trim();
  const ville=document.getElementById("regVille").value.trim();
+ const pays=document.getElementById("regPays").value.trim();
  const code=document.getElementById("regCode").value.trim();
  const password=document.getElementById("regPassword").value;
  const msg=document.getElementById("regMsg"),btn=document.getElementById("regBtn");
@@ -778,6 +779,7 @@ async function signup(e){
     nom_complet:nom,
     telephone:tel,
     Ville:ville,
+    pays:pays,
     role:"membre",
     parrain_id:parrain.id,
     code_parrain:nouveauCode,
@@ -1116,7 +1118,7 @@ function founderMembers(){
  const list=rows.length?`<div class="list">${rows.map(m=>`<div class="rule" style="display:flex;align-items:center;gap:14px;padding:12px"><div>${inviteeAvatarHtml(m)}</div><div style="flex:1;min-width:0"><strong style="display:block;font-size:15px;overflow-wrap:anywhere">${esc(m.nom_complet||'Membre sans nom')}</strong><div class="small" style="margin-top:5px;overflow-wrap:anywhere">📱 Téléphone : ${esc(m.telephone||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🎟️ Code : ${esc(m.code_parrain||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🌍 Pays : ${esc(m.pays||m.country||'Non renseigné')}</div></div></div>`).join('')}</div>`:`<div class="empty">Aucun membre chargé. Appuie sur Actualiser.</div>`;
  return page('👥 Membres BuSAF',`<div class="notice">Tous les inscrits : photo, nom, téléphone, code et pays lorsqu’ils sont renseignés.</div>${list}<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER LES MEMBRES</button>`);
 }
-async function refreshFounderMembers(){if(!isFounder())return;try{state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,country,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc');render();}catch(e){alert('❌ Impossible de charger les membres : '+e.message)}}
+async function refreshFounderMembers(){if(!isFounder())return;try{state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc');render();}catch(e){alert('❌ Impossible de charger les membres : '+e.message)}}
 function founderPayments(){
  if(!isFounder())return memberHome();
  const rows=state.founderPayments||[];
@@ -1274,6 +1276,8 @@ function signupPage(){
   <input id="regTel" required placeholder="Numéro de téléphone">
   <label>Ville</label>
   <input id="regVille" required placeholder="Votre ville">
+  <label>Pays</label>
+  <input id="regPays" required placeholder="Votre pays (ex. Burkina Faso)">
   <label>Code d'invitation</label>
   <input id="regCode" required placeholder="Code reçu de votre invitant">
   <label>Mot de passe</label>
