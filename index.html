@@ -574,7 +574,11 @@ function setScreen(screen){
  state.screen=screen;
  history.pushState({busafScreen:screen},"","#"+screen);
  render();
- if((screen==="market" || screen==="public" || screen==="products")&&!state.marketCatalogLoaded)loadMarketCatalog().then(()=>{if(state.screen===screen)render();}).catch(()=>{});
+ if(screen==="market" || screen==="public" || screen==="products" || screen==="founderMarket" || screen==="founderStocks"){
+  // Toujours actualiser les données du Marché en arrière-plan à l'ouverture,
+  // sans demander au visiteur de recharger toute la page.
+  loadMarketCatalog(true).then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation automatique du Marché:",e));
+ }
  window.scrollTo({top:0,left:0,behavior:"instant"});
 }
 
@@ -598,7 +602,9 @@ window.addEventListener("popstate",(event)=>{
  const screen=normalScreen(fromHistory||fromHash);
  state.screen=screen;
  render();
- if((screen==="market" || screen==="public" || screen==="products")&&!state.marketCatalogLoaded)loadMarketCatalog().then(()=>{if(state.screen===screen)render();}).catch(()=>{});
+ if(screen==="market" || screen==="public" || screen==="products" || screen==="founderMarket" || screen==="founderStocks"){
+  loadMarketCatalog(true).then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation automatique du Marché:",e));
+ }
  window.scrollTo({top:0,left:0,behavior:"instant"});
 });
 function openModal(title,html){
@@ -2283,6 +2289,29 @@ function render(){
    Cela évite le double rendu et le retour forcé vers l'Espace membre. */
 window.addEventListener("error",e=>console.error("BuSAF:",e.message));
 window.addEventListener("unhandledrejection",e=>console.error("BuSAF:",e.reason));
+
+// Actualisation automatique au retour dans l'application ou après une coupure Internet.
+// Aucun bouton « Actualiser » ni rechargement complet de la page n'est nécessaire.
+let busafLastAutoRefresh=0;
+async function refreshVisibleBusafData(){
+ const now=Date.now();
+ if(now-busafLastAutoRefresh<8000)return;
+ busafLastAutoRefresh=now;
+ const screen=state.screen;
+ if(screen==="market"||screen==="public"||screen==="products"||screen==="founderMarket"||screen==="founderStocks"){
+  await loadMarketCatalog(true);
+  if(state.screen===screen)render();
+ }
+ if(state.userId){
+  syncSharedBusafEvents().catch(e=>console.warn("Actualisation notifications:",e));
+  if(screen==="founderMembers")refreshFounderMembers().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation membres:",e));
+  if(screen==="founderPayments")refreshFounderPayments().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation paiements:",e));
+  if(screen==="founderDirectInvites")loadDirectInvites().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation invités:",e));
+ }
+}
+window.addEventListener("online",()=>{refreshVisibleBusafData().catch(e=>console.warn("Reconnexion BuSAF:",e));});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refreshVisibleBusafData().catch(e=>console.warn("Retour BuSAF:",e));});
+window.addEventListener("pageshow",()=>{refreshVisibleBusafData().catch(e=>console.warn("Réouverture BuSAF:",e));});
 
 async function start(){
   try{
