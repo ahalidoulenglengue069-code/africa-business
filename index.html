@@ -520,6 +520,86 @@ html[data-busaf-theme="founderSettings"]{--green:#475569;--green2:#64748b;--ligh
   }
 }
 
+
+
+/* Classement commun des tableaux de bord : Accueil, Marché, Membres, Compte et Fondateur */
+#app .work-grid,
+#app .founder-grid,
+#app .reference-grid,
+#app .profile-actions-grid{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:9px;
+  width:100%;
+  min-width:0;
+  align-items:stretch;
+}
+#app .work-grid>*,
+#app .founder-grid>*,
+#app .reference-grid>*,
+#app .profile-actions-grid>*{
+  min-width:0;
+  max-width:100%;
+  overflow-wrap:anywhere;
+}
+#app .work-card,
+#app .founder-app,
+#app .reference-card,
+#app .profile-action-card{
+  min-width:0;
+  height:100%;
+  overflow-wrap:anywhere;
+}
+#app .work-card small,
+#app .founder-app small,
+#app .reference-card small,
+#app .profile-action-card small{
+  line-height:1.35;
+  overflow-wrap:anywhere;
+}
+#app .public-info-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  width:100%;
+  min-width:0;
+}
+#app .public-info-grid>*{min-width:0;max-width:100%;overflow-wrap:anywhere}
+#app .work-panel + .work-panel,
+#app .profile-section-card + .profile-section-card,
+#app .founder-section-title + .founder-grid{
+  margin-top:12px;
+}
+@media(max-width:760px){
+  #app .work-grid,
+  #app .founder-grid,
+  #app .reference-grid,
+  #app .profile-actions-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:8px;
+  }
+  #app .work-card{min-height:100px;padding:12px 8px}
+  #app .work-card span{font-size:24px}
+  #app .work-card b,
+  #app .reference-card b,
+  #app .profile-action-card b{font-size:13px;line-height:1.25}
+  #app .founder-app{min-height:98px;padding:11px 7px}
+  #app .reference-card{min-height:100px;padding:11px 9px}
+  #app .public-info-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  #app .public-info-card{padding:12px 10px}
+}
+@media(max-width:360px){
+  #app .work-grid,
+  #app .founder-grid,
+  #app .reference-grid,
+  #app .profile-actions-grid{gap:6px}
+  #app .work-card{padding:10px 6px}
+  #app .work-card b,
+  #app .reference-card b,
+  #app .profile-action-card b{font-size:12px}
+  #app .public-info-card{padding:10px 8px}
+}
+
 </style>
 </head>
 <body>
