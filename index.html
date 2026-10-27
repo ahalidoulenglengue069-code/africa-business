@@ -108,6 +108,12 @@ a{text-decoration:none;color:inherit}
 .rule p,.rule li{line-height:1.55}
 .rule ul{margin:7px 0 0;padding-left:20px}
 .statgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:9px}
+.founder-wallet-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:start}
+.founder-wallet-panel{margin:0;min-width:0}
+.founder-wallet-panel input,.founder-wallet-panel select{width:100%;max-width:100%;margin:4px 0 9px}
+.founder-wallet-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.founder-wallet-list>.rule{margin:0;padding:10px;font-size:12px;overflow-wrap:anywhere}
+@media(max-width:600px){.founder-wallet-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.founder-wallet-panel{padding:9px}.founder-wallet-panel h3{font-size:13px}.founder-wallet-list{grid-template-columns:1fr}.founder-wallet-panel .btn{font-size:11px;padding:10px 6px}}
 .stat{background:#f7fbf8;border:1px solid var(--line);border-radius:14px;padding:13px;text-align:center}
 .stat strong{display:block;font-size:20px;color:var(--green);margin-top:5px}
 .productgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;align-items:start;width:100%}
@@ -1187,9 +1193,11 @@ function founderWallet(){
  return page("👛 Portefeuille Fondateur",`
   <div class="notice success"><strong>Portefeuille financier BuSAF</strong><br>Soldes calculés à partir des opérations confirmées dans Supabase.</div>
   <div class="statgrid"><div class="stat">Solde disponible<strong id="fwAvailable">Chargement…</strong></div><div class="stat">Total crédité<strong id="fwCredits">—</strong></div><div class="stat">Total débité<strong id="fwDebits">—</strong></div><div class="stat">Retraits en attente<strong id="fwPending">—</strong></div></div>
-  <div class="rule"><h3>📱 Demander un retrait</h3><label>Montant (FCFA)</label><input id="fwAmount" type="number" min="1" inputmode="numeric" placeholder="Ex. 5000"><label>Compte</label><select id="fwAccount"><option value="Fonds BuSAF">Fonds BuSAF</option><option value="Commissions de parrainage">Commissions de parrainage</option></select><label>Opérateur</label><select id="fwOperator"><option>Orange Money</option><option>Moov Money</option><option>Telecel Money</option><option>Wave</option></select><label>Numéro Mobile Money</label><input id="fwPhone" type="tel" inputmode="tel" placeholder="Numéro de réception"><button class="btn" onclick="submitFounderWithdrawal()">ENVOYER LA DEMANDE</button><p class="small">La demande attend une validation. Aucun paiement n'est déclenché automatiquement.</p></div>
-  <div class="rule"><h3>🧾 Historique du portefeuille</h3><div id="fwTransactions"><div class="empty">Chargement des opérations…</div></div></div>
-  <div class="rule"><h3>💸 Mes demandes de retrait</h3><div id="fwWithdrawals"><div class="empty">Chargement des demandes…</div></div></div>
+  <div class="founder-wallet-grid">
+   <section class="rule founder-wallet-panel"><h3>📱 Demander un retrait</h3><label>Montant (FCFA)</label><input id="fwAmount" type="number" min="1" inputmode="numeric" placeholder="Ex. 5000"><label>Compte</label><select id="fwAccount"><option value="Fonds BuSAF">Fonds BuSAF</option><option value="Commissions de parrainage">Commissions de parrainage</option></select><label>Opérateur</label><select id="fwOperator"><option>Orange Money</option><option>Moov Money</option><option>Telecel Money</option><option>Wave</option></select><label>Numéro Mobile Money</label><input id="fwPhone" type="tel" inputmode="tel" placeholder="Numéro de réception"><button class="btn" onclick="submitFounderWithdrawal()">ENVOYER LA DEMANDE</button><p class="small">La demande attend une validation. Aucun paiement n'est déclenché automatiquement.</p></section>
+   <section class="rule founder-wallet-panel"><h3>🧾 Historique du portefeuille</h3><div id="fwTransactions" class="founder-wallet-list"><div class="empty">Chargement des opérations…</div></div></section>
+   <section class="rule founder-wallet-panel"><h3>💸 Mes demandes de retrait</h3><div id="fwWithdrawals" class="founder-wallet-list"><div class="empty">Chargement des demandes…</div></div></section>
+  </div>
   <button class="btn alt" onclick="loadFounderWallet()">🔄 ACTUALISER LE PORTEFEUILLE</button>
  `);
 }
