@@ -884,10 +884,18 @@ async function ensureMemberProfile(user){
  const parrain=Array.isArray(parrains)?parrains[0]:null;
  if(!parrain)throw new Error("Le code parrain utilisé à l'inscription est invalide ou introuvable.");
  const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
- const rows=await api("/rest/v1/profils_busaf",{method:"POST",headers:{"Prefer":"return=representation"},body:JSON.stringify({
-   user_id:state.userId,nom_complet:nom||state.email.split("@")[0],telephone:tel,Ville:ville,role:"membre",parrain_id:parrain.id,code_parrain:nouveauCode,photo_url:null
- })});
- state.profile=Array.isArray(rows)?rows[0]:rows;
+ try{
+   const rows=await api("/rest/v1/profils_busaf",{method:"POST",headers:{"Prefer":"return=representation"},body:JSON.stringify({
+     user_id:state.userId,nom_complet:nom||state.email.split("@")[0],telephone:tel,Ville:ville,role:"membre",parrain_id:parrain.id,code_parrain:nouveauCode,photo_url:null
+   })});
+   state.profile=Array.isArray(rows)?rows[0]:rows;
+ }catch(insertError){
+   // Le profil peut déjà exister même si la première lecture a échoué.
+   if(!/duplicate key|unique constraint|23505/i.test(insertError.message||""))throw insertError;
+   await loadProfile();
+   if(!state.profile?.id)throw new Error("Ton profil BuSAF existe déjà, mais sa lecture a échoué. Recharge la page puis reconnecte-toi ; aucun nouveau profil n'a été créé.");
+ }
+ if(!state.profile?.id)throw new Error("Le profil BuSAF n'a pas pu être chargé. Réessaie la connexion.");
  saveState();
 }
 
