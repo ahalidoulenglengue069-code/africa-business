@@ -1060,7 +1060,7 @@ function founderHome(){
   </div>
   <h2 class="founder-section-title">👥 RÉSEAU</h2>
   <div class="founder-grid">
-   ${founderApp('founderMembers','👥','Membres','Gestion des membres')}
+   ${founderApp('founderMembers','🌍','TOUS LES MEMBRES','Tous les inscrits sur BuSAF')}
    ${founderApp('founderReferral','🤝','Parrainage','Réseau et commissions')}
    ${founderApp('partner','⭐','Partner','Suivi des statuts Partner')}
    ${founderApp('commissions','💰','Commissions','Commissions')}
@@ -1117,9 +1117,9 @@ function founderMembers(){
  if(!isFounder())return memberHome();
  const rows=state.founderMembers||[];
  const list=rows.length?`<div class="list">${rows.map(m=>`<div class="rule" style="display:flex;align-items:center;gap:14px;padding:12px"><div>${inviteeAvatarHtml(m)}</div><div style="flex:1;min-width:0"><strong style="display:block;font-size:15px;overflow-wrap:anywhere">${esc(m.nom_complet||'Membre sans nom')}</strong><div class="small" style="margin-top:5px;overflow-wrap:anywhere">📱 Téléphone : ${esc(m.telephone||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🎟️ Code : ${esc(m.code_parrain||'Non renseigné')}</div><div class="small" style="margin-top:3px;overflow-wrap:anywhere">🌍 Pays : ${esc(m.pays?countryFlag(m.pays)+" "+m.pays:(m.country?countryFlag(m.country)+" "+m.country:"Non renseigné"))}</div></div></div>`).join('')}</div>`:`<div class="empty">Aucun membre chargé. Appuie sur Actualiser.</div>`;
- return page('👥 Membres BuSAF',`<div class="notice">Tous les inscrits : photo, nom, téléphone, code et pays lorsqu’ils sont renseignés.</div>${list}<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER LES MEMBRES</button>`);
+ return page('🌍 Tous les membres inscrits sur BuSAF',`<div class="notice success"><strong>ESPACE RÉSERVÉ AU FONDATEUR</strong><br>Cette liste est différente de « Mes Invités » : elle regroupe tous les profils BuSAF, même ceux qui ne sont pas tes invités directs.</div>${state.founderMembersLoading?'<div class="notice">Chargement des membres...</div>':''}${list}<button class="btn" onclick="refreshFounderMembers()">🔄 ACTUALISER TOUS LES MEMBRES</button><button class="btn alt" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>`);
 }
-async function refreshFounderMembers(){if(!isFounder())return;try{state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc');render();}catch(e){alert('❌ Impossible de charger les membres : '+e.message)}}
+async function refreshFounderMembers(){if(!isFounder())return;state.founderMembersLoading=true;try{state.founderMembers=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc');state.founderMembersLoaded=true;render();}catch(e){alert('❌ Impossible de charger les membres : '+e.message)}finally{state.founderMembersLoading=false}}
 function founderPayments(){
  if(!isFounder())return memberHome();
  const rows=state.founderPayments||[];
@@ -2193,6 +2193,7 @@ function render(){
      if(state.screen==='founderWallet')setTimeout(()=>loadFounderWallet().catch(()=>{}),0);
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+founderQuick();
     if(state.screen==='founder' && !state.founderStats){ founderLoadStats().then(()=>{ if(state.screen==='founder')render(); }).catch(()=>{}); }
+      if(state.screen==='founderMembers' && !state.founderMembersLoaded && !state.founderMembersLoading){ setTimeout(()=>refreshFounderMembers(),0); }
    }else{
     const map={
      member:memberHome,market:memberMarket,boutique:memberBoutique,invites:memberInvites,orders:memberOrders,account:memberAccount,
