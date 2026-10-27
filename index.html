@@ -875,12 +875,12 @@ async function ensureMemberProfile(user){
  await loadProfile();
  if(state.profile)return;
  const meta=user?.user_metadata||user?.raw_user_meta_data||{};
- const code=String(meta.code_invitation||'').trim();
+ const code=String(meta.code_invitation||'').trim().toUpperCase();
  const nom=String(meta.nom_complet||'').trim();
  const tel=String(meta.telephone||'').trim();
  const ville=String(meta.ville||'').trim();
  if(!code)throw new Error("Le profil BuSAF n'est pas encore configuré : code d'invitation introuvable.");
- const parrains=await api(`/rest/v1/profils_busaf?code_parrain=eq.${encodeURIComponent(code)}&select=id,code_parrain,nom_complet`);
+ const parrains=await api("/rest/v1/rpc/busaf_trouver_parrain",{method:"POST",body:JSON.stringify({p_code:code})});
  const parrain=Array.isArray(parrains)?parrains[0]:null;
  if(!parrain)throw new Error("Le code parrain utilisé à l'inscription est invalide ou introuvable.");
  const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
@@ -983,13 +983,17 @@ async function signup(e){
  const tel=document.getElementById("regTel").value.trim();
  const ville=document.getElementById("regVille").value.trim();
  const pays=document.getElementById("regPays").value.trim();
- const code=document.getElementById("regCode").value.trim();
+ const code=document.getElementById("regCode").value.trim().toUpperCase();
  const password=document.getElementById("regPassword").value;
  const msg=document.getElementById("regMsg"),btn=document.getElementById("regBtn");
  btn.disabled=true;btn.textContent="CRÉATION...";
  try{
   if(!code)throw new Error("Le code d'invitation est obligatoire.");
   if(password.length<6)throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
+
+  const parrains=await api("/rest/v1/rpc/busaf_trouver_parrain",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({p_code:code})});
+  const parrain=Array.isArray(parrains)?parrains[0]:null;
+  if(!parrain)throw new Error("Code parrain invalide ou introuvable. Vérifie le code et réessaie.");
 
   const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,pays,code_invitation:code}})});
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
@@ -1003,10 +1007,6 @@ async function signup(e){
     openModal("Compte créé",`<div class="notice success">Le compte a été créé. Connecte-toi maintenant avec ton e-mail et ton mot de passe.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button>`);
     return;
   }
-
-  const parrains=await api(`/rest/v1/profils_busaf?code_parrain=eq.${encodeURIComponent(code)}&select=id,code_parrain,nom_complet`);
-  const parrain=Array.isArray(parrains)?parrains[0]:null;
-  if(!parrain)throw new Error("Code parrain invalide ou introuvable.");
 
   const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
 
@@ -1436,11 +1436,12 @@ async function loadFounderWallet(){
 async function submitFounderWithdrawal(){
  if(!isFounder()||!state.profile?.id)return;
  const amount=Number(document.getElementById('fwAmount')?.value||0),phone=(document.getElementById('fwPhone')?.value||'').trim(),operator=document.getElementById('fwOperator')?.value||'',account=document.getElementById('fwAccount')?.value||'Fonds BuSAF';
- if(!Number.isFinite(amount)||amount<=0||phone.length<6||phone.length>30){alert('Entre un montant positif et un numéro Mobile Money valide.');return;}
+ if(!Number.isInteger(amount)||amount<=0||phone.length<6||phone.length>30){alert('Entre un montant entier positif et un numéro Mobile Money valide.');return;}
  if(!confirm('Envoyer une demande de retrait de '+money(amount)+' FCFA vers '+phone+' ? Elle devra être validée par BuSAF.'))return;
  try{
-  await api('/rest/v1/busaf_retraits',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({profil_id:state.profile.id,montant:amount,numero_mobile_money:phone,operateur,compte:account,statut:'en_attente'})});
-  alert('Demande enregistrée si Supabase l’a acceptée. Aucun argent n’a encore été envoyé.');
+  const saved=await api('/rest/v1/busaf_retraits',{method:'POST',headers:{'Prefer':'return=representation'},body:JSON.stringify({profil_id:state.profile.id,montant:amount,numero_mobile_money:phone,operateur,compte:account,statut:'en_attente'})});
+  if(!Array.isArray(saved)||!saved[0]?.id)throw new Error('Supabase n’a pas confirmé l’enregistrement de la demande.');
+  alert('Demande de retrait enregistrée. Référence : '+saved[0].id+'. Aucun argent n’a encore été envoyé.');
   await loadFounderWallet();
  }catch(e){alert('Demande non enregistrée : '+(e.message||'erreur Supabase'));}
 }
@@ -2068,7 +2069,7 @@ function memberInvites(){
     <div class="notice success">Tu peux inviter gratuitement, sans achat préalable. La règle d’achat s’applique au premier achat du nouveau membre : il doit choisir un produit numérique déjà acheté par son parrain direct.</div>
    <div class="rule"><h3>📋 Comment inviter ?</h3><ol><li>Appuie sur <strong>PARTAGER / INVITER UN AMI</strong>.</li><li>Choisis WhatsApp ou une autre application de partage.</li><li>Ton invité s'inscrit avec ton lien personnel.</li><li>Son profil apparaîtra ici après son inscription et le rattachement du parrainage.</li></ol></div>
    <h3 class="invite-list-title">👥 Liste de mes invités directs</h3>
-   ${state.directInvitesLoading?`<div class="empty">Chargement des invités…</div>`:members.length?`<div class="invitee-list">${members.map(m=>`<article class="invitee-card">${inviteeAvatarHtml(m)}<div class="invitee-details"><strong>${esc(m.nom_complet||"Nom non renseigné")}</strong></div></article>`).join("")}</div>`:`<div class="empty">Aucun invité direct trouvé pour le moment. Les nouveaux inscrits apparaîtront ici dès que leur compte sera lié à ton code de parrainage.</div>`}
+   ${state.directInvitesLoading?`<div class="empty">Chargement des invités…</div>`:members.length?`<div class="invitee-list">${members.map(m=>`<article class="invitee-card">${inviteeAvatarHtml(m)}<div class="invitee-details"><strong>${esc(m.nom_complet||"Nom non renseigné")}</strong>${m.telephone?`<div>📱 ${esc(m.telephone)}</div>`:""}${m.code_parrain?`<small>🎟️ Code : ${esc(m.code_parrain)}</small>`:""}${m.pays?`<div>${esc(countryFlag(m.pays))} ${esc(m.pays)}</div>`:""}</div></article>`).join("")}</div>`:`<div class="empty">Aucun invité direct trouvé pour le moment. Les nouveaux inscrits apparaîtront ici dès que leur compte sera lié à ton code de parrainage.</div>`}
  </div>`);
 }
 
