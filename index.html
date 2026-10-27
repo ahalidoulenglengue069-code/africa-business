@@ -2040,7 +2040,7 @@ function inviteeAvatarHtml(m){
 }
 function founderDirectInvites(){
  const members=Array.isArray(state.directInvites)?state.directInvites:[];
- if(!state.directInvitesLoaded && !state.directInvitesLoading){
+ if(!state.directInvitesLoaded && !state.directInvitesLoading && !state.directInvitesError){
    loadDirectInvites().then(()=>{if(state.screen==="founderDirectInvites")render();});
  }
  return page("👥 MES INVITÉS DIRECTS",`
@@ -2057,7 +2057,7 @@ function founderDirectInvites(){
 function memberInvites(){
  const allowed=canInvite();
  const members=Array.isArray(state.directInvites)?state.directInvites:[];
- if(!state.directInvitesLoaded && !state.directInvitesLoading){
+ if(!state.directInvitesLoaded && !state.directInvitesLoading && !state.directInvitesError){
    loadDirectInvites().then(()=>{if(state.screen==="invites")render();});
  }
  return page("👥 Mes Invités Directs",`
