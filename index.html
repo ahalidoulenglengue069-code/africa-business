@@ -1757,26 +1757,35 @@ function confirmBoutiqueSale(i){const p=state.boutiqueProducts[i],customer=docum
 async function loadDirectInvites(){
  if(!state.userId||!state.token||!state.profile?.id){
    state.directInvites=[];
-   state.directInvitesError="Connecte-toi pour consulter tes invités directs.";
-   state.directInvitesLoaded=true;
+   state.directInvitesError="Ta session BuSAF n'est pas prête. Reconnecte-toi puis réessaie.";
+   state.directInvitesLoaded=false;
    return [];
  }
  if(state.directInvitesLoading)return state.directInvites||[];
  state.directInvitesLoading=true;
- state.directInvitesLoaded=true;
  state.directInvitesError="";
  try{
-   // RPC sécurisé : un membre ne lit que les champs publics de ses propres invités directs.
    const rows=await api("/rest/v1/rpc/busaf_mes_invites_directs",{method:"POST",body:"{}"});
    state.directInvites=Array.isArray(rows)?rows:[];
+   state.directInvitesLoaded=true;
  }catch(e){
    state.directInvitesError=e.message||"Chargement des invités impossible.";
+   state.directInvitesLoaded=false;
    console.warn("Invités directs BuSAF :",e);
  }finally{
    state.directInvitesLoading=false;
  }
  return state.directInvites||[];
 }
+async function retryDirectInvites(){
+ state.directInvitesLoaded=false;
+ state.directInvitesError="";
+ state.directInvitesLoading=false;
+ render();
+ await loadDirectInvites();
+ if(state.screen==="founderDirectInvites"||state.screen==="invites")render();
+}
+
 function inviteeAvatarHtml(m){
  const name=String(m?.nom_complet||"Membre BuSAF").trim();
  const initials=name.split(/\\s+/).slice(0,2).map(x=>x.charAt(0)).join("").toUpperCase()||"M";
@@ -1794,9 +1803,9 @@ function founderDirectInvites(){
   <div class="invite-page">
    <div class="invite-hero"><span>👑 ESPACE FONDATEUR</span><h2>Mes invités directs</h2><p>Cette liste contient uniquement les personnes directement parrainées par le compte Fondateur.</p></div>
    <div class="statgrid"><div class="stat">Invités directs<strong>${members.length}</strong></div></div>
-   <button class="btn alt" onclick="state.directInvitesLoaded=false;loadDirectInvites().then(()=>render())">🔄 ACTUALISER</button>
+   <button class="btn alt" onclick="retryDirectInvites()">🔄 RÉESSAYER / ACTUALISER</button>
    ${state.directInvitesError?`<div class="notice error">Chargement impossible : ${esc(state.directInvitesError)}</div>`:""}
-   ${state.directInvitesLoading?`<div class="empty">Chargement des invités…</div>`:members.length?`<div class="invitee-list">${members.map(m=>`<article class="invitee-card">${inviteeAvatarHtml(m)}<div class="invitee-details"><strong>${esc(m.nom_complet||"Nom non renseigné")}</strong>${m.telephone?`<div>${esc(m.telephone)}</div>`:""}${m.code_parrain?`<small>Code : ${esc(m.code_parrain)}</small>`:""}${m.pays?`<div>${esc(countryFlag(m.pays))} ${esc(m.pays)}</div>`:""}</div></article>`).join("")}</div>`:`<div class="empty">Aucun invité direct trouvé pour le moment.</div>`}
+   ${state.directInvitesLoading?`<div class="empty">Chargement des invités…</div>`:members.length?`<div class="invitee-list">${members.map(m=>`<article class="invitee-card">${inviteeAvatarHtml(m)}<div class="invitee-details"><strong>${esc(m.nom_complet||"Nom non renseigné")}</strong>${m.telephone?`<div>${esc(m.telephone)}</div>`:""}${m.code_parrain?`<small>Code : ${esc(m.code_parrain)}</small>`:""}${m.pays?`<div>${esc(countryFlag(m.pays))} ${esc(m.pays)}</div>`:""}</div></article>`).join("")}</div>`:`<div class="empty">Aucun invité direct enregistré pour ce compte.</div>`}
    <button class="btn alt" onclick="setScreen('founder')">← RETOUR AU CENTRE DE CONTRÔLE</button>
   </div>`);
 }
