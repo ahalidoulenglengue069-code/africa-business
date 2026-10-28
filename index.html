@@ -714,6 +714,73 @@ input:focus,select:focus,textarea:focus{outline:2px solid #b9e4cb!important;bord
 .bottom-badge{position:absolute;top:2px;right:calc(50% - 24px);min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;border-radius:10px;background:#d92828;color:white;font-size:9px;font-style:normal;font-weight:900;border:2px solid white}
 @media(max-width:600px){.bottom-inner button,.quick-inner button{font-size:9px!important;min-height:50px}.bottom-inner button span,.quick-inner button span{font-size:20px!important}}
 
+
+/* ===== BuSAF — Centre Fondateur professionnel et responsive ===== */
+#app.founder-mode .wrap{max-width:1240px;padding:20px 16px 110px}
+#app.founder-mode .header{background:linear-gradient(120deg,#073b25 0%,#087a38 55%,#109b53 100%);box-shadow:0 5px 22px rgba(4,44,25,.2);padding:13px 16px}
+#app.founder-mode .logo{font-size:25px;letter-spacing:-.7px}
+#app.founder-mode .hbtn{border-radius:12px;background:rgba(255,255,255,.13);border-color:rgba(255,255,255,.3);font-size:12px}
+#app.founder-mode .founder-dashboard{max-width:1160px;margin:0 auto;padding-bottom:30px}
+#app.founder-mode .founder-hero{position:relative;isolation:isolate;overflow:hidden;border:1px solid rgba(255,255,255,.12);border-radius:26px;padding:25px;background:linear-gradient(125deg,#092f22 0%,#075b35 52%,#0c8a47 100%);box-shadow:0 16px 38px rgba(4,64,35,.18);margin-bottom:24px}
+#app.founder-mode .founder-hero:after{content:"";position:absolute;z-index:-1;width:250px;height:250px;right:-75px;top:-115px;border-radius:50%;border:1px solid rgba(255,255,255,.14);box-shadow:0 0 0 28px rgba(255,255,255,.035),0 0 0 58px rgba(255,255,255,.025)}
+#app.founder-mode .founder-badge{display:inline-flex;align-items:center;gap:7px;padding:7px 11px;border:1px solid rgba(255,255,255,.22);border-radius:999px;background:rgba(255,255,255,.1);font-size:10px;font-weight:900;letter-spacing:1px}
+#app.founder-mode .founder-hero h1{position:relative;margin:15px 0 8px;font-size:clamp(23px,3vw,32px);font-weight:900;line-height:1.15;letter-spacing:-.7px}
+#app.founder-mode .founder-hero p{max-width:650px;font-size:13px;line-height:1.65;color:rgba(255,255,255,.84)}
+#app.founder-mode .founder-stat-grid{position:relative;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:22px!important}
+#app.founder-mode .founder-stat{min-width:0;text-align:left;padding:15px 16px;border:1px solid rgba(255,255,255,.18);border-radius:16px;background:rgba(255,255,255,.095);backdrop-filter:blur(8px)}
+#app.founder-mode .founder-stat b{font-size:25px;font-weight:900;line-height:1.2}
+#app.founder-mode .founder-stat small{display:block;margin-top:5px;font-size:11px;line-height:1.4;opacity:.88}
+#app.founder-mode .founder-section-title{display:flex;align-items:center;gap:9px;margin:25px 2px 12px;padding-bottom:10px;border-bottom:1px solid #dce9e0;color:#173b28;font-size:13px;font-weight:900;letter-spacing:.7px}
+#app.founder-mode .founder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+#app.founder-mode .founder-app{position:relative;overflow:hidden;min-height:126px;align-items:flex-start;justify-content:flex-start;text-align:left;padding:15px;border:1px solid #e0e9e3;border-radius:18px;background:linear-gradient(145deg,#fff 0%,#fbfdfb 100%);box-shadow:0 5px 15px rgba(20,61,37,.045);gap:0;transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease}
+#app.founder-mode .founder-app:before{content:"";position:absolute;left:0;top:0;bottom:0;width:3px;background:#138447;opacity:.9}
+#app.founder-mode .founder-app:hover{border-color:#b8d8c2;box-shadow:0 10px 24px rgba(20,61,37,.09);transform:translateY(-2px)}
+#app.founder-mode .founder-app .ficon{display:grid;place-items:center;flex:0 0 auto;width:43px;height:43px;margin:0 0 13px;border-radius:14px;background:#e3f5e9;color:#087a38;font-size:23px;line-height:1}
+#app.founder-mode .founder-app b{display:block;color:#173523;font-size:13px;line-height:1.3;font-weight:850}
+#app.founder-mode .founder-app small{display:block;margin-top:5px;color:#68796e;font-size:10.5px;line-height:1.4}
+#app.founder-mode .founder-section-title:nth-of-type(1)+.founder-grid .founder-app:nth-child(2) .ficon,
+#app.founder-mode .founder-section-title:nth-of-type(1)+.founder-grid .founder-app:nth-child(5) .ficon{background:#e5efff;color:#2458ad}
+#app.founder-mode .founder-section-title:nth-of-type(1)+.founder-grid .founder-app:nth-child(3) .ficon,
+#app.founder-mode .founder-section-title:nth-of-type(1)+.founder-grid .founder-app:nth-child(4) .ficon{background:#fff2d8;color:#956000}
+#app.founder-mode .founder-section-title:nth-of-type(2)+.founder-grid .founder-app .ficon{background:#e5efff;color:#2458ad}
+#app.founder-mode .founder-section-title:nth-of-type(3)+.founder-grid .founder-app .ficon{background:#e3f5e9;color:#087a38}
+#app.founder-mode .founder-section-title:nth-of-type(4)+.founder-grid .founder-app .ficon{background:#f0eaff;color:#6a42a5}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app .ficon{background:#fff0e5;color:#a54b17}
+#app.founder-mode .founder-section-title:nth-of-type(2)+.founder-grid .founder-app:before{background:#3976d2}
+#app.founder-mode .founder-section-title:nth-of-type(3)+.founder-grid .founder-app:before{background:#0b9347}
+#app.founder-mode .founder-section-title:nth-of-type(4)+.founder-grid .founder-app:before{background:#8058bd}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app:before{background:#d06b2c}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app:last-child .ficon{background:#ffe8e7;color:#b3261e}
+@media(min-width:1000px){#app.founder-mode .founder-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:700px){
+ #app.founder-mode .wrap{padding:12px 11px 100px}
+ #app.founder-mode .founder-hero{padding:19px 16px;border-radius:21px;margin-bottom:19px}
+ #app.founder-mode .founder-hero h1{font-size:24px}
+ #app.founder-mode .founder-hero p{font-size:12px}
+ #app.founder-mode .founder-stat-grid{gap:7px}
+ #app.founder-mode .founder-stat{padding:11px 9px;border-radius:13px}
+ #app.founder-mode .founder-stat b{font-size:20px}
+ #app.founder-mode .founder-stat small{font-size:9px}
+ #app.founder-mode .founder-section-title{font-size:12px;margin-top:22px}
+ #app.founder-mode .founder-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ #app.founder-mode .founder-app{min-height:123px;padding:12px 11px;border-radius:15px}
+ #app.founder-mode .founder-app .ficon{width:39px;height:39px;border-radius:12px;font-size:21px;margin-bottom:10px}
+ #app.founder-mode .founder-app b{font-size:12px;line-height:1.3}
+ #app.founder-mode .founder-app small{font-size:10px;line-height:1.35}
+ #app.founder-mode .header-row{gap:7px}
+ #app.founder-mode .logo{font-size:22px}
+ #app.founder-mode .logo small{font-size:10px}
+ #app.founder-mode .header-actions{gap:4px}
+ #app.founder-mode .hbtn{padding:8px 9px;font-size:10px}
+ #app.founder-mode .notif-top{padding:6px;font-size:11px}
+}
+@media(max-width:370px){
+ #app.founder-mode .founder-stat-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+ #app.founder-mode .founder-stat{padding:9px 6px}
+ #app.founder-mode .founder-stat b{font-size:18px}
+ #app.founder-mode .founder-app{padding:10px 9px;min-height:120px}
+}
+
 </style>
 </head>
 <body>
