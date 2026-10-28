@@ -1104,22 +1104,20 @@ async function api(path,options={}){
 async function loadProfile(){
  if(!state.userId||!state.token){state.profile=null;return null;}
  const path=`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`;
- const options={method:"GET",timeoutMs:8000,headers:{"Cache-Control":"no-cache","Pragma":"no-cache"}};
+ // GET simple sans en-têtes personnalisés : évite le précontrôle CORS OPTIONS sur mobile.
  let rows,lastError;
- // Une coupure ponctuelle du réseau ne doit pas bloquer définitivement la connexion.
  for(let attempt=0;attempt<2;attempt++){
   try{
-   rows=await api(path,options);
+   rows=await api(path,{method:"GET",timeoutMs:15000});
    lastError=null;
    break;
   }catch(e){
    lastError=e;
-   const timeout=String(e?.message||"").includes("délai de 8 s");
-   if(attempt===0&&timeout){
-    await new Promise(resolve=>setTimeout(resolve,400));
+   if(attempt===0&&String(e?.message||"").includes("délai de 15 s")){
+    await new Promise(resolve=>setTimeout(resolve,250));
     continue;
    }
-   throw e;
+   throw new Error("Authentification réussie, mais lecture du profil BuSAF interrompue : "+(e?.message||"réseau lent")+". Ton profil n'a pas été recréé.");
   }
  }
  if(lastError)throw lastError;
@@ -1220,29 +1218,34 @@ async function saveNewPassword(){
   }catch(e){alert("❌ "+(e.message||"Impossible de modifier le mot de passe."));}
 }
 
+let busafLoginInProgress=false;
 async function login(e){
  e.preventDefault();
+ if(busafLoginInProgress)return;
+ busafLoginInProgress=true;
  const email=document.getElementById("loginEmail").value.trim();
  const password=document.getElementById("loginPassword").value;
  const msg=document.getElementById("loginMsg"),btn=document.getElementById("loginBtn");
- btn.disabled=true;btn.textContent="CONNEXION...";
+ btn.disabled=true;btn.textContent="VÉRIFICATION DU COMPTE...";
+ msg.className="notice";msg.textContent="Connexion à BuSAF en cours…";
  try{
   const d=await api("/auth/v1/token?grant_type=password",{method:"POST",timeoutMs:20000,headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
-  state.token=d.access_token||"";state.userId=d.user?.id||"";state.email=email;
+  if(!d.access_token||!d.user?.id)throw new Error("Supabase n'a pas confirmé la session. Vérifie l'adresse et le mot de passe.");
+  state.token=d.access_token;state.userId=d.user.id;state.email=email;
   localStorage.setItem("busaf_access_token",state.token);
   localStorage.setItem("busaf_user_id",state.userId);
   localStorage.setItem("busaf_email",email);
-  // À la connexion, on récupère le profil existant. On ne crée jamais de profil ici.
+  msg.textContent="Compte reconnu. Ouverture de ton espace…";
   const profil=await loadProfile();
-  if(!profil?.id){
-   throw new Error("Connexion acceptée, mais ton profil BuSAF existant n'a pas été retourné par Supabase. Aucun profil n'a été recréé. Réessaie dans quelques instants.");
-  }
+  if(!profil?.id)throw new Error("Le compte est reconnu, mais Supabase n'a retourné aucun profil BuSAF. Aucun profil n'a été recréé.");
   saveState();
-  addNotification("🔐 Connexion",`Connexion réussie sur ton espace BuSAF.`,"login");
+  addNotification("🔐 Connexion","Connexion réussie sur ton espace BuSAF.","login");
   setScreen("member");
  }catch(err){
-  msg.className="notice error";msg.textContent="❌ "+err.message;
+  msg.className="notice error";msg.textContent="❌ "+(err?.message||"Connexion impossible.");
   btn.disabled=false;btn.textContent="SE CONNECTER";
+ }finally{
+  busafLoginInProgress=false;
  }
 }
 
