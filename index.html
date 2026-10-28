@@ -1070,7 +1070,9 @@ function openModal(title,html){
 function closeModal(){document.getElementById("modal").classList.remove("open")}
 
 async function api(path,options={}){
- const headers=Object.assign({"apikey":SUPABASE_KEY,"Content-Type":"application/json"},options.headers||{});
+ // Évite les en-têtes inutiles sur GET : moins de précontrôles CORS sur mobile.
+ const headers=Object.assign({"apikey":SUPABASE_KEY},options.headers||{});
+ if(options.body!==undefined && options.body!==null && !Object.keys(headers).some(k=>k.toLowerCase()==="content-type"))headers["Content-Type"]="application/json";
  if(state.token)headers.Authorization="Bearer "+state.token;
  // Un seul délai couvre la réponse complète, y compris la lecture du corps.
  const controller=new AbortController();
@@ -1666,7 +1668,7 @@ async function refreshFounderPayments(){
  try{
   const rows=await api('/rest/v1/ventes?select=id,acheteur_id,montant,moyen_paiement,reference,statut,created_at,produit_id&order=created_at.desc&limit=200',{
    method:'GET',
-   headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}
+   timeoutMs:12000
   });
   state.founderPayments=Array.isArray(rows)?rows:[];
   state.founderPaymentsLoaded=true;
@@ -2626,7 +2628,7 @@ async function loadMemberDepositHistory(){
   box.innerHTML='<div class="empty">Chargement des dépôts…</div>';
   try{
    const path='/rest/v1/busaf_depots?select=id,montant,operateur,compte,reference,statut,created_at,confirme_le&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
-   const rows=await api(path,{method:'GET',timeoutMs:7000,headers:{'Cache-Control':'no-cache'}});
+   const rows=await api(path,{method:'GET',timeoutMs:12000});
    if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="empty">Aucune demande de dépôt enregistrée.</div>';return;}
    box.innerHTML=rows.map(r=>{
     const status=String(r.statut||'inconnu').toLowerCase();
