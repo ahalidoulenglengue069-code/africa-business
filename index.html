@@ -1517,17 +1517,22 @@ function founderPayments(){
 async function refreshFounderPayments(){
  if(!isFounder()||state.founderPaymentsLoading)return;
  state.founderPaymentsLoading=true;
+ state.founderPaymentsError='';
  if(state.screen==='founderPayments')render();
  try{
-  state.founderPayments=await api('/rest/v1/ventes?select=id,acheteur_id,montant,moyen_paiement,reference,statut,created_at,produit_id&order=created_at.desc');
+  const rows=await api('/rest/v1/ventes?select=id,acheteur_id,montant,moyen_paiement,reference,statut,created_at,produit_id&order=created_at.desc&limit=200',{
+   method:'GET',
+   headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}
+  });
+  state.founderPayments=Array.isArray(rows)?rows:[];
   state.founderPaymentsLoaded=true;
-  render();
  }catch(e){
   state.founderPaymentsError=e.message||'Erreur de chargement';
-  const app=document.getElementById('founderPaymentsList');
-  if(app)app.innerHTML='<div class="notice error">Chargement impossible : '+esc(state.founderPaymentsError)+'</div>';
   console.error('Chargement paiements BuSAF :',e);
- }finally{state.founderPaymentsLoading=false;}
+ }finally{
+  state.founderPaymentsLoading=false;
+  if(state.screen==='founderPayments')render();
+ }
 }
 function founderWallet(){
  if(!isFounder())return memberHome();
