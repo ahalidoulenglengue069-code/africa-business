@@ -1640,10 +1640,11 @@ function founderMembers(){
 async function refreshFounderMembers(){
  if(!isFounder()||state.founderMembersLoading)return;
  state.founderMembersLoading=true;state.founderMembersError='';
- if(state.screen==='founderMembers')render();
  try{
-  const rows=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc&limit=100');
-  state.founderMembers=Array.isArray(rows)?rows:[];
+  // Charger explicitement les champs nécessaires, avec délai suffisant sur réseau mobile.
+  const rows=await api('/rest/v1/profils_busaf?select=id,nom_complet,telephone,Ville,pays,role,parrain_id,code_parrain,photo_url,created_at&order=created_at.desc&limit=100',{method:'GET',timeoutMs:20000});
+  if(!Array.isArray(rows))throw new Error('Réponse inattendue du serveur pour la liste des membres.');
+  state.founderMembers=rows;
   state.founderMembersLoaded=true;
   state.founderMembersLoadedAt=Date.now();
  }catch(e){
