@@ -703,6 +703,17 @@ input:focus,select:focus,textarea:focus{outline:2px solid #b9e4cb!important;bord
 #app .founder-withdraw-form input,#app .founder-withdraw-form select{width:100%;min-width:0}
 @media(max-width:380px){.money-balances{gap:7px}.money-balance-card{padding:11px!important}.money-actions{gap:7px}#app .founder-withdraw-form{grid-template-columns:1fr}}
 
+
+/* Navigation inférieure moderne, état actif et compteur d'alertes */
+.bottom,.quickbar{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);background:rgba(255,255,255,.97)!important;border-top:1px solid #d8e8df!important;box-shadow:0 -5px 20px rgba(0,65,40,.09)!important}
+.bottom-inner,.quick-inner{gap:4px!important}
+.bottom-inner button,.quick-inner button{position:relative;min-width:0;min-height:54px;border-radius:13px!important;color:#687b72!important;font-size:10px!important;font-weight:800!important;transition:background .15s,color .15s}
+.bottom-inner button span,.quick-inner button span{font-size:21px!important;line-height:1.15!important}
+.bottom-inner button.active,.quick-inner button.active{color:#078447!important;background:#e8f7ee!important}
+.bottom-inner button.active:after{content:"";position:absolute;top:2px;left:30%;right:30%;height:3px;border-radius:3px;background:#078447}
+.bottom-badge{position:absolute;top:2px;right:calc(50% - 24px);min-width:17px;height:17px;padding:0 4px;display:grid;place-items:center;border-radius:10px;background:#d92828;color:white;font-size:9px;font-style:normal;font-weight:900;border:2px solid white}
+@media(max-width:600px){.bottom-inner button,.quick-inner button{font-size:9px!important;min-height:50px}.bottom-inner button span,.quick-inner button span{font-size:20px!important}}
+
 </style>
 </head>
 <body>
@@ -2528,16 +2539,28 @@ function publicQuick(){
  </div></div>`;
 }
 function memberQuick(){
+ const active=state.screen;
+ const item=(screen,icon,label)=>`<button class="${active===screen?'active':''}" onclick="setScreen('${screen}')"><span>${icon}</span>${label}</button>`;
+ const unread=unreadNotificationCount();
  return `<div class="bottom member-bottom"><div class="bottom-inner">
- <button onclick="setScreen('member')"><span>🏠</span>Accueil</button>
- <button onclick="setScreen('market')"><span>🛒</span>Marché</button>
- <button onclick="setScreen('invites')"><span>👥</span>Invités</button>
- <button onclick="setScreen('account')"><span>💼</span>Compte</button>
+ ${item('member','🏠','Accueil')}
+ ${item('market','🛒','Marché')}
+ ${item('invites','👥','Invités')}
+ <button class="${active==='account'?'active':''}" onclick="setScreen('account')"><span>💼</span>Compte${unread? `<i class="bottom-badge">${unread>99?'99+':unread}</i>`:''}</button>
  </div></div>`;
 }
 
 function founderQuick(){
- return `<div class="bottom"><div class="bottom-inner"><button onclick="setScreen('founder')"><span>👑</span>Accueil</button><button onclick="setScreen('founderMarket')"><span>🛒</span>Marché</button><button onclick="setScreen('founderMembers')"><span>👥</span>Membres</button><button onclick="setScreen('orders')"><span>📦</span>Commandes</button><button onclick="setScreen('account')"><span>💼</span>Compte</button></div></div>`;
+ const active=state.screen;
+ const item=(screen,icon,label)=>`<button class="${active===screen?'active':''}" onclick="setScreen('${screen}')"><span>${icon}</span>${label}</button>`;
+ const unread=unreadNotificationCount();
+ return `<div class="bottom founder-bottom"><div class="bottom-inner">
+ ${item('founder','👑','Accueil')}
+ ${item('founderMarket','🛒','Marché')}
+ ${item('founderMembers','👥','Membres')}
+ ${item('orders','📦','Commandes')}
+ <button class="${active==='account'?'active':''}" onclick="setScreen('account')"><span>💼</span>Compte${unread?`<i class="bottom-badge">${unread>99?'99+':unread}</i>`:''}</button>
+ </div></div>`;
 }
 
 function unreadNotificationCount(){
