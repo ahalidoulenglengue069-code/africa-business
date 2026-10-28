@@ -668,6 +668,41 @@ input:focus,select:focus,textarea:focus{outline:2px solid #b9e4cb!important;bord
 @media(min-width:650px){.reference-grid,.founder-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.productgrid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:380px){.wrap{padding-left:9px;padding-right:9px}.card{padding:12px}.reference-grid,.founder-grid{gap:8px}.reference-card,.founder-app{padding:10px 8px!important;min-height:104px!important}.reference-card .reference-icon{width:38px;height:38px;font-size:22px}.product img{height:88px}}
 
+
+/* ===== Écrans dédiés inspirés de la maquette BuSAF ===== */
+.login-panel,.auth-panel{max-width:480px;margin:14px auto}
+#app .card:has(form[onsubmit="login(event)"]),#app .card:has(form[onsubmit="signup(event)"]){max-width:490px;margin:14px auto;padding:clamp(18px,5vw,30px);border-radius:24px;border:1px solid #d9eae0;box-shadow:0 10px 28px rgba(0,75,44,.09)}
+#app .card:has(form[onsubmit="login(event)"])>h2,#app .card:has(form[onsubmit="signup(event)"])>h2{text-align:center;font-size:24px;margin:10px 0 8px}
+#app .card:has(form[onsubmit="login(event)"]) form,#app .card:has(form[onsubmit="signup(event)"]) form{margin-top:20px}
+#app .card:has(form[onsubmit="login(event)"]) label,#app .card:has(form[onsubmit="signup(event)"]) label{display:block;font-size:13px;font-weight:800;color:#355b49;margin:13px 0 6px}
+#app .card:has(form[onsubmit="login(event)"]) form .btn,#app .card:has(form[onsubmit="signup(event)"]) form .btn{margin-top:16px;min-height:48px;background:linear-gradient(100deg,#078447,#0aa55a);border-radius:14px;font-size:14px}
+#app .card:has(form[onsubmit="login(event)"])>.btn,#app .card:has(form[onsubmit="signup(event)"])>.btn{min-height:43px;margin-top:10px}
+.money-balances{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.money-balance-card{border-radius:18px!important;padding:15px!important;min-width:0;box-shadow:0 5px 14px rgba(0,75,44,.10)}
+.money-balance-card span{display:inline-grid;place-items:center;width:37px;height:37px;border-radius:12px;background:rgba(255,255,255,.20);font-size:21px;margin-bottom:8px}
+.money-balance-card small{display:block;font-size:10px;letter-spacing:.25px;line-height:1.3}
+.money-balance-card strong{display:block;font-size:clamp(15px,4vw,21px);line-height:1.3;overflow-wrap:anywhere;margin-top:5px}
+.money-section-title{color:#075b3c;font-size:16px;margin:18px 0 10px}
+.money-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.money-actions .btn{margin:0;min-width:0}
+.money-actions .btn:last-child{grid-column:1/-1}
+.money-help{border-radius:16px!important}
+#app .card:has(.list) .list li{padding:13px;border-radius:14px;background:#fff;margin:9px 0;line-height:1.6;overflow-wrap:anywhere}
+#app .card:has(.list) .list li strong{font-size:14px;color:#075b3c}
+#app .card:has(.productgrid) .notice{border-radius:14px}
+#app .card:has(.productgrid)>.row{gap:8px}
+#app .card:has(.productgrid)>.row .btn{min-width:0}
+#app .card:has(.profit-cards) .notice{border-radius:14px}
+#app .founder-wallet-balances{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#app .founder-wallet-balances .stat{border-radius:15px!important;padding:13px!important;min-width:0}
+#app .founder-wallet-balances .stat strong{font-size:clamp(15px,4vw,21px);overflow-wrap:anywhere}
+#app .founder-withdraw-form{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+#app .founder-withdraw-form>div{min-width:0}
+#app .founder-withdraw-form .founder-withdraw-action{grid-column:1/-1}
+#app .founder-withdraw-form label{display:block;margin:7px 0;font-size:12px;font-weight:800}
+#app .founder-withdraw-form input,#app .founder-withdraw-form select{width:100%;min-width:0}
+@media(max-width:380px){.money-balances{gap:7px}.money-balance-card{padding:11px!important}.money-actions{gap:7px}#app .founder-withdraw-form{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
