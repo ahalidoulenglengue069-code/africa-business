@@ -2614,7 +2614,7 @@ async function loadMemberDepositHistory(){
    const label=status==='confirme'?'CONFIRMÉ':status==='en_attente'?'EN ATTENTE':status==='echec'?'ÉCHEC':String(r.statut||'À VÉRIFIER').toUpperCase();
    const color=status==='confirme'?'#16733a':status==='echec'?'#b3261e':'#8a5a00';
    const date=r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'Date inconnue';
-   return '<div class="rule" style="margin:8px 0"><strong>'+esc(money(Number(r.montant||0)))+' FCFA</strong><div>'+esc(String(r.compte||'Compte'))+' · '+esc(String(r.operateur||'Opérateur'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">'+esc(label)+'</div><div class="small">Référence : '+esc(String(r.reference||'—'))+'</div></div>';
+   return '<div class="rule" style="margin:8px 0"><strong>'+esc(money(Number(r.montant||0)))+'</strong><div>'+esc(String(r.compte||'Compte'))+' · '+esc(String(r.operateur||'Opérateur'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">'+esc(label)+'</div><div class="small">Référence : '+esc(String(r.reference||'—'))+'</div></div>';
   }).join('');
  }catch(e){console.error('Historique des dépôts BuSAF:',e);box.innerHTML='<div class="notice error">Impossible de charger l’historique pour le moment. '+esc(String(e?.message||'Erreur serveur'))+'</div>';}
 }
