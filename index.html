@@ -781,6 +781,58 @@ input:focus,select:focus,textarea:focus{outline:2px solid #b9e4cb!important;bord
  #app.founder-mode .founder-app{padding:10px 9px;min-height:120px}
 }
 
+
+
+/* ===== Finition visuelle du Centre Fondateur BuSAF ===== */
+#app.founder-mode .header-actions .hbtn{
+  color:#fff!important;
+  background:linear-gradient(135deg,#c62828,#a91515)!important;
+  border:1px solid rgba(255,255,255,.28)!important;
+  box-shadow:0 4px 12px rgba(115,10,10,.22);
+  font-weight:900;
+}
+#app.founder-mode .header-actions .hbtn:active{transform:scale(.97)}
+#app.founder-mode .founder-stat{position:relative;overflow:hidden}
+#app.founder-mode .founder-stat:after{
+  position:absolute;right:11px;top:10px;font-size:18px;opacity:.9;
+  line-height:1;pointer-events:none
+}
+#app.founder-mode .founder-stat:nth-child(1):after{content:"🛍️"}
+#app.founder-mode .founder-stat:nth-child(2):after{content:"👥"}
+#app.founder-mode .founder-stat:nth-child(3):after{content:"📦"}
+#app.founder-mode .founder-stat b{display:block;padding-right:22px;font-variant-numeric:tabular-nums}
+#app.founder-mode .founder-stat small{font-weight:750;letter-spacing:.15px}
+#app.founder-mode .founder-section-title{
+  position:relative;letter-spacing:.8px;text-transform:uppercase;
+}
+#app.founder-mode .founder-section-title:after{
+  content:"";position:absolute;left:0;bottom:-1px;width:54px;height:3px;
+  border-radius:3px;background:#078447
+}
+#app.founder-mode .founder-app{min-height:132px}
+#app.founder-mode .founder-app .ficon{
+  box-shadow:inset 0 0 0 1px rgba(20,70,40,.045);
+}
+#app.founder-mode .founder-app:focus-visible,
+#app.founder-mode .header-actions .hbtn:focus-visible{
+  outline:3px solid #e0ad38;outline-offset:3px
+}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app:last-child{
+  border-color:#f0c4c1;background:linear-gradient(145deg,#fff 0%,#fff5f4 100%)
+}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app:last-child:before{background:#c62828}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app:last-child b{color:#b3261e}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app:last-child small{color:#9c4a45}
+@media(max-width:700px){
+  #app.founder-mode .founder-stat:after{right:7px;top:8px;font-size:14px}
+  #app.founder-mode .founder-stat b{padding-right:16px}
+  #app.founder-mode .founder-app{min-height:126px}
+}
+@media(prefers-reduced-motion:reduce){
+  #app.founder-mode .founder-app,
+  #app.founder-mode .header-actions .hbtn{transition:none!important}
+}
+
 </style>
 </head>
 <body>
