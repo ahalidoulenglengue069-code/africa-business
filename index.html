@@ -1074,7 +1074,8 @@ async function api(path,options={}){
  if(state.token)headers.Authorization="Bearer "+state.token;
  // Un seul délai couvre la réponse complète, y compris la lecture du corps.
  const controller=new AbortController();
- const timeout=setTimeout(()=>controller.abort(),10000);
+ const timeoutMs=Number.isFinite(options.timeoutMs)?Math.max(1000,options.timeoutMs):10000;
+ const timeout=setTimeout(()=>controller.abort(),timeoutMs);
  const externalSignal=options.signal;
  const abortFromCaller=()=>controller.abort();
  if(externalSignal){
@@ -1089,7 +1090,7 @@ async function api(path,options={}){
   r=await fetch(SUPABASE_URL+path,requestOptions);
   text=await r.text();
  }catch(e){
-  if(e&&e.name==="AbortError")throw new Error("Le serveur met trop de temps à répondre (10 s). Vérifie Internet puis réessaie.");
+  if(e&&e.name==="AbortError")throw new Error("Supabase n’a pas répondu dans le délai de "+Math.round(timeoutMs/1000)+" s. Réessaie une fois; si cela continue, le service Auth ou la connexion au serveur doit être diagnostiqué.");
   throw new Error("Connexion au serveur impossible. Vérifie Internet puis réessaie.");
  }finally{
   clearTimeout(timeout);
@@ -1103,7 +1104,7 @@ async function api(path,options={}){
 async function loadProfile(){
  if(!state.userId||!state.token){state.profile=null;return null;}
  const rows=await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`,{
-   method:"GET",
+   method:"GET",timeoutMs:15000,
    headers:{"Cache-Control":"no-cache","Pragma":"no-cache"}
  });
  state.profile=Array.isArray(rows)?(rows.find(p=>String(p.user_id)===String(state.userId))||rows[0]||null):null;
@@ -1210,7 +1211,7 @@ async function login(e){
  const msg=document.getElementById("loginMsg"),btn=document.getElementById("loginBtn");
  btn.disabled=true;btn.textContent="CONNEXION...";
  try{
-  const d=await api("/auth/v1/token?grant_type=password",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
+  const d=await api("/auth/v1/token?grant_type=password",{method:"POST",timeoutMs:20000,headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
   state.token=d.access_token||"";state.userId=d.user?.id||"";state.email=email;
   localStorage.setItem("busaf_access_token",state.token);
   localStorage.setItem("busaf_user_id",state.userId);
