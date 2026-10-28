@@ -1103,10 +1103,26 @@ async function api(path,options={}){
 }
 async function loadProfile(){
  if(!state.userId||!state.token){state.profile=null;return null;}
- const rows=await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`,{
-   method:"GET",timeoutMs:15000,
-   headers:{"Cache-Control":"no-cache","Pragma":"no-cache"}
- });
+ const path=`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`;
+ const options={method:"GET",timeoutMs:8000,headers:{"Cache-Control":"no-cache","Pragma":"no-cache"}};
+ let rows,lastError;
+ // Une coupure ponctuelle du réseau ne doit pas bloquer définitivement la connexion.
+ for(let attempt=0;attempt<2;attempt++){
+  try{
+   rows=await api(path,options);
+   lastError=null;
+   break;
+  }catch(e){
+   lastError=e;
+   const timeout=String(e?.message||"").includes("délai de 8 s");
+   if(attempt===0&&timeout){
+    await new Promise(resolve=>setTimeout(resolve,400));
+    continue;
+   }
+   throw e;
+  }
+ }
+ if(lastError)throw lastError;
  state.profile=Array.isArray(rows)?(rows.find(p=>String(p.user_id)===String(state.userId))||rows[0]||null):null;
  return state.profile;
 }
