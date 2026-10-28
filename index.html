@@ -901,10 +901,15 @@ function setScreen(screen){
   state.notifications.forEach(n=>{if(n)n.read=true;});
   saveState();
  }
- if(screen===state.screen){ if(screen==="notifications")render(); return; }
+ if(screen===state.screen){
+  if(screen==="notifications")render();
+  if(screen==="founderPayments" && isFounder() && !state.founderPaymentsLoading)refreshFounderPayments();
+  return;
+ }
  state.screen=screen;
  history.pushState({busafScreen:screen},"","#"+screen);
  render();
+ if(screen==="founderPayments" && isFounder())refreshFounderPayments();
  if(screen==="market" || screen==="public" || screen==="products" || screen==="founderMarket" || screen==="founderStocks"){
   // Toujours actualiser les données du Marché en arrière-plan à l'ouverture,
   // sans demander au visiteur de recharger toute la page.
