@@ -2607,8 +2607,8 @@ async function loadMemberDepositHistory(){
  const task=(async()=>{try{
   const url=SUPABASE_URL+'/rest/v1/busaf_depots?select=id,montant,operateur,compte,reference,statut,created_at,confirme_le&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),7000);
-  let response;try{response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+state.token},signal:controller.signal});}finally{clearTimeout(timer);}
-  const raw=await response.text();let rows=[];try{rows=raw?JSON.parse(raw):[];}catch{}
+  let response,raw;try{response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+state.token},signal:controller.signal});raw=await response.text();}finally{clearTimeout(timer);}
+  let rows=[];try{rows=raw?JSON.parse(raw):[];}catch{}
   if(!response.ok)throw new Error(rows?.message||rows?.hint||'Le serveur refuse la lecture des dépôts.');
   if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="empty">Aucune demande de dépôt enregistrée.</div>';return;}
   box.innerHTML=rows.map(r=>{
