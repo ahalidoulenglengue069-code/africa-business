@@ -2650,7 +2650,7 @@ async function loadMemberWithdrawalHistory(){
   box.innerHTML='<div class="empty">Chargement des retraits…</div>';
   try{
    const path='/rest/v1/busaf_retraits?select=id,montant,numero_mobile_money,operateur,compte,statut,created_at&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
-   const rows=await api(path,{method:'GET',timeoutMs:7000,headers:{'Cache-Control':'no-cache'}});
+   const rows=await api(path,{method:'GET',timeoutMs:12000});
    if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="empty">Aucune demande de retrait enregistrée.</div>';return;}
    box.innerHTML=rows.map(r=>{
     const status=String(r.statut||'inconnu').toLowerCase();
