@@ -2602,10 +2602,12 @@ function memberMoney(){return page("💳 Dépôt / Retrait",`<div class="money-b
 async function loadMemberDepositHistory(){
  const box=document.getElementById("memberDepositHistory");if(!box)return;
  if(!state.userId||!state.token||!state.profile?.id){box.innerHTML='<div class="empty">Connecte-toi pour consulter tes dépôts.</div>';return;}
+ if(window.__busafDepositHistoryPromise){try{return await window.__busafDepositHistoryPromise;}catch{}}
  box.innerHTML='<div class="empty">Chargement des dépôts…</div>';
- try{
+ const task=(async()=>{try{
   const url=SUPABASE_URL+'/rest/v1/busaf_depots?select=id,montant,operateur,compte,reference,statut,created_at,confirme_le&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
-  const response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+state.token}});
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),7000);
+  let response;try{response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+state.token},signal:controller.signal});}finally{clearTimeout(timer);}
   const raw=await response.text();let rows=[];try{rows=raw?JSON.parse(raw):[];}catch{}
   if(!response.ok)throw new Error(rows?.message||rows?.hint||'Le serveur refuse la lecture des dépôts.');
   if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="empty">Aucune demande de dépôt enregistrée.</div>';return;}
@@ -2616,15 +2618,19 @@ async function loadMemberDepositHistory(){
    const date=r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'Date inconnue';
    return '<div class="rule" style="margin:8px 0;border-left:4px solid #16733a"><strong style="color:#16733a">📥 DÉPÔT DEMANDÉ : '+esc(money(Number(r.montant||0)))+'</strong><div>Compte : '+esc(String(r.compte||'Compte non précisé'))+' · '+esc(String(r.operateur||'Opérateur non précisé'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">STATUT : '+esc(label)+'</div><div class="small">Référence : '+esc(String(r.reference||r.id||'—'))+'</div></div>';
   }).join('');
- }catch(e){console.error('Historique des dépôts BuSAF:',e);box.innerHTML='<div class="notice error">Impossible de charger les dépôts automatiquement. '+esc(String(e?.message||'Erreur serveur'))+'</div>';}
+ }catch(e){console.error('Historique des dépôts BuSAF:',e);box.innerHTML='<div class="notice error">Le serveur est lent ou indisponible. Les dépôts n’ont pas pu être chargés en 7 secondes.</div>';throw e;}})();
+ window.__busafDepositHistoryPromise=task;
+ try{return await task;}finally{if(window.__busafDepositHistoryPromise===task)window.__busafDepositHistoryPromise=null;}
 }
 async function loadMemberWithdrawalHistory(){
  const box=document.getElementById("memberWithdrawalHistory");if(!box)return;
  if(!state.userId||!state.token||!state.profile?.id){box.innerHTML='<div class="empty">Connecte-toi pour consulter tes retraits.</div>';return;}
+ if(window.__busafWithdrawalHistoryPromise){try{return await window.__busafWithdrawalHistoryPromise;}catch{}}
  box.innerHTML='<div class="empty">Chargement des retraits…</div>';
- try{
+ const task=(async()=>{try{
   const url=SUPABASE_URL+'/rest/v1/busaf_retraits?select=id,montant,numero_mobile_money,operateur,compte,statut,created_at&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
-  const response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+state.token}});
+  const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),7000);
+  let response;try{response=await fetch(url,{headers:{apikey:SUPABASE_KEY,Authorization:'Bearer '+state.token},signal:controller.signal});}finally{clearTimeout(timer);}
   const raw=await response.text();let rows=[];try{rows=raw?JSON.parse(raw):[];}catch{}
   if(!response.ok)throw new Error(rows?.message||rows?.hint||'Le serveur refuse la lecture des retraits.');
   if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="empty">Aucune demande de retrait enregistrée.</div>';return;}
@@ -2635,7 +2641,9 @@ async function loadMemberWithdrawalHistory(){
    const date=r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'Date inconnue';
    return '<div class="rule" style="margin:8px 0;border-left:4px solid #b3261e"><strong style="color:#b3261e">📤 RETRAIT DEMANDÉ : '+esc(money(Number(r.montant||0)))+'</strong><div>Vers '+esc(String(r.operateur||'Opérateur'))+' · '+esc(String(r.numero_mobile_money||'Numéro non indiqué'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">STATUT : '+esc(label)+'</div><div class="small">Référence : '+esc(String(r.id||'—'))+'</div></div>';
   }).join('');
- }catch(e){console.error('Historique des retraits BuSAF:',e);box.innerHTML='<div class="notice error">Impossible de charger les retraits. '+esc(String(e?.message||'Erreur serveur'))+'</div>';}
+ }catch(e){console.error('Historique des retraits BuSAF:',e);box.innerHTML='<div class="notice error">Le serveur est lent ou indisponible. Les retraits n’ont pas pu être chargés en 7 secondes.</div>';throw e;}})();
+ window.__busafWithdrawalHistoryPromise=task;
+ try{return await task;}finally{if(window.__busafWithdrawalHistoryPromise===task)window.__busafWithdrawalHistoryPromise=null;}
 }
 function openMoneyDeposit(){openModal("💳 Demande de dépôt",`<label>Compte à créditer</label><select id="depAccount"><option value="Compte Marché">Compte Marché</option><option value="Compte Boutique">Compte Boutique</option></select><label>Montant (FCFA)</label><input id="depAmount" type="number" min="1" step="1" inputmode="numeric" placeholder="Ex. 5000"><label>Opérateur Mobile Money</label><select id="depOperator"><option value="Orange Money">Orange Money</option><option value="Moov Money">Moov Money</option><option value="Telecel Money">Telecel Money</option><option value="Wave">Wave</option></select><div class="notice warning">Le dépôt sera enregistré en attente. Le compte ne sera crédité qu'après confirmation sécurisée du paiement par le fournisseur.</div><button class="btn" id="depSubmitBtn" onclick="requestMoneyDeposit()">ENREGISTRER LA DEMANDE</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 async function requestMoneyDeposit(){
