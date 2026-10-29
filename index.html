@@ -833,6 +833,52 @@ input:focus,select:focus,textarea:focus{outline:2px solid #b9e4cb!important;bord
   #app.founder-mode .header-actions .hbtn{transition:none!important}
 }
 
+
+/* ===== Organisation moderne et lisible du centre fondateur ===== */
+#app.founder-mode .founder-dashboard{padding-bottom:28px}
+#app.founder-mode .founder-section-title{
+  margin:23px 2px 11px!important;padding:0 0 10px!important;
+  font-size:14px!important;letter-spacing:.45px!important;
+  color:#174b32!important;border-bottom:1px solid #d8e8df;
+}
+#app.founder-mode .founder-section-title:after{width:68px;height:4px;background:linear-gradient(90deg,#087a38,#56bd83)}
+#app.founder-mode .founder-grid{gap:10px}
+#app.founder-mode .founder-app{
+  min-height:112px!important;padding:12px 11px!important;
+  border:1px solid #dce9e2!important;border-radius:17px!important;
+  background:#fff!important;box-shadow:0 4px 13px rgba(17,65,39,.065)!important;
+  display:flex;flex-direction:column;align-items:flex-start;justify-content:flex-start;
+  transition:transform .16s ease,box-shadow .16s ease,border-color .16s ease;
+}
+#app.founder-mode .founder-app:before{width:4px;opacity:1;border-radius:0 4px 4px 0}
+#app.founder-mode .founder-app .ficon{
+  width:37px;height:37px;margin:0 0 9px!important;border-radius:12px!important;
+  font-size:21px!important;box-shadow:none!important;
+}
+#app.founder-mode .founder-app b{font-size:12.5px!important;line-height:1.28!important;color:#173b2a!important}
+#app.founder-mode .founder-app small{font-size:10.5px!important;line-height:1.35!important;color:#62746a!important;margin-top:4px!important}
+#app.founder-mode .founder-app:active{transform:scale(.98);box-shadow:0 2px 7px rgba(17,65,39,.08)!important}
+#app.founder-mode .founder-section-title:nth-of-type(1)+.founder-grid .founder-app{background:linear-gradient(145deg,#fff,#f7fbff)!important}
+#app.founder-mode .founder-section-title:nth-of-type(2)+.founder-grid .founder-app{background:linear-gradient(145deg,#fff,#f6f9ff)!important}
+#app.founder-mode .founder-section-title:nth-of-type(3)+.founder-grid .founder-app{background:linear-gradient(145deg,#fff,#f4fbf6)!important}
+#app.founder-mode .founder-section-title:nth-of-type(4)+.founder-grid .founder-app{background:linear-gradient(145deg,#fff,#fbf7ff)!important}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app{background:linear-gradient(145deg,#fff,#fff9f3)!important}
+#app.founder-mode .founder-section-title:nth-of-type(5)+.founder-grid .founder-app:last-child{background:linear-gradient(145deg,#fff,#fff4f3)!important}
+@media(max-width:700px){
+ #app.founder-mode .wrap{padding-left:12px;padding-right:12px}
+ #app.founder-mode .founder-section-title{font-size:13px!important;margin-top:21px!important}
+ #app.founder-mode .founder-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ #app.founder-mode .founder-app{min-height:108px!important;padding:11px 10px!important}
+ #app.founder-mode .founder-app .ficon{width:35px;height:35px;font-size:20px!important;margin-bottom:8px!important}
+ #app.founder-mode .founder-app b{font-size:12px!important}
+ #app.founder-mode .founder-app small{font-size:10px!important}
+}
+@media(max-width:360px){
+ #app.founder-mode .founder-grid{gap:7px}
+ #app.founder-mode .founder-app{padding:9px 8px!important;min-height:104px!important}
+ #app.founder-mode .founder-app b{font-size:11.5px!important}
+}
+
 </style>
 </head>
 <body>
