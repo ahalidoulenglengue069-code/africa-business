@@ -2291,8 +2291,12 @@ async function loadDirectInvites(){
  state.directInvitesLoading=true;
  state.directInvitesError="";
  try{
-   const rows=await api("/rest/v1/rpc/busaf_mes_invites_directs",{method:"POST",body:"{}"});
-   state.directInvites=Array.isArray(rows)?rows:[];
+   // Filtrer directement par l'identifiant du profil connecté : les invités
+   // déjà liés dans profils_busaf ne dépendent plus de la RPC pour s'afficher.
+   const parrainId=encodeURIComponent(state.profile.id);
+   const rows=await api("/rest/v1/profils_busaf?select=id,nom_complet,telephone,code_parrain,pays,Ville,role,photo_url,created_at&parrain_id=eq."+parrainId+"&order=created_at.desc.nullslast,nom_complet.asc&limit=500",{method:"GET",timeoutMs:20000});
+   if(!Array.isArray(rows))throw new Error("Réponse inattendue du serveur pour les invités directs.");
+   state.directInvites=rows.map(m=>({...m,ville:m.Ville||m.ville||null}));
    state.directInvitesLoaded=true;
    state.directInvitesLoadedAt=Date.now();
  }catch(e){
