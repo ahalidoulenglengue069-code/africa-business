@@ -1158,30 +1158,51 @@ async function ensureMemberProfile(user){
 
 async function restoreAuthenticatedSession(){
   const storedToken=localStorage.getItem("busaf_access_token")||"";
-  if(!storedToken){
+  const storedRefresh=localStorage.getItem("busaf_refresh_token")||"";
+  if(!storedToken&&!storedRefresh){
     state.userId=""; state.email=""; state.token=""; state.profile=null;
     return false;
   }
   try{
-    const oldToken=state.token; state.token=storedToken;
-    const user=await api("/auth/v1/user",{method:"GET"});
-    if(!user?.id){throw new Error("Session invalide");}
+    let user=null;
+    if(storedToken){
+      state.token=storedToken;
+      try{ user=await api("/auth/v1/user",{method:"GET",timeoutMs:12000}); }
+      catch(e){ console.warn("Jeton BuSAF à renouveler :",e.message||e); }
+    }
+    if(!user?.id && storedRefresh){
+      // Renouvelle la session expirée sans obliger le membre à se reconnecter.
+      state.token="";
+      const refreshed=await api("/auth/v1/token?grant_type=refresh_token",{
+        method:"POST",timeoutMs:15000,
+        headers:{Authorization:"Bearer "+SUPABASE_KEY},
+        body:JSON.stringify({refresh_token:storedRefresh})
+      });
+      if(!refreshed?.access_token||!refreshed?.user?.id)throw new Error("Renouvellement de session impossible.");
+      state.token=refreshed.access_token;
+      localStorage.setItem("busaf_access_token",refreshed.access_token);
+      if(refreshed.refresh_token)localStorage.setItem("busaf_refresh_token",refreshed.refresh_token);
+      user=refreshed.user;
+    }
+    if(!user?.id)throw new Error("La session a expiré. Connecte-toi à nouveau.");
     state.userId=user.id;
-    state.email=user.email||"";
+    state.email=user.email||localStorage.getItem("busaf_email")||"";
     localStorage.setItem("busaf_user_id",state.userId);
     localStorage.setItem("busaf_email",state.email);
     await loadProfile();
-    if(!state.profile){
-      state.token=oldToken;
-      throw new Error("Profil BuSAF introuvable");
-    }
-    state.screen=isFounder()?"member":"member";
+    if(!state.profile)throw new Error("Profil BuSAF introuvable.");
+    state.screen="member";
     return true;
   }catch(e){
-    console.warn("Session locale refusée :",e.message||e);
-    localStorage.removeItem("busaf_access_token");
-    localStorage.removeItem("busaf_user_id");
-    localStorage.removeItem("busaf_email");
+    console.warn("Restauration de session BuSAF impossible :",e.message||e);
+    // Ne pas effacer les identifiants en cas de panne réseau temporaire.
+    const msg=String(e?.message||"").toLowerCase();
+    if(/expired|invalid.*refresh|refresh.*invalid|session a expiré|token.*invalid|401|403/.test(msg)){
+      localStorage.removeItem("busaf_access_token");
+      localStorage.removeItem("busaf_refresh_token");
+      localStorage.removeItem("busaf_user_id");
+      localStorage.removeItem("busaf_email");
+    }
     state.userId=""; state.email=""; state.token=""; state.profile=null; state.screen="public";
     return false;
   }
@@ -1213,7 +1234,7 @@ async function saveNewPassword(){
   if(a!==b){alert("Les deux mots de passe ne correspondent pas.");return;}
   try{
     await api("/auth/v1/user",{method:"PUT",body:JSON.stringify({password:a})});
-    localStorage.removeItem("busaf_access_token"); localStorage.removeItem("busaf_user_id"); localStorage.removeItem("busaf_email");
+    localStorage.removeItem("busaf_access_token"); localStorage.removeItem("busaf_refresh_token"); localStorage.removeItem("busaf_user_id"); localStorage.removeItem("busaf_email");
     state.token="";state.userId="";state.email="";state.profile=null;
     closeModal(); history.replaceState({busafScreen:"login"},"",location.pathname+"#login"); state.screen="login"; render();
     openModal("✅ Mot de passe modifié",`<div class="notice success">Ton mot de passe a été modifié. Connecte-toi avec le nouveau mot de passe.</div><button class="btn" onclick="closeModal()">OK</button>`);
@@ -1235,6 +1256,7 @@ async function login(e){
   if(!d.access_token||!d.user?.id)throw new Error("Supabase n'a pas confirmé la session. Vérifie l'adresse et le mot de passe.");
   state.token=d.access_token;state.userId=d.user.id;state.email=email;
   localStorage.setItem("busaf_access_token",state.token);
+  if(d.refresh_token)localStorage.setItem("busaf_refresh_token",d.refresh_token);
   localStorage.setItem("busaf_user_id",state.userId);
   localStorage.setItem("busaf_email",email);
   msg.textContent="Compte reconnu. Ouverture de ton espace…";
@@ -1277,6 +1299,7 @@ async function signup(e){
   localStorage.setItem("busaf_user_id",state.userId);
   localStorage.setItem("busaf_email",email);
   if(state.token)localStorage.setItem("busaf_access_token",state.token);
+  if(d.refresh_token)localStorage.setItem("busaf_refresh_token",d.refresh_token);
 
   if(!state.token){
     openModal("Compte créé",`<div class="notice success">Le compte a été créé. Connecte-toi maintenant avec ton e-mail et ton mot de passe.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button>`);
