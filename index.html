@@ -1727,7 +1727,7 @@ async function refreshFounderMembers(){
 function founderPayments(){
  if(!isFounder())return memberHome();
  const rows=state.founderPayments||[];
- const list=state.founderPaymentsLoading?`<div class="empty">Chargement automatique des paiements…</div>`:state.founderPaymentsError?`<div class="notice error">${esc(state.founderPaymentsError)}</div>`:rows.length?`<div class="list">${rows.map(v=>`<div class="rule"><strong>${money(v.montant||0)}</strong> — ${esc(v.statut||'—')}<br>Produit : ${esc((state.marketCatalog||[]).find(p=>String(p.id)===String(v.produit_id))?.nom||'Produit BuSAF')}<br>Acheteur : ${esc(v.acheteur_id||'—')}<br>Référence : ${esc(v.reference||'—')}<br><span class="small">${esc(v.created_at||'')}</span></div>`).join('')}</div>`:`<div class="empty">Aucune vente enregistrée.</div>`;
+ const list=state.founderPaymentsLoading?`<div class="empty">Chargement automatique des paiements…</div>`:state.founderPaymentsError?`<div class="notice error">${esc(state.founderPaymentsError)}</div>`:rows.length?`<div class="list">${rows.map(v=>`<div class="rule"><strong>${money(v.montant||0)}</strong> — ${esc(v.statut||'—')}<br>Produit : ${esc((state.marketCatalog||[]).find(p=>String(p.id)===String(v.produit_id))?.nom||'Produit BuSAF')}<br>Acheteur : ${esc(v.acheteur_id||'—')}<br>Référence : ${esc(v.reference||'—')}<br><span class="small">${esc(v.created_at||'')}</span></div>`).join('')}</div>`:`<div class="empty">Aucune transaction accessible pour le moment. Appuie sur Actualiser pour réessayer.</div>`;
  return page('💳 Paiements & ventes',`<div class="notice">Transactions chargées automatiquement depuis Supabase. Les transactions en attente ou expirées ne sont pas encore des ventes confirmées.</div><div id="founderPaymentsList">${list}</div><button class="btn alt" onclick="refreshFounderPayments()">🔄 Actualiser</button>`);
 }
 async function refreshFounderPayments(){
@@ -1737,9 +1737,8 @@ async function refreshFounderPayments(){
  if(state.screen==='founderPayments')render();
  try{
   await loadMarketCatalog(true).catch(e=>{console.warn('Catalogue produits pour les paiements:',e);return [];});
-  const rows=await api('/rest/v1/ventes?select=id,acheteur_id,montant,moyen_paiement,reference,statut,created_at,produit_id&order=created_at.desc&limit=200',{
-   method:'GET',
-   timeoutMs:12000
+  const rows=await api('/rest/v1/rpc/busaf_fondateur_lister_ventes',{
+   method:'POST',body:'{}',timeoutMs:15000
   });
   state.founderPayments=Array.isArray(rows)?rows:[];
   state.founderPaymentsLoaded=true;
