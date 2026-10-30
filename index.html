@@ -1134,7 +1134,7 @@ const publicSpaces=[
 const memberSpaces=[
  ["market","🛒","Marché BuSAF"],["invites","👥","Mes Invités"],["orders","📦","Mes Commandes"],
  ["account","💼","Mon Compte"],["profits","💰","Mes Bénéfices"],["commissions","🤝","Mes Commissions"],["partner","⭐","Progression Partner"],
- ["memberBenefits","🎁","Avantages membres"],["money","💳","Dépôt / Retrait"],["stockMarket","📦","Stock BuSAF"],
+ ["memberBenefits","🎁","Avantages membres"],["money","💳","Dépôt / Retrait"],["stockMarket","📦","Dépôt de vente"],
  ["notifications","🔔","Notifications"],["rules","📜","Règles"],["help","❓","Aide"],
  ["privacy","🔒","Confidentialité"],["contact","📞","Contact"],["how","📖","Fonctionnement"],["logout","🚪","Déconnexion"]
 ];
@@ -1603,7 +1603,7 @@ function hasBoughtProduct(id){return state.orders.some(o=>['stock','direct','fir
 function directResale(id){
  const p=productForId(id);
  if(!p)return;
- openModal('💰 Revente',`<div class="notice">Produit : <strong>${esc(p.nom||p.name||'Produit BuSAF')}</strong><br>La revente réelle doit être validée côté serveur avant de créditer un solde.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
+ openModal('💰 Revente',`<div class="notice">Produit : <strong>${esc(p.nom||p.name||'Produit BuSAF')}</strong><br>La revente réelle doit être validée côté serveur avant de créditer un solde.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON DÉPÔT</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
 }
 function buyProduct(id,mode){
  const p=productForId(id);if(!p)return;
@@ -1615,7 +1615,7 @@ function buyProduct(id,mode){
  state.marketStock++;
  const item=state.marketStockItems.find(x=>x.productId===p.id);if(item)item.qty++;else state.marketStockItems.push({productId:p.id,name:p.name,emoji:p.emoji,price:p.price,qty:1});
  saveState();
- openModal('🛒 Premier achat enregistré',`<div class="notice success"><strong>${esc(p.name)}</strong><br>Le produit est maintenant dans ton Stock BuSAF.</div><div class="notice">Pour un nouveau membre, ce premier achat est réalisé auprès de son parrain direct. Les achats suivants se font dans le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
+ openModal('🛒 Premier achat enregistré',`<div class="notice success"><strong>${esc(p.name)}</strong><br>Le produit est maintenant dans ton dépôt de vente.</div><div class="notice">Pour un nouveau membre, ce premier achat est réalisé auprès de son parrain direct. Les achats suivants se font dans le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
 }
 
 function canInvite(){return Boolean(state.userId&&state.profile);}
@@ -2974,7 +2974,7 @@ async function copyBuSAFText(){
  try{await navigator.clipboard.writeText(value);openModal("Lien copié",'<div class="notice success">Le lien de partage est copié.</div><button class="btn" onclick="closeModal()">OK</button>');}
  catch(e){openModal("Copie manuelle",`<textarea readonly>${esc(value)}</textarea><button class="btn" onclick="closeModal()">FERMER</button>`);}
 }
-`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Stock BuSAF est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
+`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Dépôt de vente est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
 
 function memberStockBoutique(){
  const realProducts=filterRealProducts(state.boutiqueProducts);
