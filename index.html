@@ -1870,9 +1870,9 @@ async function loadFounderResales(){
 async function processFounderResale(id,confirmSale){
  if(!confirm(confirmSale?'Confirmer la réception du paiement et retirer la quantité du dépôt du vendeur ?':'Refuser cette demande de revente ?'))return;
  try{
-  await api('/rest/v1/rpc/busaf_confirmer_revente',{method:'POST',body:JSON.stringify({p_revente_id:id,p_confirmer:confirmSale}),timeoutMs:15000});
+  const result=await api('/rest/v1/rpc/busaf_confirmer_revente',{method:'POST',body:JSON.stringify({p_revente_id:id,p_confirmer:confirmSale}),timeoutMs:15000});
   await loadFounderResales();
-  alert(confirmSale?'Revente confirmée. Le dépôt du vendeur a été mis à jour.':'Demande de revente refusée.');
+  alert(confirmSale?'Revente confirmée. Dépôt mis à jour et bénéfice vendeur de 12 % crédité : '+money(result?.benefice_vendeur||0)+' FCFA.':'Demande de revente refusée.');
  }catch(e){alert('Opération impossible : '+(e.message||'Erreur inconnue'));}
 }
 function founderWallet(){
