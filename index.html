@@ -2193,13 +2193,13 @@ function memberMarket(){
  const all=marketCatalogProducts();
  const cards=all.map(p=>{
    const name=p.nom||'Produit';
-   const desc=p.description||'Produit numérique/business du Marché BuSAF.';
+   const desc=p.description||'Produit du Marché BuSAF.';
    const price=Number(p.prix||0);
    const image=p.image_url?`<img src="${esc(p.image_url)}" alt="" onclick="openPhotoLightbox(this.src,this.alt||'Photo produit')" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;cursor:zoom-in">`:`<div class="emoji">${marketProductEmoji(p)}</div>`;
    return `<div class="product">${image}<h3>${esc(name)}</h3><p class="small">${esc(desc)}</p><div class="price">${money(price)}</div><div class="small">📦 Produit ${String(p.type_produit||"numérique").toLowerCase()==="physique"?"physique":"numérique"} BuSAF</div><button class="btn" style="width:100%;padding:5px 4px;font-size:9px;margin-top:3px" onclick="viewMarketProduct('${String(p.id).replace(/'/g,"\'")}')">📦 VOIR / ACHETER</button>${marketCanPublish()?`<button class="btn red" onclick="deleteMarketProduct('${String(p.id).replace(/'/g,"\'")}')">🗑️ SUPPRIMER</button>`:''}</div>`;
  }).join('');
  const founderButton=marketCanPublish()?`<button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button>`:'';
- const empty=state.marketCatalogLoaded?`<div class="empty">Aucun produit numérique/business n'est encore publié dans le Marché BuSAF.</div>`:`<div class="empty">Chargement des produits du Marché BuSAF…</div>`;
+ const empty=state.marketCatalogLoaded?`<div class="empty">Aucun produit n'est encore publié dans le Marché BuSAF.</div>`:`<div class="empty">Chargement des produits du Marché BuSAF…</div>`;
  return page("🛒 Marché BuSAF",`<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits actifs affichés viennent de <strong>public.produits</strong> : numériques et physiques.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><button class="btn alt small" onclick="setScreen('boutique')">🏪 MA BOUTIQUE</button></div>${founderButton}<div class="productgrid">${cards||empty}</div>`);
 }
 async function refreshMarketCatalog(){await loadMarketCatalog(true);render();}
