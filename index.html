@@ -1258,21 +1258,41 @@ async function restoreAuthenticatedSession(){
     state.email=user.email||localStorage.getItem("busaf_email")||"";
     localStorage.setItem("busaf_user_id",state.userId);
     localStorage.setItem("busaf_email",state.email);
-    await loadProfile();
-    if(!state.profile)throw new Error("Profil BuSAF introuvable.");
+    // Le profil peut répondre plus lentement que l'authentification sur mobile.
+    let profileError=null;
+    for(let attempt=0;attempt<2;attempt++){
+      try{ await loadProfile(); profileError=null; break; }
+      catch(err){ profileError=err; if(attempt===0)await new Promise(resolve=>setTimeout(resolve,700)); }
+    }
+    if(!state.profile){
+      if(profileError)throw profileError;
+      throw new Error("Profil BuSAF introuvable.");
+    }
     state.screen="member";
     return true;
   }catch(e){
     console.warn("Restauration de session BuSAF impossible :",e.message||e);
-    // Ne pas effacer les identifiants en cas de panne réseau temporaire.
     const msg=String(e?.message||"").toLowerCase();
-    if(/expired|invalid.*refresh|refresh.*invalid|session a expiré|token.*invalid|401|403/.test(msg)){
+    const invalidSession=/invalid.*refresh|refresh.*invalid|refresh token.*not found|session a expiré|token is expired|jwt expired|invalid jwt/.test(msg);
+    if(invalidSession){
       localStorage.removeItem("busaf_access_token");
       localStorage.removeItem("busaf_refresh_token");
       localStorage.removeItem("busaf_user_id");
       localStorage.removeItem("busaf_email");
+      state.userId=""; state.email=""; state.token=""; state.profile=null; state.screen="public";
+      return false;
     }
-    state.userId=""; state.email=""; state.token=""; state.profile=null; state.screen="public";
+    // Une panne réseau ou un délai serveur ne doit jamais déconnecter le membre.
+    const savedUserId=localStorage.getItem("busaf_user_id")||"";
+    if(savedUserId){
+      state.userId=savedUserId;
+      state.email=localStorage.getItem("busaf_email")||"";
+      state.token=storedToken;
+      state.screen="member";
+      state.sessionRestoreWarning="Connexion au serveur lente. Ton compte reste mémorisé; réessaie dans un instant.";
+      return true;
+    }
+    state.screen="public";
     return false;
   }
 }
@@ -3064,10 +3084,11 @@ async function start(){
     console.error("Erreur démarrage BuSAF:",e);
     // En cas d'erreur de session ou de données locales, revenir proprement à l'accueil public.
     try{
-      localStorage.removeItem("busaf_access_token");
-      localStorage.removeItem("busaf_user_id");
-      localStorage.removeItem("busaf_email");
-      state.userId=""; state.email=""; state.token=""; state.profile=null; state.screen="public";
+      // Ne jamais supprimer une session valide à cause d'une erreur d'affichage ou de réseau.
+      state.userId=state.userId||localStorage.getItem("busaf_user_id")||"";
+      state.email=state.email||localStorage.getItem("busaf_email")||"";
+      state.token=state.token||localStorage.getItem("busaf_access_token")||"";
+      state.screen=state.userId?"member":"public";
       state.sales=Array.isArray(state.sales)?state.sales:[];
       state.orders=Array.isArray(state.orders)?state.orders:[];
       state.invites=Array.isArray(state.invites)?state.invites:[];
