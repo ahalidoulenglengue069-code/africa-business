@@ -1178,6 +1178,7 @@ function setScreen(screen){
  history.pushState({busafScreen:screen},"","#"+screen);
  render();
  if(screen==="founderPayments" && isFounder())refreshFounderPayments();
+ if(screen==="stockMarket" && state.userId)loadMarketDepot().then(()=>{if(state.screen===screen)render();});
  if(screen==="market" || screen==="public" || screen==="products" || screen==="founderMarket" || screen==="founderStocks"){
   // Toujours actualiser les données du Marché en arrière-plan à l'ouverture,
   // sans demander au visiteur de recharger toute la page.
@@ -2938,7 +2939,34 @@ function finalizeStockSale(productId,qty){
  openModal("Vente enregistrée",`<div class="notice success">${qty} unité(s) retirée(s) du Stock BuSAF et vente enregistrée.</div><div class="notice warning">Le paiement réel et la validation financière doivent être confirmés côté serveur.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
 }
 
-function memberStockMarket(){return page("📦 Stock BuSAF",`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Stock BuSAF est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
+async function loadMarketDepot(){
+ if(!state.profile?.id||!state.token)return;
+ try{
+  const rows=await api('/rest/v1/busaf_depot_vente?select=produit_id,quantite,produits(nom,prix,image_url,type_produit)&proprietaire_id=eq.'+encodeURIComponent(state.profile.id)+'&order=updated_at.desc');
+  if(!Array.isArray(rows))throw new Error('Réponse du dépôt invalide.');
+  state.marketStockItems=rows.map(row=>({
+   productId:String(row.produit_id),
+   name:row.produits?.nom||'Produit BuSAF',
+   emoji:'📦',
+   price:Number(row.produits?.prix||0),
+   qty:Number(row.quantite||0),
+   image:row.produits?.image_url||'',
+   type:row.produits?.type_produit||''
+  })).filter(x=>x.qty>0);
+  state.marketStock=state.marketStockItems.reduce((sum,x)=>sum+x.qty,0);
+  saveState();
+ }catch(e){console.warn('Chargement du dépôt de vente BuSAF:',e);}
+}
+function memberStockMarket(){return page("📦 Dépôt de vente BuSAF",`<div class="stat">Produits disponibles<strong>${state.marketStock}</strong></div><div class="notice success">Chaque achat confirmé par YengaPay est ajouté automatiquement à ton dépôt de vente.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité disponible : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="shareMarketProduct('${String(x.productId).replace(/'/g,"\\\\'")}')">📲 PARTAGER LE PRODUIT</button></li>`).join("")}</ul>`:`<div class="empty">Ton dépôt de vente est vide. Achète un produit du Marché ; après confirmation du paiement, il apparaîtra ici.</div>`}`);}
+function shareMarketProduct(productId){
+ const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
+ if(!p){openModal('Produit indisponible','<div class="notice warning">Recharge le Marché pour partager ce produit.</div>');return;}
+ const link=location.origin+location.pathname+'#market-product='+encodeURIComponent(productId)+'&invite='+encodeURIComponent(invitationCode());
+ const message='Découvre ce produit sur BuSAF : '+(p.nom||'Produit')+' — '+money(Number(p.prix||0))+' FCFA\\n'+link;
+ if(navigator.share){navigator.share({title:'Produit BuSAF',text:message}).catch(()=>{});return;}
+ openModal('Partager le produit',`<textarea readonly>${esc(message)}</textarea><button class="btn" onclick="navigator.clipboard.writeText(${JSON.stringify(message)}).then(()=>openModal('Copié','<div class=notice success>Le lien est copié.</div>')).catch(()=>{})">COPIER LE LIEN</button>`);
+}
+`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Stock BuSAF est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
 
 function memberStockBoutique(){
  const realProducts=filterRealProducts(state.boutiqueProducts);
