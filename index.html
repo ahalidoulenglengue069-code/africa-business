@@ -2210,6 +2210,12 @@ function viewMarketProduct(id){
  const shareButton=state.userId&&state.profile?'<button class="btn alt" onclick="shareMarketProduct(\''+String(id).replace(/'/g,"\\'")+'\')">📲 PARTAGER CE PRODUIT</button>':'';
  openModal('📦 Produit du Marché',`<div class="rule"><h3>${esc(p.nom||'Produit')}</h3><p>${esc(p.description||'')}</p><strong>Prix : ${money(price)}</strong></div><div class="notice">Tu peux partager ce produit sans l'acheter : cela sert au parrainage. Pour le revendre et obtenir le bénéfice vendeur, ton achat doit être confirmé et le produit ajouté à ton dépôt.</div>${shareButton}<button class="btn" onclick="closeModal();startMarketPurchase('${String(id).replace(/'/g,"\\'")}')">💳 ACHETER AVEC YENGAPAY</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
 }
+function openSponsorEligibleProducts(ids,errorMessage){
+ const allowed=new Set((Array.isArray(ids)?ids:[]).map(String));
+ const products=(state.marketCatalog||[]).filter(p=>allowed.has(String(p.id)));
+ const content=products.length?'<div class="notice">Pour ton premier achat, choisis un produit déjà acheté et confirmé par ton parrain direct.</div><div class="productgrid">'+products.map(p=>'<div class="product">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="" loading="lazy">':'<div class="emoji">📦</div>')+'<h3>'+esc(p.nom||'Produit BuSAF')+'</h3><div class="price">'+money(p.prix||0)+' FCFA</div><button class="btn" onclick="closeModal();startMarketPurchase(\''+String(p.id).replace(/'/g,"\\\\'")+'\')">CHOISIR CE PRODUIT</button></div>').join('')+'</div>':'<div class="notice warning">Ton parrain direct n’a pas encore de produit éligible confirmé. Il doit d’abord acheter un produit du Marché. Dès que son paiement sera confirmé, ses produits apparaîtront ici automatiquement.</div>';
+ openModal('🛒 Produits de ton parrain direct',content+'<button class="btn alt" onclick="closeModal()">FERMER</button>');
+}
 async function startMarketPurchase(productId){
  if(!state.userId||!state.token){
    openModal('🔐 Connexion requise',`<div class="notice warning">Connecte-toi à ton compte BuSAF pour acheter un produit du Marché.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
@@ -2231,7 +2237,13 @@ async function startMarketPurchase(productId){
    const text=await response.text();
    let data={};
    try{data=text?JSON.parse(text):{};}catch{data={};}
-   if(!response.ok)throw new Error(data.error||data.message||data.details?.message||'Impossible de préparer le paiement.');
+   if(!response.ok){
+     if(Array.isArray(data.sponsor_product_ids)){
+       openSponsorEligibleProducts(data.sponsor_product_ids,data.error||'Premier achat réservé aux produits déjà achetés par ton parrain direct.');
+       return;
+     }
+     throw new Error(data.error||data.message||data.details?.message||'Impossible de préparer le paiement.');
+   }
    if(!data.checkout_url)throw new Error('YengaPay n’a pas retourné de page de paiement.');
    closeModal();
    window.location.href=data.checkout_url;
