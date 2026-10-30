@@ -2071,7 +2071,7 @@ function signupPage(){
    <option value="Autre pays">🌐 Autre pays</option>
   </select>
   <label>Code d'invitation</label>
-  <input id="regCode" required placeholder="Code reçu de votre invitant">
+  <input id="regCode" required placeholder="Code reçu de votre invitant" value="${esc(localStorage.getItem("busaf_pending_invite")||"")}">
   <label>Mot de passe</label>
   <input id="regPassword" type="password" minlength="6" required placeholder="6 caractères minimum">
   <button class="btn" id="regBtn">CRÉER MON COMPTE</button>
@@ -2207,9 +2207,9 @@ function viewMarketProduct(id){
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(id));
  if(!p)return;
  const price=Number(p.prix||0);
- openModal('📦 Produit du Marché',`<div class="rule"><h3>${esc(p.nom||'Produit')}</h3><p>${esc(p.description||'')}</p><strong>Prix : ${money(price)}</strong></div><div class="notice">Le paiement est traité côté serveur. Après confirmation YengaPay, BuSAF synchronise automatiquement l'achat dans ton Stock.</div><button class="btn" onclick="closeModal();startMarketPurchase('${String(id).replace(/'/g,"\'")}')">💳 ACHETER AVEC YENGAPAY</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
+ const shareButton=state.userId&&state.profile?'<button class="btn alt" onclick="shareMarketProduct(\''+String(id).replace(/'/g,"\\'")+'\')">📲 PARTAGER CE PRODUIT</button>':'';
+ openModal('📦 Produit du Marché',`<div class="rule"><h3>${esc(p.nom||'Produit')}</h3><p>${esc(p.description||'')}</p><strong>Prix : ${money(price)}</strong></div><div class="notice">Tu peux partager ce produit sans l'acheter : cela sert au parrainage. Pour le revendre et obtenir le bénéfice vendeur, ton achat doit être confirmé et le produit ajouté à ton dépôt.</div>${shareButton}<button class="btn" onclick="closeModal();startMarketPurchase('${String(id).replace(/'/g,"\\'")}')">💳 ACHETER AVEC YENGAPAY</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
 }
-
 async function startMarketPurchase(productId){
  if(!state.userId||!state.token){
    openModal('🔐 Connexion requise',`<div class="notice warning">Connecte-toi à ton compte BuSAF pour acheter un produit du Marché.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
@@ -2961,10 +2961,16 @@ function memberStockMarket(){return page("📦 Dépôt de vente BuSAF",`<div cla
 function shareMarketProduct(productId){
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
  if(!p){openModal('Produit indisponible','<div class="notice warning">Recharge le Marché pour partager ce produit.</div>');return;}
- const link=location.origin+location.pathname+'#market-product='+encodeURIComponent(productId)+'&invite='+encodeURIComponent(invitationCode());
- const message='Découvre ce produit sur BuSAF : '+(p.nom||'Produit')+' — '+money(Number(p.prix||0))+' FCFA\\n'+link;
- if(navigator.share){navigator.share({title:'Produit BuSAF',text:message}).catch(()=>{});return;}
- openModal('Partager le produit',`<textarea readonly>${esc(message)}</textarea><button class="btn" onclick="navigator.clipboard.writeText(${JSON.stringify(message)}).then(()=>openModal('Copié','<div class=notice success>Le lien est copié.</div>')).catch(()=>{})">COPIER LE LIEN</button>`);
+ if(!canInvite()){openModal('Connexion requise','<div class="notice warning">Connecte-toi pour partager un produit avec ton code de parrainage.</div><button class="btn" onclick="closeModal();setScreen(\'login\')">SE CONNECTER</button>');return;}
+ const link=location.origin+location.pathname+'#signup?invite='+encodeURIComponent(invitationCode())+'&product='+encodeURIComponent(productId);
+ const message='Découvre ce produit sur BuSAF : '+(p.nom||'Produit')+' — '+money(Number(p.prix||0))+' FCFA\nCrée ton compte avec mon invitation :\n'+link;
+ if(navigator.share){navigator.share({title:'Produit BuSAF',text:message}).catch(e=>{if(e.name!=="AbortError")openModal('Partager le produit',`<textarea readonly>${esc(message)}</textarea><button class="btn" onclick="copyBuSAFText()">COPIER LE LIEN</button>`);});return;}
+ openModal('Partager le produit',`<textarea id="busafShareText" readonly>${esc(message)}</textarea><button class="btn" onclick="copyBuSAFText()">COPIER LE LIEN</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
+}
+async function copyBuSAFText(){
+ const value=document.getElementById("busafShareText")?.value||"";
+ try{await navigator.clipboard.writeText(value);openModal("Lien copié",'<div class="notice success">Le lien de partage est copié.</div><button class="btn" onclick="closeModal()">OK</button>');}
+ catch(e){openModal("Copie manuelle",`<textarea readonly>${esc(value)}</textarea><button class="btn" onclick="closeModal()">FERMER</button>`);}
 }
 `<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Stock BuSAF est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
 
@@ -3165,11 +3171,18 @@ async function start(){
   try{
     const recovery=await handlePasswordRecovery();
     if(recovery)return;
-    const h=location.hash.replace(/^#/,"");
-    if(h && ["public","market","benefits","profits","commissions","rules","signup","login"].includes(h)){
-      state.screen=h;
+    const rawHash=location.hash.replace(/^#/,"");
+    const routeParts=rawHash.split("?");
+    const route=routeParts[0]||"";
+    const routeParams=new URLSearchParams(routeParts.slice(1).join("?"));
+    const inviteFromLink=(routeParams.get("invite")||"").trim().toUpperCase();
+    const sharedProductId=routeParams.get("product")||"";
+    if(inviteFromLink)localStorage.setItem("busaf_pending_invite",inviteFromLink);
+    if(sharedProductId)localStorage.setItem("busaf_shared_product",sharedProductId);
+    if(route && ["public","market","benefits","profits","commissions","rules","signup","login"].includes(route)){
+      state.screen=route;
     }else{
-      state.screen="public";
+      state.screen=sharedProductId?"signup":"public";
     }
     history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
 
