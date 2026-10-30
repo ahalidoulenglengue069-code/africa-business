@@ -1608,7 +1608,7 @@ function directResale(id){
 function buyProduct(id,mode){
  const p=productForId(id);if(!p)return;
  if(hasBoughtProduct(id)){
-   openModal('✅ Déjà acheté',`<div class="notice success">Tu as déjà acheté <strong>${esc(p.name)}</strong>. Un même produit ne peut pas être acheté deux fois par le même membre.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);return;
+   openModal('✅ Déjà acheté',`<div class="notice success">Tu as déjà acheté <strong>${esc(p.name)}</strong>. Un même produit ne peut pas être acheté deux fois par le même membre.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON DÉPÔT</button>`);return;
  }
  if(mode==='direct'){directResale(id);return;}
  state.orders.unshift({id:Date.now(),product:p.name,productId:p.id,price:p.price,date:new Date().toLocaleString('fr-FR'),mode:'first_purchase',fromSponsor:true});
@@ -1856,7 +1856,7 @@ function founderPayments(){
  if(!isFounder())return memberHome();
  const rows=state.founderPayments||[];
  const list=state.founderPaymentsLoading?`<div class="empty">Chargement automatique des paiements…</div>`:state.founderPaymentsError?`<div class="notice error">${esc(state.founderPaymentsError)}</div>`:rows.length?`<div class="list">${rows.map(v=>`<div class="rule"><strong>${money(v.montant||0)}</strong> — ${esc(v.statut||'—')}<br>Produit : ${esc((state.marketCatalog||[]).find(p=>String(p.id)===String(v.produit_id))?.nom||'Produit BuSAF')}<br>Acheteur : ${esc(v.acheteur_id||'—')}<br>Référence : ${esc(v.reference||'—')}<br><span class="small">${esc(v.created_at||'')}</span></div>`).join('')}</div>`:`<div class="empty">Aucune transaction accessible pour le moment. Appuie sur Actualiser pour réessayer.</div>`;
- return page('💳 Paiements & ventes',`<div class="notice">Transactions chargées automatiquement depuis Supabase. Les transactions en attente ou expirées ne sont pas encore des ventes confirmées.</div><div id="founderPaymentsList">${list}</div><button class="btn alt" onclick="refreshFounderPayments()">🔄 Actualiser</button>`);
+ return page('💳 Paiements & ventes',`<div class="notice">Transactions chargées automatiquement depuis Supabase. Les transactions en attente ou expirées ne sont pas encore des ventes confirmées.</div><div id="founderPaymentsList">${list}</div><section class="rule"><h3>🧾 Reventes des membres à confirmer</h3><div id="founderResalesList">Chargement des demandes de revente…</div></section><button class="btn alt" onclick="refreshFounderPayments()">🔄 Actualiser</button>`);
 }
 async function refreshFounderPayments(){
  if(!isFounder()||state.founderPaymentsLoading)return;
@@ -1870,6 +1870,7 @@ async function refreshFounderPayments(){
   });
   state.founderPayments=Array.isArray(rows)?rows:[];
   state.founderPaymentsLoaded=true;
+  await loadFounderResales();
  }catch(e){
   state.founderPaymentsError=e.message||'Erreur de chargement';
   console.error('Chargement paiements BuSAF :',e);
@@ -1877,6 +1878,25 @@ async function refreshFounderPayments(){
   state.founderPaymentsLoading=false;
   if(state.screen==='founderPayments')render();
  }
+}
+async function loadFounderResales(){
+ const el=document.getElementById('founderResalesList');
+ try{
+  const rows=await api('/rest/v1/busaf_reventes?select=id,reference,vendeur_id,produit_id,quantite,nom_client,moyen_paiement,montant,statut,created_at&statut=eq.en_attente&order=created_at.asc');
+  const items=Array.isArray(rows)?rows:[];
+  if(el)el.innerHTML=items.length?items.map(r=>{
+   const product=(state.marketCatalog||[]).find(p=>String(p.id)===String(r.produit_id));
+   return `<div class="rule"><strong>${esc(product?.nom||'Produit BuSAF')}</strong><br>Vendeur : ${esc(r.vendeur_id)}<br>Client : ${esc(r.nom_client)}<br>Quantité : ${Number(r.quantite||0)}<br>Montant : ${money(r.montant)} FCFA<br>Paiement déclaré : ${esc(r.moyen_paiement)}<br>Réf. : ${esc(r.reference)}<br><button class="btn" onclick="processFounderResale('${r.id}',true)">CONFIRMER LE PAIEMENT</button> <button class="btn red" onclick="processFounderResale('${r.id}',false)">REFUSER</button></div>`;
+  }).join(''):'<div class="empty">Aucune revente en attente.</div>';
+ }catch(e){if(el)el.innerHTML='<div class="notice error">'+esc(e.message||'Chargement impossible')+'</div>';}
+}
+async function processFounderResale(id,confirmSale){
+ if(!confirm(confirmSale?'Confirmer la réception du paiement et retirer la quantité du dépôt du vendeur ?':'Refuser cette demande de revente ?'))return;
+ try{
+  await api('/rest/v1/rpc/busaf_confirmer_revente',{method:'POST',body:JSON.stringify({p_revente_id:id,p_confirmer:confirmSale}),timeoutMs:15000});
+  await loadFounderResales();
+  alert(confirmSale?'Revente confirmée. Le dépôt du vendeur a été mis à jour.':'Demande de revente refusée.');
+ }catch(e){alert('Opération impossible : '+(e.message||'Erreur inconnue'));}
 }
 function founderWallet(){
  if(!isFounder())return memberHome();
@@ -2931,14 +2951,21 @@ function confirmStockSale(productId){
  if(!item||qty<1||qty>item.qty){alert("Quantité invalide.");return;}
  openModal("Confirmer la vente",`<div class="rule"><strong>${esc(item.name)}</strong><br>Quantité : ${qty}<br>Total : ${money(item.price*qty)}</div><label>Nom du client</label><input id="stockCustomer"><label>Mode de paiement</label><select id="stockPayment"><option>Orange Money</option><option>Wave</option><option>Moov Money</option><option>Telecel Money</option><option>Autre</option></select><button class="btn" onclick="finalizeStockSale('${String(productId).replace(/'/g,"\\'")}',${qty})">VALIDER LA VENTE</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
 }
-function finalizeStockSale(productId,qty){
- const item=state.marketStockItems.find(x=>String(x.productId)===String(productId)),customer=document.getElementById("stockCustomer")?.value.trim(),pm=document.getElementById("stockPayment")?.value;
+async function finalizeStockSale(productId,qty){
+ const item=state.marketStockItems.find(x=>String(x.productId)===String(productId));
+ const customer=document.getElementById("stockCustomer")?.value.trim();
+ const pm=document.getElementById("stockPayment")?.value;
  if(!item||!customer){alert("Nom du client obligatoire.");return;}
- item.qty-=qty;state.marketStock=Math.max(0,state.marketStock-qty);
- recordMarketSale(productId,qty,customer,pm);
- state.orders.unshift({id:Date.now(),product:item.name,productId:String(productId),price:item.price*qty,date:new Date().toLocaleString('fr-FR'),mode:"revente_stock",customer});
- saveState();closeModal();
- openModal("Vente enregistrée",`<div class="notice success">${qty} unité(s) retirée(s) du Stock BuSAF et vente enregistrée.</div><div class="notice warning">Le paiement réel et la validation financière doivent être confirmés côté serveur.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
+ const btn=document.querySelector('#modalbox button[onclick^="finalizeStockSale"]');
+ if(btn){btn.disabled=true;btn.textContent="ENREGISTREMENT…";}
+ try{
+  const result=await api('/rest/v1/rpc/busaf_demander_revente',{method:'POST',body:JSON.stringify({p_produit_id:productId,p_quantite:qty,p_nom_client:customer,p_moyen_paiement:pm}),timeoutMs:15000});
+  closeModal();
+  openModal("⏳ Revente en attente",`<div class="notice success">La demande de revente est enregistrée dans Supabase.</div><div class="rule">Référence : <strong>${esc(result?.reference||result?.id||"Enregistrée")}</strong><br>Montant : <strong>${money(result?.montant||item.price*qty)} FCFA</strong><br>Statut : <strong>En attente de confirmation</strong></div><div class="notice warning">Le dépôt ne sera diminué qu'après confirmation par le fondateur. Aucun bénéfice n'est crédité avant cette validation.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">RETOUR AU DÉPÔT</button>`);
+ }catch(e){
+  if(btn){btn.disabled=false;btn.textContent="VALIDER LA VENTE";}
+  openModal("❌ Revente non enregistrée",`<div class="notice error">${esc(e.message||"Impossible d'enregistrer la revente.")}</div><button class="btn" onclick="closeModal()">OK</button>`);
+ }
 }
 
 async function loadMarketDepot(){
@@ -2959,7 +2986,7 @@ async function loadMarketDepot(){
   saveState();
  }catch(e){console.warn('Chargement du dépôt de vente BuSAF:',e);}
 }
-function memberStockMarket(){return page("📦 Dépôt de vente BuSAF",`<div class="stat">Produits disponibles<strong>${state.marketStock}</strong></div><div class="notice success">Chaque achat confirmé par YengaPay est ajouté automatiquement à ton dépôt de vente.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité disponible : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="shareMarketProduct('${String(x.productId).replace(/'/g,"\\\\'")}')">📲 PARTAGER LE PRODUIT</button></li>`).join("")}</ul>`:`<div class="empty">Ton dépôt de vente est vide. Achète un produit du Marché ; après confirmation du paiement, il apparaîtra ici.</div>`}`);}
+function memberStockMarket(){return page("📦 Dépôt de vente",`<div class="stat">Produits disponibles<strong>${state.marketStock}</strong></div><div class="notice success">Chaque achat confirmé par YengaPay est ajouté automatiquement à ton dépôt de vente.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité disponible : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="shareMarketProduct('${String(x.productId).replace(/'/g,"\\\\'")}')">📲 PARTAGER LE PRODUIT</button></li>`).join("")}</ul>`:`<div class="empty">Ton dépôt de vente est vide. Achète un produit du Marché ; après confirmation du paiement, il apparaîtra ici.</div>`}`);}
 function shareMarketProduct(productId){
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
  if(!p){openModal('Produit indisponible','<div class="notice warning">Recharge le Marché pour partager ce produit.</div>');return;}
