@@ -902,6 +902,67 @@ input:focus,select:focus,textarea:focus{outline:2px solid #b9e4cb!important;bord
  .public-product .pprice{font-size:14px!important}
 }
 
+
+/* ===== NOUVELLE IDENTITÉ MARKETPLACE BuSAF ===== */
+:root{--green:#087a3d;--green2:#13a45a;--light:#f4f6f5;--text:#17231d;--muted:#68766e;--line:#e4eae6;--shadow:0 10px 30px rgba(17,45,29,.07)}
+body{background:#f5f7f5}
+.header{background:#fff;color:#17231d;border-bottom:1px solid #e8eee9;box-shadow:0 2px 12px rgba(0,0,0,.035);padding:13px 14px}
+.logo{color:#087a3d;font-size:27px;letter-spacing:-1px}
+.logo small{color:#68766e;opacity:1;font-size:11px;letter-spacing:.2px}
+.hbtn{background:#f0f6f2;border:1px solid #dce9df;color:#087a3d}
+.notif-top{color:#26372d}
+.wrap{max-width:1180px;padding:20px 16px 112px}
+.hero,.card,.info{border:1px solid #e8eee9;border-radius:18px;box-shadow:0 8px 26px rgba(20,48,31,.045)}
+.market-hero{max-width:1180px;margin:8px auto 18px;padding:34px 34px;min-height:270px;border-radius:24px;background:linear-gradient(115deg,#073e28 0%,#087a3d 58%,#15a45b 100%);color:#fff;display:grid;grid-template-columns:1.3fr .7fr;align-items:center;overflow:hidden;position:relative}
+.market-hero-copy{position:relative;z-index:2;max-width:640px}
+.market-eyebrow{font-size:11px;font-weight:900;letter-spacing:2px;color:#bce9ca}
+.market-hero h1{font-size:clamp(30px,5vw,48px);line-height:1.08;margin:12px 0;color:#fff;letter-spacing:-1.5px}
+.market-hero h1 em{font-style:normal;color:#c4f2d1}
+.market-hero p{max-width:580px;color:#e4f4e9;line-height:1.65;font-size:15px}
+.market-hero-art{height:200px;position:relative;display:flex;align-items:center;justify-content:center}
+.market-orbit{width:170px;height:170px;border:1px solid rgba(255,255,255,.35);border-radius:50%;display:grid;place-items:center;font-size:76px;background:radial-gradient(circle,rgba(255,255,255,.22),rgba(255,255,255,.02));box-shadow:0 0 0 20px rgba(255,255,255,.05),0 0 0 42px rgba(255,255,255,.035)}
+.market-float{position:absolute;background:#fff;color:#173523;padding:11px 15px;border-radius:12px;font-size:12px;font-weight:900;box-shadow:0 8px 22px rgba(0,0,0,.16)}
+.market-float-one{top:18px;right:2px}.market-float-two{bottom:12px;left:0}
+.public-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.public-action{width:auto;min-width:160px;border-radius:11px;padding:13px 17px;font-weight:900}
+.public-action.primary{background:#fff;color:#087a3d}.public-action.secondary{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.55);color:#fff}
+.market-benefit-strip{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:0 auto 28px;max-width:1180px}
+.market-benefit-strip>div{background:#fff;border:1px solid #e8eee9;border-radius:13px;padding:13px;display:flex;align-items:center;gap:10px;font-size:12px;font-weight:800}
+.market-benefit-strip b{font-size:21px}
+.market-section-heading{max-width:1180px;margin:24px auto 12px;display:flex;justify-content:space-between;align-items:end;gap:12px}
+.market-section-heading span{font-size:10px;font-weight:900;letter-spacing:1.5px;color:#0a8a47}
+.market-section-heading h2{margin:4px 0 0;font-size:22px;color:#172b20}
+.market-section-heading button{border:0;background:transparent;color:#087a3d;font-weight:900}
+.market-product-grid{max-width:1180px;margin:0 auto 20px}
+.public-products{gap:12px}
+.public-info-grid{max-width:1180px;margin:0 auto;gap:12px}
+.market-info-grid .public-info-card{border-radius:15px;min-height:155px;padding:16px;text-align:left;align-items:flex-start;box-shadow:0 5px 18px rgba(0,0,0,.035)}
+.market-info-grid .pico{font-size:24px}
+.market-info-grid .public-info-card b{font-size:15px}
+.market-info-grid .public-info-card small{font-size:12px;line-height:1.5}
+.market-card-arrow{margin-top:auto;font-size:11px;font-weight:900;color:#087a3d}
+.market-join-banner{max-width:1180px;margin:24px auto 8px;padding:19px 22px;background:#e7f5eb;border:1px solid #d3ead9;border-radius:16px;display:flex;align-items:center;justify-content:space-between;gap:14px}
+.market-join-banner b,.market-join-banner small{display:block}.market-join-banner b{font-size:17px}.market-join-banner small{color:#5f7065;margin-top:4px}
+.market-join-banner button{border:0;border-radius:10px;background:#087a3d;color:white;padding:12px 18px;font-weight:900}
+.bottom,.quickbar{background:rgba(255,255,255,.98);border-top:1px solid #e6ece8;box-shadow:0 -5px 22px rgba(0,0,0,.055)}
+.quickbar button,.bottom button{color:#65736a;padding:10px 3px 11px}
+.quickbar button.active,.bottom button.active{color:#087a3d}
+.btn{background:#087a3d}
+@media(max-width:700px){
+ .wrap{padding:12px 11px 100px}
+ .market-hero{margin:4px 0 13px;padding:23px 19px;min-height:0;grid-template-columns:1fr}
+ .market-hero h1{font-size:33px;max-width:390px}
+ .market-hero p{font-size:13px}
+ .market-hero-art{display:none}
+ .public-actions{gap:8px}.public-action{min-width:0;flex:1;padding:12px 9px;font-size:11px}
+ .market-benefit-strip{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:22px}
+ .market-benefit-strip>div{padding:10px;font-size:10px}
+ .market-benefit-strip b{font-size:18px}
+ .market-section-heading h2{font-size:19px}
+ .market-join-banner{align-items:flex-start;flex-direction:column;margin-top:18px}
+ .market-join-banner button{width:100%}
+}
+
 </style>
 </head>
 <body>
@@ -1630,25 +1691,28 @@ function tile([id,ico,label]){
 
 function publicHome(){
  const publicProductsList=currentProducts();
- const preview=publicProductsList.slice(0,6).map(publicProductView).join('');
- const publicPreview=preview||`<div class="empty" style="grid-column:1/-1">${state.marketCatalogLoaded?"Aucun produit public n'est actuellement publié.":"Chargement des produits du Marché BuSAF…"}</div>`;
+ const preview=publicProductsList.slice(0,8).map(publicProductView).join('');
+ const publicPreview=preview||`<div class="empty" style="grid-column:1/-1">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement du catalogue BuSAF…"}</div>`;
  const infos=[
-  ['market','🛒','Produits du Marché','Découvrir les produits, leurs prix et le principe de revente.','accent-green'],
-  ['benefits','🎁','Avantages BuSAF','Comprendre les avantages réservés aux membres.','accent-gold'],
-  ['profits','💰','Bénéfices possibles','Voir comment le bénéfice vendeur de 12 % est calculé sur une revente validée.','accent-blue'],
-  ['commissions','🤝','Commissions possibles','Comprendre la commission de 7 % du parrain direct sur une revente validée.','accent-purple'],
-  ['rules','📜','Conditions & règlements','Lire les conditions avant de créer un compte.','accent-red']
+  ['market','🛍️','Explorer le marché','Découvrir les produits disponibles.','accent-green'],
+  ['profits','💸','Gains vendeur','Comprendre les bénéfices sur les ventes validées.','accent-blue'],
+  ['commissions','🤝','Parrainage','Découvrir les commissions du parrain direct.','accent-purple'],
+  ['benefits','⭐','Avantages membres','Voir les avantages et les étapes pour participer.','accent-gold'],
+  ['rules','📋','Règles & sécurité','Consulter les conditions de la plateforme.','accent-red']
  ];
- return `<section class="hero public-hero">
-   <h1>🌍 BuSAF</h1><p><strong>Business Africain</strong></p>
-   <p>Découvre le Marché BuSAF, les produits, les avantages, les bénéfices et les règles avant de rejoindre la plateforme.</p>
-   <div class="public-actions"><button class="public-action primary" onclick="setScreen('signup')">📝 CRÉER MON COMPTE</button><button class="public-action secondary" onclick="setScreen('login')">🔐 SE CONNECTER</button></div>
+ return `<section class="market-hero">
+   <div class="market-hero-copy"><span class="market-eyebrow">BUSINESS AFRICAIN</span>
+   <h1>Le commerce, <em>à portée de main.</em></h1>
+   <p>Découvre les produits BuSAF, commande en toute simplicité et développe ton activité grâce à la vente et au parrainage.</p>
+   <div class="public-actions"><button class="public-action primary" onclick="setScreen('market')">🛍️ EXPLORER LE MARCHÉ</button><button class="public-action secondary" onclick="setScreen('signup')">CRÉER UN COMPTE</button></div></div>
+   <div class="market-hero-art" aria-hidden="true"><div class="market-orbit">🌍</div><div class="market-float market-float-one">📦 Produits</div><div class="market-float market-float-two">💰 Opportunités</div></div>
  </section>
- <div class="public-section-head"><h2>🛒 Produits du Marché BuSAF</h2><small>Découverte publique</small></div>
- <div class="public-products">${publicPreview}</div>
- <div class="public-note">ℹ️ Les montants de bénéfice affichés ici sont une présentation indicative selon les règles BuSAF. Les opérations d'achat, de revente, de stock et de commission nécessitent un compte.</div>
- <div class="public-section-head"><h2>📚 Découvrir BuSAF</h2><small>5 espaces accessibles</small></div>
- <div class="public-info-grid">${infos.map(([id,ico,title,desc,accent])=>`<button class="public-info-card ${accent}" onclick="setScreen('${id}')"><span class="pico">${ico}</span><b>${title}</b><small>${desc}</small></button>`).join('')}</div>`;
+ <div class="market-benefit-strip"><div><b>🛒</b><span>Un marché centralisé</span></div><div><b>📦</b><span>Commandes suivies</span></div><div><b>🤝</b><span>Vente & parrainage</span></div><div><b>💳</b><span>Paiements BuSAF</span></div></div>
+ <div class="market-section-heading"><div><span>À DÉCOUVRIR</span><h2>Les produits du marché</h2></div><button onclick="setScreen('market')">Tout voir →</button></div>
+ <div class="public-products market-product-grid">${publicPreview}</div>
+ <div class="market-section-heading"><div><span>COMMENT ÇA MARCHE</span><h2>Une plateforme, plusieurs possibilités</h2></div></div>
+ <div class="public-info-grid market-info-grid">${infos.map(([id,ico,title,desc,accent])=>`<button class="public-info-card ${accent}" onclick="setScreen('${id}')"><span class="pico">${ico}</span><b>${title}</b><small>${desc}</small><span class="market-card-arrow">Découvrir →</span></button>`).join('')}</div>
+ <div class="market-join-banner"><div><b>Prêt à rejoindre BuSAF ?</b><small>Crée ton compte pour commander et développer ton activité.</small></div><button onclick="setScreen('signup')">Rejoindre BuSAF</button></div>`;
 }
 
 function founderApp(id,ico,label,desc){
