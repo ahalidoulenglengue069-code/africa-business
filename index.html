@@ -1173,6 +1173,7 @@ function setScreen(screen){
   if(screen==="notifications")render();
   if(screen==="founderPayments" && isFounder() && !state.founderPaymentsLoading)refreshFounderPayments();
   if(screen==="commissions" && state.userId)loadMemberCommissions();
+  if(screen==="profits" && state.userId)loadMemberProfits();
   return;
  }
  state.screen=screen;
@@ -1180,6 +1181,7 @@ function setScreen(screen){
  render();
  if(screen==="founderPayments" && isFounder())refreshFounderPayments();
  if(screen==="commissions" && state.userId)loadMemberCommissions();
+ if(screen==="profits" && state.userId)loadMemberProfits();
  if(screen==="stockMarket" && state.userId)loadMarketDepot().then(()=>{if(state.screen===screen){render();loadMemberResales();}});
  if(screen==="market" || screen==="public" || screen==="products" || screen==="founderMarket" || screen==="founderStocks"){
   // Toujours actualiser les données du Marché en arrière-plan à l'ouverture,
@@ -2820,19 +2822,44 @@ async function saveProfile(){
 }
 
 function memberProfits(){
- const seller=state.sales.reduce((a,x)=>a+Number(x.sellerProfit||0),0);
  return page("💰 Mes Bénéfices",`
  <div class="profit-cards">
-  <div class="profit-card profit-market"><span class="profit-label">🟢 Compte Marché</span><strong>${money(state.marketBalance)}</strong></div>
-  <div class="profit-card profit-boutique"><span class="profit-label">🔵 Compte Boutique</span><strong>${money(state.boutiqueBalance)}</strong></div>
-  <div class="profit-card profit-sales"><span class="profit-label">🟠 Ventes du Marché</span><strong>${money(seller)}</strong></div>
+  <div class="profit-card profit-market"><span class="profit-label">💰 Bénéfices vendeur (45 %)</span><strong id="memberSellerProfit">Chargement…</strong></div>
+  <div class="profit-card profit-boutique"><span class="profit-label">🤝 Commissions directes (8 %)</span><strong id="memberReferralCommission">Chargement…</strong></div>
+  <div class="profit-card profit-sales"><span class="profit-label">👛 Solde portefeuille confirmé</span><strong id="memberWalletBalance">Chargement…</strong></div>
  </div>
- <div class="notice warning">⚠️ Les bénéfices des ventes affichés ici sont enregistrés localement. Les soldes financiers officiels doivent être calculés et protégés dans Supabase.</div>
+ <div id="memberProfitMessage" class="small">Montants calculés à partir des opérations confirmées dans Supabase.</div>
  <div class="profit-actions">
   <button class="btn deposit-action" onclick="setScreen('money')">💙 DÉPÔT</button>
   <button class="btn withdraw-action" onclick="setScreen('money')">🔴 RETRAIT</button>
   <button class="btn commission-action" onclick="setScreen('commissions')">🤝 MES COMMISSIONS</button>
- </div>`);
+ </div>
+ <button class="btn alt" onclick="loadMemberProfits()">🔄 ACTUALISER</button>`);
+}
+async function loadMemberProfits(){
+ const sellerEl=document.getElementById('memberSellerProfit');
+ const referralEl=document.getElementById('memberReferralCommission');
+ const walletEl=document.getElementById('memberWalletBalance');
+ const message=document.getElementById('memberProfitMessage');
+ if(!sellerEl||!referralEl||!walletEl)return;
+ if(!state.profile?.id||!state.token){message.textContent='Connecte-toi pour consulter tes montants.';return;}
+ try{
+  const [commissions,transactions]=await Promise.all([
+   api('/rest/v1/busaf_commissions?select=type_commission,montant,statut&beneficiaire_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=500',{timeoutMs:15000}),
+   api('/rest/v1/busaf_transactions_portefeuille?select=montant,sens,statut&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=500',{timeoutMs:15000})
+  ]);
+  const confirmed=(Array.isArray(commissions)?commissions:[]).filter(x=>x.statut==='confirmee');
+  const seller=confirmed.filter(x=>x.type_commission==='benefice_vendeur_45').reduce((n,x)=>n+Number(x.montant||0),0);
+  const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_8').reduce((n,x)=>n+Number(x.montant||0),0);
+  const tx=(Array.isArray(transactions)?transactions:[]).filter(x=>x.statut==='confirmee');
+  const balance=tx.reduce((n,x)=>n+(x.sens==='credit'?1:-1)*Number(x.montant||0),0);
+  sellerEl.textContent=money(seller)+' FCFA';
+  referralEl.textContent=money(referral)+' FCFA';
+  walletEl.textContent=money(balance)+' FCFA';
+  message.textContent='Données confirmées et synchronisées depuis Supabase.';
+ }catch(e){
+  message.textContent='Chargement impossible : '+(e.message||'Erreur Supabase');
+ }
 }
 
 function memberCommissions(){return page("🤝 Mes Commissions",`<div id="memberCommissionSummary"><div class="empty">Chargement de tes commissions réelles…</div></div><div id="memberCommissionRows"></div><div class="rule"><h3>Règle BuSAF</h3><p>Le parrain direct reçoit 8 % après le premier achat confirmé et sur les reventes validées de ses invités directs. Aucun niveau indirect n'est commissionné.</p></div><button class="btn alt" onclick="loadMemberCommissions()">🔄 ACTUALISER</button><button class="btn" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
