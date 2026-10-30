@@ -1576,29 +1576,6 @@ function dayKey(d=new Date()){return d.toISOString().slice(0,10);}
 function monthlySalesCount(){const k=monthKey();const rows=Array.isArray(state.sales)?state.sales:[];return rows.filter(x=>x&&monthKey(new Date(x.date))===k).reduce((a,x)=>a+Number(x.qty||0),0);}
 function dailySalesCount(){const k=dayKey();const rows=Array.isArray(state.sales)?state.sales:[];return rows.filter(x=>x&&dayKey(new Date(x.date))===k).reduce((a,x)=>a+Number(x.qty||0),0);}
 function totalSalesCount(){const rows=Array.isArray(state.sales)?state.sales:[];return rows.reduce((a,x)=>a+Number(x.qty||0),0);}
-function recordMarketSale(productId,qty,customer,paymentMethod){
- const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
- if(!p)return;
- const productName=p.nom||"Produit BuSAF";
- const productPrice=Number(p.prix||0);
- const now=new Date();
- const resaleTotal=productPrice*qty;
- const sellerProfit=resaleTotal*0.12;
- const sponsorCommission=resaleTotal*0.07;
- state.sales.unshift({id:Date.now(),productId:p.id,product:productName,qty,customer,paymentMethod,date:now.toISOString(),sellerProfit,sponsorCommission,total:resaleTotal,validated:true});
- state.marketSales=totalSalesCount();
- state.marketBalance+=sellerProfit;
- addNotification('💰 Revente validée',`${qty} × ${productName} : bénéfice vendeur 12 % = ${money(sellerProfit)}.`,`market_sale`);
- addNotification('🤝 Parrain direct',`La commission de 7 % est réservée au parrain direct du vendeur : ${money(sponsorCommission)}.`,`sponsor_commission`);
- const after=totalSalesCount();
- const before=after-qty;
- for(let palier=Math.floor(before/100)+1;palier<=Math.floor(after/100);palier++){
-   addNotification('🏆 Palier 100 ventes',`Le palier ${palier*100} ventes du Marché BuSAF est atteint.`,`bonus100`);
- }
- if(monthlySalesCount()>=10 && !state.notifications.some(n=>n.type==='partner'&&n.month===monthKey(now)))
-   addNotification('⭐ Partner','10 ventes validées du Marché BuSAF atteintes ce mois-ci.','partner');
- saveState();
-}
 function hasBoughtProduct(id){return state.orders.some(o=>['stock','direct','first_purchase','yengapay_purchase'].includes(o.mode) && String(o.productId)===String(id));}
 function directResale(id){
  const p=productForId(id);
