@@ -1491,6 +1491,7 @@ async function signup(e){
   }),headers:{"Prefer":"return=representation"}});
 
   state.profile=Array.isArray(rows)?rows[0]:rows;
+  localStorage.removeItem("busaf_pending_invite");
   setScreen("member");
  }catch(err){
   msg.className="notice error";msg.textContent="❌ "+err.message;
@@ -2088,7 +2089,7 @@ function publicMarket(){
  const products=currentProducts();
  const cards=products.map(publicProductView).join('');
  return page("🛒 Marché BuSAF",`
-<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits affichés viennent de <strong>public.produits</strong>. Les produits physiques des Boutiques sont exclus.</div>
+<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits actifs affichés viennent de <strong>public.produits</strong> : numériques et physiques.</div>
 <div class="rule"><h3>Ce que permet le Marché</h3><ul><li>Découvrir les produits réels publiés.</li><li>Acheter un produit.</li><li>Choisir entre revente directe et ajout au Stock BuSAF après achat.</li><li>Revendre les produits selon les règles BuSAF.</li><li>Participer aux avantages, commissions et paliers prévus.</li></ul></div>
 <div class="public-products">${cards||`<div class="empty" style="grid-column:1/-1">${state.marketCatalogLoaded?"Aucun produit public n'est actuellement publié.":"Chargement des produits du Marché BuSAF…"}</div>`}</div>
 <div class="notice warning">Les opérations d'achat, de vente, de stock, de commissions et de bonus réservées aux membres nécessitent un compte et le respect des conditions BuSAF.</div>
@@ -2149,7 +2150,7 @@ async function loadMarketCatalog(force=false){
  const request=(async()=>{
   try{
    // Cette requête fonctionne aussi pour un visiteur non connecté grâce à la policy anon SELECT.
-   // Les produits physiques sont exclus du Marché et aucun produit n'est filtré par son nom.
+   // Le Marché accepte les produits numériques et physiques ; les archives sont masquées.
    const rows=await api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
    state.marketCatalog=Array.isArray(rows)?rows.filter(p=>String(p.type_produit||'').toLowerCase()!=='archive'):[];
    state.marketCatalogLoaded=true;
@@ -2195,11 +2196,11 @@ function memberMarket(){
    const desc=p.description||'Produit numérique/business du Marché BuSAF.';
    const price=Number(p.prix||0);
    const image=p.image_url?`<img src="${esc(p.image_url)}" alt="" onclick="openPhotoLightbox(this.src,this.alt||'Photo produit')" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;cursor:zoom-in">`:`<div class="emoji">${marketProductEmoji(p)}</div>`;
-   return `<div class="product">${image}<h3>${esc(name)}</h3><p class="small">${esc(desc)}</p><div class="price">${money(price)}</div><div class="small">📱 Produit numérique/business BuSAF</div><button class="btn" style="width:100%;padding:5px 4px;font-size:9px;margin-top:3px" onclick="viewMarketProduct('${String(p.id).replace(/'/g,"\'")}')">📦 VOIR / ACHETER</button>${marketCanPublish()?`<button class="btn red" onclick="deleteMarketProduct('${String(p.id).replace(/'/g,"\'")}')">🗑️ SUPPRIMER</button>`:''}</div>`;
+   return `<div class="product">${image}<h3>${esc(name)}</h3><p class="small">${esc(desc)}</p><div class="price">${money(price)}</div><div class="small">📦 Produit ${String(p.type_produit||"numérique").toLowerCase()==="physique"?"physique":"numérique"} BuSAF</div><button class="btn" style="width:100%;padding:5px 4px;font-size:9px;margin-top:3px" onclick="viewMarketProduct('${String(p.id).replace(/'/g,"\'")}')">📦 VOIR / ACHETER</button>${marketCanPublish()?`<button class="btn red" onclick="deleteMarketProduct('${String(p.id).replace(/'/g,"\'")}')">🗑️ SUPPRIMER</button>`:''}</div>`;
  }).join('');
  const founderButton=marketCanPublish()?`<button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button>`:'';
  const empty=state.marketCatalogLoaded?`<div class="empty">Aucun produit numérique/business n'est encore publié dans le Marché BuSAF.</div>`:`<div class="empty">Chargement des produits du Marché BuSAF…</div>`;
- return page("🛒 Marché BuSAF",`<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits affichés viennent maintenant de <strong>public.produits</strong>. Les produits physiques des Boutiques sont exclus.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><button class="btn alt small" onclick="setScreen('boutique')">🏪 MA BOUTIQUE</button></div>${founderButton}<div class="productgrid">${cards||empty}</div>`);
+ return page("🛒 Marché BuSAF",`<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits actifs affichés viennent de <strong>public.produits</strong> : numériques et physiques.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><button class="btn alt small" onclick="setScreen('boutique')">🏪 MA BOUTIQUE</button></div>${founderButton}<div class="productgrid">${cards||empty}</div>`);
 }
 async function refreshMarketCatalog(){await loadMarketCatalog(true);render();}
 function viewMarketProduct(id){
