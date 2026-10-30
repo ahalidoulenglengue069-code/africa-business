@@ -963,6 +963,25 @@ body{background:#f5f7f5}
  .market-join-banner button{width:100%}
 }
 
+
+/* Catalogue marketplace : cartes produits compactes, photo prioritaire */
+.market-product-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+.public-product.market-product-card{padding:0!important;border:1px solid #e8eee9!important;border-radius:15px!important;background:#fff;overflow:hidden;box-shadow:0 5px 18px rgba(19,51,31,.055)!important;display:flex;flex-direction:column;min-width:0}
+.market-product-image{position:relative;background:#f0f4f1;aspect-ratio:1/1;overflow:hidden}
+.market-product-image img{display:block;width:100%;height:100%;object-fit:cover;cursor:zoom-in}
+.market-product-tag{position:absolute;top:9px;left:9px;background:#fff;color:#087a3d;border-radius:6px;padding:5px 8px;font-size:9px;font-weight:900;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.market-product-info{padding:11px;display:flex;flex-direction:column;flex:1;min-width:0}
+.public-product.market-product-card h3{font-size:14px!important;line-height:1.3!important;margin:0 0 5px!important;color:#1d3025}
+.public-product.market-product-card .small{font-size:11px!important;line-height:1.4!important;color:#718077;white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:31px}
+.market-product-price{font-size:19px;font-weight:900;color:#087a3d;margin-top:9px}
+.market-product-price small{font-size:9px;letter-spacing:.5px}
+.public-product.market-product-card .benefit{margin-top:7px!important;background:#edf7ef!important;color:#16713b!important;border-radius:7px;padding:7px!important;font-size:10px!important}
+.public-product.market-product-card .market-product-button{margin-top:10px!important;min-height:39px!important;border-radius:9px!important;font-size:10px!important;display:flex;justify-content:space-between;align-items:center;padding:8px 10px!important}
+.market-product-button span{font-size:17px}
+.market-product-image .pemoji{height:100%;display:grid;place-items:center;font-size:56px}
+@media(max-width:900px){.market-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:600px){.market-product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.market-product-info{padding:9px}.public-product.market-product-card h3{font-size:12px!important}.market-product-price{font-size:16px}}
+
 </style>
 </head>
 <body>
@@ -1098,7 +1117,7 @@ function publicProductView(p){
  const price=Number(p?.prix||0);
  const image=p?.image_url||'';
  const img=image?`<img src="${esc(image)}" alt="${esc(p?.nom||'Produit')}" onclick="openPhotoLightbox(this.src,this.alt)" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;margin-bottom:4px;cursor:zoom-in" loading="lazy">`:'<div class="pemoji">📦</div>';
- return `<div class="public-product">${img}<h3>${esc(p?.nom||'Produit BuSAF')}</h3><div class="small">${esc(p?.description||'')}</div><div class="pprice">${money(price)}</div><div class="benefit">💰 Bénéfice vendeur indicatif : ${money(Math.round(price*0.12))}</div><button class="btn" style="width:100%;padding:5px 4px;font-size:9px;margin-top:3px" onclick="viewMarketProduct('${String(p?.id||'')}')">📦 VOIR LE PRODUIT</button></div>`;
+ return '<article class="public-product market-product-card"><div class="market-product-image">'+img+'<span class="market-product-tag">BuSAF</span></div><div class="market-product-info"><h3>'+esc(p?.nom||'Produit BuSAF')+'</h3><div class="small">'+esc(p?.description||'Découvrez ce produit du Marché BuSAF.')+'</div><div class="market-product-price">'+money(price)+' <small>FCFA</small></div><div class="benefit">Bénéfice vendeur indicatif : '+money(Math.round(price*0.12))+'</div><button class="btn market-product-button" onclick="viewMarketProduct(\''+String(p?.id||'')+'\')">DÉCOUVRIR LE PRODUIT <span>→</span></button></div></article>';
 }
 function productForId(id){
  return currentProducts().find(x=>String(x.id)===String(id))||null;
