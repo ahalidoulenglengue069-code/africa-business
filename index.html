@@ -1178,7 +1178,7 @@ function setScreen(screen){
  history.pushState({busafScreen:screen},"","#"+screen);
  render();
  if(screen==="founderPayments" && isFounder())refreshFounderPayments();
- if(screen==="stockMarket" && state.userId)loadMarketDepot().then(()=>{if(state.screen===screen)render();});
+ if(screen==="stockMarket" && state.userId)loadMarketDepot().then(()=>{if(state.screen===screen){render();loadMemberResales();}});
  if(screen==="market" || screen==="public" || screen==="products" || screen==="founderMarket" || screen==="founderStocks"){
   // Toujours actualiser les données du Marché en arrière-plan à l'ouverture,
   // sans demander au visiteur de recharger toute la page.
@@ -2963,7 +2963,20 @@ async function loadMarketDepot(){
   saveState();
  }catch(e){console.warn('Chargement du dépôt de vente BuSAF:',e);}
 }
-function memberStockMarket(){return page("📦 Dépôt de vente",`<div class="stat">Produits disponibles<strong>${state.marketStock}</strong></div><div class="notice success">Chaque achat confirmé par YengaPay est ajouté automatiquement à ton dépôt de vente.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité disponible : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="shareMarketProduct('${String(x.productId).replace(/'/g,"\\\\'")}')">📲 PARTAGER LE PRODUIT</button></li>`).join("")}</ul>`:`<div class="empty">Ton dépôt de vente est vide. Achète un produit du Marché ; après confirmation du paiement, il apparaîtra ici.</div>`}`);}
+async function loadMemberResales(){
+ const el=document.getElementById('memberResalesList');
+ if(!el||!state.profile?.id)return;
+ try{
+  const rows=await api('/rest/v1/busaf_reventes?select=id,reference,produit_id,quantite,nom_client,montant,statut,created_at&vendeur_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30');
+  const items=Array.isArray(rows)?rows:[];
+  el.innerHTML=items.length?items.map(r=>{
+   const product=(state.marketCatalog||[]).find(p=>String(p.id)===String(r.produit_id));
+   const status=r.statut==='confirmee'?'Confirmée':r.statut==='refusee'?'Refusée':'En attente';
+   return `<div class="rule"><strong>${esc(product?.nom||'Produit BuSAF')}</strong><br>Quantité : ${Number(r.quantite||0)} · ${money(r.montant)} FCFA<br>Client : ${esc(r.nom_client)}<br>Statut : <strong>${status}</strong><br><span class="small">${esc(r.reference||'')}</span></div>`;
+  }).join(''):'<div class="empty">Aucune revente enregistrée pour le moment.</div>';
+ }catch(e){el.innerHTML='<div class="notice error">'+esc(e.message||'Historique indisponible')+'</div>';}
+}
+function memberStockMarket(){return page("📦 Dépôt de vente",`<div class="stat">Produits disponibles<strong>${state.marketStock}</strong></div><div class="notice success">Chaque achat confirmé par YengaPay est ajouté automatiquement à ton dépôt de vente.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité disponible : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="shareMarketProduct('${String(x.productId).replace(/'/g,"\\\\'")}')">📲 PARTAGER LE PRODUIT</button><label>Quantité à revendre</label><input id="sellQty" type="number" min="1" max="${x.qty}" value="1"><button class="btn" onclick="confirmStockSale('${String(x.productId).replace(/'/g,"\\\\'")}')">💰 ENREGISTRER UNE REVENTE</button></li>`).join("")}</ul>`:`<div class="empty">Ton dépôt de vente est vide. Achète un produit du Marché ; après confirmation du paiement, il apparaîtra ici.</div>`}<section class="rule"><h3>📋 Mes reventes</h3><div id="memberResalesList">Chargement de tes reventes…</div><button class="btn alt" onclick="loadMemberResales()">🔄 ACTUALISER</button></section>`);}
 function shareMarketProduct(productId){
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
  if(!p){openModal('Produit indisponible','<div class="notice warning">Recharge le Marché pour partager ce produit.</div>');return;}
