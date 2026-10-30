@@ -3062,23 +3062,26 @@ async function start(){
     }
     history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
 
-    // Afficher l'interface immédiatement : le réseau ne doit pas bloquer les boutons.
-    render();
-    loadMarketCatalog().then(()=>{if(!state.userId)render();}).catch(e=>console.warn("Marché public non chargé :",e));
-
+    // Écran de démarrage stable : ne pas afficher brièvement l'accueil public
+    // avant de découvrir que le membre possède déjà une session active.
+    const app=document.getElementById("app");
+    if(app)app.innerHTML='<main style="min-height:65vh;display:grid;place-items:center;padding:28px;text-align:center;font-family:Arial;color:#174b32"><div><div style="font-size:34px">🌍</div><strong>Ouverture de BuSAF…</strong><p style="color:#64756b">Récupération de ta session et de tes données.</p></div></main>';
     const authenticated=await restoreAuthenticatedSession();
     if(authenticated){
       state.screen="member";
       history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
       render();
-      // Synchronisations secondaires en arrière-plan, après l'affichage.
+      // Charger les données complémentaires en arrière-plan sans remplacer l'espace affiché.
       loadMarketCatalog().then(async()=>{
         await syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
-        render();
+        if(state.screen==="member"||state.screen==="market")render();
       }).catch(e=>console.warn("Marché non chargé :",e));
       initBusafRealtime().catch(e=>console.warn("Realtime BuSAF indisponible :",e));
       syncSharedBusafEvents().catch(e=>console.warn("Événements non synchronisés :",e));
       if(!window.busafSyncTimer)window.busafSyncTimer=setInterval(()=>{syncSharedBusafEvents();},30000);
+    }else{
+      render();
+      loadMarketCatalog().then(()=>{if(!state.userId)render();}).catch(e=>console.warn("Marché public non chargé :",e));
     }
   }catch(e){
     console.error("Erreur démarrage BuSAF:",e);
