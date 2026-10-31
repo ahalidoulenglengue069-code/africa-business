@@ -2153,9 +2153,11 @@ function memberHome(){
 }
 
 function page(title,body,extra=""){
- return `<div class="card"><button class="back" onclick="goBack()">← RETOUR</button><h2>${title}</h2>${body}${extra}</div>`;
+ return `<section class="busaf-workspace-page">
+  <div class="busaf-page-heading"><button class="busaf-back" onclick="goBack()" aria-label="Retour">←</button><div><small>BuSAF • ESPACE NUMÉRIQUE</small><h1>${title}</h1></div></div>
+  <div class="busaf-page-content">${body}${extra}</div>
+ </section>`;
 }
-
 
 function loginPage(){
  return page("🔐 Connexion BuSAF",`
@@ -3239,38 +3241,22 @@ function memberContact(){return publicContact();}
 function memberHow(){return publicHow();}
 
 function publicQuick(){
- return `<div class="quickbar"><div class="quick-inner">
- <button onclick="setScreen('public')"><span>🏠</span>Accueil</button>
- <button onclick="setScreen('market')"><span>🛒</span>Marché</button>
- <button onclick="setScreen('profits')"><span>💰</span>Bénéfices</button>
- <button onclick="setScreen('signup')"><span>👤</span>Inscription</button>
- <button onclick="setScreen('login')"><span>🔐</span>Connexion</button>
- </div></div>`;
+ const item=(screen,icon,label)=>`<button class="${state.screen===screen?'active':''}" onclick="setScreen('${screen}')"><span>${icon}</span><small>${label}</small></button>`;
+ return `<nav class="busaf-bottom-nav public-bottom-v2">${item('public','⌂','Accueil')}${item('market','▦','Marché')}${item('benefits','✧','Avantages')}${item('signup','＋','Inscription')}${item('login','↗','Connexion')}</nav>`;
 }
+
 function memberQuick(){
  const active=state.screen;
- const item=(screen,icon,label)=>`<button class="${active===screen?'active':''}" onclick="setScreen('${screen}')"><span>${icon}</span>${label}</button>`;
+ const item=(screen,icon,label)=>`<button class="${active===screen?'active':''}" onclick="setScreen('${screen}')"><span>${icon}</span><small>${label}</small></button>`;
  const unread=unreadNotificationCount();
- return `<div class="bottom member-bottom member-v2-nav"><div class="bottom-inner">
- ${item('member','🏠','Accueil')}
- ${item('market','🛒','Marché')}
- ${item('stockMarket','📦','Stock')}
- ${item('invites','👥','Invités')}
- <button class="${active==='account'?'active':''}" onclick="setScreen('account')"><span>👤</span>Compte${unread? `<i class="bottom-badge">${unread>99?'99+':unread}</i>`:''}</button>
- </div></div>`;
+ return `<nav class="busaf-bottom-nav member-bottom-v2">${item('member','⌂','Accueil')}${item('market','▦','Marché')}${item('stockMarket','▤','Stock')}${item('invites','♧','Invités')}<button class="${active==='account'?'active':''}" onclick="setScreen('account')"><span>◉</span><small>Compte</small>${unread?`<i class="bottom-badge">${unread>99?'99+':unread}</i>`:""}</button></nav>`;
 }
 
 function founderQuick(){
  const active=state.screen;
- const item=(screen,icon,label)=>`<button class="${active===screen?'active':''}" onclick="setScreen('${screen}')"><span>${icon}</span>${label}</button>`;
+ const item=(screen,icon,label)=>`<button class="${active===screen?'active':''}" onclick="setScreen('${screen}')"><span>${icon}</span><small>${label}</small></button>`;
  const unread=unreadNotificationCount();
- return `<div class="bottom founder-bottom"><div class="bottom-inner">
- ${item('founder','👑','Accueil')}
- ${item('founderMarket','🛒','Marché')}
- ${item('founderMembers','👥','Membres')}
- ${item('orders','📦','Commandes')}
- <button class="${active==='account'?'active':''}" onclick="setScreen('account')"><span>💼</span>Compte${unread?`<i class="bottom-badge">${unread>99?'99+':unread}</i>`:''}</button>
- </div></div>`;
+ return `<nav class="busaf-bottom-nav founder-bottom-v2">${item('founder','⌂','Pilotage')}${item('founderMarket','▦','Marché')}${item('founderMembers','♧','Membres')}${item('founderPayments','▤','Ventes')}<button class="${active==='founderWallet'?'active':''}" onclick="setScreen('founderWallet')"><span>◈</span><small>Fonds</small>${unread?`<i class="bottom-badge">${unread>99?'99+':unread}</i>`:""}</button></nav>`;
 }
 
 function unreadNotificationCount(){
@@ -3281,7 +3267,12 @@ function notificationTopHtml(){
  return `<button class="notif-top" onclick="setScreen('notifications')" aria-label="Notifications">🔔 Notifications${n>0?` <span class="notif-count">${n}</span>`:""}</button>`;
 }
 function header(member=false){
- return `<header class="header"><div class="header-row"><div class="logo">🌍 BuSAF<small>Business Africain${member?(isFounder()?" • Espace fondateur":" • Espace membre"):""}</small></div>${member?`<div class="header-actions">${notificationTopHtml()}<button class="hbtn" onclick="logout()">Déconnexion</button></div>`:""}</div></header>`;
+ const founder=member&&isFounder();
+ const label=member?(founder?"ADMINISTRATION":"ESPACE MEMBRE"):"BUSINESS AFRICAIN";
+ return `<header class="busaf-shell-header">
+  <button class="busaf-brand" onclick="setScreen('${member?(founder?'founder':'member'):'public')}"><span class="busaf-brand-mark">B</span><span><b>BuSAF</b><small>${label}</small></span></button>
+  <div class="busaf-header-right">${member?`${notificationTopHtml()}<button class="busaf-profile-shortcut" onclick="setScreen('account')" aria-label="Mon compte">◉</button>`:`<button class="busaf-login-link" onclick="setScreen('login')">Connexion</button><button class="busaf-signup-link" onclick="setScreen('signup')">Créer un compte</button>`}</div>
+ </header>`;
 }
 
 function render(){
@@ -3508,3 +3499,27 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 <script>initUniversalPhotoViewer();</script>
 </body>
 </html>
+
+/* Nouvelle coque BuSAF : navigation et pages d'espace unifiées, sans les anciens cadres. */
+.busaf-shell-header{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px max(16px,calc((100vw - 1120px)/2));background:#fff;border-bottom:1px solid #e8eee9;box-shadow:0 4px 18px #123b2010}
+.busaf-brand{display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:0;color:#123b25;text-align:left}
+.busaf-brand-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:linear-gradient(145deg,#18a45b,#075b32);color:#fff;font-size:22px;font-weight:1000}
+.busaf-brand b{display:block;font-size:20px;line-height:1.05;letter-spacing:-.6px}.busaf-brand small{display:block;margin-top:3px;color:#718176;font-size:9px;font-weight:900;letter-spacing:1.2px}
+.busaf-header-right{display:flex;align-items:center;gap:8px}.busaf-header-right button{border:0;border-radius:11px;padding:10px 13px;font-weight:850}
+.busaf-login-link{background:#edf5ef;color:#12643a}.busaf-signup-link{background:#087a3b;color:#fff}.busaf-profile-shortcut{background:#edf5ef;color:#12643a;font-size:20px}
+.busaf-workspace-page{max-width:1080px;margin:18px auto 34px;padding:0 14px 20px}
+.busaf-page-heading{display:flex;align-items:center;gap:12px;margin:8px 0 18px}
+.busaf-back{flex:0 0 42px;width:42px;height:42px;border:0;border-radius:13px;background:#eaf4ed;color:#087a3b;font-size:22px;font-weight:900}
+.busaf-page-heading small{display:block;color:#16804a;font-size:9px;font-weight:950;letter-spacing:1.5px}
+.busaf-page-heading h1{margin:4px 0 0;color:#142f20;font-size:clamp(22px,5vw,30px);line-height:1.15;font-weight:950}
+.busaf-page-content{background:#fff;border:1px solid #e7eee8;border-radius:20px;padding:clamp(14px,3vw,24px);box-shadow:0 8px 26px #173c240b}
+.busaf-page-content>.card{border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;border-radius:0!important;background:transparent!important}
+.busaf-page-content>.card>h2,.busaf-page-content>.card>.back{display:none!important}
+.busaf-bottom-nav{position:fixed;z-index:90;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:8px max(8px,calc((100vw - 720px)/2)) calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e5ece6;box-shadow:0 -8px 25px #102d1a12}
+.busaf-bottom-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:48px;border:0;border-radius:12px;background:transparent;color:#78847b;padding:5px 2px}
+.busaf-bottom-nav button span{font-size:20px;line-height:1}.busaf-bottom-nav button small{font-size:10px;font-weight:800;white-space:nowrap}
+.busaf-bottom-nav button.active{background:#eaf6ee;color:#087a3b}.busaf-bottom-nav .bottom-badge{position:absolute;top:0;right:13%;font-style:normal}
+body{padding-bottom:78px!important}
+.header,.quickbar,.bottom{display:none!important}
+@media(min-width:760px){.busaf-workspace-page{margin-top:28px}.busaf-page-content{padding:28px}.busaf-bottom-nav{max-width:760px;left:50%;right:auto;width:calc(100% - 28px);transform:translateX(-50%);border:1px solid #e5ece6;border-bottom:0;border-radius:18px 18px 0 0}}
+@media(max-width:420px){.busaf-shell-header{padding:10px 12px}.busaf-brand-mark{width:36px;height:36px}.busaf-brand b{font-size:18px}.busaf-header-right button{padding:9px 10px}.busaf-page-content{padding:12px}.busaf-bottom-nav button small{font-size:9px}}
