@@ -1028,6 +1028,40 @@ input,textarea,select{border-radius:12px!important}
  .wrap{width:calc(100% - 20px);margin-top:12px}
 }
 
+
+/* BuSAF V2 — nouvelle structure réelle du tableau de bord membre */
+.member-v2{display:grid;gap:18px;padding-bottom:18px}
+.member-v2-head{background:linear-gradient(135deg,#075b35,#0b9b50);border-radius:24px;padding:20px;color:#fff;box-shadow:0 12px 28px #075b3528}
+.member-v2-user{display:flex;align-items:center;gap:12px}
+.member-v2-avatar{width:52px;height:52px;border-radius:50%;background:#ffffff25;border:2px solid #ffffff70;display:grid;place-items:center;font-size:25px;overflow:hidden;flex:none}
+.member-v2-avatar img{width:100%;height:100%;object-fit:cover}
+.member-v2-user small,.member-v2-balance small{font-size:10px;letter-spacing:1px;font-weight:800;opacity:.82}
+.member-v2-user h1{font-size:21px;margin:3px 0;color:#fff}
+.member-v2-user span{font-size:10px;font-weight:800;opacity:.8}
+.member-v2-bell{margin-left:auto;border:0;background:#ffffff24;color:#fff;border-radius:13px;padding:11px;font-size:20px}
+.member-v2-balance{margin-top:22px;padding:17px;border-radius:17px;background:#ffffff18;border:1px solid #ffffff35;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.member-v2-balance strong{display:block;font-size:clamp(23px,6vw,31px);margin-top:5px;color:#fff}
+.member-v2-balance button{border:1px solid #ffffff8a;background:#fff;color:#087a3b;border-radius:11px;padding:10px;font-size:11px;font-weight:800}
+.member-v2-actions{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}
+.member-v2-actions button{background:#fff;border:1px solid #e3ece5;border-radius:13px;padding:13px 5px;color:#17643b;font-weight:800;font-size:12px;box-shadow:0 4px 14px #183d2410}
+.member-v2-section,.member-v2-progress{background:#fff;border:1px solid #e4ece6;border-radius:21px;padding:17px;box-shadow:0 7px 22px #173c2410}
+.member-v2-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.member-v2-title small{font-size:10px;letter-spacing:1px;color:#75847a;font-weight:800}
+.member-v2-title h2{margin:3px 0 0;font-size:21px;color:#153d29}
+.member-v2-title>span{font-size:23px;color:#087a3b;font-weight:900}
+.member-v2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+.member-v2-tile{min-width:0;text-align:left;border:0;border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:flex-start;min-height:132px;color:#183b2a}
+.member-v2-tile-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#ffffffa8;font-size:22px;margin-bottom:9px}
+.member-v2-tile b{font-size:14px}.member-v2-tile small{font-size:11px;color:#566c5e;margin-top:3px}.member-v2-tile i{font-style:normal;font-size:10px;font-weight:800;margin-top:auto;padding-top:10px}
+.tile-wallet{background:#e4f5e9}.tile-stock{background:#e5f0ff}.tile-orders{background:#fff0df}.tile-profits{background:#f0eaff}.tile-commissions{background:#ffe8ef}.tile-progress{background:#def5f0}.tile-invites{background:#e6f2ff}.tile-account{background:#edf1f3}
+.member-v2-progress-item{padding:12px 0;border-top:1px solid #edf1ed}
+.member-v2-progress-item>div{display:flex;justify-content:space-between;gap:8px;color:#183b2a}
+.member-v2-progress-item p{font-size:12px;color:#718077;margin:5px 0 9px}
+.member-v2-track{height:9px;background:#e7eee9;border-radius:20px;overflow:hidden}.member-v2-track i{display:block;height:100%;background:linear-gradient(90deg,#087a3b,#21b76a);border-radius:20px}
+.member-v2-nav .bottom-inner{grid-template-columns:repeat(5,minmax(0,1fr))}
+.member-v2-nav button{font-size:10px}
+@media(max-width:390px){.member-v2-balance{align-items:flex-start;flex-direction:column}.member-v2-actions button{font-size:10px}.member-v2-tile{min-height:122px}}
+
 </style>
 </head>
 <body>
@@ -2035,32 +2069,30 @@ function memberHome(){
  const name=state.profile?.nom_complet||state.email||"Membre";
  const monthly=monthlySalesCount();
  const total=totalSalesCount();
- const p10=Math.min(monthly,10);
- const p100=Math.min(total,100);
- const desc={
-  market:'Produits et revente',invites:'Mes invitations directes',orders:'Achats et ventes',account:'Profil et sécurité',profits:'Mes gains',commissions:'Mes commissions directes',partner:'Suivi des 10 ventes',memberBenefits:'Avantages réservés',money:'Dépôt et retrait',stockMarket:'Produits du Marché',notifications:'Informations importantes',rules:'Règles BuSAF',help:'Assistance',privacy:'Protection des données',contact:'Nous contacter',how:'Comment fonctionne BuSAF',logout:'Quitter la session'
- };
- const accent=['accent-green','accent-blue','accent-purple','accent-orange','accent-teal','accent-green','accent-purple','accent-gold','accent-gold','accent-teal','accent-blue','accent-orange','accent-pink','accent-red','accent-red','accent-blue','accent-purple','accent-teal','accent-green','accent-red'];
- const cards=memberSpaces.map(([id,ico,label],i)=>`<button class="reference-card ${id==='market'||id==='boutique'?'main-space ':''}${accent[i%accent.length]}" onclick="${id==='logout'?'logout()':`setScreen('${id}')`}"><span class="reference-icon">${ico}</span><b>${label}</b><small>${desc[id]||''}</small></button>`).join('');
- return `<div class="member-dashboard member-reference">
-   <div class="member-welcome compact-welcome">
-     <div><span class="member-badge">ESPACE DE TRAVAIL</span><h1>👋 Bonjour ${esc(name)}</h1><p>Gère ton activité BuSAF depuis cet espace : Marché numérique, commandes, invitations, bénéfices, commissions et paiements.</p></div>
-     <button class="dash-profile" onclick="setScreen('account')">💼 MON COMPTE</button>
-   </div>
-   <div class="dashboard-stats">
-     <button class="dash-stat" onclick="setScreen('profits')"><span>💰</span><small>Compte Marché</small><strong>${money(state.marketBalance)}</strong></button>
-       <button class="dash-stat" onclick="setScreen('orders')"><span>📦</span><small>Commandes</small><strong>${state.orders.length}</strong></button>
-     <button class="dash-stat" onclick="setScreen('invites')"><span>👥</span><small>Invités</small><strong>${state.invites.length}</strong></button>
-   </div>
-   <div class="work-panel progress-panel">
-     <div class="work-head"><h2>🚀 Ma progression</h2><span>${monthly} vente(s) ce mois</span></div>
-     <div class="progress-row"><div><b>⭐ Vers PARTNER</b><small>${p10}/10 ventes validées dans le même mois</small></div><strong>${p10}/10</strong></div>
-     <div class="progress"><i style="width:${p10*10}%"></i></div>
-     <div class="progress-row"><div><b>🏆 Vers 100 ventes</b><small>${p100}/100 ventes validées</small></div><strong>${p100}/100</strong></div>
-     <div class="progress"><i style="width:${p100}%"></i></div>
-   </div>
-   <h2 class="section-title member-section-title">📱 MON ESPACE DE TRAVAIL</h2>
-   <div class="reference-grid">${cards}</div>
+ const p10=Math.min(monthly,10), p100=Math.min(total,100);
+ const tiles=[
+  ['money','👛','Portefeuille','Gérer mes fonds','tile-wallet'],
+  ['stockMarket','📦','Stocks','Mes produits','tile-stock'],
+  ['orders','🛍️','Commandes','Mes achats et ventes','tile-orders'],
+  ['profits','💰','Bénéfices','Mes gains','tile-profits'],
+  ['commissions','🤝','Commissions','Mes commissions','tile-commissions'],
+  ['partner','⭐','Progression','Mon évolution','tile-progress'],
+  ['invites','👥','Mes invités','Invitations directes','tile-invites'],
+  ['account','👤','Mon compte','Profil et sécurité','tile-account']
+ ];
+ return `<div class="member-v2">
+  <section class="member-v2-head">
+   <div class="member-v2-user"><div class="member-v2-avatar">${state.profile?.photo_url?'<img src="'+esc(state.profile.photo_url)+'" alt="Photo de profil">':'👤'}</div><div><small>BIENVENUE SUR BuSAF</small><h1>${esc(name)}</h1><span>ESPACE MEMBRE</span></div><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div>
+   <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong>${money(state.marketBalance)}</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
+  </section>
+  <div class="member-v2-actions"><button onclick="setScreen('money')">＋ Déposer</button><button onclick="setScreen('money')">↗ Retirer</button><button onclick="setScreen('market')">🛒 Acheter</button></div>
+  <section class="member-v2-section"><div class="member-v2-title"><div><small>VOTRE ACTIVITÉ</small><h2>Mon espace</h2></div><span>BuSAF</span></div>
+   <div class="member-v2-grid">${tiles.map(([id,ico,label,desc,cls])=>`<button class="member-v2-tile ${cls}" onclick="setScreen('${id}')"><span class="member-v2-tile-icon">${ico}</span><b>${label}</b><small>${desc}</small><i>Ouvrir →</i></button>`).join('')}</div>
+  </section>
+  <section class="member-v2-progress"><div class="member-v2-title"><div><small>OBJECTIFS ET RÉCOMPENSES</small><h2>Ma progression</h2></div><span>🚀</span></div>
+   <div class="member-v2-progress-item"><div><b>⭐ Statut PARTNER</b><strong>${p10}/10</strong></div><p>${p10} ventes validées ce mois sur 10</p><div class="member-v2-track"><i style="width:${p10*10}%"></i></div></div>
+   <div class="member-v2-progress-item"><div><b>🏆 Objectif 100 ventes</b><strong>${p100}/100</strong></div><p>${p100} ventes validées au total</p><div class="member-v2-track"><i style="width:${p100}%"></i></div></div>
+  </section>
  </div>`;
 }
 
@@ -3160,11 +3192,12 @@ function memberQuick(){
  const active=state.screen;
  const item=(screen,icon,label)=>`<button class="${active===screen?'active':''}" onclick="setScreen('${screen}')"><span>${icon}</span>${label}</button>`;
  const unread=unreadNotificationCount();
- return `<div class="bottom member-bottom"><div class="bottom-inner">
+ return `<div class="bottom member-bottom member-v2-nav"><div class="bottom-inner">
  ${item('member','🏠','Accueil')}
  ${item('market','🛒','Marché')}
+ ${item('stockMarket','📦','Stock')}
  ${item('invites','👥','Invités')}
- <button class="${active==='account'?'active':''}" onclick="setScreen('account')"><span>💼</span>Compte${unread? `<i class="bottom-badge">${unread>99?'99+':unread}</i>`:''}</button>
+ <button class="${active==='account'?'active':''}" onclick="setScreen('account')"><span>👤</span>Compte${unread? `<i class="bottom-badge">${unread>99?'99+':unread}</i>`:''}</button>
  </div></div>`;
 }
 
