@@ -1984,12 +1984,12 @@ function publicHome(){
    </div>
    <div class="public-v2-points"><span>✓ Produits numériques</span><span>✓ Suivi des commandes</span><span>✓ Paiements sécurisés</span></div>
   </section>
+  <section class="public-v2-market"><div class="public-v2-heading"><div><small>NOTRE SÉLECTION</small><h2>À découvrir sur le marché</h2></div><button onclick="setScreen('market')">Tout voir →</button></div>
+   <div class="public-v2-products">${list||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement des produits BuSAF…"}</div>`}</div>
+  </section>
   <section class="public-v2-inspiration">
    <div class="public-v2-inspiration-photo"><img src="https://assets.weforum.org/article/image/APc0-70JZWFKgYbUea30PmQdF12tNBhlaYSrseR9xmc.jpeg" alt="Trois entrepreneuses africaines collaborent autour d’un ordinateur" loading="lazy"></div>
    <div class="public-v2-inspiration-copy"><small>UNE AMBITION, UN AVENIR</small><h2>Ensemble, faisons grandir les initiatives africaines.</h2><p>Chaque projet commence par une décision : apprendre, essayer et avancer. BuSAF met le commerce numérique à portée de main pour découvrir des produits, acheter, revendre et développer son réseau.</p><blockquote>« Ne sous-estime jamais le pouvoir d’un petit pas. Avec de la détermination, de la discipline et de bonnes opportunités, ton idée peut devenir une activité qui grandit. »</blockquote><button onclick="setScreen('signup')">Je commence aujourd’hui →</button></div>
-  </section>
-  <section class="public-v2-market"><div class="public-v2-heading"><div><small>NOTRE SÉLECTION</small><h2>À découvrir sur le marché</h2></div><button onclick="setScreen('market')">Tout voir →</button></div>
-   <div class="public-v2-products">${list||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement des produits BuSAF…"}</div>`}</div>
   </section>
   <section class="public-v2-journey"><div class="public-v2-journey-heading"><small>TON PARCOURS AVEC BuSAF</small><h2>Des étapes simples pour avancer.</h2><p>Découvre les possibilités de la plateforme et progresse à ton rythme.</p></div>
    <div class="public-v2-journey-grid">
@@ -3627,3 +3627,43 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")window.close
 .public-v2-bottom p{color:#e0f1e5;line-height:1.6}
 .public-v2-bottom button{background:#fff;color:#087a3b}
 @media(max-width:680px){.public-v2-inspiration{grid-template-columns:1fr;gap:12px;padding:10px}.public-v2-inspiration-photo,.public-v2-inspiration-photo img{min-height:215px;height:215px}.public-v2-inspiration-copy{padding:8px 8px 12px}.public-v2-journey-grid{grid-template-columns:1fr}.public-v2-values{grid-template-columns:1fr;padding:19px}.public-v2-journey{padding:19px 12px}}
+
+
+/* Accueil public compact : le marché reste visible dès le premier écran */
+.public-v2{gap:12px;padding-bottom:12px}
+.public-v2-hero{padding:12px 15px;border-radius:17px;box-shadow:none}
+.public-v2-top button{padding:7px 10px;font-size:12px}
+.public-v2-logo{font-size:19px}
+.public-v2-copy{padding:12px 0 10px}
+.public-v2-copy>span{font-size:9px;letter-spacing:1px}
+.public-v2-copy h1{font-size:clamp(24px,5vw,34px);line-height:1.08;letter-spacing:-.7px;margin:5px 0}
+.public-v2-copy p{font-size:12px;line-height:1.35;margin:5px 0;max-width:560px}
+.public-v2-cta{gap:7px;margin-top:9px}
+.public-v2-cta button{padding:9px 11px;font-size:11px;border-radius:9px}
+.public-v2-points{gap:6px 12px;padding-top:8px;font-size:9px}
+.public-v2-market{padding:11px;border-radius:15px}
+.public-v2-heading{margin-bottom:9px}
+.public-v2-heading h2{font-size:18px;margin:2px 0}
+.public-v2-products{gap:8px}
+.market-v2-image{aspect-ratio:1.25/1}
+.market-v2-info{padding:8px;gap:5px}
+.market-v2-info p{min-height:0;font-size:10px}
+.market-v2-benefit{padding:5px;font-size:9px}
+.market-v2-price{font-size:14px}
+.market-v2-info>button{padding:8px 6px}
+.public-v2-inspiration{display:grid;grid-template-columns:minmax(105px,26%) 1fr;gap:10px;padding:10px;border-radius:15px;background:#fff;border:1px solid #e6eee8}
+.public-v2-inspiration-photo,.public-v2-inspiration-photo img{height:112px;min-height:112px;width:100%;object-fit:cover;border-radius:10px}
+.public-v2-inspiration-copy{padding:0;min-width:0}
+.public-v2-inspiration-copy h2{font-size:16px;line-height:1.15;margin:3px 0}
+.public-v2-inspiration-copy p{font-size:10px;line-height:1.35;margin:4px 0}
+.public-v2-inspiration-copy blockquote{font-size:9px;line-height:1.3;margin:4px 0;padding-left:7px}
+.public-v2-inspiration-copy button{font-size:10px;padding:7px 9px}
+.public-v2-journey,.public-v2-how,.public-v2-values,.public-v2-bottom{padding:13px!important;border-radius:15px!important}
+.public-v2-journey-heading h2,.public-v2-values h2,.public-v2-bottom h2{font-size:17px!important;margin:3px 0}
+.public-v2-journey-grid{gap:7px}
+.public-v2-journey-grid article{padding:9px!important}
+.public-v2-journey-grid article p,.public-v2-values p,.public-v2-bottom p{font-size:10px;line-height:1.35}
+.public-v2-feature-grid{gap:7px;margin-top:8px}
+.public-v2-feature-grid button{padding:9px}
+@media(max-width:600px){.public-v2-inspiration{grid-template-columns:100px minmax(0,1fr);gap:9px}.public-v2-inspiration-photo,.public-v2-inspiration-photo img{height:108px;min-height:108px}.public-v2-inspiration-copy blockquote{display:none}.public-v2-copy{padding:10px 0 8px}.public-v2-hero{padding:11px 12px}}
+@media(min-width:760px){.public-v2-copy{padding:12px 0 10px}.public-v2-hero{padding:13px 20px}.public-v2-products{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}}
