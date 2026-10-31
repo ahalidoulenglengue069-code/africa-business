@@ -3547,6 +3547,9 @@ window.initUniversalPhotoViewer=function(){
 }
 
 if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",start); else start();
+;
+// Initialisation dans le même script que la définition pour éviter toute référence globale manquante.
+try{window.initUniversalPhotoViewer();}catch(viewerError){console.warn('Visionneuse photo indisponible:',viewerError);}
 </script>
 <div id="photoLightbox" class="photo-lightbox" aria-hidden="true">
   <button type="button" class="photo-lightbox-close" aria-label="Fermer">✕</button>
@@ -3557,6 +3560,6 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
     <button type="button" id="photoZoomIn" aria-label="Zoom avant">+</button>
   </div>
 </div>
-<script>if(typeof window.initUniversalPhotoViewer==='function'){window.initUniversalPhotoViewer();}</script>
+
 </body>
 </html>
