@@ -982,6 +982,52 @@ body{background:#f5f7f5}
 @media(max-width:900px){.market-product-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:600px){.market-product-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.market-product-info{padding:9px}.public-product.market-product-card h3{font-size:12px!important}.market-product-price{font-size:16px}}
 
+
+/* ===== NOUVELLE IDENTITE VISUELLE BuSAF — base mobile ===== */
+:root{--green:#087a3b;--green2:#10a653;--light:#f3f7f4;--card:#fff;--text:#172b20;--muted:#68786e;--line:#e3ebe5;--shadow:0 8px 24px rgba(20,55,34,.07)}
+html,body{background:#f3f7f4;color:#172b20;font-family:Inter,system-ui,-apple-system,"Segoe UI",Arial,sans-serif}
+.header{background:#087a3b;padding:12px 16px;box-shadow:0 2px 12px #063d2522}
+.logo{font-size:25px;letter-spacing:-.7px}.logo small{font-size:11px;letter-spacing:.3px;opacity:.88}
+.wrap{width:min(100% - 24px,1120px);margin:16px auto 104px}
+.market-hero{border-radius:22px;min-height:230px;padding:25px 22px;background:linear-gradient(125deg,#064b2c,#087a3b 58%,#18a75b);box-shadow:0 12px 28px #07522c24}
+.market-hero h1{font-size:clamp(27px,6vw,43px);letter-spacing:-1px}
+.market-hero p{font-size:14px;line-height:1.55}
+.market-benefit-strip{border-radius:16px;background:#fff;box-shadow:var(--shadow);padding:13px 8px}
+.market-section-heading{margin:24px 2px 12px}
+.market-section-heading h2{font-size:20px;letter-spacing:-.4px}
+.public-info-grid{gap:11px}
+.public-info-card{border:1px solid #e7eee8!important;border-radius:17px!important;box-shadow:var(--shadow)!important;padding:15px!important}
+.product{border:0;border-radius:15px;padding:9px;background:#fff;box-shadow:0 5px 18px #153c2410}
+.product img{height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:10px}
+.product h3{font-size:14px;color:#173b28}.product p.small{font-size:11px;color:#718077}
+.product .price{font-size:15px;color:#087a3b}
+.member-welcome{border-radius:20px;padding:20px;background:linear-gradient(125deg,#07532f,#0b9348);box-shadow:0 10px 25px #07522c20}
+.member-welcome h1{font-size:23px}
+.dashboard-stats{gap:9px}.dash-stat{border:0;border-radius:15px;background:#fff;box-shadow:var(--shadow);padding:13px}
+.reference-grid{gap:11px}
+.reference-card{border:1px solid #e7eee8;border-radius:17px;min-height:116px;padding:14px;background:#fff;box-shadow:0 5px 18px #153c2410}
+.reference-card.main-space{border:1.5px solid #0a9850;background:#f4fbf6}
+.reference-icon{width:43px;height:43px;border-radius:13px;display:grid;place-items:center;font-size:24px;background:#edf7f0}
+.reference-card b{font-size:13px;color:#183b28}.reference-card small{font-size:11px;color:#748178}
+.founder-hero{border-radius:20px;background:linear-gradient(125deg,#173b2a,#245b3b);padding:20px;box-shadow:0 10px 24px #173b2a20}
+.founder-app{border:1px solid #e6ece7;border-radius:16px;background:#fff;box-shadow:0 5px 18px #153c2410}
+.bottom,.quickbar{background:rgba(255,255,255,.97);border-top:1px solid #e5ece6;box-shadow:0 -5px 22px #163d2512;backdrop-filter:blur(14px)}
+.quick-inner,.bottom-inner{padding:5px 7px max(5px,env(safe-area-inset-bottom))}
+.quickbar button,.bottom button{font-size:10px;color:#65746a;padding:8px 2px}
+.quickbar span,.bottom span{font-size:21px}
+.quickbar button.active,.bottom button.active{color:#078344}
+.btn,.public-action,.market-join-banner button{border-radius:12px;background:#087a3b}
+input,textarea,select{border-radius:12px!important}
+@media(max-width:600px){
+ .market-hero{grid-template-columns:1fr;padding:22px 18px;min-height:0}
+ .market-hero-art{display:none}
+ .public-products{gap:9px}
+ .reference-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .reference-card{min-height:108px}
+ .dashboard-stats{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .wrap{width:calc(100% - 20px);margin-top:12px}
+}
+
 </style>
 </head>
 <body>
