@@ -1117,6 +1117,24 @@ input,textarea,select{border-radius:12px!important}
 .founder-v2-footer{display:flex;flex-wrap:wrap;gap:8px}.founder-v2-footer button{flex:1;min-width:100px;background:#fff;border:1px solid #e4ebe5;border-radius:11px;padding:12px;color:#365543;font-weight:800;font-size:11px}
 @media(max-width:420px){.public-v2-hero{padding:17px;border-radius:20px}.public-v2-copy{padding:30px 0 22px}.public-v2-products{gap:8px}.market-v2-info{padding:9px}.market-v2-info h3{font-size:12px}.market-v2-price{font-size:14px}.public-v2-market,.public-v2-how{padding:12px}.founder-v2-section{padding:13px}}
 
+
+.market-page-v2,.member-market-v2{display:grid;gap:15px;padding-bottom:20px}
+.market-page-v2-head,.member-market-v2-head{border-radius:22px;padding:19px;background:linear-gradient(135deg,#07552f,#0a9850);color:#fff}
+.market-page-v2-head>small,.member-market-v2-head>small{font-size:10px;letter-spacing:1.2px;font-weight:900;color:#c8f0d6}
+.market-page-v2-head h1,.member-market-v2-head h1{font-size:29px;margin:7px 0;color:#fff}
+.market-page-v2-head p,.member-market-v2-head p{font-size:12px;line-height:1.5;color:#e4f4e9;margin:0;max-width:560px}
+.market-page-v2-search{display:flex;align-items:center;gap:8px;background:#fff;border-radius:12px;padding:0 12px;margin-top:17px;color:#087a3b}
+.market-page-v2-search input{border:0!important;outline:0;box-shadow:none!important;min-width:0;width:100%;padding:13px 2px!important;background:transparent!important}
+.market-page-v2-toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px}
+.market-page-v2-toolbar small{display:block;font-size:9px;letter-spacing:1.2px;color:#728176;font-weight:900}
+.market-page-v2-toolbar b{display:block;font-size:14px;color:#193d2a;margin-top:3px}
+.market-page-v2-toolbar button{border:1px solid #dce9df;background:#fff;border-radius:10px;padding:9px 12px;color:#087a3b;font-weight:800;font-size:11px}
+.market-page-v2-foot{font-size:11px;line-height:1.5;color:#6b7b70;background:#fff;border:1px solid #e5ece6;border-radius:13px;padding:13px}
+.market-page-v2-join{border:0;border-radius:13px;background:#087a3b;color:white;padding:14px;font-weight:900}
+.member-market-v2-head{background:linear-gradient(135deg,#064c2b,#087a3b 65%,#1ba75b)}
+.member-market-v2-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.member-market-v2-actions button{background:#ffffff20;border:1px solid #ffffff70;border-radius:10px;color:white;padding:10px 12px;font-weight:800;font-size:11px}
+
 </style>
 </head>
 <body>
@@ -2221,13 +2239,19 @@ function signupPage(){
 function publicMarket(){
  const products=currentProducts();
  const cards=products.map(publicProductView).join('');
- return page("🛒 Marché BuSAF",`
-<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits actifs affichés viennent de <strong>public.produits</strong> : numériques et physiques.</div>
-<div class="rule"><h3>Ce que permet le Marché</h3><ul><li>Découvrir les produits réels publiés.</li><li>Acheter un produit.</li><li>Choisir entre revente directe et ajout au Stock BuSAF après achat.</li><li>Revendre les produits selon les règles BuSAF.</li><li>Participer aux avantages, commissions et paliers prévus.</li></ul></div>
-<div class="public-products">${cards||`<div class="empty" style="grid-column:1/-1">${state.marketCatalogLoaded?"Aucun produit public n'est actuellement publié.":"Chargement des produits du Marché BuSAF…"}</div>`}</div>
-<div class="notice warning">Les opérations d'achat, de vente, de stock, de commissions et de bonus réservées aux membres nécessitent un compte et le respect des conditions BuSAF.</div>
-<button class="btn" onclick="setScreen('signup')">CRÉER MON COMPTE</button>`);
+ return `<div class="market-page-v2">
+  <section class="market-page-v2-head"><small>BuSAF • COMMERCE NUMÉRIQUE</small><h1>Le Marché</h1><p>Découvre les produits disponibles et consulte chaque fiche avant de commander.</p><div class="market-page-v2-search"><span>🔎</span><input id="marketSearchInput" type="search" placeholder="Rechercher un produit…" oninput="filterMarketCards(this.value)"></div></section>
+  <div class="market-page-v2-toolbar"><div><small>CATALOGUE BuSAF</small><b>${products.length} produit(s)</b></div><button onclick="loadMarketCatalog(true).then(()=>render())">↻ Actualiser</button></div>
+  <div class="public-v2-products" id="marketCardsGrid">${cards||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement du catalogue…"}</div>`}</div>
+  <div class="market-page-v2-foot">Les commandes et paiements sont traités selon les conditions BuSAF. Connecte-toi pour acheter.</div>
+  <button class="market-page-v2-join" onclick="setScreen('signup')">Créer mon compte pour commander →</button>
+ </div>`;
 }
+function filterMarketCards(value){
+ const q=String(value||'').toLocaleLowerCase();
+ document.querySelectorAll('#marketCardsGrid .market-v2-card').forEach(card=>{card.style.display=card.innerText.toLocaleLowerCase().includes(q)?'':'none';});
+}
+
 function publicProducts(){
  const products=currentProducts();
  return page("📦 Produits",`
@@ -2324,17 +2348,14 @@ async function syncConfirmedMarketPurchases(){
 }
 function memberMarket(){
  const all=marketCatalogProducts();
- const cards=all.map(p=>{
-   const name=p.nom||'Produit';
-   const desc=p.description||'Produit du Marché BuSAF.';
-   const price=Number(p.prix||0);
-   const image=p.image_url?`<img src="${esc(p.image_url)}" alt="" onclick="openPhotoLightbox(this.src,this.alt||'Photo produit')" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:12px;cursor:zoom-in">`:`<div class="emoji">${marketProductEmoji(p)}</div>`;
-   return `<div class="product">${image}<h3>${esc(name)}</h3><p class="small">${esc(desc)}</p><div class="price">${money(price)}</div><div class="small">📦 Produit ${String(p.type_produit||"numérique").toLowerCase()==="physique"?"physique":"numérique"} BuSAF</div><button class="btn" style="width:100%;padding:5px 4px;font-size:9px;margin-top:3px" onclick="viewMarketProduct('${String(p.id).replace(/'/g,"\'")}')">📦 VOIR / ACHETER</button>${marketCanPublish()?`<button class="btn red" onclick="deleteMarketProduct('${String(p.id).replace(/'/g,"\'")}')">🗑️ SUPPRIMER</button>`:''}</div>`;
- }).join('');
- const founderButton=marketCanPublish()?`<button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button>`:'';
- const empty=state.marketCatalogLoaded?`<div class="empty">Aucun produit n'est encore publié dans le Marché BuSAF.</div>`:`<div class="empty">Chargement des produits du Marché BuSAF…</div>`;
- return page("🛒 Marché BuSAF",`<div class="notice success"><strong>Marché BuSAF connecté à Supabase</strong><br>Les produits actifs affichés viennent de <strong>public.produits</strong> : numériques et physiques.</div><div class="row"><button class="btn small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><button class="btn alt small" onclick="setScreen('boutique')">🏪 MA BOUTIQUE</button></div>${founderButton}<div class="productgrid">${cards||empty}</div>`);
+ const cards=all.map(publicProductView).join('');
+ return `<div class="member-market-v2">
+  <section class="member-market-v2-head"><small>ESPACE MEMBRE • ACHATS ET REVENTE</small><h1>Marché BuSAF</h1><p>Choisis un produit, consulte sa fiche et effectue ton achat. Après confirmation, il sera disponible dans ton stock de revente.</p><div class="member-market-v2-actions"><button onclick="setScreen('stockMarket')">📦 Mon stock</button><button onclick="setScreen('orders')">🧾 Mes commandes</button></div></section>
+  <div class="market-page-v2-toolbar"><div><small>PRODUITS DISPONIBLES</small><b>${all.length} produit(s)</b></div><button onclick="refreshMarketCatalog()">↻ Actualiser</button></div>
+  <div class="public-v2-products" id="marketCardsGrid">${cards||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit publié actuellement.":"Chargement des produits…"}</div>`}</div>
+ </div>`;
 }
+
 async function refreshMarketCatalog(){await loadMarketCatalog(true);render();}
 function viewMarketProduct(id){
  if(isFounder()){setScreen('founderMarket');return;}
