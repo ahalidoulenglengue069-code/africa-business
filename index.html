@@ -1196,6 +1196,50 @@ body{padding-bottom:78px!important}
  .market-v2-info>button{font-size:11px}
  .busaf-bottom-nav button small{font-size:8px}
 }
+
+/* Harmonisation moderne des écrans fonctionnels BuSAF — sans toucher aux parcours métier */
+:root{--busaf-green:#087a3b;--busaf-deep:#064b2b;--busaf-ink:#173b29;--busaf-muted:#66776d;--busaf-surface:#fff;--busaf-line:#e1ebe4;--busaf-soft:#eff8f2;--busaf-shadow:0 8px 24px rgba(11,66,35,.075)}
+html,body{background:#f4f8f5;color:var(--busaf-ink)}
+.wrap{width:min(100%,1120px);margin:0 auto;padding:16px 14px 112px}
+.busaf-shell-header{min-height:68px;padding:10px max(14px,calc((100vw - 1120px)/2))}
+.busaf-brand-mark{box-shadow:0 5px 12px rgba(5,100,48,.2)}
+.card,.hero,.info,.rule,.profile-section-card,.profile-summary-card,.profile-action-card,.work-card,.reference-card,.list li{border-color:var(--busaf-line)!important;box-shadow:var(--busaf-shadow)!important}
+.card,.info,.rule,.profile-section-card,.profile-summary-card,.profile-action-card,.work-card{border-radius:18px!important;background:#fff}
+.card{padding:clamp(14px,2.5vw,22px);margin-bottom:14px}
+.card>h2,.card>h3,.section-title,.member-section-title,.founder-section-title{color:var(--busaf-ink)}
+.btn{min-height:45px;border-radius:13px;background:linear-gradient(135deg,#0b9149,#076532);box-shadow:0 5px 13px rgba(7,111,53,.14);letter-spacing:.1px}
+.btn.alt{background:#edf7f0;color:#086b37;border:1px solid #d4e9db}
+.btn.red{background:#fff0ef;color:#b3261e;border:1px solid #f0d0cd;box-shadow:none}
+input,select,textarea{border-radius:12px!important;border-color:#d9e7dd!important;background:#fbfdfb!important;color:#173b29!important}
+input:focus,select:focus,textarea:focus{outline:3px solid #d9f1e1!important;border-color:#0b9149!important}
+.notice{border-radius:14px}
+.rule{padding:15px;margin:10px 0}
+.rule h3{color:#087a3b}
+table{width:100%;border-collapse:separate;border-spacing:0;overflow:hidden;border-radius:14px}
+th{background:#edf7f0;color:#17452d}
+td,th{padding:10px 9px;border-bottom:1px solid #e8efe9;text-align:left}
+.productgrid,.founder-product-grid,.public-products{gap:12px}
+.product,.founder-product,.public-product{border:1px solid #e4ece6!important;border-radius:16px!important;box-shadow:0 5px 18px rgba(13,65,36,.07)!important;overflow:hidden}
+.product img,.founder-product img,.public-product img{border-radius:11px;object-fit:cover}
+.member-welcome{background:linear-gradient(125deg,#07552f,#0b9850)!important}
+.founder-hero{background:linear-gradient(125deg,#142c45,#174e42)!important}
+.founder-app,.reference-card,.profile-action-card{border-radius:16px!important}
+#app.member-mode .member-section-title{color:#087a3b}
+#app.founder-mode .founder-section-title{color:#1b4260}
+#app.founder-mode .btn:not(.red){background:linear-gradient(135deg,#1a587d,#123b59)}
+#app.founder-mode .btn.alt{background:#edf4f9;color:#174b6a;border-color:#d9e7f0}
+#app.founder-mode .back{background:#eaf2f8;color:#174b6a}
+#app.founder-mode .card>h2,#app.founder-mode .rule h3{color:#174b6a}
+@media(max-width:600px){
+ .wrap{padding:12px 10px 108px}
+ .card{padding:13px;border-radius:16px!important}
+ .productgrid,.founder-product-grid,.public-products{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+ .product,.founder-product,.public-product{min-width:0}
+ .product img,.founder-product img,.public-product img{height:auto;aspect-ratio:1/1}
+ .btn{min-height:43px;font-size:13px}
+ table{display:block;overflow-x:auto;white-space:nowrap}
+}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
 </style>
 </head>
 <body>
