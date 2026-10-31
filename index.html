@@ -1290,7 +1290,7 @@ function publicProductView(p){
   <div class="market-v2-image">${img}<span>BuSAF MARKET</span></div>
   <div class="market-v2-info"><h3>${esc(p?.nom||'Produit BuSAF')}</h3>
    <p>${esc(p?.description||'Découvrez ce produit du Marché BuSAF.')}</p>
-   <div class="market-v2-benefit"><span>Bénéfice vendeur</span><b>12 %</b></div>
+   <div class="market-v2-benefit"><span>Bénéfice vendeur</span><b>40 %</b></div>
    <div class="market-v2-price">${money(price)}</div>
    <button onclick="viewMarketProduct('${String(p?.id||'')}')">Voir le produit <span>→</span></button>
   </div>
@@ -2977,7 +2977,7 @@ async function saveProfile(){
 function memberProfits(){
  return page("💰 Mes Bénéfices",`
  <div class="profit-cards">
-  <div class="profit-card profit-market"><span class="profit-label">💰 Bénéfices vendeur (12 %)</span><strong id="memberSellerProfit">Chargement…</strong></div>
+  <div class="profit-card profit-market"><span class="profit-label">💰 Bénéfices vendeur (40 %)</span><strong id="memberSellerProfit">Chargement…</strong></div>
   <div class="profit-card profit-boutique"><span class="profit-label">🤝 Commissions directes (7 %)</span><strong id="memberReferralCommission">Chargement…</strong></div>
   <div class="profit-card profit-sales"><span class="profit-label">👛 Solde portefeuille confirmé</span><strong id="memberWalletBalance">Chargement…</strong></div>
  </div>
