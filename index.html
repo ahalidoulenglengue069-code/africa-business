@@ -3049,7 +3049,6 @@ async function copyBuSAFText(){
  try{await navigator.clipboard.writeText(value);openModal("Lien copié",'<div class="notice success">Le lien de partage est copié.</div><button class="btn" onclick="closeModal()">OK</button>');}
  catch(e){openModal("Copie manuelle",`<textarea readonly>${esc(value)}</textarea><button class="btn" onclick="closeModal()">FERMER</button>`);}
 }
-`<div class="stat">Quantité totale<strong>${state.marketStock}</strong></div><div class="notice">Uniquement les produits du Marché BuSAF. Les produits de Boutique personnelle ne doivent jamais être placés ici.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="sellFromStock('${String(x.productId).replace(/'/g,"\\'")}')">💰 REVENDRE</button></li>`).join("")}</ul>`:`<div class="empty">Ton Dépôt de vente est vide. Après un achat confirmé du Marché, le produit apparaît ici.</div>`}`);}
 
 function memberStockBoutique(){
  const realProducts=filterRealProducts(state.boutiqueProducts);
