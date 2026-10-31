@@ -988,6 +988,22 @@ body{background:#f5f7f5}
 <div id="app" class="app"></div>
 <div id="modal" class="modal" onclick="if(event.target===this)closeModal()"><div id="modalbox" class="modalbox"></div></div>
 
+<!-- Secours de démarrage : évite un écran blanc si le script principal rencontre une erreur. -->
+<script>
+(function(){
+  var app=document.getElementById("app");
+  function showBootError(message){
+    if(!app || app.dataset.busafReady==="1") return;
+    app.innerHTML='<main style="min-height:65vh;display:grid;place-items:center;padding:24px;text-align:center;font-family:Arial;color:#173523"><section style="max-width:420px;background:#fff;padding:24px;border-radius:16px;box-shadow:0 4px 20px #0001"><div style="font-size:38px">🌍</div><h2 style="margin:10px 0">BuSAF ne démarre pas correctement</h2><p style="color:#63736a">Une erreur JavaScript empêche le chargement. Recharge la page. Si le problème continue, transmets ce message au support.</p><p style="font-size:12px;color:#a3261e;overflow-wrap:anywhere">'+String(message||"Erreur de démarrage").replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];})+'</p><button onclick="location.reload()" style="padding:13px 20px;border:0;border-radius:10px;background:#087a38;color:white;font-weight:bold">RECHARGER BuSAF</button></section></main>';
+  }
+  window.addEventListener("error",function(e){showBootError(e.message||"Erreur JavaScript");});
+  window.addEventListener("unhandledrejection",function(e){showBootError(e.reason&&e.reason.message||e.reason||"Erreur de chargement");});
+  setTimeout(function(){
+    if(app && !app.innerHTML.trim()) showBootError("Le script principal n'a pas affiché l'accueil.");
+  },12000);
+})();
+</script>
+
 <script>
 /* =========================
    CONFIGURATION SUPABASE
