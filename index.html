@@ -2425,8 +2425,8 @@ function viewMarketProduct(id){
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(id));
  if(!p)return;
  const price=Number(p.prix||0);
- const shareButton=state.userId&&state.profile?'<button class="btn alt" onclick="shareMarketProduct(\''+String(id).replace(/'/g,"\\'")+'\')">📲 PARTAGER CE PRODUIT</button>':'';
- openModal('📦 Produit du Marché',`<div class="rule"><h3>${esc(p.nom||'Produit')}</h3><p>${esc(p.description||'')}</p><strong>Prix : ${money(price)}</strong></div><div class="notice">Tu peux partager ce produit sans l'acheter : cela sert au parrainage. Pour le revendre et obtenir le bénéfice vendeur, ton achat doit être confirmé et le produit ajouté à ton dépôt.</div>${shareButton}<button class="btn" onclick="closeModal();startMarketPurchase('${String(id).replace(/'/g,"\\'")}')">💳 ACHETER AVEC YENGAPAY</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
+ const shareButton=state.userId&&state.profile?'<button class="btn alt" onclick="shareMarketProduct(\''+encodeURIComponent(String(id))+'\')">📲 PARTAGER CE PRODUIT</button>':'';
+ openModal('📦 Produit du Marché',`<div class="rule"><h3>${esc(p.nom||'Produit')}</h3><p>${esc(p.description||'')}</p><strong>Prix : ${money(price)}</strong></div><div class="notice">Tu peux partager ce produit sans l'acheter : cela sert au parrainage. Pour le revendre et obtenir le bénéfice vendeur, ton achat doit être confirmé et le produit ajouté à ton dépôt.</div>${shareButton}<button class="btn" onclick="closeModal();startMarketPurchase('${encodeURIComponent(String(id))}')">💳 ACHETER AVEC YENGAPAY</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
 }
 function openSponsorEligibleProducts(ids,errorMessage){
  const allowed=new Set((Array.isArray(ids)?ids:[]).map(String));
