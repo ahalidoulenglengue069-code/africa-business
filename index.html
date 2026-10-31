@@ -1984,21 +1984,32 @@ function publicHome(){
    </div>
    <div class="public-v2-points"><span>✓ Produits numériques</span><span>✓ Suivi des commandes</span><span>✓ Paiements sécurisés</span></div>
   </section>
+  <section class="public-v2-inspiration">
+   <div class="public-v2-inspiration-photo"><img src="https://assets.weforum.org/article/image/APc0-70JZWFKgYbUea30PmQdF12tNBhlaYSrseR9xmc.jpeg" alt="Trois entrepreneuses africaines collaborent autour d’un ordinateur" loading="lazy"></div>
+   <div class="public-v2-inspiration-copy"><small>UNE AMBITION, UN AVENIR</small><h2>Ensemble, faisons grandir les initiatives africaines.</h2><p>Chaque projet commence par une décision : apprendre, essayer et avancer. BuSAF met le commerce numérique à portée de main pour découvrir des produits, acheter, revendre et développer son réseau.</p><blockquote>« Ne sous-estime jamais le pouvoir d’un petit pas. Avec de la détermination, de la discipline et de bonnes opportunités, ton idée peut devenir une activité qui grandit. »</blockquote><button onclick="setScreen('signup')">Je commence aujourd’hui →</button></div>
+  </section>
   <section class="public-v2-market"><div class="public-v2-heading"><div><small>NOTRE SÉLECTION</small><h2>À découvrir sur le marché</h2></div><button onclick="setScreen('market')">Tout voir →</button></div>
    <div class="public-v2-products">${list||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement des produits BuSAF…"}</div>`}</div>
+  </section>
+  <section class="public-v2-journey"><div class="public-v2-journey-heading"><small>TON PARCOURS AVEC BuSAF</small><h2>Des étapes simples pour avancer.</h2><p>Découvre les possibilités de la plateforme et progresse à ton rythme.</p></div>
+   <div class="public-v2-journey-grid">
+    <article><span>01</span><b>Crée ton compte</b><p>Inscris-toi avec tes informations et ton code de parrainage pour accéder à ton espace membre.</p></article>
+    <article><span>02</span><b>Explore le marché</b><p>Consulte les fiches des produits numériques, leurs descriptions et leurs prix avant de choisir.</p></article>
+    <article><span>03</span><b>Achète et développe-toi</b><p>Effectue tes achats. Après confirmation, suis tes commandes et les possibilités de revente dans ton espace.</p></article>
+   </div>
   </section>
   <section class="public-v2-how"><div><small>POURQUOI BuSAF ?</small><h2>Une plateforme pour passer à l'action.</h2></div>
    <div class="public-v2-feature-grid">
     <button onclick="setScreen('market')"><span>🛍️</span><b>Marché numérique</b><small>Découvre les produits et leurs informations.</small></button>
-    <button onclick="setScreen('profits')"><span>💰</span><b>Bénéfices vendeur</b><small>Développe ton activité avec la revente.</small></button>
-    <button onclick="setScreen('commissions')"><span>🤝</span><b>Parrainage</b><small>Invite directement et suis tes commissions.</small></button>
-    <button onclick="setScreen('rules')"><span>🛡️</span><b>Conditions claires</b><small>Consulte les règles avant de participer.</small></button>
+    <button onclick="setScreen('profits')"><span>💰</span><b>Bénéfices vendeur</b><small>Consulte les conditions de revente et les bénéfices prévus.</small></button>
+    <button onclick="setScreen('commissions')"><span>🤝</span><b>Parrainage direct</b><small>Invite des personnes et suis les commissions selon les règles BuSAF.</small></button>
+    <button onclick="setScreen('rules')"><span>🛡️</span><b>Conditions claires</b><small>Prends connaissance des règles avant de participer.</small></button>
    </div>
   </section>
-  <section class="public-v2-bottom"><h2>Prêt à commencer avec BuSAF ?</h2><p>Crée ton compte et accède à ton espace personnel.</p><button onclick="setScreen('signup')">Rejoindre BuSAF →</button></section>
+  <section class="public-v2-values"><div><small>L’ESPRIT BuSAF</small><h2>La motivation ouvre la voie. L’action fait la différence.</h2><p>Construis avec patience. Informe-toi avant chaque achat. Suis tes résultats et avance avec sérieux. BuSAF est un espace pour entreprendre, apprendre et saisir des opportunités numériques.</p></div><div class="public-v2-values-points"><span>✓ Apprendre en avançant</span><span>✓ Agir avec responsabilité</span><span>✓ Développer son réseau direct</span><span>✓ Suivre ses opérations clairement</span></div></section>
+  <section class="public-v2-bottom"><h2>Ton prochain chapitre peut commencer ici.</h2><p>Fais le premier pas : découvre le marché et rejoins la communauté BuSAF.</p><button onclick="setScreen('signup')">Créer mon compte BuSAF →</button></section>
  </div>`;
 }
-
 function founderApp(id,ico,label,desc){
  return `<button class="founder-app" onclick="setScreen('${id}')"><span class="ficon">${ico}</span><b>${label}</b><small>${desc||''}</small></button>`;
 }
@@ -3589,3 +3600,30 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")window.close
 
 </body>
 </html>
+
+/* Développement éditorial de l'accueil public BuSAF */
+.public-v2-inspiration{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:22px;align-items:center;background:#fff;border:1px solid #e3eee5;border-radius:24px;padding:14px;box-shadow:0 9px 26px #173c240c;overflow:hidden}
+.public-v2-inspiration-photo{min-height:290px;border-radius:17px;overflow:hidden;background:#eaf3ec}
+.public-v2-inspiration-photo img{display:block;width:100%;height:100%;min-height:290px;object-fit:cover}
+.public-v2-inspiration-copy{padding:12px 16px 12px 4px}
+.public-v2-inspiration-copy>small,.public-v2-journey-heading>small,.public-v2-values>div>small{font-size:10px;letter-spacing:1.4px;font-weight:950;color:#078344}
+.public-v2-inspiration-copy h2,.public-v2-journey-heading h2,.public-v2-values h2{font-size:clamp(23px,4vw,34px);line-height:1.12;letter-spacing:-.7px;color:#153d28;margin:9px 0}
+.public-v2-inspiration-copy p,.public-v2-journey-heading p,.public-v2-values p{font-size:14px;line-height:1.7;color:#586b5e}
+.public-v2-inspiration-copy blockquote{margin:15px 0;padding:13px 15px;border-left:4px solid #0b9149;background:#eff8f1;border-radius:0 12px 12px 0;color:#24563a;font-weight:750;line-height:1.55}
+.public-v2-inspiration-copy button,.public-v2-bottom button{border:0;border-radius:13px;padding:13px 17px;background:#087a3b;color:#fff;font-weight:900}
+.public-v2-journey{padding:22px 18px;border-radius:23px;background:linear-gradient(135deg,#eaf7ee,#f8fcf9);border:1px solid #dcece0}
+.public-v2-journey-heading{text-align:center;max-width:620px;margin:0 auto 18px}
+.public-v2-journey-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.public-v2-journey-grid article{background:#fff;border:1px solid #e2eee5;border-radius:17px;padding:17px;box-shadow:0 5px 16px #173c2408}
+.public-v2-journey-grid article>span{display:grid;place-items:center;width:35px;height:35px;border-radius:11px;background:#087a3b;color:#fff;font-size:12px;font-weight:950;margin-bottom:12px}
+.public-v2-journey-grid article b{display:block;color:#173b29;font-size:16px}
+.public-v2-journey-grid article p{margin:7px 0 0;color:#68796e;font-size:13px;line-height:1.55}
+.public-v2-values{display:grid;grid-template-columns:1.2fr .8fr;gap:22px;align-items:center;padding:24px;border-radius:22px;background:#103e29;color:#fff}
+.public-v2-values h2{color:#fff}.public-v2-values p{color:#d8e9dd}
+.public-v2-values-points{display:grid;gap:10px}
+.public-v2-values-points span{padding:11px 13px;border:1px solid #ffffff2e;background:#ffffff12;border-radius:12px;color:#f1fff4;font-size:13px;font-weight:750}
+.public-v2-bottom{padding:27px 18px;text-align:center;border-radius:22px;background:linear-gradient(135deg,#087a3b,#064b2b);color:#fff}
+.public-v2-bottom h2{margin:0;color:#fff;font-size:clamp(23px,4vw,32px)}
+.public-v2-bottom p{color:#e0f1e5;line-height:1.6}
+.public-v2-bottom button{background:#fff;color:#087a3b}
+@media(max-width:680px){.public-v2-inspiration{grid-template-columns:1fr;gap:12px;padding:10px}.public-v2-inspiration-photo,.public-v2-inspiration-photo img{min-height:215px;height:215px}.public-v2-inspiration-copy{padding:8px 8px 12px}.public-v2-journey-grid{grid-template-columns:1fr}.public-v2-values{grid-template-columns:1fr;padding:19px}.public-v2-journey{padding:19px 12px}}
