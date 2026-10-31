@@ -1062,6 +1062,61 @@ input,textarea,select{border-radius:12px!important}
 .member-v2-nav button{font-size:10px}
 @media(max-width:390px){.member-v2-balance{align-items:flex-start;flex-direction:column}.member-v2-actions button{font-size:10px}.member-v2-tile{min-height:122px}}
 
+
+/* Refonte visuelle globale BuSAF — parcours public, marché et fondateur */
+.public-v2{display:grid;gap:25px;padding-bottom:22px}
+.public-v2-hero{border-radius:26px;padding:20px;color:#fff;background:radial-gradient(circle at 85% 35%,#21a866 0,#087a3b 42%,#064b2c 100%);box-shadow:0 16px 36px #07552d2b;overflow:hidden}
+.public-v2-top{display:flex;justify-content:space-between;align-items:center}
+.public-v2-logo{font-size:22px;font-weight:900;letter-spacing:-.6px}.public-v2-logo small{display:block;font-size:9px;letter-spacing:1.6px;opacity:.75}
+.public-v2-top button{background:#ffffff1c;color:white;border:1px solid #ffffff70;border-radius:12px;padding:10px 13px;font-weight:800}
+.public-v2-copy{max-width:680px;padding:38px 0 28px}
+.public-v2-copy>span,.public-v2-heading small,.public-v2-how>div>small{font-size:10px;letter-spacing:1.5px;font-weight:900;opacity:.78}
+.public-v2-copy h1{font-size:clamp(32px,7vw,54px);line-height:1.04;letter-spacing:-1.8px;color:#fff;margin:12px 0}
+.public-v2-copy h1 em{font-style:normal;color:#b9f3cd}
+.public-v2-copy p{max-width:520px;line-height:1.6;color:#e6f5eb;font-size:14px}
+.public-v2-cta{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+.public-v2-cta button,.public-v2-bottom button{border:0;border-radius:13px;padding:14px 16px;font-weight:900;background:#fff;color:#087a3b}
+.public-v2-cta button+button{background:#ffffff20;color:#fff;border:1px solid #ffffff70}
+.public-v2-points{display:flex;gap:10px 20px;flex-wrap:wrap;border-top:1px solid #ffffff35;padding-top:15px;font-size:11px;color:#e4f4e9}
+.public-v2-market,.public-v2-how{background:#fff;border:1px solid #e6eee8;border-radius:22px;padding:17px;box-shadow:0 8px 25px #173c2410}
+.public-v2-heading,.founder-v2-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px}
+.public-v2-heading small{color:#078344}.public-v2-heading h2,.public-v2-how h2{font-size:22px;color:#173c29;margin:4px 0}
+.public-v2-heading button{background:none;border:0;color:#087a3b;font-weight:900}
+.public-v2-products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.market-v2-card{padding:0!important;overflow:hidden;border:1px solid #e7eee8!important;border-radius:17px!important;background:#fff!important;box-shadow:0 6px 20px #183d2410!important}
+.market-v2-image{position:relative;background:#f1f5f2;aspect-ratio:1/1;overflow:hidden}
+.market-v2-image img{width:100%;height:100%;object-fit:cover;display:block;border-radius:0!important;margin:0!important}
+.market-v2-image>span{position:absolute;left:8px;top:8px;background:#087a3b;color:#fff;border-radius:7px;padding:5px 7px;font-size:8px;font-weight:900;letter-spacing:.5px}
+.market-v2-placeholder{height:100%;display:grid;place-items:center;font-size:42px}
+.market-v2-info{padding:11px;display:flex;flex-direction:column;gap:7px}
+.market-v2-info h3{font-size:14px;line-height:1.3;margin:0;color:#183b29}
+.market-v2-info p{font-size:11px;line-height:1.4;color:#68796e;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:30px}
+.market-v2-benefit{display:flex;justify-content:space-between;align-items:center;font-size:10px;color:#526b5b;background:#eff8f1;padding:7px;border-radius:8px}
+.market-v2-benefit b{font-size:12px;color:#087a3b}
+.market-v2-price{font-size:16px;font-weight:900;color:#087a3b}
+.market-v2-info>button{border:0;border-radius:10px;background:#087a3b;color:#fff;padding:10px 8px;font-size:10px;font-weight:900}
+.public-v2-how>div>small{color:#087a3b}
+.public-v2-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:15px}
+.public-v2-feature-grid button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:5px;border:1px solid #e8eee9;border-radius:14px;background:#f8fbf8;padding:14px}
+.public-v2-feature-grid span{font-size:24px}.public-v2-feature-grid b{font-size:13px;color:#183b29}.public-v2-feature-grid small{font-size:11px;color:#68796e;line-height:1.4}
+.public-v2-bottom{border-radius:20px;padding:22px;background:#e8f6ec;text-align:center}
+.public-v2-bottom h2{margin:0;color:#145d35;font-size:21px}.public-v2-bottom p{font-size:12px;color:#597365}.public-v2-bottom button{background:#087a3b;color:white}
+.founder-v2{display:grid;gap:17px;padding-bottom:20px}
+.founder-v2-hero{border-radius:24px;padding:20px;background:linear-gradient(135deg,#172e25,#285c40);color:#fff;box-shadow:0 14px 30px #173b2925}
+.founder-v2-brand{display:flex;align-items:center;justify-content:space-between}.founder-v2-brand span{font-size:24px;font-weight:900}.founder-v2-brand small{font-size:9px;letter-spacing:1px;opacity:.7}
+.founder-v2-welcome{padding:25px 0 18px}.founder-v2-welcome>small{font-size:10px;letter-spacing:1.5px;color:#b9e6c8;font-weight:900}.founder-v2-welcome h1{font-size:27px;color:#fff;margin:6px 0}.founder-v2-welcome p{font-size:13px;color:#d5e8da;margin:0}
+.founder-v2-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.founder-v2-stats>div{padding:12px;border-radius:13px;background:#ffffff16;border:1px solid #ffffff25}
+.founder-v2-stats small{display:block;color:#d7e9dd;font-size:10px}.founder-v2-stats b{display:block;color:#fff;font-size:22px;margin-top:4px}
+.founder-v2-section{padding:17px;border-radius:21px;background:#fff;border:1px solid #e5ece6;box-shadow:0 7px 22px #153c240d}
+.founder-v2-heading small{font-size:10px;letter-spacing:1px;color:#718176;font-weight:900}.founder-v2-heading h2{font-size:21px;color:#173b29;margin:4px 0}.founder-v2-heading>span{font-size:24px}
+.founder-v2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.founder-v2-tile{min-height:125px;display:flex;flex-direction:column;align-items:flex-start;text-align:left;border:0;border-radius:15px;padding:13px;color:#193b2a}
+.founder-v2-tile>span{font-size:23px;margin-bottom:8px}.founder-v2-tile b{font-size:13px}.founder-v2-tile small{font-size:10px;color:#64766a;margin-top:3px}.founder-v2-tile i{font-size:10px;font-style:normal;font-weight:900;margin-top:auto;padding-top:9px}
+.fv-green{background:#e4f5e9}.fv-blue{background:#e7f0ff}.fv-orange{background:#fff0df}.fv-purple{background:#f0eaff}.fv-teal{background:#def5ef}.fv-pink{background:#ffeaf0}.fv-gold{background:#fff6d9}.fv-slate{background:#edf1f3}
+.founder-v2-footer{display:flex;flex-wrap:wrap;gap:8px}.founder-v2-footer button{flex:1;min-width:100px;background:#fff;border:1px solid #e4ebe5;border-radius:11px;padding:12px;color:#365543;font-weight:800;font-size:11px}
+@media(max-width:420px){.public-v2-hero{padding:17px;border-radius:20px}.public-v2-copy{padding:30px 0 22px}.public-v2-products{gap:8px}.market-v2-info{padding:9px}.market-v2-info h3{font-size:12px}.market-v2-price{font-size:14px}.public-v2-market,.public-v2-how{padding:12px}.founder-v2-section{padding:13px}}
+
 </style>
 </head>
 <body>
@@ -1212,9 +1267,18 @@ function currentProducts(){
 function publicProductView(p){
  const price=Number(p?.prix||0);
  const image=p?.image_url||'';
- const img=image?`<img src="${esc(image)}" alt="${esc(p?.nom||'Produit')}" onclick="openPhotoLightbox(this.src,this.alt)" style="width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:8px;margin-bottom:4px;cursor:zoom-in" loading="lazy">`:'<div class="pemoji">📦</div>';
- return '<article class="public-product market-product-card"><div class="market-product-image">'+img+'<span class="market-product-tag">BuSAF</span></div><div class="market-product-info"><h3>'+esc(p?.nom||'Produit BuSAF')+'</h3><div class="small">'+esc(p?.description||'Découvrez ce produit du Marché BuSAF.')+'</div><div class="market-product-price">'+money(price)+' <small>FCFA</small></div><div class="benefit">Bénéfice vendeur indicatif : '+money(Math.round(price*0.45))+'</div><button class="btn market-product-button" onclick="viewMarketProduct(\''+String(p?.id||'')+'\')">DÉCOUVRIR LE PRODUIT <span>→</span></button></div></article>';
+ const img=image?`<img src="${esc(image)}" alt="${esc(p?.nom||'Produit')}" onclick="openPhotoLightbox(this.src,this.alt)" loading="lazy">`:'<div class="market-v2-placeholder">📦</div>';
+ return `<article class="public-product market-v2-card">
+  <div class="market-v2-image">${img}<span>BuSAF MARKET</span></div>
+  <div class="market-v2-info"><h3>${esc(p?.nom||'Produit BuSAF')}</h3>
+   <p>${esc(p?.description||'Découvrez ce produit du Marché BuSAF.')}</p>
+   <div class="market-v2-benefit"><span>Bénéfice vendeur</span><b>12 %</b></div>
+   <div class="market-v2-price">${money(price)}</div>
+   <button onclick="viewMarketProduct('${String(p?.id||'')}')">Voir le produit <span>→</span></button>
+  </div>
+ </article>`;
 }
+
 function productForId(id){
  return currentProducts().find(x=>String(x.id)===String(id))||null;
 }
@@ -1788,29 +1852,28 @@ function tile([id,ico,label]){
 }
 
 function publicHome(){
- const publicProductsList=currentProducts();
- const preview=publicProductsList.slice(0,8).map(publicProductView).join('');
- const publicPreview=preview||`<div class="empty" style="grid-column:1/-1">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement du catalogue BuSAF…"}</div>`;
- const infos=[
-  ['market','🛍️','Explorer le marché','Découvrir les produits disponibles.','accent-green'],
-  ['profits','💸','Gains vendeur','Comprendre les bénéfices sur les ventes validées.','accent-blue'],
-  ['commissions','🤝','Parrainage','Découvrir les commissions du parrain direct.','accent-purple'],
-  ['benefits','⭐','Avantages membres','Voir les avantages et les étapes pour participer.','accent-gold'],
-  ['rules','📋','Règles & sécurité','Consulter les conditions de la plateforme.','accent-red']
- ];
- return `<section class="market-hero">
-   <div class="market-hero-copy"><span class="market-eyebrow">BUSINESS AFRICAIN</span>
-   <h1>Le commerce, <em>à portée de main.</em></h1>
-   <p>Découvre les produits BuSAF, commande en toute simplicité et développe ton activité grâce à la vente et au parrainage.</p>
-   <div class="public-actions"><button class="public-action primary" onclick="setScreen('market')">🛍️ EXPLORER LE MARCHÉ</button><button class="public-action secondary" onclick="setScreen('signup')">CRÉER UN COMPTE</button></div></div>
-   <div class="market-hero-art" aria-hidden="true"><div class="market-orbit">🌍</div><div class="market-float market-float-one">📦 Produits</div><div class="market-float market-float-two">💰 Opportunités</div></div>
- </section>
- <div class="market-benefit-strip"><div><b>🛒</b><span>Un marché centralisé</span></div><div><b>📦</b><span>Commandes suivies</span></div><div><b>🤝</b><span>Vente & parrainage</span></div><div><b>💳</b><span>Paiements BuSAF</span></div></div>
- <div class="market-section-heading"><div><span>À DÉCOUVRIR</span><h2>Les produits du marché</h2></div><button onclick="setScreen('market')">Tout voir →</button></div>
- <div class="public-products market-product-grid">${publicPreview}</div>
- <div class="market-section-heading"><div><span>COMMENT ÇA MARCHE</span><h2>Une plateforme, plusieurs possibilités</h2></div></div>
- <div class="public-info-grid market-info-grid">${infos.map(([id,ico,title,desc,accent])=>`<button class="public-info-card ${accent}" onclick="setScreen('${id}')"><span class="pico">${ico}</span><b>${title}</b><small>${desc}</small><span class="market-card-arrow">Découvrir →</span></button>`).join('')}</div>
- <div class="market-join-banner"><div><b>Prêt à rejoindre BuSAF ?</b><small>Crée ton compte pour commander et développer ton activité.</small></div><button onclick="setScreen('signup')">Rejoindre BuSAF</button></div>`;
+ const list=currentProducts().slice(0,6).map(publicProductView).join('');
+ return `<div class="public-v2">
+  <section class="public-v2-hero">
+   <div class="public-v2-top"><div class="public-v2-logo">🌍 BuSAF <small>BUSINESS AFRICAIN</small></div><button onclick="setScreen('login')">Connexion ↗</button></div>
+   <div class="public-v2-copy"><span>LE COMMERCE NUMÉRIQUE AFRICAIN</span><h1>Achète. Vends.<br><em>Développe ton activité.</em></h1><p>Découvre des produits numériques, réalise tes achats et développe tes revenus grâce à la revente et au parrainage.</p>
+    <div class="public-v2-cta"><button onclick="setScreen('market')">Explorer le marché <b>→</b></button><button onclick="setScreen('signup')">Créer mon compte</button></div>
+   </div>
+   <div class="public-v2-points"><span>✓ Produits numériques</span><span>✓ Suivi des commandes</span><span>✓ Paiements sécurisés</span></div>
+  </section>
+  <section class="public-v2-market"><div class="public-v2-heading"><div><small>NOTRE SÉLECTION</small><h2>À découvrir sur le marché</h2></div><button onclick="setScreen('market')">Tout voir →</button></div>
+   <div class="public-v2-products">${list||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement des produits BuSAF…"}</div>`}</div>
+  </section>
+  <section class="public-v2-how"><div><small>POURQUOI BuSAF ?</small><h2>Une plateforme pour passer à l'action.</h2></div>
+   <div class="public-v2-feature-grid">
+    <button onclick="setScreen('market')"><span>🛍️</span><b>Marché numérique</b><small>Découvre les produits et leurs informations.</small></button>
+    <button onclick="setScreen('profits')"><span>💰</span><b>Bénéfices vendeur</b><small>Développe ton activité avec la revente.</small></button>
+    <button onclick="setScreen('commissions')"><span>🤝</span><b>Parrainage</b><small>Invite directement et suis tes commissions.</small></button>
+    <button onclick="setScreen('rules')"><span>🛡️</span><b>Conditions claires</b><small>Consulte les règles avant de participer.</small></button>
+   </div>
+  </section>
+  <section class="public-v2-bottom"><h2>Prêt à commencer avec BuSAF ?</h2><p>Crée ton compte et accède à ton espace personnel.</p><button onclick="setScreen('signup')">Rejoindre BuSAF →</button></section>
+ </div>`;
 }
 
 function founderApp(id,ico,label,desc){
@@ -1819,59 +1882,34 @@ function founderApp(id,ico,label,desc){
 
 function founderHome(){
  const name=state.profile?.nom_complet||state.email||'Fondateur';
- const products=Array.isArray(state.marketCatalog)?state.marketCatalog.length:0;
- const members=state.invites.length;
- const orders=state.orders.length;
- const meetings=state.meetings.length;
- return `<div class="founder-dashboard">
-  <section class="founder-hero">
-   <span class="founder-badge">👑 ESPACE FONDATEUR</span>
-   <h1>Centre de contrôle BuSAF</h1>
-   <p>Bienvenue ${esc(name)}. Ici, tu pilotes BuSAF. Cet espace est réservé à l'administration et ne reprend pas l'espace Membre.</p>
-   <div class="founder-stat-grid" style="margin-top:13px">
-    <div class="founder-stat"><b>${products}</b><small>Produits Marché</small></div>
-    <div class="founder-stat"><b>${members}</b><small>Invités suivis</small></div>
-    <div class="founder-stat"><b>${orders}</b><small>Commandes</small></div>
-     </div>
+ const stats=state.founderStats||{};
+ const products=Number(stats.products??(Array.isArray(state.marketCatalog)?state.marketCatalog.length:0));
+ const members=Number(stats.members??state.invites.length);
+ const sales=Number(stats.sales??state.orders.length);
+ const pending=Number(stats.pending||0);
+ const tile=(id,ico,label,sub,cls)=>`<button class="founder-v2-tile ${cls}" onclick="setScreen('${id}')"><span>${ico}</span><b>${label}</b><small>${sub}</small><i>Ouvrir →</i></button>`;
+ return `<div class="founder-v2">
+  <section class="founder-v2-hero"><div class="founder-v2-brand"><span>BuSAF</span><small>ADMINISTRATION GÉNÉRALE</small></div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR</small><h1>Bonjour ${esc(name)}</h1><p>Voici le centre de pilotage de ta plateforme.</p></div>
+   <div class="founder-v2-stats"><div><small>Produits</small><b>${products}</b></div><div><small>Membres</small><b>${members}</b></div><div><small>Ventes / commandes</small><b>${sales}</b></div><div><small>En attente</small><b>${pending}</b></div></div>
   </section>
-  <h2 class="founder-section-title">📊 PILOTAGE</h2>
-  <div class="founder-grid">
-   ${founderApp('founderDashboard','📈','Tableau de bord','Vue générale')}
-   ${founderApp('founderStats','📊','Statistiques','Activité BuSAF')}
-   ${founderApp('founderFinance','💰','Finances','Suivi financier')}
-   ${founderApp('founderWallet','👛','Mon portefeuille','Soldes et retraits')}
-   ${founderApp('founderPayments','💳','Paiements','Transactions')}
-   ${founderApp('orders','📦','Commandes','Suivi des commandes')}
-  </div>
-  <h2 class="founder-section-title">👥 RÉSEAU</h2>
-  <div class="founder-grid">
-   ${founderApp('founderMembers','🌍','TOUS LES MEMBRES','Tous les inscrits sur BuSAF')}
-   ${founderApp('founderDirectInvites','👥','MES INVITÉS','Tes invités directs uniquement')}
-   ${founderApp('founderReferral','🤝','Parrainage','Réseau et commissions')}
-   ${founderApp('partner','⭐','Partner','Suivi des statuts Partner')}
-   ${founderApp('commissions','💰','Commissions','Commissions')}
-  </div>
-  <h2 class="founder-section-title">🛍️ COMMERCE</h2>
-  <div class="founder-grid">
-   ${founderApp('founderMarket','🛒','Gestion du Marché','Ajouter, modifier, supprimer')}
-   ${founderApp('founderStocks','📦','Gestion des Stocks','Suivi des stocks')}
-   ${founderApp('founderMarket','➕','Ajouter un produit','Publier au Marché')}
-  </div>
-  <h2 class="founder-section-title">📢 COMMUNICATION</h2>
-  <div class="founder-grid">
-   ${founderApp('notifications','🔔','Notifications','Informations')}
-   ${founderApp('founderAnnouncements','📢','Annonces','Communications')}
-  </div>
-  <h2 class="founder-section-title">⚙️ ADMINISTRATION</h2>
-  <div class="founder-grid">
-   ${founderApp('privacy','🛡️','Sécurité','Protection')}
-   ${founderApp('founderSettings','⚙️','Paramètres','Configuration BuSAF')}
-   ${founderApp('rules','📜','Règles BuSAF','Règlements')}
-   ${founderApp('account','💼','Mon profil','Compte fondateur')}
-   ${founderApp('logout','🚪','Déconnexion','Quitter la session')}
-  </div>
+  <section class="founder-v2-section"><div class="founder-v2-heading"><div><small>GESTION DE LA PLATEFORME</small><h2>Vue générale</h2></div><span>⚙️</span></div>
+   <div class="founder-v2-grid">
+    ${tile('founderDashboard','📊','Tableau de bord','Activité et statistiques','fv-green')}
+    ${tile('founderMarket','🛍️','Marché numérique','Gérer les produits','fv-blue')}
+    ${tile('founderPayments','💳','Paiements & ventes','Transactions réelles','fv-orange')}
+    ${tile('founderWallet','👛','Portefeuille','Fonds et retraits','fv-purple')}
+    ${tile('founderMembers','👥','Tous les membres','Liste des inscrits','fv-teal')}
+    ${tile('founderDirectInvites','🤝','Mes invités directs','Ton réseau personnel','fv-pink')}
+    ${tile('founderFinance','💰','Finances','Suivi financier','fv-gold')}
+    ${tile('founderStocks','📦','Stocks','Suivi des produits','fv-slate')}
+    ${tile('founderAnnouncements','📢','Annonces','Communications BuSAF','fv-blue')}
+    ${tile('founderSettings','🔧','Paramètres','Configuration','fv-slate')}
+   </div>
+  </section>
+  <div class="founder-v2-footer"><button onclick="setScreen('notifications')">🔔 Notifications</button><button onclick="setScreen('account')">👤 Mon profil</button><button onclick="logout()">🚪 Déconnexion</button></div>
  </div>`;
 }
+
 function founderMarket(){
  if(!isFounder()){return memberMarket();}
  const all=marketCatalogProducts();
