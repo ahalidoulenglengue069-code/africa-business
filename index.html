@@ -3331,7 +3331,7 @@ function header(member=false){
  const founder=member&&isFounder();
  const label=member?(founder?"ADMINISTRATION":"ESPACE MEMBRE"):"BUSINESS AFRICAIN";
  return `<header class="busaf-shell-header">
-  <button class="busaf-brand" onclick="setScreen('${member?(founder?'founder':'member'):'public')}"><span class="busaf-brand-mark">B</span><span><b>BuSAF</b><small>${label}</small></span></button>
+  <button class="busaf-brand" onclick="setScreen('${member?(founder?'founder':'member'):'public'}"><span class="busaf-brand-mark">B</span><span><b>BuSAF</b><small>${label}</small></span></button>
   <div class="busaf-header-right">${member?`${notificationTopHtml()}<button class="busaf-profile-shortcut" onclick="setScreen('account')" aria-label="Mon compte">◉</button>`:`<button class="busaf-login-link" onclick="setScreen('login')">Connexion</button><button class="busaf-signup-link" onclick="setScreen('signup')">Créer un compte</button>`}</div>
  </header>`;
 }
