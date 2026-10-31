@@ -1135,6 +1135,67 @@ input,textarea,select{border-radius:12px!important}
 .member-market-v2-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
 .member-market-v2-actions button{background:#ffffff20;border:1px solid #ffffff70;border-radius:10px;color:white;padding:10px 12px;font-weight:800;font-size:11px}
 
+/* Nouvelle coque BuSAF : navigation et pages d'espace unifiées, sans les anciens cadres. */
+.busaf-shell-header{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px max(16px,calc((100vw - 1120px)/2));background:#fff;border-bottom:1px solid #e8eee9;box-shadow:0 4px 18px #123b2010}
+.busaf-brand{display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:0;color:#123b25;text-align:left}
+.busaf-brand-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:linear-gradient(145deg,#18a45b,#075b32);color:#fff;font-size:22px;font-weight:1000}
+.busaf-brand b{display:block;font-size:20px;line-height:1.05;letter-spacing:-.6px}.busaf-brand small{display:block;margin-top:3px;color:#718176;font-size:9px;font-weight:900;letter-spacing:1.2px}
+.busaf-header-right{display:flex;align-items:center;gap:8px}.busaf-header-right button{border:0;border-radius:11px;padding:10px 13px;font-weight:850}
+.busaf-login-link{background:#edf5ef;color:#12643a}.busaf-signup-link{background:#087a3b;color:#fff}.busaf-profile-shortcut{background:#edf5ef;color:#12643a;font-size:20px}
+.busaf-workspace-page{max-width:1080px;margin:18px auto 34px;padding:0 14px 20px}
+.busaf-page-heading{display:flex;align-items:center;gap:12px;margin:8px 0 18px}
+.busaf-back{flex:0 0 42px;width:42px;height:42px;border:0;border-radius:13px;background:#eaf4ed;color:#087a3b;font-size:22px;font-weight:900}
+.busaf-page-heading small{display:block;color:#16804a;font-size:9px;font-weight:950;letter-spacing:1.5px}
+.busaf-page-heading h1{margin:4px 0 0;color:#142f20;font-size:clamp(22px,5vw,30px);line-height:1.15;font-weight:950}
+.busaf-page-content{background:#fff;border:1px solid #e7eee8;border-radius:20px;padding:clamp(14px,3vw,24px);box-shadow:0 8px 26px #173c240b}
+.busaf-page-content>.card{border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;border-radius:0!important;background:transparent!important}
+.busaf-page-content>.card>h2,.busaf-page-content>.card>.back{display:none!important}
+.busaf-bottom-nav{position:fixed;z-index:90;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:8px max(8px,calc((100vw - 720px)/2)) calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e5ece6;box-shadow:0 -8px 25px #102d1a12}
+.busaf-bottom-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:48px;border:0;border-radius:12px;background:transparent;color:#78847b;padding:5px 2px}
+.busaf-bottom-nav button span{font-size:20px;line-height:1}.busaf-bottom-nav button small{font-size:10px;font-weight:800;white-space:nowrap}
+.busaf-bottom-nav button.active{background:#eaf6ee;color:#087a3b}.busaf-bottom-nav .bottom-badge{position:absolute;top:0;right:13%;font-style:normal}
+body{padding-bottom:78px!important}
+.header,.quickbar,.bottom{display:none!important}
+@media(min-width:760px){.busaf-workspace-page{margin-top:28px}.busaf-page-content{padding:28px}.busaf-bottom-nav{max-width:760px;left:50%;right:auto;width:calc(100% - 28px);transform:translateX(-50%);border:1px solid #e5ece6;border-bottom:0;border-radius:18px 18px 0 0}}
+@media(max-width:420px){.busaf-shell-header{padding:10px 12px}.busaf-brand-mark{width:36px;height:36px}.busaf-brand b{font-size:18px}.busaf-header-right button{padding:9px 10px}.busaf-page-content{padding:12px}.busaf-bottom-nav button small{font-size:9px}}
+
+/* Ajustements de finition : rendu réel de la nouvelle coque BuSAF */
+.busaf-shell-header{width:100%;min-height:66px}
+.busaf-workspace-page{width:min(100%,1080px)}
+.busaf-page-content{min-width:0}
+.public-v2,.member-v2,.founder-v2,.market-page-v2{width:100%;min-width:0}
+.public-v2-products{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.market-v2-card{min-width:0}
+.market-v2-info{min-width:0}
+.market-v2-info h3,.market-v2-info p{overflow-wrap:anywhere}
+.market-v2-benefit{display:flex;align-items:center;justify-content:space-between;gap:8px;color:#087a3b;font-size:11px;font-weight:800}
+.market-v2-benefit b{font-size:15px}
+.market-v2-price{font-size:17px;font-weight:950;color:#173b27}
+.market-v2-info>button{width:100%;border:0;border-radius:12px;background:#07843f;color:#fff;padding:11px 8px;font-weight:900}
+.public-v2-how,.public-v2-market{min-width:0}
+.public-v2-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.public-v2-feature-grid button{min-width:0;text-align:left;border:1px solid #e4eee6;border-radius:16px;background:#fff;padding:15px;box-shadow:0 5px 16px #173c2409}
+.public-v2-feature-grid button span{display:block;font-size:23px;margin-bottom:8px}
+.public-v2-feature-grid button b,.public-v2-feature-grid button small{display:block}
+.public-v2-feature-grid button small{margin-top:5px;color:#6b7b70;line-height:1.4}
+.member-v2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.member-v2-tile{min-width:0}
+.founder-v2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.founder-v2-tile{min-width:0}
+@media(min-width:760px){
+ .public-v2-products{grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}
+ .public-v2-hero{padding:28px 34px}
+ .public-v2-copy{padding:54px 0 38px}
+ .member-v2-grid,.founder-v2-grid{grid-template-columns:repeat(3,minmax(0,1fr))}
+}
+@media(max-width:380px){
+ .public-v2-products{gap:8px}
+ .market-v2-info{padding:9px}
+ .market-v2-info h3{font-size:12px}
+ .market-v2-price{font-size:15px}
+ .market-v2-info>button{font-size:11px}
+ .busaf-bottom-nav button small{font-size:8px}
+}
 </style>
 </head>
 <body>
@@ -3499,27 +3560,3 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
 <script>initUniversalPhotoViewer();</script>
 </body>
 </html>
-
-/* Nouvelle coque BuSAF : navigation et pages d'espace unifiées, sans les anciens cadres. */
-.busaf-shell-header{position:sticky;top:0;z-index:80;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px max(16px,calc((100vw - 1120px)/2));background:#fff;border-bottom:1px solid #e8eee9;box-shadow:0 4px 18px #123b2010}
-.busaf-brand{display:flex;align-items:center;gap:10px;border:0;background:transparent;padding:0;color:#123b25;text-align:left}
-.busaf-brand-mark{display:grid;place-items:center;width:40px;height:40px;border-radius:13px;background:linear-gradient(145deg,#18a45b,#075b32);color:#fff;font-size:22px;font-weight:1000}
-.busaf-brand b{display:block;font-size:20px;line-height:1.05;letter-spacing:-.6px}.busaf-brand small{display:block;margin-top:3px;color:#718176;font-size:9px;font-weight:900;letter-spacing:1.2px}
-.busaf-header-right{display:flex;align-items:center;gap:8px}.busaf-header-right button{border:0;border-radius:11px;padding:10px 13px;font-weight:850}
-.busaf-login-link{background:#edf5ef;color:#12643a}.busaf-signup-link{background:#087a3b;color:#fff}.busaf-profile-shortcut{background:#edf5ef;color:#12643a;font-size:20px}
-.busaf-workspace-page{max-width:1080px;margin:18px auto 34px;padding:0 14px 20px}
-.busaf-page-heading{display:flex;align-items:center;gap:12px;margin:8px 0 18px}
-.busaf-back{flex:0 0 42px;width:42px;height:42px;border:0;border-radius:13px;background:#eaf4ed;color:#087a3b;font-size:22px;font-weight:900}
-.busaf-page-heading small{display:block;color:#16804a;font-size:9px;font-weight:950;letter-spacing:1.5px}
-.busaf-page-heading h1{margin:4px 0 0;color:#142f20;font-size:clamp(22px,5vw,30px);line-height:1.15;font-weight:950}
-.busaf-page-content{background:#fff;border:1px solid #e7eee8;border-radius:20px;padding:clamp(14px,3vw,24px);box-shadow:0 8px 26px #173c240b}
-.busaf-page-content>.card{border:0!important;box-shadow:none!important;padding:0!important;margin:0!important;border-radius:0!important;background:transparent!important}
-.busaf-page-content>.card>h2,.busaf-page-content>.card>.back{display:none!important}
-.busaf-bottom-nav{position:fixed;z-index:90;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:8px max(8px,calc((100vw - 720px)/2)) calc(8px + env(safe-area-inset-bottom));background:#fff;border-top:1px solid #e5ece6;box-shadow:0 -8px 25px #102d1a12}
-.busaf-bottom-nav button{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;min-width:0;min-height:48px;border:0;border-radius:12px;background:transparent;color:#78847b;padding:5px 2px}
-.busaf-bottom-nav button span{font-size:20px;line-height:1}.busaf-bottom-nav button small{font-size:10px;font-weight:800;white-space:nowrap}
-.busaf-bottom-nav button.active{background:#eaf6ee;color:#087a3b}.busaf-bottom-nav .bottom-badge{position:absolute;top:0;right:13%;font-style:normal}
-body{padding-bottom:78px!important}
-.header,.quickbar,.bottom{display:none!important}
-@media(min-width:760px){.busaf-workspace-page{margin-top:28px}.busaf-page-content{padding:28px}.busaf-bottom-nav{max-width:760px;left:50%;right:auto;width:calc(100% - 28px);transform:translateX(-50%);border:1px solid #e5ece6;border-bottom:0;border-radius:18px 18px 0 0}}
-@media(max-width:420px){.busaf-shell-header{padding:10px 12px}.busaf-brand-mark{width:36px;height:36px}.busaf-brand b{font-size:18px}.busaf-header-right button{padding:9px 10px}.busaf-page-content{padding:12px}.busaf-bottom-nav button small{font-size:9px}}
