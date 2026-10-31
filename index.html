@@ -3511,7 +3511,7 @@ async function start(){
   }
 }
 // Visionneuse universelle : toutes les photos BuSAF peuvent être ouvertes et zoomées.
-function initUniversalPhotoViewer(){
+window.initUniversalPhotoViewer=function(){
   const box=document.getElementById("photoLightbox");
   const img=document.getElementById("photoLightboxImage");
   const closeBtn=document.querySelector(".photo-lightbox-close");
@@ -3557,6 +3557,6 @@ if(document.readyState==="loading") document.addEventListener("DOMContentLoaded"
     <button type="button" id="photoZoomIn" aria-label="Zoom avant">+</button>
   </div>
 </div>
-<script>initUniversalPhotoViewer();</script>
+<script>if(typeof window.initUniversalPhotoViewer==='function'){window.initUniversalPhotoViewer();}</script>
 </body>
 </html>
