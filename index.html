@@ -2402,16 +2402,20 @@ function founderApp(id,ico,label,desc){
 function founderHome(){
  const name=state.profile?.nom_complet||state.email||'Fondateur';
  const stats=state.founderStats||{};
+ const profile=state.profile||{};
+ const founderCountry=profile.pays||"Pays non renseigné";
+ const founderPhone=profile.telephone||"Téléphone non renseigné";
  const products=Number(stats.products??(Array.isArray(state.marketCatalog)?state.marketCatalog.length:0));
  const members=Number(stats.members??state.invites.length);
  const sales=Number(stats.sales??state.orders.length);
  const pending=Number(stats.pending||0);
  const tile=(id,ico,label,sub,cls)=>`<button class="founder-v2-tile ${cls}" onclick="setScreen('${id}')"><span>${ico}</span><b>${label}</b><small>${sub}</small><i>Ouvrir →</i></button>`;
  return `<div class="founder-v2">
-  <section class="founder-v2-hero"><div class="founder-v2-brand"><span>BuSAF</span><small>ADMINISTRATION GÉNÉRALE</small></div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR</small><h1>Bonjour ${esc(name)}</h1><p>Voici le centre de pilotage de ta plateforme.</p></div>
+  <section class="founder-v2-hero"><div class="founder-v2-brand"><span>BuSAF</span><small>BUSINESS AFRICAIN · ADMINISTRATION</small></div><div class="founder-v2-founder-profile"><div class="founder-v2-founder-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo du fondateur">':'👑'}</div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR · COMPTE OFFICIEL</small><h1>${esc(name)}</h1><p>👑 Fondateur BuSAF</p><div class="founder-v2-founder-meta">${esc(countryFlag(founderCountry))} ${esc(founderCountry)} · 📱 ${esc(founderPhone)}</div><div class="founder-v2-founder-code">CODE : ${esc(profile.code_parrain||'BUSAF-FONDATEUR')}</div></div></div><p class="founder-v2-intro">Centre de contrôle — pilote les activités réelles de la plateforme.</p>
    <div class="founder-v2-stats"><div><small>Produits publiés</small><b>${products}</b></div><div><small>Membres inscrits</small><b>${members}</b></div><div><small>Ventes / commandes</small><b>${sales}</b></div><div><small>En attente</small><b>${pending}</b></div><div><small>Ventes confirmées</small><b>${Number(stats.confirmed||0)}</b></div><div><small>Montant confirmé</small><b>${money(stats.revenue||0)}</b></div></div>
    <button class="founder-home-refresh" onclick="refreshFounderHomeStats()">↻ ACTUALISER LES INDICATEURS</button>
   </section>
+  <section class="founder-v2-section founder-v2-activity"><div class="founder-v2-heading"><div><small>INDICATEURS DE PILOTAGE</small><h2>Activité BuSAF</h2></div><span>📈</span></div><div class="founder-v2-bars"><div><span>Produits</span><i><b style="width:${Math.min(100,products?100:0)}%"></b></i><strong>${products}</strong></div><div><span>Membres</span><i><b style="width:${Math.min(100,members?Math.max(8,members/Math.max(members,products,sales,1)*100):0)}%"></b></i><strong>${members}</strong></div><div><span>Ventes confirmées</span><i><b style="width:${Math.min(100,sales?Math.max(8,Number(stats.confirmed||0)/Math.max(sales,1)*100):0)}%"></b></i><strong>${Number(stats.confirmed||0)}</strong></div></div><p class="founder-v2-chart-note">Visualisation basée sur les compteurs actuellement chargés depuis Supabase.</p></section>
   <section class="founder-v2-section"><div class="founder-v2-heading"><div><small>GESTION DE LA PLATEFORME</small><h2>Vue générale</h2></div><span>⚙️</span></div>
    <div class="founder-v2-grid">
     ${tile('founderDashboard','📊','Tableau de bord','Activité et statistiques','fv-green')}
@@ -2694,13 +2698,17 @@ async function loadMemberHomeMetrics(){
   const ownResales=(Array.isArray(resales)?resales:[]).filter(x=>ok(x.statut));
   const stock=(Array.isArray(stocks)?stocks:[]).reduce((n,x)=>n+Math.max(0,Number(x.quantite||0)-Number(x.quantite_reservee||0)),0);
   const gains=(Array.isArray(commissions)?commissions:[]).filter(x=>ok(x.statut)).reduce((n,x)=>n+Number(x.montant||0),0);
-  set('mhPurchases',purchases.length);set('mhSales',ownSales.length+ownResales.length);set('mhStock',stock);set('mhEarnings',money(gains)+' FCFA');
+  set('mhPurchases',purchases.length);set('mhSales',ownSales.length+ownResales.length);set('mhStock',stock);set('mhEarnings',money(gains)+' FCFA');set('mhEarningsCard',money(gains)+' FCFA');
   if(msg)msg.textContent='Données confirmées synchronisées depuis Supabase. Les opérations en attente ne sont pas comptées.';
- }catch(e){console.warn('Activité membre BuSAF:',e);if(msg)msg.textContent='Certaines données ne sont pas disponibles : '+(e.message||'erreur de connexion');set('mhPurchases','—');set('mhSales','—');set('mhStock','—');set('mhEarnings','—');}
+ }catch(e){console.warn('Activité membre BuSAF:',e);if(msg)msg.textContent='Certaines données ne sont pas disponibles : '+(e.message||'erreur de connexion');set('mhPurchases','—');set('mhSales','—');set('mhStock','—');set('mhEarnings','—');set('mhEarningsCard','Indisponible');}
 }
 
 function memberHome(){
  const name=state.profile?.nom_complet||state.email||"Membre";
+ const profile=state.profile||{};
+ const referral=profile.code_parrain||invitationCode();
+ const country=profile.pays||"Pays non renseigné";
+ const phone=profile.telephone||"Téléphone non renseigné";
  const tiles=[
   ['money','👛','Portefeuille','Gérer mes fonds','tile-wallet'],
   ['stockMarket','📦','Stocks','Mes produits','tile-stock'],
@@ -2713,10 +2721,12 @@ function memberHome(){
  ];
  return `<div class="member-v2">
   <section class="member-v2-head">
-   <div class="member-v2-user"><div class="member-v2-avatar">${state.profile?.photo_url?'<img src="'+esc(state.profile.photo_url)+'" alt="Photo de profil">':'👤'}</div><div><small>BIENVENUE SUR BuSAF</small><h1>${esc(name)}</h1><span>ESPACE MEMBRE</span></div><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div>
+   <div class="member-v2-user"><div class="member-v2-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo de profil">':'👤'}</div><div class="member-v2-identity"><small>BIENVENUE SUR BuSAF</small><h1>${esc(name)}</h1><span>MEMBRE BuSAF</span><div class="member-v2-meta">${esc(countryFlag(country))} ${esc(country)} · 📱 ${esc(phone)}</div></div><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div>
    <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong>${money(state.marketBalance)}</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
+   <div class="member-v2-referral"><div><small>MON CODE DE PARRAINAGE</small><b>${esc(referral)}</b></div><button onclick="invite()">📲 INVITER</button></div>
   </section>
   <div class="member-v2-actions"><button onclick="setScreen('money')">＋ Déposer</button><button onclick="setScreen('money')">↗ Retirer</button><button onclick="setScreen('market')">🛒 Acheter</button></div>
+  <section class="member-v2-earnings"><div><small>MES GAINS CONFIRMÉS</small><b id="mhEarningsCard">Chargement…</b><span>Commissions validées sur BuSAF</span></div><button onclick="setScreen('profits')">Voir mes gains →</button></section>
   <section class="member-v2-live"><div class="member-v2-title"><div><small>MES RÉSULTATS RÉELS</small><h2>Mon activité BuSAF</h2></div><button onclick="loadMemberHomeMetrics()" aria-label="Actualiser mon activité">↻</button></div><div class="member-v2-live-grid"><div><small>Achats confirmés</small><b id="mhPurchases">…</b></div><div><small>Ventes confirmées</small><b id="mhSales">…</b></div><div><small>Stock disponible</small><b id="mhStock">…</b></div><div><small>Gains confirmés</small><b id="mhEarnings">…</b></div></div><p id="mhMetricsMessage">Synchronisation avec ton compte BuSAF…</p></section>
   <section class="member-v2-section"><div class="member-v2-title"><div><small>VOTRE ACTIVITÉ</small><h2>Mon espace</h2></div><span>BuSAF</span></div>
    <div class="member-v2-grid">${tiles.map(([id,ico,label,desc,cls])=>`<button class="member-v2-tile ${cls}" onclick="setScreen('${id}')"><span class="member-v2-tile-icon">${ico}</span><b>${label}</b><small>${desc}</small><i>Ouvrir →</i></button>`).join('')}</div>
@@ -4065,3 +4075,20 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")window.close
 
 </body>
 </html>
+<style>
+.member-v2-identity{min-width:0;flex:1}.member-v2-meta{font-size:10px;color:#e3f7e9;margin-top:5px;line-height:1.45;overflow-wrap:anywhere}
+.member-v2-referral{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;border-radius:17px;background:#e1f5e8;border:1px solid #c4e8d0;color:#125d35}
+.member-v2-referral small,.member-v2-earnings small{display:block;font-size:9px;font-weight:900;letter-spacing:1px;opacity:.72}.member-v2-referral b{display:block;font-size:17px;letter-spacing:.7px;margin-top:4px;overflow-wrap:anywhere}
+.member-v2-referral button{flex:none;border:0;border-radius:11px;background:#087a3b;color:#fff;padding:11px 13px;font-weight:900;font-size:10px}
+.member-v2-earnings{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px;border-radius:18px;background:linear-gradient(120deg,#123f2b,#087a3b);color:#fff}
+.member-v2-earnings b{display:block;font-size:22px;margin:5px 0}.member-v2-earnings span{font-size:10px;color:#d8f1e1}
+.member-v2-earnings button{border:1px solid #ffffff70;border-radius:11px;background:#ffffff18;color:#fff;padding:10px;font-size:10px;font-weight:800}
+.founder-v2-founder-profile{display:flex;align-items:center;gap:14px;margin:20px 0 8px}.founder-v2-founder-avatar{width:72px;height:72px;flex:none;border-radius:22px;display:grid;place-items:center;overflow:hidden;background:#ffffff18;border:2px solid #d8b76a;color:#f4d994;font-size:30px}
+.founder-v2-founder-avatar img{width:100%;height:100%;object-fit:cover}.founder-v2-founder-profile .founder-v2-welcome{min-width:0}
+.founder-v2-founder-meta{font-size:10px;color:#f1e6c9;margin-top:5px;overflow-wrap:anywhere}.founder-v2-founder-code{display:inline-block;margin-top:7px;padding:5px 9px;border:1px solid #c8a85b70;border-radius:8px;color:#f5d98e;font-size:9px;font-weight:900;letter-spacing:.7px}
+.founder-v2-intro{color:#e5ddc8;font-size:12px;margin:12px 0}.founder-v2-activity{background:#fff}.founder-v2-bars{display:grid;gap:13px}
+.founder-v2-bars>div{display:grid;grid-template-columns:112px minmax(30px,1fr) 34px;gap:9px;align-items:center;font-size:11px;color:#415447}
+.founder-v2-bars i{height:9px;border-radius:20px;background:#e8eee9;overflow:hidden}.founder-v2-bars i b{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#0b7041,#d2ad58)}
+.founder-v2-bars strong{text-align:right;color:#173e2a}.founder-v2-chart-note{font-size:10px;color:#849087;margin:12px 0 0}
+@media(max-width:390px){.member-v2-referral,.member-v2-earnings{align-items:flex-start;flex-direction:column}.founder-v2-founder-avatar{width:60px;height:60px;border-radius:18px}.founder-v2-bars>div{grid-template-columns:92px minmax(25px,1fr) 28px;gap:6px}}
+</style>
