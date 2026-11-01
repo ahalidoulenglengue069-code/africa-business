@@ -2148,11 +2148,40 @@ async function restoreAuthenticatedSession(){
     if(!user?.id && storedRefresh){
       // Renouvelle la session expirée sans obliger le membre à se reconnecter.
       state.token="";
-      const refreshed=await api("/auth/v1/token?grant_type=refresh_token",{
+      // Chrome peut ouvrir plusieurs onglets : un autre onglet peut avoir
+      // renouvelé le refresh token entre-temps. Toujours relire le jeton partagé.
+      let refreshToUse=localStorage.getItem("busaf_refresh_token")||storedRefresh;
+      const renewSession=(token)=>api("/auth/v1/token?grant_type=refresh_token",{
         method:"POST",timeoutMs:15000,
         headers:{Authorization:"Bearer "+SUPABASE_KEY},
-        body:JSON.stringify({refresh_token:storedRefresh})
+        body:JSON.stringify({refresh_token:token})
       });
+      let refreshed;
+      try{
+        refreshed=await renewSession(refreshToUse);
+      }catch(refreshError){
+        const latestRefresh=localStorage.getItem("busaf_refresh_token")||"";
+        const latestAccess=localStorage.getItem("busaf_access_token")||"";
+        // Si un autre onglet a fait la rotation, utiliser ses nouveaux jetons.
+        if(latestRefresh && latestRefresh!==refreshToUse){
+          refreshToUse=latestRefresh;
+          refreshed=await renewSession(refreshToUse);
+        }else if(latestAccess && latestAccess!==storedToken){
+          state.token=latestAccess;
+          user=await api("/auth/v1/user",{method:"GET",timeoutMs:12000});
+        }else{
+          throw refreshError;
+        }
+      }
+      if(user?.id){
+        // L'autre onglet a déjà établi une session valide.
+      }else{
+        if(!refreshed?.access_token||!refreshed?.user?.id)throw new Error("Renouvellement de session impossible.");
+        state.token=refreshed.access_token;
+        localStorage.setItem("busaf_access_token",refreshed.access_token);
+        if(refreshed.refresh_token)localStorage.setItem("busaf_refresh_token",refreshed.refresh_token);
+        user=refreshed.user;
+      }
       if(!refreshed?.access_token||!refreshed?.user?.id)throw new Error("Renouvellement de session impossible.");
       state.token=refreshed.access_token;
       localStorage.setItem("busaf_access_token",refreshed.access_token);
@@ -2181,12 +2210,29 @@ async function restoreAuthenticatedSession(){
     const msg=String(e?.message||"").toLowerCase();
     const invalidSession=/invalid.*refresh|refresh.*invalid|refresh token.*not found|session a expiré|token is expired|jwt expired|invalid jwt/.test(msg);
     if(invalidSession){
-      localStorage.removeItem("busaf_access_token");
-      localStorage.removeItem("busaf_refresh_token");
-      localStorage.removeItem("busaf_user_id");
-      localStorage.removeItem("busaf_email");
-      state.userId=""; state.email=""; state.token=""; state.profile=null; state.screen="public";
-      return false;
+      // Ne jamais effacer une session fraîche écrite par un autre onglet Chrome.
+      const latestRefresh=localStorage.getItem("busaf_refresh_token")||"";
+      const latestAccess=localStorage.getItem("busaf_access_token")||"";
+      const latestUserId=localStorage.getItem("busaf_user_id")||"";
+      if((latestRefresh && latestRefresh!==storedRefresh) || (latestAccess && latestAccess!==storedToken)){
+        state.token=latestAccess;
+        if(latestUserId)state.userId=latestUserId;
+        state.email=localStorage.getItem("busaf_email")||state.email||"";
+        state.screen=state.userId?"member":"public";
+        if(state.userId)return true;
+      }
+      // Une erreur de réseau ou un jeton périmé seul ne prouve pas que
+      // le refresh token est révoqué : conserver les identifiants stockés.
+      if(/invalid.*refresh|refresh.*invalid|refresh token.*not found/.test(msg)){
+        state.userId=latestUserId||state.userId||"";
+        state.email=localStorage.getItem("busaf_email")||state.email||"";
+        state.token=latestAccess||"";
+        state.screen=state.userId?"member":"public";
+        if(state.userId){
+          state.sessionRestoreWarning="La session doit être renouvelée. Réessaie sans recréer ton compte.";
+          return true;
+        }
+      }
     }
     // Une panne réseau ou un délai serveur ne doit jamais déconnecter le membre.
     const savedUserId=localStorage.getItem("busaf_user_id")||"";
