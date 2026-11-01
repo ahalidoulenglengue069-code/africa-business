@@ -2195,7 +2195,7 @@ function setScreen(screen){
  if(screen==="market" || screen==="public" || screen==="products" || screen==="founderMarket" || screen==="founderStocks"){
   // Toujours actualiser les données du Marché en arrière-plan à l'ouverture,
   // sans demander au visiteur de recharger toute la page.
-  loadMarketCatalog(true).then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation automatique du Marché:",e));
+  loadMarketCatalog().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation automatique du Marché:",e));
  }
  window.scrollTo({top:0,left:0,behavior:"instant"});
 }
@@ -2236,7 +2236,7 @@ async function api(path,options={}){
  // Évite les en-têtes inutiles sur GET : moins de précontrôles CORS sur mobile.
  const headers=Object.assign({"apikey":SUPABASE_KEY},options.headers||{});
  if(options.body!==undefined && options.body!==null && !Object.keys(headers).some(k=>k.toLowerCase()==="content-type"))headers["Content-Type"]="application/json";
- if(state.token)headers.Authorization="Bearer "+state.token;
+ if(state.token&&!Object.keys(headers).some(k=>k.toLowerCase()==="authorization"))headers.Authorization="Bearer "+state.token;
  // Un seul délai couvre la réponse complète, y compris la lecture du corps.
  const controller=new AbortController();
  const timeoutMs=Number.isFinite(options.timeoutMs)?Math.max(1000,options.timeoutMs):10000;
@@ -2320,7 +2320,7 @@ async function ensureMemberProfile(user){
  saveState();
 }
 
-async function restoreAuthenticatedSession(){
+async function restoreAuthenticatedSessionCore(){
   const storedToken=localStorage.getItem("busaf_access_token")||"";
   const storedRefresh=localStorage.getItem("busaf_refresh_token")||"";
   if(!storedToken&&!storedRefresh){
@@ -2394,27 +2394,59 @@ async function restoreAuthenticatedSession(){
     const msg=String(e?.message||"").toLowerCase();
     const invalidSession=/invalid.*refresh|refresh.*invalid|refresh token.*not found|session a expiré|token is expired|jwt expired|invalid jwt/.test(msg);
     if(invalidSession){
-      // Ne jamais effacer une session fraîche écrite par un autre onglet Chrome.
       const latestRefresh=localStorage.getItem("busaf_refresh_token")||"";
       const latestAccess=localStorage.getItem("busaf_access_token")||"";
       const latestUserId=localStorage.getItem("busaf_user_id")||"";
-      if((latestRefresh && latestRefresh!==storedRefresh) || (latestAccess && latestAccess!==storedToken)){
+      // Un autre onglet peut avoir écrit une nouvelle session : ne l'accepter qu'après vérification Auth.
+      if(latestAccess&&latestAccess!==storedToken){
         state.token=latestAccess;
-        if(latestUserId)state.userId=latestUserId;
-        state.email=localStorage.getItem("busaf_email")||state.email||"";
-        if(state.userId)return true;
+        try{
+          const latestUser=await api("/auth/v1/user",{method:"GET",timeoutMs:12000});
+          if(latestUser?.id){
+            state.userId=latestUser.id;
+            state.email=latestUser.email||localStorage.getItem("busaf_email")||"";
+            await loadProfile();
+            if(state.profile)return true;
+          }
+        }catch(_){}
       }
-      // Une erreur de réseau ou un jeton périmé seul ne prouve pas que
-      // le refresh token est révoqué : conserver les identifiants stockés.
-      if(/invalid.*refresh|refresh.*invalid|refresh token.*not found/.test(msg)){
-        state.userId=latestUserId||state.userId||"";
-        state.email=localStorage.getItem("busaf_email")||state.email||"";
-        state.token=latestAccess||"";
-        if(state.userId){
-          state.sessionRestoreWarning="La session doit être renouvelée. Réessaie sans recréer ton compte.";
-          return true;
-        }
+      // Si seul le refresh token a changé, tenter une fois le jeton partagé le plus récent.
+      if(latestRefresh&&latestRefresh!==storedRefresh){
+        try{
+          state.token="";
+          const latestSession=await api("/auth/v1/token?grant_type=refresh_token",{
+            method:"POST",timeoutMs:15000,
+            headers:{Authorization:"Bearer "+SUPABASE_KEY},
+            body:JSON.stringify({refresh_token:latestRefresh})
+          });
+          if(latestSession?.access_token&&latestSession?.user?.id){
+            state.token=latestSession.access_token;
+            state.userId=latestSession.user.id;
+            state.email=latestSession.user.email||localStorage.getItem("busaf_email")||"";
+            localStorage.setItem("busaf_access_token",latestSession.access_token);
+            if(latestSession.refresh_token)localStorage.setItem("busaf_refresh_token",latestSession.refresh_token);
+            localStorage.setItem("busaf_user_id",state.userId);
+            localStorage.setItem("busaf_email",state.email);
+            try{await loadProfile();}catch(_){}
+            if(state.profile)return true;
+          }
+        }catch(_){}
       }
+      // Aucun jeton utilisable : demander une nouvelle connexion, sans toucher au profil ni aux données métier.
+      if((localStorage.getItem("busaf_refresh_token")||"")===storedRefresh&&
+         (localStorage.getItem("busaf_access_token")||"")===storedToken){
+        localStorage.removeItem("busaf_access_token");
+        localStorage.removeItem("busaf_refresh_token");
+        localStorage.removeItem("busaf_user_id");
+      }
+      state.userId="";
+      state.token="";
+      state.profile=null;
+      state.sessionRestoreWarning="Ta session a expiré. Reconnecte-toi : ton profil et tes données BuSAF sont conservés.";
+      state.screen="login";
+      history.replaceState({busafScreen:"login"},"",location.pathname+"#login");
+      if(document.getElementById("app"))render();
+      return false;
     }
     // Une panne réseau ou un délai serveur ne doit jamais déconnecter le membre.
     const savedUserId=localStorage.getItem("busaf_user_id")||"";
@@ -2427,6 +2459,15 @@ async function restoreAuthenticatedSession(){
     }
     return false;
   }
+}
+
+let busafSessionRestorePromise=null;
+async function restoreAuthenticatedSession(){
+ if(busafSessionRestorePromise)return busafSessionRestorePromise;
+ const task=restoreAuthenticatedSessionCore();
+ busafSessionRestorePromise=task;
+ try{return await task;}
+ finally{if(busafSessionRestorePromise===task)busafSessionRestorePromise=null;}
 }
 
 async function handlePasswordRecovery(){
@@ -2624,38 +2665,44 @@ function dailySalesCount(){const k=dayKey();const rows=Array.isArray(state.sales
 function totalSalesCount(){const rows=Array.isArray(state.sales)?state.sales:[];return rows.reduce((a,x)=>a+Number(x.qty||0),0);}
 async function loadMemberSalesProgress(){
  const ids=["memberPartnerProgress","partnerMonthCount","member100Progress","partnerTotalCount"];
+ const update=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+ const bar=(id,value)=>{const el=document.getElementById(id);if(el)el.style.width=Math.min(100,Math.max(0,value))+"%";};
+ const apply=v=>{
+  update("memberPartnerProgress",Math.min(v.month,10)+"/10");
+  update("memberPartnerProgressText",v.month+" ventes validées ce mois sur 10");
+  bar("memberPartnerProgressBar",v.month*10);
+  update("member100Progress",Math.min(v.total,100)+"/100");
+  update("member100ProgressText",v.total+" ventes validées au total");
+  update("partnerMonthCount",String(v.month));update("partnerTotalCount",String(v.total));bar("partnerProgressBar",v.month*10);
+  updateProgressMessage(v.month>=10?"Objectif PARTNER atteint selon les ventes confirmées dans Supabase.":"Données réelles des ventes confirmées chargées depuis Supabase.");
+ };
  if(!state.userId||!state.profile?.id||!state.token){
-  for(const id of ids){const el=document.getElementById(id);if(el)el.textContent="Connexion requise";}
-  updateProgressMessage("Connecte-toi pour vérifier tes ventes.");
-  return;
+  for(const id of ids)update(id,"Connexion requise");
+  updateProgressMessage("Connecte-toi pour vérifier tes ventes.");return;
  }
- try{
-  const result=await api("/rest/v1/rpc/busaf_progression_ventes",{method:"POST",body:JSON.stringify({}),timeoutMs:12000});
-  const data=Array.isArray(result)?result[0]:result;
-  if(!data||typeof data!=="object")throw new Error("Réponse de progression invalide.");
-  const month=Math.max(0,Number(data.mois||0));
-  const total=Math.max(0,Number(data.total||0));
-  const update=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
-  const bar=(id,value)=>{const el=document.getElementById(id);if(el)el.style.width=Math.min(100,Math.max(0,value))+"%";};
-  update("memberPartnerProgress",Math.min(month,10)+"/10");
-  update("memberPartnerProgressText",month+" ventes validées ce mois sur 10");
-  bar("memberPartnerProgressBar",month*10);
-  update("member100Progress",Math.min(total,100)+"/100");
-  update("member100ProgressText",total+" ventes validées au total");
-  bar("member100ProgressBar",total);
-  update("partnerMonthCount",String(month));
-  update("partnerTotalCount",String(total));
-  bar("partnerProgressBar",month*10);
-  updateProgressMessage(month>=10?"Objectif PARTNER atteint selon les ventes confirmées dans Supabase.":"Données réelles des ventes confirmées chargées depuis Supabase.");
- }catch(e){
+ const cached=window.__busafSalesProgressCache;
+ if(cached&&Date.now()-cached.at<20000){apply(cached);return;}
+ if(window.__busafSalesProgressPromise){try{const v=await window.__busafSalesProgressPromise;if(v)apply(v);}catch(_){}return;}
+ const task=(async()=>{
+  const data=await api("/rest/v1/rpc/busaf_progression_ventes",{method:"POST",body:JSON.stringify({}),timeoutMs:12000});
+  const row=Array.isArray(data)?data[0]:data;
+  if(!row||typeof row!=="object")throw new Error("Réponse de progression invalide.");
+  const value={month:Math.max(0,Number(row.mois||0)),total:Math.max(0,Number(row.total||0)),at:Date.now()};
+  window.__busafSalesProgressCache=value;apply(value);return value;
+ })();
+ window.__busafSalesProgressPromise=task;
+ try{await task;}
+ catch(e){
   const msg="Chargement impossible : "+(e.message||"Erreur Supabase");
-  for(const id of ids){const el=document.getElementById(id);if(el)el.textContent="—";}
-  const memberMonthText=document.getElementById("memberPartnerProgressText");if(memberMonthText)memberMonthText.textContent=msg;
-  const memberTotalText=document.getElementById("member100ProgressText");if(memberTotalText)memberTotalText.textContent=msg;
+  for(const id of ids)update(id,"—");
+  const a=document.getElementById("memberPartnerProgressText");if(a)a.textContent=msg;
+  const b=document.getElementById("member100ProgressText");if(b)b.textContent=msg;
   updateProgressMessage(msg);
  }
+ finally{if(window.__busafSalesProgressPromise===task)window.__busafSalesProgressPromise=null;}
  function updateProgressMessage(value){const el=document.getElementById("partnerProgressMessage");if(el)el.textContent=value;}
 }
+
 function hasBoughtProduct(id){return state.orders.some(o=>['stock','direct','first_purchase','yengapay_purchase'].includes(o.mode) && String(o.productId)===String(id));}
 function directResale(id){
  const p=productForId(id);
@@ -3007,34 +3054,36 @@ async function submitFounderWithdrawal(){
 function founderFinance(){if(!isFounder())return memberHome();const s=state.founderStats||{};return page('💰 Finances',`<div class="notice success">Montants calculés à partir des ventes confirmées chargées depuis Supabase.</div><div class="statgrid"><div class="stat">Ventes confirmées<strong>${s.confirmed??'—'}</strong></div><div class="stat">Montant confirmé<strong>${money(s.revenue||0)}</strong></div></div><button class="btn" onclick="refreshFounderData()">🔄 ACTUALISER</button>`);}
 function founderStocks(){
  if(!isFounder())return memberHome();
- return page('📦 Gestion des stocks',`
-  <div class="notice success"><strong>INVENTAIRE CENTRAL BuSAF</strong><br>Quantités lues dans la table stocks_busaf. Les quantités réservées sont séparées du stock disponible.</div>
-  <div class="statgrid founder-stock-kpis"><div class="stat">Lignes de stock<strong id="fStockLines">…</strong></div><div class="stat">Unités disponibles<strong id="fStockAvailable">…</strong></div><div class="stat">Unités réservées<strong id="fStockReserved">…</strong></div><div class="stat">Alertes de stock<strong id="fStockAlerts">…</strong></div></div>
-  <div class="rule"><label for="founderStockSearch">Rechercher un produit ou un propriétaire</label><input id="founderStockSearch" type="search" placeholder="Nom du produit, membre…" oninput="filterFounderStocks()"><label for="founderStockType">Type de stock</label><select id="founderStockType" onchange="filterFounderStocks()"><option value="">Tous les types</option><option value="marche">Marché</option><option value="revente">Revente</option></select></div>
-  <div id="founderStockRows"><div class="empty">Chargement de l'inventaire réel…</div></div>
-  <button class="btn alt" onclick="loadFounderStocks()">↻ ACTUALISER L'INVENTAIRE</button>
+ return page('📦 Stocks du Marché BuSAF',`
+  <div class="notice success"><strong>INVENTAIRE NUMÉRIQUE CENTRAL</strong><br>Quantités disponibles dans le dépôt de revente des membres, après confirmation des achats.</div>
+  <div class="statgrid founder-stock-kpis"><div class="stat">Lignes de stock<strong id="fStockLines">…</strong></div><div class="stat">Unités disponibles<strong id="fStockAvailable">…</strong></div><div class="stat">Membres concernés<strong id="fStockMembers">…</strong></div><div class="stat">Produits concernés<strong id="fStockProducts">…</strong></div></div>
+  <div class="rule"><label for="founderStockSearch">Rechercher un produit ou un propriétaire</label><input id="founderStockSearch" type="search" placeholder="Nom du produit, membre…" oninput="filterFounderStocks()"><label for="founderStockType">Type de produit</label><select id="founderStockType" onchange="filterFounderStocks()"><option value="">Tous les types</option><option value="digital">Numérique</option><option value="physique">Physique</option></select></div>
+  <div id="founderStockRows"><div class="empty">Chargement du dépôt de revente réel…</div></div>
+  <button class="btn alt" onclick="loadFounderStocks()">↻ ACTUALISER LES STOCKS</button>
   <button class="btn alt" onclick="setScreen('founderPayments')">💳 VOIR LES VENTES ET PAIEMENTS</button>
  `);
 }
+
 async function loadFounderStocks(){
  if(!isFounder())return;
- const box=document.getElementById('founderStockRows');if(box)box.innerHTML='<div class="empty">Synchronisation de l’inventaire…</div>';
+ const box=document.getElementById('founderStockRows');if(box)box.innerHTML='<div class="empty">Synchronisation du dépôt numérique…</div>';
  try{
   const [stocks,products,profiles]=await Promise.all([
-   api('/rest/v1/stocks_busaf?select=id,produit_id,proprietaire_id,type_stock,quantite,quantite_reservee,seuil_alerte,updated_at&order=updated_at.desc&limit=1000',{timeoutMs:18000}),
-   api('/rest/v1/produits?select=id,nom,prix,image_url&limit=1000',{timeoutMs:18000}),
+   api('/rest/v1/busaf_depot_vente?select=id,produit_id,proprietaire_id,quantite,updated_at&order=updated_at.desc&limit=1000',{timeoutMs:18000}),
+   api('/rest/v1/produits?select=id,nom,prix,image_url,type_produit&limit=1000',{timeoutMs:18000}),
    api('/rest/v1/profils_busaf?select=id,nom_complet,telephone&limit=1000',{timeoutMs:18000})
   ]);
   if(!Array.isArray(stocks)||!Array.isArray(products)||!Array.isArray(profiles))throw new Error('Réponse incomplète du serveur.');
   state.founderStockRows=stocks.map(s=>({...s,product:products.find(p=>String(p.id)===String(s.produit_id))||null,owner:profiles.find(p=>String(p.id)===String(s.proprietaire_id))||null}));
-  const available=stocks.reduce((n,s)=>n+Math.max(0,Number(s.quantite||0)-Number(s.quantite_reservee||0)),0);
-  const reserved=stocks.reduce((n,s)=>n+Math.max(0,Number(s.quantite_reservee||0)),0);
-  const alerts=stocks.filter(s=>Math.max(0,Number(s.quantite||0)-Number(s.quantite_reservee||0))<=Number(s.seuil_alerte||0)).length;
+  const units=stocks.reduce((n,s)=>n+Math.max(0,Number(s.quantite||0)),0);
+  const members=new Set(stocks.map(s=>String(s.proprietaire_id))).size;
+  const productCount=new Set(stocks.map(s=>String(s.produit_id))).size;
   const put=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=String(v)};
-  put('fStockLines',stocks.length);put('fStockAvailable',available);put('fStockReserved',reserved);put('fStockAlerts',alerts);
+  put('fStockLines',stocks.length);put('fStockAvailable',units);put('fStockMembers',members);put('fStockProducts',productCount);
   renderFounderStockRows();
- }catch(e){console.error('Inventaire fondateur:',e);if(box)box.innerHTML='<div class="notice error">Inventaire indisponible : '+esc(e.message||'Erreur serveur')+'</div>';}
+ }catch(e){console.error('Dépôt numérique fondateur:',e);if(box)box.innerHTML='<div class="notice error">Dépôt numérique indisponible : '+esc(e.message||'Erreur serveur')+'</div>';}
 }
+
 function filterFounderStocks(){renderFounderStockRows();}
 function renderFounderStockRows(){
  const box=document.getElementById('founderStockRows');if(!box)return;
@@ -3042,14 +3091,15 @@ function renderFounderStockRows(){
  const type=(document.getElementById('founderStockType')?.value||'').toLowerCase();
  const rows=(state.founderStockRows||[]).filter(s=>{
   const product=s.product?.nom||'Produit non identifié',owner=s.owner?.nom_complet||'Propriétaire non identifié';
-  return (!q||(product+' '+owner+' '+(s.owner?.telephone||'')).toLowerCase().includes(q))&&(!type||String(s.type_stock||'').toLowerCase().includes(type));
+  return (!q||(product+' '+owner+' '+(s.owner?.telephone||'')).toLowerCase().includes(q))&&(!type||String(s.product?.type_produit||'').toLowerCase()===type);
  });
- if(!rows.length){box.innerHTML='<div class="empty">Aucune ligne de stock ne correspond à cette recherche.</div>';return;}
+ if(!rows.length){box.innerHTML='<div class="empty">Aucun produit disponible dans les dépôts de revente.</div>';return;}
  box.innerHTML='<div class="founder-stock-list">'+rows.map(s=>{
-  const qty=Math.max(0,Number(s.quantite||0)),reserved=Math.max(0,Number(s.quantite_reservee||0)),available=Math.max(0,qty-reserved),threshold=Number(s.seuil_alerte||0),low=available<=threshold;
-  return '<article class="founder-stock-row"><div class="founder-stock-row-top"><div><strong>'+esc(s.product?.nom||'Produit non identifié')+'</strong><small>'+esc(s.owner?.nom_complet||'Propriétaire non identifié')+' · '+esc(s.type_stock||'Type non précisé')+'</small></div><span class="founder-stock-status '+(low?'is-low':'is-ok')+'">'+(low?'STOCK BAS':'DISPONIBLE')+'</span></div><div class="founder-stock-numbers"><div><small>Disponible</small><b>'+available+'</b></div><div><small>Réservé</small><b>'+reserved+'</b></div><div><small>Quantité totale</small><b>'+qty+'</b></div><div><small>Seuil alerte</small><b>'+threshold+'</b></div></div><div class="founder-stock-updated">Dernière mise à jour : '+esc(s.updated_at?new Date(s.updated_at).toLocaleString('fr-FR'):'Non renseignée')+'</div></article>';
+  const qty=Math.max(0,Number(s.quantite||0));
+  return '<article class="founder-stock-row"><div class="founder-stock-row-top"><div><strong>'+esc(s.product?.nom||'Produit non identifié')+'</strong><small>'+esc(s.owner?.nom_complet||'Propriétaire non identifié')+' · '+esc(s.product?.type_produit||'Type non précisé')+'</small></div><span class="founder-stock-status is-ok">DISPONIBLE</span></div><div class="founder-stock-numbers"><div><small>Quantité disponible</small><b>'+qty+'</b></div><div><small>Prix de référence</small><b>'+money(s.product?.prix||0)+'</b></div></div><div class="founder-stock-updated">Dernière mise à jour : '+esc(s.updated_at?new Date(s.updated_at).toLocaleString('fr-FR'):'Non renseignée')+'</div></article>';
  }).join('')+'</div>';
 }
+
 function founderPlaceholder(title,desc){
  if(!isFounder())return memberHome();
  const key=String(title||'').toLowerCase();
@@ -3093,24 +3143,39 @@ async function publishFounderAnnouncement(){
 async function loadMemberHomeMetrics(){
  const profileId=state.profile?.id;if(!profileId||!state.token)return;
  const set=(id,value)=>{const e=document.getElementById(id);if(e)e.textContent=String(value)};
- const msg=document.getElementById('mhMetricsMessage');if(msg)msg.textContent='Actualisation des données…';
- try{
+ const apply=v=>{
+  set('mhPurchases',v.purchases);set('mhSales',v.sales);set('mhStock',v.stock);set('mhEarnings',money(v.gains));set('mhEarningsCard',money(v.gains));
+  const msg=document.getElementById('mhMetricsMessage');if(msg)msg.textContent=v.message;
+ };
+ const cached=window.__busafHomeMetricsCache;
+ if(cached&&Date.now()-cached.at<20000){apply(cached);return;}
+ if(window.__busafHomeMetricsPromise){try{const v=await window.__busafHomeMetricsPromise;if(v)apply(v);}catch(_){}return;}
+ const task=(async()=>{
   const id=encodeURIComponent(profileId);
+  const msg=document.getElementById('mhMetricsMessage');if(msg)msg.textContent='Actualisation des données…';
   const [sales,resales,stocks,commissions]=await Promise.all([
    api('/rest/v1/ventes?select=id,montant,statut,vendeur_id,acheteur_id&or=(vendeur_id.eq.'+id+',acheteur_id.eq.'+id+')&limit=1000',{timeoutMs:15000}),
    api('/rest/v1/busaf_reventes?select=id,montant,statut,vendeur_id&vendeur_id=eq.'+id+'&limit=1000',{timeoutMs:15000}),
-   api('/rest/v1/stocks_busaf?select=quantite,quantite_reservee&proprietaire_id=eq.'+id+'&limit=1000',{timeoutMs:15000}),
+   api('/rest/v1/busaf_depot_vente?select=quantite&proprietaire_id=eq.'+id+'&limit=1000',{timeoutMs:15000}),
    api('/rest/v1/busaf_commissions?select=montant,statut,type_commission&beneficiaire_id=eq.'+id+'&limit=1000',{timeoutMs:15000})
   ]);
   const ok=s=>['confirmee','confirme','validee','valide','payee','paye','success','succeeded'].includes(String(s||'').toLowerCase());
   const ownSales=(Array.isArray(sales)?sales:[]).filter(x=>String(x.vendeur_id)===String(profileId)&&ok(x.statut));
   const purchases=(Array.isArray(sales)?sales:[]).filter(x=>String(x.acheteur_id)===String(profileId)&&ok(x.statut));
   const ownResales=(Array.isArray(resales)?resales:[]).filter(x=>ok(x.statut));
-  const stock=(Array.isArray(stocks)?stocks:[]).reduce((n,x)=>n+Math.max(0,Number(x.quantite||0)-Number(x.quantite_reservee||0)),0);
+  const stock=(Array.isArray(stocks)?stocks:[]).reduce((n,x)=>n+Math.max(0,Number(x.quantite||0)),0);
   const gains=(Array.isArray(commissions)?commissions:[]).filter(x=>ok(x.statut)).reduce((n,x)=>n+Number(x.montant||0),0);
-  set('mhPurchases',purchases.length);set('mhSales',ownSales.length+ownResales.length);set('mhStock',stock);set('mhEarnings',money(gains));set('mhEarningsCard',money(gains));
-  if(msg)msg.textContent='Données confirmées synchronisées depuis Supabase. Les opérations en attente ne sont pas comptées.';
- }catch(e){console.warn('Activité membre BuSAF:',e);if(msg)msg.textContent='Certaines données ne sont pas disponibles : '+(e.message||'erreur de connexion');set('mhPurchases','—');set('mhSales','—');set('mhStock','—');set('mhEarnings','—');set('mhEarningsCard','Indisponible');}
+  const value={purchases:purchases.length,sales:ownSales.length+ownResales.length,stock,gains,message:'Données confirmées synchronisées depuis Supabase. Les opérations en attente ne sont pas comptées.',at:Date.now()};
+  window.__busafHomeMetricsCache=value;apply(value);return value;
+ })();
+ window.__busafHomeMetricsPromise=task;
+ try{await task;}
+ catch(e){
+  console.warn('Activité membre BuSAF:',e);
+  const msg=document.getElementById('mhMetricsMessage');if(msg)msg.textContent='Certaines données ne sont pas disponibles : '+(e.message||'erreur de connexion');
+  set('mhPurchases','—');set('mhSales','—');set('mhStock','—');set('mhEarnings','—');set('mhEarningsCard','Indisponible');
+ }
+ finally{if(window.__busafHomeMetricsPromise===task)window.__busafHomeMetricsPromise=null;}
 }
 
 function busafWorkspaceTheme(scope){const key=scope==='founder'?'busaf_founder_theme':'busaf_member_theme';try{return localStorage.getItem(key)==='dark'?'dark':'light';}catch(e){return 'light';}}
@@ -4005,31 +4070,22 @@ function memberProfits(){
  <button class="btn alt" onclick="loadMemberProfits()">🔄 ACTUALISER</button>`);
 }
 async function loadMemberProfits(){
- const sellerEl=document.getElementById('memberSellerProfit');
- const referralEl=document.getElementById('memberReferralCommission');
- const walletEl=document.getElementById('memberWalletBalance');
- const message=document.getElementById('memberProfitMessage');
+ const sellerEl=document.getElementById('memberSellerProfit'),referralEl=document.getElementById('memberReferralCommission'),walletEl=document.getElementById('memberWalletBalance'),message=document.getElementById('memberProfitMessage');
  if(!sellerEl||!referralEl||!walletEl)return;
  if(!state.profile?.id||!state.token){message.textContent='Connecte-toi pour consulter tes montants.';return;}
  try{
-  const [commissions,transactions,withdrawals]=await Promise.all([
+  const [commissions,balanceResult]=await Promise.all([
    api('/rest/v1/busaf_commissions?select=type_commission,montant,statut&beneficiaire_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=500',{timeoutMs:15000}),
-   api('/rest/v1/busaf_transactions_portefeuille?select=montant,sens,statut&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=500',{timeoutMs:15000}),
-   api('/rest/v1/busaf_retraits?select=montant,statut&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=200',{timeoutMs:15000})
+   api('/rest/v1/rpc/busaf_solde_compte_fondateur',{method:'POST',body:JSON.stringify({p_profil_id:state.profile.id,p_compte:'Compte Marché'}),timeoutMs:12000})
   ]);
   const confirmed=(Array.isArray(commissions)?commissions:[]).filter(x=>x.statut==='confirmee');
   const seller=confirmed.filter(x=>(x.type_commission==='benefice_vendeur_12'||x.type_commission==='benefice_vendeur_40')).reduce((n,x)=>n+Number(x.montant||0),0);
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
-  const tx=(Array.isArray(transactions)?transactions:[]).filter(x=>x.statut==='confirmee');
-  const pendingWithdrawals=(Array.isArray(withdrawals)?withdrawals:[]).filter(x=>['en_attente','approuve'].includes(String(x.statut||'').toLowerCase())).reduce((n,x)=>n+Number(x.montant||0),0);
-  const balance=Math.max(0,tx.reduce((n,x)=>n+(x.sens==='credit'?1:-1)*Number(x.montant||0),0)-pendingWithdrawals);
-  sellerEl.textContent=money(seller)+' FCFA';
-  referralEl.textContent=money(referral)+' FCFA';
-  walletEl.textContent=money(balance)+' FCFA';
-  message.textContent='Données confirmées et synchronisées depuis Supabase.';
- }catch(e){
-  message.textContent='Chargement impossible : '+(e.message||'Erreur Supabase');
- }
+  const balance=Number(balanceResult);
+  if(!Number.isFinite(balance))throw new Error('Solde du portefeuille invalide.');
+  sellerEl.textContent=money(seller)+' FCFA';referralEl.textContent=money(referral)+' FCFA';walletEl.textContent=money(Math.max(0,balance))+' FCFA';
+  message.textContent='Commissions et solde confirmés synchronisés depuis Supabase.';
+ }catch(e){message.textContent='Chargement impossible : '+(e.message||'Erreur Supabase');}
 }
 
 function memberCommissions(){return page("🤝 Mes Commissions",`<div id="memberCommissionSummary"><div class="empty">Chargement de tes commissions réelles…</div></div><div id="memberCommissionRows"></div><div class="rule"><h3>Règle BuSAF</h3><p>Le parrain direct reçoit 7 % après le premier achat confirmé et sur les reventes validées de ses invités directs. Aucun niveau indirect n'est commissionné.</p></div><button class="btn alt" onclick="loadMemberCommissions()">🔄 ACTUALISER</button><button class="btn" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
@@ -4055,32 +4111,33 @@ function memberPartner(){return page("⭐ Progression Partner",`<div class="stat
 function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 12 % sur chaque revente validée ; son parrain direct reçoit 7 % après son premier achat confirmé et sur ses reventes validées.</p></div>`);}
 async function loadMemberWalletBalance(){
  if(!state.profile?.id||!state.token)return;
+ const targets=['memberWalletBalanceHome','memberWalletBalanceMini','memberWalletBalancePage'];
+ const apply=value=>targets.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(value)+' FCFA';});
+ const cached=window.__busafWalletBalanceCache;
+ if(cached&&Date.now()-cached.at<20000){state.marketBalance=cached.balance;apply(cached.balance);return cached.balance;}
  if(window.__busafWalletBalancePromise)return window.__busafWalletBalancePromise;
  const task=(async()=>{
-  const targets=['memberWalletBalanceHome','memberWalletBalanceMini','memberWalletBalancePage'];
   try{
    const result=await api('/rest/v1/rpc/busaf_solde_compte_fondateur',{
-    method:'POST',
-    body:JSON.stringify({p_profil_id:state.profile.id,p_compte:'Compte Marché'}),
-    timeoutMs:12000
+    method:'POST',body:JSON.stringify({p_profil_id:state.profile.id,p_compte:'Compte Marché'}),timeoutMs:12000
    });
    const balance=Number(result);
    if(!Number.isFinite(balance))throw new Error('Le serveur a retourné un solde invalide.');
    state.marketBalance=Math.max(0,balance);
+   window.__busafWalletBalanceCache={balance:state.marketBalance,at:Date.now()};
    try{localStorage.setItem('busaf_market_balance',String(state.marketBalance));}catch(_){}
-   targets.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(state.marketBalance)+' FCFA';});
-   return state.marketBalance;
+   apply(state.marketBalance);return state.marketBalance;
   }catch(e){
    console.warn('Solde portefeuille membre non synchronisé:',e);
    targets.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Indisponible';});
-   const pageBalance=document.getElementById('memberWalletBalancePage');
-   if(pageBalance)pageBalance.title='Impossible de vérifier le solde auprès du serveur.';
+   const pageBalance=document.getElementById('memberWalletBalancePage');if(pageBalance)pageBalance.title='Impossible de vérifier le solde auprès du serveur.';
    return null;
   }
  })();
  window.__busafWalletBalancePromise=task;
  try{return await task;}finally{if(window.__busafWalletBalancePromise===task)window.__busafWalletBalancePromise=null;}
 }
+
 function memberMoney(){return page("👛 Mon portefeuille",`<section class="wallet-hero"><div class="wallet-hero-top"><span>💼 COMPTE MARCHÉ</span><span class="wallet-live">● DONNÉES DU COMPTE</span></div><small>Solde disponible</small><strong id="memberWalletBalancePage">${money(state.marketBalance)} <i>FCFA</i></strong><p>Ton portefeuille BuSAF centralise tes dépôts, retraits et opérations confirmées.</p></section><div class="wallet-action-grid"><button class="wallet-action wallet-deposit" onclick="openMoneyDeposit()"><span>＋</span><b>Faire un dépôt</b><small>Recharger le compte</small></button><button class="wallet-action wallet-withdraw" onclick="openMoneyWithdraw()"><span>↗</span><b>Demander un retrait</b><small>Recevoir par Mobile Money</small></button></div><div class="wallet-security-note">🔐 <strong>Protection du solde</strong><br>Un dépôt est crédité uniquement après confirmation sécurisée du paiement. Un retrait est soumis à la vérification du solde disponible.</div><section class="wallet-history-panel deposit-history-panel"><div class="wallet-panel-heading"><span>📥</span><div><h3>Historique des dépôts</h3><p>Recharges et paiements entrants</p></div></div><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="wallet-history-panel withdrawal-history-panel"><div class="wallet-panel-heading"><span>📤</span><div><h3>Historique des retraits</h3><p>Demandes et paiements sortants</p></div></div><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section>`);setTimeout(()=>{loadMemberWalletBalance();loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
 async function loadMemberDepositHistory(){
  const box=document.getElementById("memberDepositHistory");if(!box)return;
@@ -4203,22 +4260,25 @@ async function finalizeStockSale(productId,qty){
 
 async function loadMarketDepot(){
  if(!state.profile?.id||!state.token)return;
+ state.marketDepotError="";
  try{
   const rows=await api('/rest/v1/busaf_depot_vente?select=produit_id,quantite,produits(nom,prix,image_url,type_produit)&proprietaire_id=eq.'+encodeURIComponent(state.profile.id)+'&order=updated_at.desc');
   if(!Array.isArray(rows))throw new Error('Réponse du dépôt invalide.');
   state.marketStockItems=rows.map(row=>({
-   productId:String(row.produit_id),
-   name:row.produits?.nom||'Produit BuSAF',
-   emoji:'📦',
-   price:Number(row.produits?.prix||0),
-   qty:Number(row.quantite||0),
-   image:row.produits?.image_url||'',
-   type:row.produits?.type_produit||''
+   productId:String(row.produit_id),name:row.produits?.nom||'Produit BuSAF',emoji:'📦',
+   price:Number(row.produits?.prix||0),qty:Number(row.quantite||0),
+   image:row.produits?.image_url||'',type:row.produits?.type_produit||''
   })).filter(x=>x.qty>0);
   state.marketStock=state.marketStockItems.reduce((sum,x)=>sum+x.qty,0);
+  state.marketDepotError="";
   saveState();
- }catch(e){console.warn('Chargement du dépôt de vente BuSAF:',e);}
+ }catch(e){
+  console.warn('Chargement du dépôt de vente BuSAF:',e);
+  state.marketDepotError=e.message||'Le dépôt de vente est indisponible.';
+  state.marketStockItems=[];state.marketStock=0;saveState();
+ }
 }
+
 async function loadMemberResales(){
  const el=document.getElementById('memberResalesList');
  if(!el||!state.profile?.id)return;
@@ -4232,7 +4292,15 @@ async function loadMemberResales(){
   }).join(''):'<div class="empty">Aucune revente enregistrée pour le moment.</div>';
  }catch(e){el.innerHTML='<div class="notice error">'+esc(e.message||'Historique indisponible')+'</div>';}
 }
-function memberStockMarket(){return page("📦 Dépôt de vente",`<div class="stat">Produits disponibles<strong>${state.marketStock}</strong></div><div class="notice success">Chaque achat confirmé par YengaPay est ajouté automatiquement à ton dépôt de vente.</div>${state.marketStockItems.length?`<ul class="list">${state.marketStockItems.filter(x=>x.qty>0).map(x=>`<li><strong>${esc(x.emoji||"🛒")} ${esc(x.name)}</strong><br>Quantité disponible : ${x.qty}<br>Prix de référence : ${money(x.price)}<button class="btn" onclick="shareMarketProduct('${String(x.productId).replace(/'/g,"\\\\'")}')">📲 PARTAGER LE PRODUIT</button><label>Quantité à revendre</label><input id="sellQty" type="number" min="1" max="${x.qty}" value="1"><button class="btn" onclick="confirmStockSale('${String(x.productId).replace(/'/g,"\\\\'")}')">💰 ENREGISTRER UNE REVENTE</button></li>`).join("")}</ul>`:`<div class="empty">Ton dépôt de vente est vide. Achète un produit du Marché ; après confirmation du paiement, il apparaîtra ici.</div>`}<section class="rule"><h3>📋 Mes reventes</h3><div id="memberResalesList">Chargement de tes reventes…</div><button class="btn alt" onclick="loadMemberResales()">🔄 ACTUALISER</button></section>`);}
+function memberStockMarket(){
+ const content=state.marketDepotError
+  ?'<div class="notice error">Stock non vérifié auprès du serveur : '+esc(state.marketDepotError)+'. Réessaie lorsque la connexion sera rétablie.</div>'
+  :state.marketStockItems.length
+   ?'<ul class="list">'+state.marketStockItems.filter(x=>x.qty>0).map(x=>'<li><strong>'+esc(x.emoji||"🛒")+' '+esc(x.name)+'</strong><br>Quantité disponible : '+x.qty+'<br>Prix de référence : '+money(x.price)+'<button class="btn" onclick="shareMarketProduct(\''+String(x.productId).replace(/'/g,"\\'")+'\')">📲 PARTAGER LE PRODUIT</button><label>Quantité à revendre</label><input id="sellQty" type="number" min="1" max="'+x.qty+'" value="1"><button class="btn" onclick="confirmStockSale(\''+String(x.productId).replace(/'/g,"\\'")+'\')">💰 ENREGISTRER UNE REVENTE</button></li>').join('')+'</ul>'
+   :'<div class="empty">Ton dépôt de vente est vide. Achète un produit du Marché ; après confirmation du paiement, il apparaîtra ici.</div>';
+ return page("📦 Dépôt de vente",'<div class="stat">Produits disponibles<strong>'+state.marketStock+'</strong></div><div class="notice success">Le stock affiché est lu depuis le dépôt numérique BuSAF. Seuls les achats confirmés sont disponibles à la revente.</div>'+content+'<section class="rule"><h3>📋 Mes reventes</h3><div id="memberResalesList">Chargement de tes reventes…</div><button class="btn alt" onclick="loadMemberResales()">🔄 ACTUALISER</button></section>');
+}
+
 function shareMarketProduct(productId){
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
  if(!p){openModal('Produit indisponible','<div class="notice warning">Recharge le Marché pour partager ce produit.</div>');return;}
@@ -4455,7 +4523,6 @@ async function resumeBusafAfterReturn(){
   if(!state.userId)return;
   if(screen==="member"||screen==="partner"){
    loadMemberHomeMetrics();
-   loadMemberSalesProgress();
   }else if(screen==="invites"||screen==="founderDirectInvites"){
    if(screen==="invites")loadDirectInvites().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Reprise invités:",e));
   }else if(screen==="commissions")loadMemberCommissions();
