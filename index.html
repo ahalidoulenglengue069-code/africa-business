@@ -1650,6 +1650,7 @@ async function ensureMemberProfile(user){
  const nom=String(meta.nom_complet||'').trim();
  const tel=String(meta.telephone||'').trim();
  const ville=String(meta.ville||'').trim();
+ const pays=String(meta.pays||'').trim();
  if(!code)throw new Error("Le profil BuSAF n'est pas encore configuré : code d'invitation introuvable.");
  const parrains=await api("/rest/v1/rpc/busaf_trouver_parrain",{method:"POST",body:JSON.stringify({p_code:code})});
  const parrain=Array.isArray(parrains)?parrains[0]:null;
@@ -1657,7 +1658,7 @@ async function ensureMemberProfile(user){
  const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
  try{
    const rows=await api("/rest/v1/profils_busaf",{method:"POST",headers:{"Prefer":"return=representation"},body:JSON.stringify({
-     user_id:state.userId,nom_complet:nom||state.email.split("@")[0],telephone:tel,Ville:ville,role:"membre",parrain_id:parrain.id,code_parrain:nouveauCode,photo_url:null
+     user_id:state.userId,nom_complet:nom||state.email.split("@")[0],telephone:tel,Ville:ville,pays,role:"membre",parrain_id:parrain.id,code_parrain:nouveauCode,photo_url:null
    })});
    state.profile=Array.isArray(rows)?rows[0]:rows;
  }catch(insertError){
@@ -1794,8 +1795,12 @@ async function login(e){
   localStorage.setItem("busaf_user_id",state.userId);
   localStorage.setItem("busaf_email",email);
   msg.textContent="Compte reconnu. Ouverture de ton espace…";
-  const profil=await loadProfile();
-  if(!profil?.id)throw new Error("Le compte est reconnu, mais Supabase n'a retourné aucun profil BuSAF. Aucun profil n'a été recréé.");
+  let profil=await loadProfile();
+  if(!profil?.id){
+   await ensureMemberProfile(d.user);
+   profil=state.profile;
+  }
+  if(!profil?.id)throw new Error("Le compte est reconnu, mais le profil BuSAF n'a pas pu être récupéré ou créé à partir des informations d'inscription.");
   saveState();
   addNotification("🔐 Connexion","Connexion réussie sur ton espace BuSAF.","login");
   setScreen("member");
@@ -1826,7 +1831,7 @@ async function signup(e){
   const parrain=Array.isArray(parrains)?parrains[0]:null;
   if(!parrain)throw new Error("Code parrain invalide ou introuvable. Vérifie le code et réessaie.");
 
-  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,pays,code_invitation:code}})});
+  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville,pays,code_invitation:code}})});
   if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
 
   state.userId=d.user.id;state.email=email;state.token=d.access_token||"";
