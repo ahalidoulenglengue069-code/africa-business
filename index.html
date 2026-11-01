@@ -1868,6 +1868,62 @@ html[data-busaf-theme] #app textarea:focus{border-color:var(--green)!important;o
 html[data-busaf-theme] #app .stat,
 html[data-busaf-theme] #app .dash-stat{border-color:var(--line)!important}
 
+
+/* BuSAF — identité premium semi-sombre, sans thème rouge */
+html[data-busaf-theme="public"],html[data-busaf-theme="member"],html[data-busaf-theme="benefits"],html[data-busaf-theme="money"],html[data-busaf-theme="founderWallet"]{
+ --green:#19a765;--green2:#087a48;--light:#101b17;--card:#182720;--text:#edf7f0;--muted:#a8b9ae;--line:#2d493a;--shadow:0 8px 24px rgba(0,0,0,.28)
+}
+html[data-busaf-theme="founder"],html[data-busaf-theme="founderDashboard"],html[data-busaf-theme="founderStats"],html[data-busaf-theme="founderFinance"]{
+ --green:#d4b46a;--green2:#a8873e;--light:#111923;--card:#1b2633;--text:#f2f3f5;--muted:#b1bac5;--line:#394656;--shadow:0 8px 24px rgba(0,0,0,.3)
+}
+html[data-busaf-theme="market"],html[data-busaf-theme="founderMarket"],html[data-busaf-theme="stockMarket"],html[data-busaf-theme="founderStocks"]{
+ --green:#28b8b0;--green2:#087f7b;--light:#101d20;--card:#192a2d;--text:#edfafa;--muted:#a6c2c1;--line:#315052;--shadow:0 8px 24px rgba(0,0,0,.28)
+}
+html[data-busaf-theme="invites"],html[data-busaf-theme="commissions"],html[data-busaf-theme="partner"],html[data-busaf-theme="profits"],html[data-busaf-theme="founderReferral"],html[data-busaf-theme="founderDirectInvites"]{
+ --green:#a98be8;--green2:#7652bf;--light:#1a1725;--card:#282136;--text:#f4efff;--muted:#c0b5d4;--line:#493b60;--shadow:0 8px 24px rgba(0,0,0,.3)
+}
+html[data-busaf-theme="orders"],html[data-busaf-theme="founderPayments"]{
+ --green:#f0a04a;--green2:#bb6c24;--light:#211a14;--card:#302419;--text:#fff5e9;--muted:#d2b99e;--line:#5b422c;--shadow:0 8px 24px rgba(0,0,0,.3)
+}
+html[data-busaf-theme="account"],html[data-busaf-theme="notifications"],html[data-busaf-theme="rules"],html[data-busaf-theme="help"],html[data-busaf-theme="privacy"],html[data-busaf-theme="contact"],html[data-busaf-theme="how"],html[data-busaf-theme="founderSettings"],html[data-busaf-theme="founderMembers"],html[data-busaf-theme="founderAnnouncements"]{
+ --green:#19a765;--green2:#087a48;--light:#171d1b;--card:#222b27;--text:#f0f4f1;--muted:#b4c0b8;--line:#3b4941;--shadow:0 8px 24px rgba(0,0,0,.28)
+}
+html,body{background:var(--light)!important;color:var(--text)!important}
+#app .wrap,#app .founder-dashboard,#app .profile-page{background:var(--light)!important;color:var(--text)!important}
+#app .card,#app .rule,#app .profile-section-card,#app .founder-app,#app .stat,#app .dash-stat,#app .founder-stat,#app .money-balance-card,#app .contact-topic,#app .contact-steps,#app .contact-send-panel{
+ background:var(--card)!important;color:var(--text)!important;border-color:var(--line)!important;box-shadow:var(--shadow)!important
+}
+#app .header,#app .founder-mode .header{background:linear-gradient(120deg,#080d0b,var(--green2))!important;color:#fff!important;border-bottom:1px solid var(--line)!important}
+#app .hero,#app .founder-hero,#app .member-v2-hero,#app .founder-v2-hero{background:linear-gradient(135deg,#101a15,#203b2d)!important;color:#f4fff7!important;border:1px solid var(--line)!important}
+#app .card h1,#app .card h2,#app .card h3,#app .section-title,#app .founder-section-title,#app .rule h3,#app .founder-app b,#app .founder-app small,#app .contact-topic b,#app .contact-topic small,#app .contact-steps p,#app .contact-hero p,#app .contact-send-panel p{color:var(--text)!important}
+#app p,#app label,#app small,#app .muted,#app .description{color:var(--muted)}
+#app input,#app select,#app textarea{background:#0e1712!important;color:#f3fff6!important;border:1px solid var(--line)!important}
+#app input::placeholder,#app textarea::placeholder{color:#91a69a!important}
+#app button.btn,#app button.busaf-signup-link,#app button.contact-main-btn,#app .money-actions .btn,#app .btn:not(.alt):not(.back){
+ background:#087a48!important;color:#fff!important;border:1px solid #19a765!important;box-shadow:0 4px 12px rgba(0,0,0,.2)!important
+}
+#app button.btn.alt,#app button.back,#app .btn.alt,#app .back,#app button.busaf-login-link{
+ background:#080d0b!important;color:#eaffef!important;border:1px solid #28794f!important
+}
+#app .btn.red,#app .btn.danger,#app .money-actions .btn.danger,#app button[style*="background:#b3261e"],#app button[style*="background: rgb(179, 38, 30)"]{
+ background:#080d0b!important;color:#fff!important;border:1px solid #19a765!important
+}
+#app .money-balance-card,#app .money-balance-card strong,#app .money-balance-card small{color:var(--text)!important}
+#app .money-balance-card.market-balance,#app .money-balance-card.boutique-balance{background:var(--card)!important;border-color:var(--line)!important}
+#app .founder-app .ficon,#app .profile-section-heading>span,#app .profile-summary-card>span{background:#10271b!important;color:#45d58d!important;border:1px solid #285c3d!important}
+#app .quickbar,#app .bottom,#app .bottom-inner,#app .quick-inner{background:#080d0b!important;border-color:var(--line)!important}
+#app .quick-inner button,#app .bottom-inner button{color:#c1cec5!important}
+#app .quick-inner button.active,#app .bottom-inner button.active{background:#123322!important;color:#4cdb94!important}
+#app .notification-count,#app .notification-badge,#app .unread-count{background:#087a48!important;color:#fff!important;border:1px solid #19a765!important}
+#app .contact-hero{background:#182720!important;border-color:var(--line)!important}
+#app .contact-hero-icon{background:#087a48!important;color:#fff!important}
+#app .founder-mode .wrap{background:var(--light)!important}
+#app .founder-mode .founder-app{background:var(--card)!important;border-color:var(--line)!important}
+#app .founder-mode .founder-app b{color:var(--text)!important}
+#app .founder-mode .founder-app small{color:var(--muted)!important}
+#app .founder-mode .founder-stat{background:#202d26!important;border-color:var(--line)!important}
+#app .founder-mode .founder-stat strong,#app .founder-mode .stat strong{color:var(--green)!important}
+
 </style>
 </head>
 <body>
