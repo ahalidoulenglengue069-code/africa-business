@@ -4272,6 +4272,10 @@ async function start(){
     }
   }
 }
+// Lancer réellement la restauration de session à chaque ouverture/actualisation.
+// Le script est placé en fin de body : le DOM est déjà disponible.
+if(!window.__busafStartLaunched){window.__busafStartLaunched=true;start();}
+
 // Ouverture photo simple et autonome : aucun initialiseur séparé.
 window.openPhotoLightbox=function(src,alt){
   const box=document.getElementById("photoLightbox");
