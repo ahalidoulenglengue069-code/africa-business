@@ -3191,7 +3191,7 @@ async function loadMemberProfits(){
    api('/rest/v1/busaf_transactions_portefeuille?select=montant,sens,statut&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=500',{timeoutMs:15000})
   ]);
   const confirmed=(Array.isArray(commissions)?commissions:[]).filter(x=>x.statut==='confirmee');
-  const seller=confirmed.filter(x=>x.type_commission==='benefice_vendeur_45').reduce((n,x)=>n+Number(x.montant||0),0);
+  const seller=confirmed.filter(x=>x.type_commission==='benefice_vendeur_40').reduce((n,x)=>n+Number(x.montant||0),0);
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
   const tx=(Array.isArray(transactions)?transactions:[]).filter(x=>x.statut==='confirmee');
   const balance=tx.reduce((n,x)=>n+(x.sens==='credit'?1:-1)*Number(x.montant||0),0);
@@ -3214,7 +3214,7 @@ async function loadMemberCommissions(){
   const rows=await api('/rest/v1/busaf_commissions?select=id,type_commission,taux,montant,statut,vente_id,revente_id,created_at&beneficiaire_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=100',{timeoutMs:15000});
   const confirmed=(Array.isArray(rows)?rows:[]).filter(x=>x.statut==='confirmee');
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
-  const seller=confirmed.filter(x=>x.type_commission==='benefice_vendeur_45').reduce((n,x)=>n+Number(x.montant||0),0);
+  const seller=confirmed.filter(x=>x.type_commission==='benefice_vendeur_40').reduce((n,x)=>n+Number(x.montant||0),0);
   summary.innerHTML='<div class="statgrid"><div class="stat">Commissions parrain direct<strong>'+money(referral)+' FCFA</strong></div><div class="stat">Bénéfices vendeur<strong>'+money(seller)+' FCFA</strong></div></div>';
   rowsBox.innerHTML=confirmed.length?'<h3 class="section-title">Historique confirmé</h3><div class="list">'+confirmed.map(x=>'<li><strong>'+(x.type_commission==='parrain_direct_7'?'🤝 Parrain direct (7 %)':'💰 Bénéfice vendeur (40 %)')+'</strong><br>'+money(x.montant)+' FCFA<br><small>'+esc(x.created_at||'')+'</small></li>').join('')+'</div>':'<div class="empty">Aucune commission confirmée pour le moment. Elles apparaîtront automatiquement après confirmation du paiement.</div>';
  }catch(e){
