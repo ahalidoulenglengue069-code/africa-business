@@ -1315,6 +1315,48 @@ td,th{padding:10px 9px;border-bottom:1px solid #e8efe9;text-align:left}
 .public-v2-feature-grid button{padding:9px}
 @media(max-width:600px){.public-v2-inspiration{grid-template-columns:100px minmax(0,1fr);gap:9px}.public-v2-inspiration-photo,.public-v2-inspiration-photo img{height:108px;min-height:108px}.public-v2-inspiration-copy blockquote{display:none}.public-v2-copy{padding:10px 0 8px}.public-v2-hero{padding:11px 12px}}
 @media(min-width:760px){.public-v2-copy{padding:12px 0 10px}.public-v2-hero{padding:13px 20px}.public-v2-products{grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}}
+
+/* BuSAF Workspaces — finition premium, distincte membre/fondateur */
+#app.member-mode .member-v2{gap:16px;padding-bottom:24px}
+#app.member-mode .member-v2-head{position:relative;overflow:hidden;border-radius:26px;padding:21px;background:radial-gradient(circle at 92% 8%,#22b96a 0,transparent 34%),linear-gradient(135deg,#064b2c 0%,#087a3b 58%,#0a9850 100%);box-shadow:0 16px 34px rgba(4,76,42,.2)}
+#app.member-mode .member-v2-head:after{content:"";position:absolute;width:170px;height:170px;border:1px solid #ffffff20;border-radius:50%;right:-75px;bottom:-105px;pointer-events:none}
+#app.member-mode .member-v2-avatar{width:58px;height:58px;border-radius:18px;border:1px solid #ffffff8a;box-shadow:0 5px 15px #002b1738}
+#app.member-mode .member-v2-user h1{font-size:clamp(19px,5vw,25px);letter-spacing:-.45px}
+#app.member-mode .member-v2-user span{display:inline-flex;margin-top:4px;padding:4px 8px;border-radius:30px;background:#ffffff20;color:#eafff0}
+#app.member-mode .member-v2-balance{position:relative;z-index:1;background:linear-gradient(110deg,#ffffff22,#ffffff12);border:1px solid #ffffff42;box-shadow:inset 0 1px #ffffff20}
+#app.member-mode .member-v2-balance strong{letter-spacing:-.8px}
+#app.member-mode .member-v2-actions{gap:8px}
+#app.member-mode .member-v2-actions button{border:1px solid #dcebe0;border-radius:14px;min-height:48px;box-shadow:0 5px 14px #123b2110;transition:background .15s,border-color .15s}
+#app.member-mode .member-v2-actions button:last-child{background:#087a3b;color:#fff;border-color:#087a3b}
+#app.member-mode .member-v2-section,#app.member-mode .member-v2-progress{border:1px solid #e0ebe3;border-radius:22px;box-shadow:0 9px 26px rgba(19,60,35,.065)}
+#app.member-mode .member-v2-title h2,#app.founder-mode .founder-v2-heading h2{letter-spacing:-.45px}
+#app.member-mode .member-v2-tile{position:relative;overflow:hidden;min-height:140px;border:1px solid #ffffffa8;box-shadow:0 5px 16px #193b2a0b;transition:filter .15s,box-shadow .15s}
+#app.member-mode .member-v2-tile:active,#app.founder-mode .founder-v2-tile:active{filter:brightness(.97);box-shadow:0 2px 8px #193b2a12}
+#app.member-mode .member-v2-tile-icon{width:43px;height:43px;border-radius:14px;box-shadow:0 3px 10px #173c2410}
+#app.member-mode .member-v2-tile b{font-size:14px;letter-spacing:-.15px}
+#app.member-mode .member-v2-progress{background:linear-gradient(145deg,#fff,#f7fbf8)}
+#app.founder-mode .founder-v2{gap:16px;padding-bottom:24px}
+#app.founder-mode .founder-v2-hero{position:relative;overflow:hidden;border-radius:26px;padding:21px;background:radial-gradient(circle at 95% 0%,#287b58 0,transparent 34%),linear-gradient(135deg,#102238 0%,#153c34 55%,#176344 100%);box-shadow:0 16px 36px rgba(12,38,31,.22)}
+#app.founder-mode .founder-v2-hero:after{content:"";position:absolute;width:210px;height:210px;border:1px solid #ffffff18;border-radius:50%;right:-110px;bottom:-145px;pointer-events:none}
+#app.founder-mode .founder-v2-brand span{letter-spacing:-.8px}
+#app.founder-mode .founder-v2-brand small{padding:6px 9px;border:1px solid #ffffff32;border-radius:30px;background:#ffffff12}
+#app.founder-mode .founder-v2-welcome{padding:23px 0 18px}
+#app.founder-mode .founder-v2-welcome h1{font-size:clamp(23px,5vw,30px);letter-spacing:-.7px}
+#app.founder-mode .founder-v2-stats{position:relative;z-index:1;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+#app.founder-mode .founder-v2-stats>div{background:#ffffff13;border:1px solid #ffffff27;border-radius:15px;padding:13px}
+#app.founder-mode .founder-v2-stats b{font-size:clamp(18px,4vw,24px);letter-spacing:-.4px}
+#app.founder-mode .founder-v2-section{border:1px solid #e2e9e5;border-radius:23px;padding:17px;box-shadow:0 9px 26px rgba(19,49,34,.07)}
+#app.founder-mode .founder-v2-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:13px}
+#app.founder-mode .founder-v2-grid{gap:10px}
+#app.founder-mode .founder-v2-tile{position:relative;overflow:hidden;min-height:139px;border:1px solid #ffffffa8;border-radius:17px;padding:14px;box-shadow:0 5px 16px #173b2910;transition:filter .15s,box-shadow .15s}
+#app.founder-mode .founder-v2-tile>span{width:42px;height:42px;display:grid;place-items:center;border-radius:14px;background:#ffffffa8;margin-bottom:10px}
+#app.founder-mode .founder-v2-tile b{font-size:13px;line-height:1.25}
+#app.founder-mode .founder-v2-tile small{font-size:10px;line-height:1.35}
+#app.founder-mode .founder-v2-tile i{font-size:10px}
+#app.founder-mode .founder-v2-footer button{min-height:44px;border-radius:13px;box-shadow:0 4px 12px #173b2909}
+#app.founder-mode .founder-home-refresh{width:100%;position:relative;z-index:2;margin-top:12px;padding:11px 13px;border:1px solid #ffffff50;border-radius:13px;background:#ffffff16;color:#fff;font-size:11px;font-weight:900}
+@media(min-width:700px){#app.member-mode .member-v2-grid,#app.founder-mode .founder-v2-grid{grid-template-columns:repeat(4,minmax(0,1fr))}#app.member-mode .member-v2-head{padding:26px}#app.founder-mode .founder-v2-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:390px){#app.member-mode .member-v2-section,#app.member-mode .member-v2-progress,#app.founder-mode .founder-v2-section{padding:13px}#app.member-mode .member-v2-tile{min-height:130px;padding:12px}#app.founder-mode .founder-v2-tile{min-height:132px;padding:11px}#app.founder-mode .founder-v2-tile>span{width:38px;height:38px}}
 </style>
 </head>
 <body>
@@ -2136,7 +2178,8 @@ function founderHome(){
  const tile=(id,ico,label,sub,cls)=>`<button class="founder-v2-tile ${cls}" onclick="setScreen('${id}')"><span>${ico}</span><b>${label}</b><small>${sub}</small><i>Ouvrir →</i></button>`;
  return `<div class="founder-v2">
   <section class="founder-v2-hero"><div class="founder-v2-brand"><span>BuSAF</span><small>ADMINISTRATION GÉNÉRALE</small></div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR</small><h1>Bonjour ${esc(name)}</h1><p>Voici le centre de pilotage de ta plateforme.</p></div>
-   <div class="founder-v2-stats"><div><small>Produits</small><b>${products}</b></div><div><small>Membres</small><b>${members}</b></div><div><small>Ventes / commandes</small><b>${sales}</b></div><div><small>En attente</small><b>${pending}</b></div></div>
+   <div class="founder-v2-stats"><div><small>Produits publiés</small><b>${products}</b></div><div><small>Membres inscrits</small><b>${members}</b></div><div><small>Ventes / commandes</small><b>${sales}</b></div><div><small>En attente</small><b>${pending}</b></div><div><small>Ventes confirmées</small><b>${Number(stats.confirmed||0)}</b></div><div><small>Montant confirmé</small><b>${money(stats.revenue||0)}</b></div></div>
+   <button class="founder-home-refresh" onclick="refreshFounderHomeStats()">↻ ACTUALISER LES INDICATEURS</button>
   </section>
   <section class="founder-v2-section"><div class="founder-v2-heading"><div><small>GESTION DE LA PLATEFORME</small><h2>Vue générale</h2></div><span>⚙️</span></div>
    <div class="founder-v2-grid">
@@ -2154,6 +2197,14 @@ function founderHome(){
   </section>
   <div class="founder-v2-footer"><button onclick="setScreen('notifications')">🔔 Notifications</button><button onclick="setScreen('account')">👤 Mon profil</button><button onclick="logout()">🚪 Déconnexion</button></div>
  </div>`;
+}
+
+async function refreshFounderHomeStats(){
+ const button=document.querySelector('.founder-home-refresh');
+ if(button){button.disabled=true;button.textContent='CHARGEMENT DES DONNÉES…';}
+ try{await founderLoadStats();if(state.screen==='founder')render();}
+ catch(e){console.error('Actualisation tableau fondateur:',e);alert('Les indicateurs ne sont pas disponibles pour le moment.');}
+ finally{const current=document.querySelector('.founder-home-refresh');if(current){current.disabled=false;current.textContent='↻ ACTUALISER LES INDICATEURS';}}
 }
 
 function founderMarket(){
@@ -2180,7 +2231,7 @@ async function founderLoadStats(){
  if(Array.isArray(products))out.products=products.length;
  if(Array.isArray(members))out.members=members.length;
  if(Array.isArray(sales)){out.sales=sales.length;for(const v of sales){const st=String(v.statut||'').toLowerCase();if(st==='confirmee'||st==='validee'){out.confirmed++;out.revenue+=Number(v.montant||0)}else if(st.includes('attente'))out.pending++;else if(st.includes('echec')||st.includes('failed'))out.failed++;}}
- state.founderStats=out;return out;
+ out.loadedAt=Date.now();state.founderStats=out;return out;
 }
 function founderDashboard(){
  if(!isFounder())return memberHome();
@@ -3562,7 +3613,7 @@ function render(){
      if(state.screen==='founderAnnouncements')setTimeout(()=>loadFounderAnnouncements().catch(()=>{}),0);
      if(state.screen==='founderWallet')setTimeout(()=>loadFounderWallet().catch(()=>{}),0);
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+founderQuick();
-    if(state.screen==='founder' && !state.founderStats){ founderLoadStats().then(()=>{ if(state.screen==='founder')render(); }).catch(()=>{}); }
+    if(state.screen==='founder' && (!state.founderStats || !state.founderStats.loadedAt || Date.now()-state.founderStats.loadedAt>60000)){ setTimeout(()=>{if(state.screen==='founder')founderLoadStats().then(()=>{if(state.screen==='founder')render();}).catch(e=>console.warn('Indicateurs fondateur indisponibles:',e));},0); }
       if(state.screen==='founderMembers' && !state.founderMembersLoaded && !state.founderMembersLoading){ setTimeout(()=>refreshFounderMembers(),0); }
       if(state.screen==='founderPayments' && !state.founderPaymentsLoaded && !state.founderPaymentsLoading){ setTimeout(()=>refreshFounderPayments(),0); }
       if(state.screen==='founderDirectInvites' && !state.directInvitesLoaded && !state.directInvitesLoading){ setTimeout(()=>loadDirectInvites().then(()=>{if(state.screen==='founderDirectInvites')render();}),0); }
