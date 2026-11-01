@@ -1528,6 +1528,7 @@ function setScreen(screen){
   saveState();
  }
  if(screen===state.screen){
+  if((screen==="member"||screen==="partner")&&state.userId)loadMemberSalesProgress();
   if(screen==="notifications")render();
   if(screen==="founderPayments" && isFounder() && !state.founderPaymentsLoading)refreshFounderPayments();
   if(screen==="commissions" && state.userId)loadMemberCommissions();
@@ -1939,6 +1940,38 @@ function dayKey(d=new Date()){return d.toISOString().slice(0,10);}
 function monthlySalesCount(){const k=monthKey();const rows=Array.isArray(state.sales)?state.sales:[];return rows.filter(x=>x&&monthKey(new Date(x.date))===k).reduce((a,x)=>a+Number(x.qty||0),0);}
 function dailySalesCount(){const k=dayKey();const rows=Array.isArray(state.sales)?state.sales:[];return rows.filter(x=>x&&dayKey(new Date(x.date))===k).reduce((a,x)=>a+Number(x.qty||0),0);}
 function totalSalesCount(){const rows=Array.isArray(state.sales)?state.sales:[];return rows.reduce((a,x)=>a+Number(x.qty||0),0);}
+async function loadMemberSalesProgress(){
+ const ids=["memberPartnerProgress","partnerMonthCount"];
+ if(!state.userId||!state.profile?.id||!state.token){
+  for(const id of ids){const el=document.getElementById(id);if(el)el.textContent="Connexion requise";}
+  updateProgressMessage("Connecte-toi pour vérifier tes ventes.");
+  return;
+ }
+ try{
+  const result=await api("/rest/v1/rpc/busaf_progression_ventes",{method:"POST",body:JSON.stringify({}),timeoutMs:12000});
+  const data=Array.isArray(result)?result[0]:result;
+  if(!data||typeof data!=="object")throw new Error("Réponse de progression invalide.");
+  const month=Math.max(0,Number(data.mois||0));
+  const total=Math.max(0,Number(data.total||0));
+  const update=(id,value)=>{const el=document.getElementById(id);if(el)el.textContent=value;};
+  const bar=(id,value)=>{const el=document.getElementById(id);if(el)el.style.width=Math.min(100,Math.max(0,value))+"%";};
+  update("memberPartnerProgress",Math.min(month,10)+"/10");
+  update("memberPartnerProgressText",month+" ventes validées ce mois sur 10");
+  bar("memberPartnerProgressBar",month*10);
+  update("member100Progress",Math.min(total,100)+"/100");
+  update("member100ProgressText",total+" ventes validées au total");
+  bar("member100ProgressBar",total);
+  update("partnerMonthCount",String(month));
+  update("partnerTotalCount",String(total));
+  bar("partnerProgressBar",month*10);
+  updateProgressMessage(month>=10?"Objectif PARTNER atteint selon les ventes confirmées dans Supabase.":"Données réelles des ventes confirmées chargées depuis Supabase.");
+ }catch(e){
+  const msg="Chargement impossible : "+(e.message||"Erreur Supabase");
+  for(const id of ids){const el=document.getElementById(id);if(el)el.textContent="—";}
+  updateProgressMessage(msg);
+ }
+ function updateProgressMessage(value){const el=document.getElementById("partnerProgressMessage");if(el)el.textContent=value;}
+}
 function hasBoughtProduct(id){return state.orders.some(o=>['stock','direct','first_purchase','yengapay_purchase'].includes(o.mode) && String(o.productId)===String(id));}
 function directResale(id){
  const p=productForId(id);
@@ -2311,9 +2344,6 @@ async function publishFounderAnnouncement(){
 
 function memberHome(){
  const name=state.profile?.nom_complet||state.email||"Membre";
- const monthly=monthlySalesCount();
- const total=totalSalesCount();
- const p10=Math.min(monthly,10), p100=Math.min(total,100);
  const tiles=[
   ['money','👛','Portefeuille','Gérer mes fonds','tile-wallet'],
   ['stockMarket','📦','Stocks','Mes produits','tile-stock'],
@@ -2334,8 +2364,8 @@ function memberHome(){
    <div class="member-v2-grid">${tiles.map(([id,ico,label,desc,cls])=>`<button class="member-v2-tile ${cls}" onclick="setScreen('${id}')"><span class="member-v2-tile-icon">${ico}</span><b>${label}</b><small>${desc}</small><i>Ouvrir →</i></button>`).join('')}</div>
   </section>
   <section class="member-v2-progress"><div class="member-v2-title"><div><small>OBJECTIFS ET RÉCOMPENSES</small><h2>Ma progression</h2></div><span>🚀</span></div>
-   <div class="member-v2-progress-item"><div><b>⭐ Statut PARTNER</b><strong>${p10}/10</strong></div><p>${p10} ventes validées ce mois sur 10</p><div class="member-v2-track"><i style="width:${p10*10}%"></i></div></div>
-   <div class="member-v2-progress-item"><div><b>🏆 Objectif 100 ventes</b><strong>${p100}/100</strong></div><p>${p100} ventes validées au total</p><div class="member-v2-track"><i style="width:${p100}%"></i></div></div>
+   <div class="member-v2-progress-item"><div><b>⭐ Statut PARTNER</b><strong id="memberPartnerProgress">Chargement…</strong></div><p id="memberPartnerProgressText">Vérification des ventes confirmées…</p><div class="member-v2-track"><i id="memberPartnerProgressBar" style="width:0%"></i></div></div>
+   <div class="member-v2-progress-item"><div><b>🏆 Objectif 100 ventes</b><strong id="member100Progress">Chargement…</strong></div><p id="member100ProgressText">Vérification des ventes confirmées…</p><div class="member-v2-track"><i id="member100ProgressBar" style="width:0%"></i></div></div>
   </section>
  </div>`;
 }
@@ -3220,7 +3250,7 @@ async function loadMemberCommissions(){
   rowsBox.innerHTML='';
  }
 }
-function memberPartner(){const n=monthlySalesCount(),pct=Math.min(100,n*10),total=totalSalesCount();return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong>${n}/10</strong></div><div class="stat">Ventes totales<strong>${total}</strong></div></div><div class="progress"><i style="width:${pct}%"></i></div><div class="rule"><h3>Condition</h3><p>10 ventes du Marché BuSAF dans un même mois. Les ventes personnelles et les mois cumulés ne remplacent pas la condition.</p></div><button class="btn" onclick="setScreen('login')">SE CONNECTER</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
+function memberPartner(){return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong id="partnerMonthCount">Chargement…</strong></div><div class="stat">Ventes totales<strong id="partnerTotalCount">Chargement…</strong></div></div><div class="progress"><i id="partnerProgressBar" style="width:0%"></i></div><div id="partnerProgressMessage" class="small">Vérification des ventes confirmées dans Supabase…</div><div class="rule"><h3>Condition</h3><p>10 ventes validées du Marché BuSAF dans un même mois. Les ventes non confirmées ne comptent pas.</p></div><button class="btn alt" onclick="loadMemberSalesProgress()">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
 
 function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 12 % sur chaque revente validée ; son parrain direct reçoit 7 % après son premier achat confirmé et sur ses reventes validées.</p></div>`);}
 function memberMoney(){return page("💳 Dépôt / Retrait",`<div class="money-balances"><div class="money-balance-card market-balance"><span>💼</span><small>COMPTE MARCHÉ</small><strong>${money(state.marketBalance)}</strong></div></div><div class="money-details"><div class="notice warning">🔐 Les dépôts et retraits réels doivent être validés côté serveur par le fournisseur de paiement. Aucun solde ne sera modifié avant confirmation.</div><h3 class="money-section-title">💳 Gérer mon argent</h3><div class="money-actions"><button class="btn" onclick="openMoneyDeposit()">💳 DÉPÔT</button><button class="btn danger" onclick="openMoneyWithdraw()">💸 RETRAIT</button></div><section class="rule money-history" style="border-top:4px solid #16733a"><h3 style="color:#16733a">📥 HISTORIQUE DES DÉPÔTS</h3><p class="small">Argent que tu demandes à ajouter à ton portefeuille.</p><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="rule money-history" style="border-top:4px solid #b3261e"><h3 style="color:#b3261e">📤 HISTORIQUE DES RETRAITS</h3><p class="small">Argent que tu demandes à recevoir sur ton numéro Mobile Money.</p><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section><div class="rule money-help"><h3>ℹ️ Informations</h3><p><strong>Dépôt :</strong> indique le montant et ton moyen de paiement.</p><p><strong>Retrait :</strong> indique le montant et le numéro Mobile Money.</p></div></div>`);setTimeout(()=>{loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
@@ -3539,6 +3569,7 @@ function render(){
     };
     content=(map[state.screen]||memberHome)();
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+memberQuick();
+     if(state.screen==="member"||state.screen==="partner")setTimeout(()=>loadMemberSalesProgress(),0);
    }
  }
 }
