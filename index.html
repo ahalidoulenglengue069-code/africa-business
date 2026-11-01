@@ -4830,5 +4830,33 @@ html #app .busaf-bottom-nav button:nth-child(5).active{background:#e7f6ec!import
 #app.member-mode .member-v2-tile{color:#263b52!important}
 #app.member-mode .member-v2-tile small{color:#586b7d!important}
 </style>
+
+<style id="busaf-member-theme-force-neutral-v2">
+/* Neutraliser les anciens thèmes verts qui écrasent le tableau de bord membre */
+html[data-busaf-theme] #app.member-mode .member-v2-head,
+html[data-busaf-theme] #app.member-mode .member-welcome,
+html[data-busaf-theme] #app.member-mode .member-v2-head{
+  background:linear-gradient(135deg,#17283d 0%,#263f5c 58%,#315879 100%)!important;
+  color:#fff!important;
+  box-shadow:0 14px 30px rgba(23,40,61,.16)!important;
+}
+html[data-busaf-theme] #app.member-mode .member-v2-head:before,
+html[data-busaf-theme] #app.member-mode .member-v2-head:after{background:none!important;border-color:#ffffff18!important}
+html[data-busaf-theme] #app.member-mode .member-v2-head h1,
+html[data-busaf-theme] #app.member-mode .member-v2-head h2,
+html[data-busaf-theme] #app.member-mode .member-v2-head strong{color:#fff!important}
+html[data-busaf-theme] #app.member-mode .member-v2-balance{background:#ffffff16!important;border:1px solid #ffffff38!important}
+html[data-busaf-theme] #app.member-mode .member-v2-balance button{background:#fff!important;color:#294d72!important}
+html[data-busaf-theme] #app.member-mode .member-v2-actions button{background:#fff!important;color:#29445f!important;border-color:#dce5ee!important}
+html[data-busaf-theme] #app.member-mode .member-v2-actions button:last-child{background:#315f91!important;color:#fff!important;border-color:#315f91!important}
+html[data-busaf-theme] #app.member-mode .member-v2-section,
+html[data-busaf-theme] #app.member-mode .member-v2-progress{background:#fff!important;border-color:#e1e7ed!important}
+html[data-busaf-theme] #app.member-mode .member-v2-title h2{color:#263b52!important}
+html[data-busaf-theme] #app.member-mode .member-v2-title>span{color:#315f91!important}
+html[data-busaf-theme] #app.member-mode .member-v2-track{background:#e8edf2!important}
+html[data-busaf-theme] #app.member-mode .member-v2-track i{background:linear-gradient(90deg,#315f91,#5b91c4)!important}
+html[data-busaf-theme] #app.member-mode .member-v2-tile{color:#263b52!important}
+html[data-busaf-theme] #app.member-mode .member-v2-tile small{color:#586b7d!important}
+</style>
 </body>
 </html>
