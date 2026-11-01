@@ -224,6 +224,15 @@ textarea{min-height:100px;resize:vertical}
 .invitee-details{display:flex;flex-direction:column;gap:4px;min-width:0}.invitee-details strong{font-size:14px;color:#173523;overflow-wrap:anywhere}.invitee-details span,.invitee-details small{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
 @media(max-width:380px){.invitee-card{padding:9px;gap:9px}.invitee-avatar,.invitee-avatar-fallback{width:50px;height:50px;flex-basis:50px}}
 
+
+.public-v2-motivation{display:flex;align-items:center;gap:11px;max-width:560px;margin:16px 0 4px;padding:9px;border:1px solid #ffffff35;border-radius:15px;background:#ffffff13}
+.public-v2-motivation img{width:94px;height:76px;flex:0 0 94px;object-fit:cover;border-radius:10px}
+.public-v2-motivation div{display:flex;flex-direction:column;gap:4px}
+.public-v2-motivation small{font-size:9px;letter-spacing:1px;font-weight:900;color:#b9f3cd}
+.public-v2-motivation strong{font-size:13px;line-height:1.25;color:#fff}
+.public-v2-motivation span{font-size:10px;line-height:1.35;color:#e6f5eb}
+@media(max-width:380px){.public-v2-motivation{gap:8px;padding:7px}.public-v2-motivation img{width:78px;height:70px;flex-basis:78px}.public-v2-motivation strong{font-size:12px}}
+
 /* ===== ESPACE FONDATEUR : interface d'administration distincte ===== */
 .founder-dashboard{padding-bottom:24px}.founder-hero{background:linear-gradient(135deg,#102a43,#0b5d3b);color:#fff;border-radius:22px;padding:18px;margin-bottom:14px;box-shadow:0 10px 28px rgba(0,0,0,.12)}.founder-hero .founder-badge{display:inline-block;padding:5px 9px;border-radius:999px;background:rgba(255,255,255,.14);font-size:10px;font-weight:900;letter-spacing:.5px}.founder-hero h1{margin:9px 0 4px;font-size:22px}.founder-hero p{margin:0;opacity:.88;font-size:12px;line-height:1.35}.founder-section-title{font-size:13px;font-weight:900;margin:16px 2px 8px}.founder-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:9px}.founder-app{border:1px solid #dfe7ed;background:#fff;border-radius:16px;padding:13px 8px;min-height:96px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;box-shadow:0 5px 14px rgba(0,0,0,.06);cursor:pointer}.founder-app .ficon{font-size:27px;line-height:1;margin-bottom:7px}.founder-app b{font-size:11px;line-height:1.15}.founder-app small{font-size:8.5px;line-height:1.15;color:#6b7280;margin-top:4px}.founder-stat-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.founder-stat{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.1);border-radius:13px;padding:9px 5px;text-align:center;color:#fff}.founder-stat b{display:block;font-size:15px}.founder-stat small{font-size:8px;opacity:.85}.founder-product-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.founder-product{border:1px solid #dfe7ed;border-radius:15px;background:#fff;padding:7px;overflow:hidden;box-shadow:0 5px 14px rgba(0,0,0,.05)}.founder-product img{display:block;width:100%;aspect-ratio:1/1;object-fit:cover;border-radius:10px}.founder-product h3{font-size:12px;margin:6px 2px 2px;line-height:1.15}.founder-product .fprice{font-size:14px;font-weight:900;color:#0b7a43;margin:3px 2px 5px}.founder-actions{display:grid;grid-template-columns:1fr 1fr;gap:5px}.founder-actions button{font-size:9px!important;padding:7px 4px!important;margin:0!important}.founder-market-note{margin-bottom:9px}.founder-back{margin-bottom:9px}
 @media(max-width:420px){.founder-grid{gap:7px}.founder-app{min-height:88px;padding:10px 5px}.founder-app .ficon{font-size:24px}.founder-stat-grid{gap:5px}.founder-stat{padding:8px 3px}.founder-product-grid{gap:7px}}
@@ -2045,16 +2054,13 @@ function publicHome(){
  return `<div class="public-v2">
   <section class="public-v2-hero">
    <div class="public-v2-copy"><span>LE COMMERCE NUMÉRIQUE AFRICAIN</span><h1>Achète. Vends.<br><em>Développe ton activité.</em></h1><p>Découvre des produits numériques, réalise tes achats et développe tes revenus grâce à la revente et au parrainage.</p>
+    <div class="public-v2-motivation"><img src="https://assets.weforum.org/article/image/APc0-70JZWFKgYbUea30PmQdF12tNBhlaYSrseR9xmc.jpeg" alt="Des entrepreneuses africaines travaillent ensemble" loading="lazy"><div><small>TA MOTIVATION, TON AVENIR</small><strong>Chaque grande réussite commence par un premier pas.</strong><span>Ose apprendre, passe à l’action et fais grandir ton projet avec BuSAF.</span></div></div>
     <div class="public-v2-cta"><button onclick="setScreen('market')">Explorer le marché <b>→</b></button><button onclick="setScreen('signup')">Créer mon compte</button></div>
    </div>
    <div class="public-v2-points"><span>✓ Produits numériques</span><span>✓ Suivi des commandes</span><span>✓ Paiements sécurisés</span></div>
   </section>
   <section class="public-v2-market"><div class="public-v2-heading"><div><small>NOTRE SÉLECTION</small><h2>À découvrir sur le marché</h2></div><button onclick="setScreen('market')">Tout voir →</button></div>
    <div class="public-v2-products">${list||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement des produits BuSAF…"}</div>`}</div>
-  </section>
-  <section class="public-v2-inspiration">
-   <div class="public-v2-inspiration-photo"><img src="https://assets.weforum.org/article/image/APc0-70JZWFKgYbUea30PmQdF12tNBhlaYSrseR9xmc.jpeg" alt="Trois entrepreneuses africaines collaborent autour d’un ordinateur" loading="lazy"></div>
-   <div class="public-v2-inspiration-copy"><small>UNE AMBITION, UN AVENIR</small><h2>Ensemble, faisons grandir les initiatives africaines.</h2><p>Chaque projet commence par une décision : apprendre, essayer et avancer. BuSAF met le commerce numérique à portée de main pour découvrir des produits, acheter, revendre et développer son réseau.</p><blockquote>« Ne sous-estime jamais le pouvoir d’un petit pas. Avec de la détermination, de la discipline et de bonnes opportunités, ton idée peut devenir une activité qui grandit. »</blockquote><button onclick="setScreen('signup')">Je commence aujourd’hui →</button></div>
   </section>
   <section class="public-v2-journey"><div class="public-v2-journey-heading"><small>TON PARCOURS AVEC BuSAF</small><h2>Des étapes simples pour avancer.</h2><p>Découvre les possibilités de la plateforme et progresse à ton rythme.</p></div>
    <div class="public-v2-journey-grid">
