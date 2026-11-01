@@ -1887,45 +1887,6 @@ html[data-busaf-theme] #app .product-card,html[data-busaf-theme] #app .public-pr
 html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-color:var(--line)}
 
 
-/* Palette dédiée aux quatre espaces demandés : invités, portefeuille, commissions, progression */
-html[data-busaf-theme="invites"],html[data-busaf-theme="founderDirectInvites"]{
- --green:#2878b8;--green2:#4b9bd3;--light:#eff7ff;--card:#ffffff;--text:#193f5c;--muted:#5b7890;--line:#d4e7f5;--shadow:0 8px 22px rgba(35,103,153,.09)
-}
-html[data-busaf-theme="money"],html[data-busaf-theme="founderWallet"]{
- --green:#16866d;--green2:#32ad8d;--light:#eef9f5;--card:#ffffff;--text:#17483d;--muted:#5b7d73;--line:#d1eae1;--shadow:0 8px 22px rgba(25,115,91,.09)
-}
-html[data-busaf-theme="commissions"],html[data-busaf-theme="founderReferral"]{
- --green:#287f9b;--green2:#45a9bd;--light:#eff9fb;--card:#ffffff;--text:#194756;--muted:#5c7b85;--line:#d2e9ee;--shadow:0 8px 22px rgba(37,119,143,.09)
-}
-html[data-busaf-theme="partner"]{
- --green:#a87924;--green2:#d0a64e;--light:#fff9eb;--card:#ffffff;--text:#4d3a19;--muted:#806b43;--line:#efe1bd;--shadow:0 8px 22px rgba(145,105,34,.09)
-}
-/* Harmonisation des grands panneaux dans ces espaces, sans toucher aux boutons d'action */
-html[data-busaf-theme="invites"] #app .invite-hero,
-html[data-busaf-theme="founderDirectInvites"] #app .invite-hero{background:linear-gradient(135deg,#e3f2ff,#cfe7fa)!important;border:1px solid #c6e1f5!important;color:#193f5c!important}
-html[data-busaf-theme="invites"] #app .invite-hero h2,
-html[data-busaf-theme="invites"] #app .invite-hero p,
-html[data-busaf-theme="invites"] #app .invite-hero span,
-html[data-busaf-theme="founderDirectInvites"] #app .invite-hero h2,
-html[data-busaf-theme="founderDirectInvites"] #app .invite-hero p,
-html[data-busaf-theme="founderDirectInvites"] #app .invite-hero span{color:#193f5c!important}
-html[data-busaf-theme="money"] #app .wallet-hero,
-html[data-busaf-theme="founderWallet"] #app .wallet-hero{background:linear-gradient(135deg,#d9f2e9,#c5e9dc)!important;border:1px solid #bfe2d4!important;color:#17483d!important}
-html[data-busaf-theme="money"] #app .wallet-hero small,
-html[data-busaf-theme="money"] #app .wallet-hero p,
-html[data-busaf-theme="money"] #app .wallet-hero strong,
-html[data-busaf-theme="founderWallet"] #app .wallet-hero small,
-html[data-busaf-theme="founderWallet"] #app .wallet-hero p,
-html[data-busaf-theme="founderWallet"] #app .wallet-hero strong{color:#17483d!important}
-html[data-busaf-theme="commissions"] #app .stat,
-html[data-busaf-theme="commissions"] #app .rule,
-html[data-busaf-theme="founderReferral"] #app .stat,
-html[data-busaf-theme="founderReferral"] #app .rule{background:#ffffff!important;border-color:#d2e9ee!important;color:#194756!important}
-html[data-busaf-theme="partner"] #app .stat,
-html[data-busaf-theme="partner"] #app .rule{background:#ffffff!important;border-color:#efe1bd!important;color:#4d3a19!important}
-html[data-busaf-theme="partner"] #app .progress{background:#f3e9cf!important;border:1px solid #ead9ae!important}
-html[data-busaf-theme="partner"] #app .progress>i{background:linear-gradient(90deg,#b88a36,#dfbd70)!important}
-
 </style>
 </head>
 <body>
@@ -4530,85 +4491,7 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")window.close
 </div>
 
 
-<style id="busaf-all-spaces-light-themes">
-/* BuSAF : thèmes clairs dans tous les espaces. Les couleurs et styles des boutons restent inchangés. */
-html[data-busaf-theme="member"],html[data-busaf-theme="benefits"],html[data-busaf-theme="money"],html[data-busaf-theme="founderWallet"]{
- --green:#16834d;--green2:#27a866;--light:#f0f8f2;--card:#ffffff;--text:#17432e;--muted:#587464;--line:#d5e8da;--shadow:0 7px 20px rgba(25,85,50,.08)
-}
-html[data-busaf-theme="founder"],html[data-busaf-theme="founderDashboard"],html[data-busaf-theme="founderStats"],html[data-busaf-theme="founderFinance"]{
- --green:#8a6a28;--green2:#b18a3d;--light:#fbf7eb;--card:#ffffff;--text:#443719;--muted:#766743;--line:#eadfbd;--shadow:0 7px 20px rgba(112,83,27,.08)
-}
-html[data-busaf-theme="market"],html[data-busaf-theme="founderMarket"],html[data-busaf-theme="stockMarket"],html[data-busaf-theme="founderStocks"]{
- --green:#168b88;--green2:#32aaa4;--light:#eff9f8;--card:#ffffff;--text:#174b49;--muted:#587a78;--line:#d1eae7;--shadow:0 7px 20px rgba(22,112,108,.08)
-}
-html[data-busaf-theme="invites"],html[data-busaf-theme="commissions"],html[data-busaf-theme="partner"],html[data-busaf-theme="profits"],html[data-busaf-theme="founderReferral"],html[data-busaf-theme="founderDirectInvites"]{
- --green:#7655ae;--green2:#9577ca;--light:#f6f2fb;--card:#ffffff;--text:#38294f;--muted:#716183;--line:#e3d9f1;--shadow:0 7px 20px rgba(91,63,135,.08)
-}
-html[data-busaf-theme="orders"],html[data-busaf-theme="founderPayments"]{
- --green:#b87532;--green2:#d99752;--light:#fff7ef;--card:#ffffff;--text:#563719;--muted:#806448;--line:#f0dfca;--shadow:0 7px 20px rgba(146,91,36,.08)
-}
-html[data-busaf-theme="account"],html[data-busaf-theme="notifications"],html[data-busaf-theme="rules"],html[data-busaf-theme="help"],html[data-busaf-theme="privacy"],html[data-busaf-theme="contact"],html[data-busaf-theme="how"],html[data-busaf-theme="founderSettings"],html[data-busaf-theme="founderMembers"],html[data-busaf-theme="founderAnnouncements"]{
- --green:#527b65;--green2:#729b82;--light:#f3f7f4;--card:#ffffff;--text:#294536;--muted:#62786b;--line:#dce8df;--shadow:0 7px 20px rgba(55,91,68,.07)
-}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) body{background:var(--light)!important;color:var(--text)!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .wrap,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-dashboard,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .profile-page{background:var(--light)!important;color:var(--text)!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .card,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .work-panel,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .dash-stat,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .stat,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .rule,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .profile-section-card,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-app,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-product{background:var(--card)!important;color:var(--text)!important;border-color:var(--line)!important;box-shadow:var(--shadow)!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .card h1,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .card h2,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .card h3,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .section-title,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-section-title,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .work-card b,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-app b{color:var(--text)!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .card p,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .card small,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-app small,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .work-card small,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .dash-stat small{color:var(--muted)!important}
-html[data-busaf-theme="member"] #app .member-v2-head #app .member-welcome{background:linear-gradient(135deg,#dff3e5,#c9ebd5)!important;color:#17432e!important;box-shadow:var(--shadow)!important}
-html[data-busaf-theme="member"] #app .member-v2-head h1,
-html[data-busaf-theme="member"] #app .member-v2-head .member-v2-brand b,
-html[data-busaf-theme="member"] #app .member-v2-head .member-v2-identity h1,
-html[data-busaf-theme="member"] #app .member-v2-head .member-v2-meta,
-html[data-busaf-theme="member"] #app .member-v2-head .member-v2-identity small{color:#17432e!important}
-html[data-busaf-theme="member"] #app .member-v2-balance,
-html[data-busaf-theme="member"] #app .member-v2-earnings{background:linear-gradient(120deg,#e1f3e7,#ccebd7)!important;color:#17432e!important;border-color:#c5e3cf!important}
-html[data-busaf-theme="member"] #app .member-v2-balance small,
-html[data-busaf-theme="member"] #app .member-v2-earnings span,
-html[data-busaf-theme="member"] #app .member-v2-earnings small{color:#426b52!important}
-html[data-busaf-theme^="founder"] #app .founder-v2-hero,
-html[data-busaf-theme="founder"] #app .founder-hero{background:linear-gradient(135deg,#fff5d9,#f4e8c4)!important;border:1px solid #ead9a8!important;box-shadow:var(--shadow)!important;color:#493b1c!important}
-html[data-busaf-theme^="founder"] #app .founder-v2-hero h1,
-html[data-busaf-theme^="founder"] #app .founder-v2-hero p,
-html[data-busaf-theme^="founder"] #app .founder-v2-hero small,
-html[data-busaf-theme^="founder"] #app .founder-v2-hero b,
-html[data-busaf-theme^="founder"] #app .founder-hero{color:#493b1c!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .member-v2-section,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .member-v2-live,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .member-v2-progress,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-section{background:var(--card)!important;color:var(--text)!important;border-color:var(--line)!important;box-shadow:var(--shadow)!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .member-v2-tile,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-tile{color:var(--text)!important;border-color:var(--line)!important;box-shadow:var(--shadow)!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .member-v2-title h2,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-heading h2,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .member-v2-tile b,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-tile b{color:var(--text)!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .member-v2-title small,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .member-v2-tile small,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-heading small,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-tile small{color:var(--muted)!important}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-tile i{color:var(--green)!important}
-</style>
+
 
 
 <style id="busaf-member-spaces-palette-v2">
