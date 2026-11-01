@@ -2411,7 +2411,7 @@ function founderHome(){
  const pending=Number(stats.pending||0);
  const tile=(id,ico,label,sub,cls)=>`<button class="founder-v2-tile ${cls}" onclick="setScreen('${id}')"><span>${ico}</span><b>${label}</b><small>${sub}</small><i>Ouvrir →</i></button>`;
  return `<div class="founder-v2">
-  <section class="founder-v2-hero"><div class="founder-v2-brand"><span>BuSAF</span><small>BUSINESS AFRICAIN · ADMINISTRATION</small></div><div class="founder-v2-founder-profile"><div class="founder-v2-founder-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo du fondateur">':'👑'}</div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR · COMPTE OFFICIEL</small><h1>${esc(name)}</h1><p>👑 Fondateur BuSAF</p><div class="founder-v2-founder-meta">${esc(countryFlag(founderCountry))} ${esc(founderCountry)} · 📱 ${esc(founderPhone)}</div><div class="founder-v2-founder-code">CODE : ${esc(profile.code_parrain||'BUSAF-FONDATEUR')}</div></div></div><p class="founder-v2-intro">Centre de contrôle — pilote les activités réelles de la plateforme.</p>
+  <section class="founder-v2-hero"><div class="founder-v2-brand"><div><span>BuSAF</span><small>BUSINESS AFRICAIN · ADMINISTRATION</small></div><button class="founder-v2-theme" onclick="toggleWorkspaceTheme('founder')" aria-label="Changer le thème">${busafWorkspaceTheme('founder')==='dark'?'☀️ Mode clair':'🌙 Mode sombre'}</button></div><div class="founder-v2-founder-profile"><div class="founder-v2-founder-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo du fondateur">':'👑'}</div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR · COMPTE OFFICIEL</small><h1>${esc(name)}</h1><p>👑 Fondateur BuSAF</p><div class="founder-v2-founder-meta">${esc(countryFlag(founderCountry))} ${esc(founderCountry)} · 📱 ${esc(founderPhone)}</div><div class="founder-v2-founder-code">CODE : ${esc(profile.code_parrain||'BUSAF-FONDATEUR')}</div></div></div><p class="founder-v2-intro">Centre de contrôle — pilote les activités réelles de la plateforme.</p>
    <div class="founder-v2-stats"><div class="founder-kpi founder-kpi-members"><span>👥</span><small>MEMBRES INSCRITS</small><b>${members}</b></div><div class="founder-kpi founder-kpi-sales"><span>🛒</span><small>VENTES CONFIRMÉES</small><b>${Number(stats.confirmed||0)}</b></div><div class="founder-kpi founder-kpi-products"><span>📦</span><small>PRODUITS PUBLIÉS</small><b>${products}</b></div><div class="founder-kpi founder-kpi-revenue"><span>💳</span><small>MONTANT CONFIRMÉ</small><b>${money(stats.revenue||0)}</b></div></div>
    <div class="founder-v2-hero-actions"><button class="founder-home-refresh" onclick="refreshFounderHomeStats()">↻ Actualiser les données</button><button onclick="setScreen('founderMembers')">👥 Voir les membres</button></div>
   </section>
@@ -2703,6 +2703,8 @@ async function loadMemberHomeMetrics(){
  }catch(e){console.warn('Activité membre BuSAF:',e);if(msg)msg.textContent='Certaines données ne sont pas disponibles : '+(e.message||'erreur de connexion');set('mhPurchases','—');set('mhSales','—');set('mhStock','—');set('mhEarnings','—');set('mhEarningsCard','Indisponible');}
 }
 
+function busafWorkspaceTheme(scope){const key=scope==='founder'?'busaf_founder_theme':'busaf_member_theme';try{return localStorage.getItem(key)==='dark'?'dark':'light';}catch(e){return 'light';}}
+function toggleWorkspaceTheme(scope){const key=scope==='founder'?'busaf_founder_theme':'busaf_member_theme';const next=busafWorkspaceTheme(scope)==='dark'?'light':'dark';try{localStorage.setItem(key,next);}catch(e){}render();}
 function memberHome(){
  const name=state.profile?.nom_complet||state.email||"Membre";
  const profile=state.profile||{};
@@ -2721,7 +2723,7 @@ function memberHome(){
  ];
  return `<div class="member-v2">
   <section class="member-v2-head">
-   <div class="member-v2-brandline"><div class="member-v2-brand"><b>BuSAF</b><small>BUSINESS AFRICAIN</small></div><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div>
+   <div class="member-v2-brandline"><div class="member-v2-brand"><b>BuSAF</b><small>BUSINESS AFRICAIN</small></div><div class="member-v2-head-tools"><button class="member-v2-theme" onclick="toggleWorkspaceTheme('member')" aria-label="Changer le thème">${busafWorkspaceTheme('member')==='dark'?'☀️':'🌙'}</button><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div></div>
    <div class="member-v2-user"><div class="member-v2-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo de profil">':'👤'}</div><div class="member-v2-identity"><small>BIENVENUE SUR BuSAF</small><h1>${esc(name)}</h1><span>MEMBRE BuSAF</span><div class="member-v2-meta">${esc(countryFlag(country))} ${esc(country)} · 📱 ${esc(phone)}</div></div></div>
    <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong>${money(state.marketBalance)}</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
    <div class="member-v2-referral"><div><small>MON CODE DE PARRAINAGE</small><b>${esc(referral)}</b></div><button onclick="invite()">📲 INVITER</button></div>
@@ -3884,6 +3886,7 @@ function render(){
   if(appRoot){
     appRoot.classList.toggle("founder-mode",!!state.userId&&isFounder());
     appRoot.classList.toggle("member-mode",!!state.userId&&!isFounder());
+    appRoot.classList.toggle("workspace-dark",!!state.userId&&busafWorkspaceTheme(isFounder()?"founder":"member")==="dark");
   }
  let content="";
  if(!state.userId){
@@ -4188,3 +4191,21 @@ document.addEventListener("keydown",function(e){if(e.key==="Escape")window.close
  .member-v2-tile{min-height:94px;padding:9px}
  .founder-v2-tile{min-height:92px;padding:9px}
 }
+
+/* Thèmes indépendants membre / fondateur */
+.member-v2-head-tools{display:flex;gap:7px;margin-left:auto}
+.member-v2-head-tools button{width:38px;height:38px;display:grid;place-items:center;border:1px solid #ffffff55;border-radius:12px;background:#ffffff20;color:#fff;font-size:17px}
+.member-v2-brandline{display:flex;align-items:center}.member-v2-bell{margin-left:0}
+.founder-v2-brand{gap:10px}
+.founder-v2-theme{border:1px solid #d9c58a66;background:#ffffff12;color:#f7e7b2;border-radius:11px;padding:9px 11px;font-size:10px;font-weight:900;white-space:nowrap}
+#app.workspace-dark{background:#101b16;color:#e6f1e9}
+#app.workspace-dark .member-v2-live,#app.workspace-dark .member-v2-section,#app.workspace-dark .member-v2-progress,#app.workspace-dark .founder-v2-section{background:#192820;border-color:#2b4435;box-shadow:0 7px 20px #0005}
+#app.workspace-dark .member-v2-title h2,#app.workspace-dark .founder-v2-heading h2,#app.workspace-dark .member-v2-progress-item>div,#app.workspace-dark .member-v2-tile b,#app.workspace-dark .founder-v2-tile b{color:#edf8f0}
+#app.workspace-dark .member-v2-title small,#app.workspace-dark .member-v2-live-grid small,#app.workspace-dark .member-v2-progress-item p,#app.workspace-dark .member-v2-tile small,#app.workspace-dark .founder-v2-heading small,#app.workspace-dark .founder-v2-tile small{color:#a8bdaf}
+#app.workspace-dark .member-v2-live-grid>div{background:#22372b;border:1px solid #314b3a}
+#app.workspace-dark .member-v2-actions button,#app.workspace-dark .founder-v2-footer button{background:#20372a;border-color:#35513e;color:#dff3e5}
+#app.workspace-dark .member-v2-tile,#app.workspace-dark .founder-v2-tile{border:1px solid #ffffff10}
+#app.workspace-dark .tile-wallet{background:#203d2b}#app.workspace-dark .tile-stock{background:#20354b}#app.workspace-dark .tile-orders{background:#493723}#app.workspace-dark .tile-profits{background:#3b2e50}#app.workspace-dark .tile-commissions{background:#492d38}#app.workspace-dark .tile-progress{background:#1e403b}#app.workspace-dark .tile-invites{background:#233c50}#app.workspace-dark .tile-account{background:#303b40}
+#app.workspace-dark .fv-green{background:#203d2b}#app.workspace-dark .fv-blue{background:#20354b}#app.workspace-dark .fv-orange{background:#493723}#app.workspace-dark .fv-purple{background:#3b2e50}#app.workspace-dark .fv-teal{background:#1e403b}#app.workspace-dark .fv-pink{background:#492d38}#app.workspace-dark .fv-gold{background:#494027}#app.workspace-dark .fv-slate{background:#303b40}
+#app.workspace-dark .member-v2-progress-item{border-color:#304638}#app.workspace-dark .member-v2-track{background:#304638}
+@media(max-width:390px){.founder-v2-theme{padding:8px;font-size:9px}.member-v2-head-tools button{width:35px;height:35px}}
