@@ -2240,7 +2240,7 @@ async function loadFounderWallet(){
   const confirmed=(txs||[]).filter(x=>x.statut==='confirmee');
   const credits=confirmed.filter(x=>x.sens==='credit').reduce((s,x)=>s+Number(x.montant||0),0);
   const debits=confirmed.filter(x=>x.sens==='debit').reduce((s,x)=>s+Number(x.montant||0),0);
-  const pending=(withdrawals||[]).filter(x=>x.statut==='en_attente').reduce((s,x)=>s+Number(x.montant||0),0);
+  const pending=(withdrawals||[]).filter(x=>['en_attente','approuve'].includes(String(x.statut||'').toLowerCase())).reduce((s,x)=>s+Number(x.montant||0),0);
   if(el('fwAvailable'))el('fwAvailable').textContent=fmt(credits-debits-pending);
   if(el('fwCredits'))el('fwCredits').textContent=fmt(credits);
   if(el('fwDebits'))el('fwDebits').textContent=fmt(debits);
