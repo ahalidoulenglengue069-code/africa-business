@@ -2182,11 +2182,6 @@ async function restoreAuthenticatedSession(){
         if(refreshed.refresh_token)localStorage.setItem("busaf_refresh_token",refreshed.refresh_token);
         user=refreshed.user;
       }
-      if(!refreshed?.access_token||!refreshed?.user?.id)throw new Error("Renouvellement de session impossible.");
-      state.token=refreshed.access_token;
-      localStorage.setItem("busaf_access_token",refreshed.access_token);
-      if(refreshed.refresh_token)localStorage.setItem("busaf_refresh_token",refreshed.refresh_token);
-      user=refreshed.user;
     }
     if(!user?.id)throw new Error("La session a expiré. Connecte-toi à nouveau.");
     state.userId=user.id;
