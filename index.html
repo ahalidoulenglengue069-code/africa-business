@@ -2689,6 +2689,7 @@ async function loadMemberSalesProgress(){
   const data=await api("/rest/v1/rpc/busaf_progression_ventes",{method:"POST",body:JSON.stringify({}),timeoutMs:12000});
   const row=Array.isArray(data)?data[0]:data;
   if(!row||typeof row!=="object")throw new Error("Réponse de progression invalide.");
+  if(String(state.profile?.id||"")!==String(profileId))return null;
   const value={profileId,month:Math.max(0,Number(row.mois||0)),total:Math.max(0,Number(row.total||0)),at:Date.now()};
   window.__busafSalesProgressCache=value;apply(value);return value;
  })();
@@ -3166,6 +3167,7 @@ async function loadMemberHomeMetrics(){
   const ownSales=(Array.isArray(sales)?sales:[]).filter(x=>String(x.vendeur_id)===String(profileId)&&ok(x.statut));
   const purchases=(Array.isArray(sales)?sales:[]).filter(x=>String(x.acheteur_id)===String(profileId)&&ok(x.statut));
   const ownResales=(Array.isArray(resales)?resales:[]).filter(x=>ok(x.statut));
+  if(String(state.profile?.id||'')!==String(profileId))return null;
   const stock=(Array.isArray(stocks)?stocks:[]).reduce((n,x)=>n+Math.max(0,Number(x.quantite||0)),0);
   const gains=(Array.isArray(commissions)?commissions:[]).filter(x=>ok(x.statut)).reduce((n,x)=>n+Number(x.montant||0),0);
   const value={profileId,purchases:purchases.length,sales:ownSales.length+ownResales.length,stock,gains,message:'Données confirmées synchronisées depuis Supabase. Les opérations en attente ne sont pas comptées.',at:Date.now()};
@@ -4126,6 +4128,7 @@ async function loadMemberWalletBalance(){
    const result=await api('/rest/v1/rpc/busaf_solde_compte_fondateur',{
     method:'POST',body:JSON.stringify({p_profil_id:state.profile.id,p_compte:'Compte Marché'}),timeoutMs:12000
    });
+   if(String(state.profile?.id||'')!==String(profileId))return null;
    const balance=Number(result);
    if(!Number.isFinite(balance))throw new Error('Le serveur a retourné un solde invalide.');
    state.marketBalance=Math.max(0,balance);
