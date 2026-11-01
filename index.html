@@ -2316,65 +2316,67 @@ async function login(e){
 
 async function signup(e){
  e.preventDefault();
- // Lire uniquement les champs réellement présents dans le formulaire d'inscription.
- // regVille n'existe plus depuis le passage au sélecteur de pays : sa lecture directe
- // provoquait « Cannot read properties of null (reading 'value') ».
  const fieldValue=(id)=>{const el=document.getElementById(id);return el?String(el.value||"").trim():"";};
  const nom=fieldValue("regNom");
- const email=fieldValue("regEmail");
+ const email=fieldValue("regEmail").toLowerCase();
  const tel=fieldValue("regTel");
  const ville=fieldValue("regVille");
  const pays=fieldValue("regPays");
  const code=fieldValue("regCode").toUpperCase();
- const password=fieldValue("regPassword");
+ const password=document.getElementById("regPassword")?.value||"";
  const msg=document.getElementById("regMsg"),btn=document.getElementById("regBtn");
- if(!msg||!btn){console.error("Formulaire BuSAF incomplet : éléments de retour ou bouton manquants.");return;}
- btn.disabled=true;btn.textContent="CRÉATION...";
+ if(!msg||!btn){console.error("Formulaire BuSAF incomplet.");return;}
+ btn.disabled=true;btn.textContent="CRÉATION DU COMPTE...";
+ msg.className="notice";msg.textContent="Vérification des informations...";
  try{
-  if(!code)throw new Error("Le code d'invitation est obligatoire.");
+  if(!nom||!email||!tel||!pays||!code||!password)throw new Error("Remplis tous les champs obligatoires.");
   if(password.length<6)throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
 
   const parrains=await api("/rest/v1/rpc/busaf_trouver_parrain",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({p_code:code})});
   const parrain=Array.isArray(parrains)?parrains[0]:null;
   if(!parrain)throw new Error("Code parrain invalide ou introuvable. Vérifie le code et réessaie.");
 
-  const d=await api("/auth/v1/signup",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password,data:{nom_complet:nom,telephone:tel,ville,pays,code_invitation:code}})});
-  if(!d.user?.id)throw new Error("Le compte n'a pas pu être créé.");
+  msg.textContent="Création sécurisée du compte...";
+  const d=await api("/auth/v1/signup",{method:"POST",timeoutMs:25000,headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({
+    email,password,
+    data:{nom_complet:nom,telephone:tel,ville,pays,code_invitation:code,code_parrain:code}
+  })});
+  if(!d.user?.id)throw new Error("Supabase n'a pas confirmé la création du compte.");
+  if(Array.isArray(d.user.identities)&&d.user.identities.length===0){
+    throw new Error("Cette adresse e-mail possède déjà un compte. Utilise « Se connecter » ou « Mot de passe oublié ».");
+  }
 
-  state.userId=d.user.id;state.email=email;state.token=d.access_token||"";
-  localStorage.setItem("busaf_user_id",state.userId);
-  localStorage.setItem("busaf_email",email);
-  if(state.token)localStorage.setItem("busaf_access_token",state.token);
-  if(d.refresh_token)localStorage.setItem("busaf_refresh_token",d.refresh_token);
-
-  if(!state.token){
-    openModal("Compte créé",`<div class="notice success">Le compte a été créé. Connecte-toi maintenant avec ton e-mail et ton mot de passe.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button>`);
+  // Le déclencheur PostgreSQL crée déjà le profil BuSAF lors de la création Auth.
+  // Ne surtout pas réinsérer ce profil depuis le navigateur : cela créait un doublon.
+  if(!d.access_token){
+    state.userId="";state.token="";state.profile=null;state.email=email;
+    msg.className="notice success";
+    msg.textContent="Compte créé. Vérifie ta boîte e-mail et confirme ton adresse avant de te connecter.";
+    btn.disabled=false;btn.textContent="COMPTE CRÉÉ";
+    openModal("📩 Confirme ton adresse e-mail",`<div class="notice success">Ton compte BuSAF et ton profil membre ont été créés. Ouvre le message envoyé à <strong>${esc(email)}</strong>, confirme ton adresse, puis connecte-toi.</div><button class="btn" onclick="closeModal();setScreen('login')">ALLER À LA CONNEXION</button>`);
     return;
   }
 
-  const nouveauCode="BUSAF-"+state.userId.replace(/-/g,"").slice(0,8).toUpperCase();
+  state.userId=d.user.id;state.email=email;state.token=d.access_token;
+  localStorage.setItem("busaf_user_id",state.userId);
+  localStorage.setItem("busaf_email",email);
+  localStorage.setItem("busaf_access_token",d.access_token);
+  if(d.refresh_token)localStorage.setItem("busaf_refresh_token",d.refresh_token);
 
-  const rows=await api("/rest/v1/profils_busaf",{method:"POST",body:JSON.stringify({
-    user_id:state.userId,
-    nom_complet:nom,
-    telephone:tel,
-    Ville:ville,
-    pays:pays,
-    role:"membre",
-    parrain_id:parrain.id,
-    code_parrain:nouveauCode,
-    photo_url:null
-  }),headers:{"Prefer":"return=representation"}});
-
-  state.profile=Array.isArray(rows)?rows[0]:rows;
+  msg.textContent="Profil BuSAF créé automatiquement. Ouverture de ton espace...";
+  const profil=await loadProfile();
+  if(!profil?.id)throw new Error("Le compte Auth est créé, mais le profil BuSAF automatique n'est pas encore visible. Ne recrée pas le compte ; réessaie de te connecter dans quelques instants.");
+  state.profile=profil;
   localStorage.removeItem("busaf_pending_invite");
+  saveState();
   setScreen("member");
  }catch(err){
-  msg.className="notice error";msg.textContent="❌ "+err.message;
+  const raw=String(err?.message||"");
+  msg.className="notice error";
+  msg.textContent="❌ "+(/already registered|user already exists|email already/i.test(raw)?"Cette adresse e-mail est déjà utilisée. Connecte-toi ou utilise « Mot de passe oublié ».":raw);
   btn.disabled=false;btn.textContent="CRÉER MON COMPTE";
  }
 }
-
 function forgot(){
  openModal("🔑 Mot de passe oublié",`
    <div class="notice">Entre l'adresse e-mail utilisée pour ton compte BuSAF. Si elle existe, Supabase enverra le lien de récupération.</div>
