@@ -1374,6 +1374,15 @@ td,th{padding:10px 9px;border-bottom:1px solid #e8efe9;text-align:left}
 .founder-stock-numbers b{display:block;font-size:16px;color:#173b29;margin-top:4px}
 .founder-stock-updated{font-size:10px;color:#77847b;margin-top:10px}
 @media(max-width:390px){.founder-stock-row{padding:11px}.founder-stock-numbers{gap:5px}.founder-stock-numbers>div{padding:8px 4px}.founder-stock-numbers b{font-size:14px}}
+
+.member-v2-live{background:linear-gradient(145deg,#fff,#f6fbf7);border:1px solid #deebe2;border-radius:22px;padding:16px;box-shadow:0 8px 22px #153c240b}
+.member-v2-live .member-v2-title{margin-bottom:12px}
+.member-v2-live .member-v2-title button{width:36px;height:36px;border:1px solid #dce9df;border-radius:11px;background:#fff;color:#087a3b;font-size:20px}
+.member-v2-live-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.member-v2-live-grid>div{padding:12px;border-radius:13px;background:#edf6ef;border:1px solid #e0eee3;min-width:0}
+.member-v2-live-grid small{display:block;font-size:10px;color:#5d7464;font-weight:700}
+.member-v2-live-grid b{display:block;color:#075b35;font-size:19px;margin-top:5px;overflow-wrap:anywhere}
+.member-v2-live>p{font-size:10px;color:#738176;margin:11px 0 0;line-height:1.45}
 </style>
 </head>
 <body>
@@ -1588,6 +1597,7 @@ function setScreen(screen){
  }
  if(screen===state.screen){
   if((screen==="member"||screen==="partner")&&state.userId)loadMemberSalesProgress();
+  if(screen==="member"&&state.userId)loadMemberHomeMetrics();
   if(screen==="notifications")render();
   if(screen==="founderPayments" && isFounder() && !state.founderPaymentsLoading)refreshFounderPayments();
   if(screen==="commissions" && state.userId)loadMemberCommissions();
@@ -1598,6 +1608,7 @@ function setScreen(screen){
  state.screen=screen;
  history.pushState({busafScreen:screen},"","#"+screen);
  render();
+ if(screen==="member" && state.userId && !isFounder())loadMemberHomeMetrics();
  if(screen==="founderPayments" && isFounder())refreshFounderPayments();
  if(screen==="founderStocks" && isFounder())loadFounderStocks();
  if(screen==="commissions" && state.userId)loadMemberCommissions();
@@ -2462,6 +2473,30 @@ async function publishFounderAnnouncement(){
  try{await api('/rest/v1/busaf_events',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({event_type:'annonce_fondateur',title,details:{message},user_id:state.userId})});alert('Annonce enregistrée si Supabase l’accepte.');await loadFounderAnnouncements();}catch(e){alert('Annonce non enregistrée : '+(e.message||'erreur Supabase'));}
 }
 
+
+async function loadMemberHomeMetrics(){
+ const profileId=state.profile?.id;if(!profileId||!state.token)return;
+ const set=(id,value)=>{const e=document.getElementById(id);if(e)e.textContent=String(value)};
+ const msg=document.getElementById('mhMetricsMessage');if(msg)msg.textContent='Actualisation des données…';
+ try{
+  const id=encodeURIComponent(profileId);
+  const [sales,resales,stocks,commissions]=await Promise.all([
+   api('/rest/v1/ventes?select=id,montant,statut,vendeur_id,acheteur_id&or=(vendeur_id.eq.'+id+',acheteur_id.eq.'+id+')&limit=1000',{timeoutMs:15000}),
+   api('/rest/v1/busaf_reventes?select=id,montant,statut,vendeur_id&vendeur_id=eq.'+id+'&limit=1000',{timeoutMs:15000}),
+   api('/rest/v1/stocks_busaf?select=quantite,quantite_reservee&proprietaire_id=eq.'+id+'&limit=1000',{timeoutMs:15000}),
+   api('/rest/v1/busaf_commissions?select=montant,statut,type_commission&beneficiaire_id=eq.'+id+'&limit=1000',{timeoutMs:15000})
+  ]);
+  const ok=s=>['confirmee','confirme','validee','valide','payee','paye','success','succeeded'].includes(String(s||'').toLowerCase());
+  const ownSales=(Array.isArray(sales)?sales:[]).filter(x=>String(x.vendeur_id)===String(profileId)&&ok(x.statut));
+  const purchases=(Array.isArray(sales)?sales:[]).filter(x=>String(x.acheteur_id)===String(profileId)&&ok(x.statut));
+  const ownResales=(Array.isArray(resales)?resales:[]).filter(x=>ok(x.statut));
+  const stock=(Array.isArray(stocks)?stocks:[]).reduce((n,x)=>n+Math.max(0,Number(x.quantite||0)-Number(x.quantite_reservee||0)),0);
+  const gains=(Array.isArray(commissions)?commissions:[]).filter(x=>ok(x.statut)).reduce((n,x)=>n+Number(x.montant||0),0);
+  set('mhPurchases',purchases.length);set('mhSales',ownSales.length+ownResales.length);set('mhStock',stock);set('mhEarnings',money(gains)+' FCFA');
+  if(msg)msg.textContent='Données confirmées synchronisées depuis Supabase. Les opérations en attente ne sont pas comptées.';
+ }catch(e){console.warn('Activité membre BuSAF:',e);if(msg)msg.textContent='Certaines données ne sont pas disponibles : '+(e.message||'erreur de connexion');set('mhPurchases','—');set('mhSales','—');set('mhStock','—');set('mhEarnings','—');}
+}
+
 function memberHome(){
  const name=state.profile?.nom_complet||state.email||"Membre";
  const tiles=[
@@ -2480,6 +2515,7 @@ function memberHome(){
    <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong>${money(state.marketBalance)}</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
   </section>
   <div class="member-v2-actions"><button onclick="setScreen('money')">＋ Déposer</button><button onclick="setScreen('money')">↗ Retirer</button><button onclick="setScreen('market')">🛒 Acheter</button></div>
+  <section class="member-v2-live"><div class="member-v2-title"><div><small>MES RÉSULTATS RÉELS</small><h2>Mon activité BuSAF</h2></div><button onclick="loadMemberHomeMetrics()" aria-label="Actualiser mon activité">↻</button></div><div class="member-v2-live-grid"><div><small>Achats confirmés</small><b id="mhPurchases">…</b></div><div><small>Ventes confirmées</small><b id="mhSales">…</b></div><div><small>Stock disponible</small><b id="mhStock">…</b></div><div><small>Gains confirmés</small><b id="mhEarnings">…</b></div></div><p id="mhMetricsMessage">Synchronisation avec ton compte BuSAF…</p></section>
   <section class="member-v2-section"><div class="member-v2-title"><div><small>VOTRE ACTIVITÉ</small><h2>Mon espace</h2></div><span>BuSAF</span></div>
    <div class="member-v2-grid">${tiles.map(([id,ico,label,desc,cls])=>`<button class="member-v2-tile ${cls}" onclick="setScreen('${id}')"><span class="member-v2-tile-icon">${ico}</span><b>${label}</b><small>${desc}</small><i>Ouvrir →</i></button>`).join('')}</div>
   </section>
