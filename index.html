@@ -153,6 +153,7 @@ label{display:block;font-weight:800;margin:11px 0 5px}
 input,textarea,select{
   width:100%;border:1px solid #cbdcd0;border-radius:11px;padding:11px;background:#fff;outline:none
 }
+.password-field{display:flex;align-items:center;gap:6px;width:100%;border:1px solid #cbdcd0;border-radius:11px;background:#fff;padding-right:7px}.password-field input{flex:1;min-width:0;border:0!important;outline:none!important;box-shadow:none!important;background:transparent}.password-toggle{flex:0 0 40px;width:40px;height:40px;border:0;border-radius:9px;background:#e8f5ec;color:#087a38;font-size:19px;display:grid;place-items:center;padding:0}.password-toggle:focus-visible{outline:2px solid #087a38;outline-offset:2px}
 textarea{min-height:100px;resize:vertical}
 .small{font-size:13px;color:var(--muted)}
 .center{text-align:center}
@@ -2981,13 +2982,21 @@ function page(title,body,extra=""){
  </section>`;
 }
 
+function togglePasswordVisibility(inputId,button){
+ const input=document.getElementById(inputId);
+ if(!input)return;
+ const show=input.type==="password";
+ input.type=show?"text":"password";
+ if(button){button.textContent=show?"🙈":"👁️";button.setAttribute("aria-label",show?"Masquer le mot de passe":"Afficher le mot de passe");button.title=show?"Masquer le mot de passe":"Afficher le mot de passe";}
+}
+
 function loginPage(){
  return page("🔐 Connexion BuSAF",`
  <form onsubmit="login(event)">
   <label>Adresse e-mail</label>
   <input id="loginEmail" type="email" required autocomplete="email" placeholder="exemple@email.com">
   <label>Mot de passe</label>
-  <input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Mot de passe">
+  <div class="password-field"><input id="loginPassword" type="password" required autocomplete="current-password" placeholder="Mot de passe"><button class="password-toggle" type="button" onclick="togglePasswordVisibility('loginPassword',this)" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">👁️</button></div>
   <button class="btn" id="loginBtn">SE CONNECTER</button>
  </form>
  <div id="loginMsg" class="notice hidden"></div>
@@ -3049,7 +3058,7 @@ function signupPage(){
   <label>Code d'invitation</label>
   <input id="regCode" required placeholder="Code reçu de votre invitant" value="${esc(localStorage.getItem("busaf_pending_invite")||"")}">
   <label>Mot de passe</label>
-  <input id="regPassword" type="password" minlength="6" required placeholder="6 caractères minimum">
+  <div class="password-field"><input id="regPassword" type="password" minlength="6" required placeholder="6 caractères minimum"><button class="password-toggle" type="button" onclick="togglePasswordVisibility('regPassword',this)" aria-label="Afficher le mot de passe" title="Afficher le mot de passe">👁️</button></div>
   <button class="btn" id="regBtn">CRÉER MON COMPTE</button>
  </form>
  <div id="regMsg" class="notice hidden"></div>
