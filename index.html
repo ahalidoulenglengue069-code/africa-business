@@ -1592,6 +1592,46 @@ td,th{padding:10px 9px;border-bottom:1px solid #e8efe9;text-align:left}
 
 
 .founder-wallet-balances .fund-bucket{background:#e9f6ee;border-color:#b9dfc6}.founder-wallet-balances .commission-bucket{background:#f0eaff;border-color:#d5c6f2}
+
+/* ===== Identité chromatique automatique par espace BuSAF ===== */
+html[data-busaf-theme="member"]{--green:#087a38;--green2:#13a45a;--light:#edf8f1;--line:#cfe7d7;--text:#173b29;--muted:#63796b}
+html[data-busaf-theme="stockMarket"]{--green:#087f9b;--green2:#12a9c2;--light:#eafaff;--line:#c5e9f0;--text:#16414b;--muted:#5d7e85}
+html[data-busaf-theme="benefits"]{--green:#a66b08;--green2:#d69a19;--light:#fff9e9;--line:#f0dfb5;--text:#503b17;--muted:#85734e}
+html[data-busaf-theme="founderDirectInvites"]{--green:#a43d78;--green2:#d15a9c;--light:#fff1f7;--line:#f0cadd;--text:#54243f;--muted:#89687c}
+html[data-busaf-theme="founderReferral"]{--green:#6941a5;--green2:#9166cf;--light:#f5f0ff;--line:#ded0f4;--text:#3d2a58;--muted:#78698d}
+html[data-busaf-theme="founderAnnouncements"]{--green:#b34c42;--green2:#df7163;--light:#fff2ef;--line:#f0d0ca;--text:#542a27;--muted:#896c68}
+html[data-busaf-theme="founderDashboard"]{--green:#5140a0;--green2:#7967cf;--light:#f3f1ff;--line:#d9d5f3;--text:#302a57;--muted:#716b94}
+html[data-busaf-theme="founderFinance"]{--green:#9a6900;--green2:#c58a08;--light:#fff9e8;--line:#f0dfaa;--text:#4e3c0e;--muted:#827044}
+html[data-busaf-theme="founderWallet"]{--green:#087b61;--green2:#10a27f;--light:#eaf9f4;--line:#c7e9dd;--text:#16483b;--muted:#5d8176}
+html[data-busaf-theme="founderPayments"]{--green:#b65a13;--green2:#e17a20;--light:#fff5e9;--line:#f1d7b8;--text:#573516;--muted:#866b50}
+html[data-busaf-theme="founderMembers"]{--green:#087f8c;--green2:#0ca6b4;--light:#eafafb;--line:#c5e8eb;--text:#16454a;--muted:#5d7e81}
+html[data-busaf-theme="founderStocks"]{--green:#1769aa;--green2:#2589d8;--light:#edf6ff;--line:#c8def2;--text:#173653;--muted:#5b7187}
+html[data-busaf-theme="founderSettings"]{--green:#475569;--green2:#64748b;--light:#f1f5f9;--line:#d5dde7;--text:#263445;--muted:#687789}
+html[data-busaf-theme="founderDirectInvites"]{--green:#a43d78;--green2:#d15a9c;--light:#fff1f7;--line:#f0cadd;--text:#54243f;--muted:#89687c}
+html[data-busaf-theme] body{background:var(--light);color:var(--text)}
+html[data-busaf-theme] #app .busaf-shell-header{background:linear-gradient(120deg,var(--green),var(--green2));}
+html[data-busaf-theme] #app .section-title,
+html[data-busaf-theme] #app .card>h1,
+html[data-busaf-theme] #app .card>h2,
+html[data-busaf-theme] #app .rule h3,
+html[data-busaf-theme] #app .busaf-page-heading h1,
+html[data-busaf-theme] #app .member-v2-title h2,
+html[data-busaf-theme] #app .founder-v2-heading h2{color:var(--green)!important}
+html[data-busaf-theme] #app .btn:not(.red):not(.gold){background:linear-gradient(120deg,var(--green),var(--green2));color:#fff}
+html[data-busaf-theme] #app .btn.alt,
+html[data-busaf-theme] #app .back{background:var(--light);border:1px solid var(--line);color:var(--green)}
+html[data-busaf-theme] #app .member-v2-head{background:linear-gradient(125deg,var(--green),var(--green2));}
+html[data-busaf-theme] #app .member-v2-live,
+html[data-busaf-theme] #app .member-v2-section,
+html[data-busaf-theme] #app .member-v2-progress,
+html[data-busaf-theme] #app .founder-v2-section{border-color:var(--line)}
+html[data-busaf-theme] #app .profile-section-heading>span,
+html[data-busaf-theme] #app .profile-summary-card>span{background:var(--light);color:var(--green)}
+html[data-busaf-theme] #app .profile-code-box{background:var(--light);border-color:var(--line)}
+html[data-busaf-theme] #app .profile-code-box strong{color:var(--green)}
+html[data-busaf-theme] #app .bottom-inner button.active,
+html[data-busaf-theme] #app .quick-inner button.active{color:var(--green)!important;background:var(--light)!important}
+
 </style>
 
 <style>
@@ -4156,15 +4196,15 @@ function header(member=false){
 
 function render(){
   const themeByScreen = {
-   public:"public",member:"public",founder:"founder",founderMarket:"founderMarket",market:"market",
+   public:"public",member:"member",founder:"founder",founderMarket:"founderMarket",market:"market",
    founderDashboard:"founderDashboard",founderStats:"founderDashboard",founderFinance:"founderFinance",
    founderWallet:"founderWallet",money:"money",founderPayments:"founderPayments",orders:"orders",
-   founderMembers:"founderMembers",founderDirectInvites:"invites",invites:"invites",account:"account",profits:"profits",commissions:"commissions",
-   partner:"partner",memberBenefits:"profits",stockMarket:"market",
+   founderMembers:"founderMembers",founderDirectInvites:"founderDirectInvites",invites:"invites",
+   account:"account",profits:"profits",commissions:"commissions",partner:"partner",
+   memberBenefits:"benefits",stockMarket:"stockMarket",
    notifications:"notifications",rules:"rules",help:"help",privacy:"privacy",contact:"contact",how:"how",
-   founderStocks:"founderStocks",founderSettings:"founderSettings",founderReferral:"invites",
-   founderAnnouncements:"contact",founderStats:"founderDashboard",
-   signup:"account",login:"account",benefits:"profits"
+   founderStocks:"founderStocks",founderSettings:"founderSettings",founderReferral:"founderReferral",
+   founderAnnouncements:"founderAnnouncements",signup:"account",login:"account",benefits:"benefits"
   };
   document.documentElement.setAttribute("data-busaf-theme",themeByScreen[state.screen]||"public");
   const appRoot=document.getElementById("app");
