@@ -1590,6 +1590,8 @@ td,th{padding:10px 9px;border-bottom:1px solid #e8efe9;text-align:left}
 /* BuSAF Wallet V2 — hiérarchie visuelle, contrastes et responsive */
 .wallet-hero,.founder-wallet-hero{padding:19px;border-radius:20px;margin:4px 0 14px;background:linear-gradient(135deg,#075b35,#0a8d49 68%,#20a75e);color:#fff;box-shadow:0 10px 25px rgba(5,91,49,.18);min-width:0}.wallet-hero-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11px;font-weight:900;letter-spacing:.35px}.wallet-live{font-size:9px;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.25);border-radius:99px;padding:5px 8px;white-space:nowrap}.wallet-hero>small,.founder-wallet-hero>small{display:block;margin-top:22px;font-size:12px;font-weight:700;opacity:.9}.wallet-hero>strong,.founder-wallet-hero>strong{display:block;font-size:clamp(25px,7vw,36px);line-height:1.15;margin:7px 0;overflow-wrap:anywhere;color:#fff}.wallet-hero>strong i,.founder-wallet-hero>strong i{font-size:13px;font-style:normal;font-weight:800}.wallet-hero>p,.founder-wallet-hero>p{margin:9px 0 0;font-size:12px;line-height:1.5;color:#effff4}.wallet-action-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:0 0 14px}.wallet-action{min-width:0;text-align:left;border:1px solid transparent;border-radius:17px;padding:14px 12px;display:flex;flex-direction:column;align-items:flex-start;gap:5px;box-shadow:0 4px 14px rgba(0,0,0,.06)}.wallet-action>span{width:35px;height:35px;border-radius:11px;display:grid;place-items:center;font-size:22px;font-weight:900;margin-bottom:3px}.wallet-action b{font-size:13px;color:#111}.wallet-action small{font-size:10px;color:#4b5750;line-height:1.35}.wallet-deposit{background:#eaf3ff;border-color:#b8d2f5}.wallet-deposit>span{background:#1769b4;color:#fff}.wallet-withdraw{background:#fff1e2;border-color:#f2c28e}.wallet-withdraw>span{background:#f58220;color:#fff}.wallet-security-note{padding:12px 13px;border-radius:14px;background:#f0f7f2;border:1px solid #cfe4d5;font-size:11px;line-height:1.55;color:#23372a;margin-bottom:14px}.wallet-history-panel,.founder-wallet-panel{background:#fff;border:1px solid #dce9df;border-radius:17px;padding:13px;margin:0 0 12px;box-shadow:0 4px 14px rgba(10,70,35,.045);min-width:0}.deposit-history-panel{border-top:4px solid #2675c8}.withdrawal-history-panel{border-top:4px solid #f58220}.wallet-panel-heading{display:flex;align-items:center;gap:10px;margin-bottom:10px}.wallet-panel-heading>span{width:39px;height:39px;border-radius:12px;background:#edf5ef;display:grid;place-items:center;font-size:21px;flex:0 0 39px}.wallet-panel-heading h3{margin:0;color:#17251b;font-size:15px}.wallet-panel-heading p{margin:3px 0 0;color:#69766e;font-size:10px}.wallet-history-panel .rule,.founder-wallet-list .rule{border:1px solid #e5ece7;border-radius:12px;padding:11px;margin:8px 0;background:#fbfdfb;box-shadow:none;font-size:12px;line-height:1.55;overflow-wrap:anywhere}.wallet-history-panel .rule strong,.founder-wallet-list .rule strong{font-size:13px}.deposit-history-panel .rule{border-left:4px solid #2675c8!important}.withdrawal-history-panel .rule{border-left:4px solid #f58220!important}.founder-wallet-hero{background:linear-gradient(135deg,#064c30,#087b43 70%,#15965a)}.founder-wallet-balances .stat{background:#f7fbf8;border:1px solid #dce9df;border-radius:15px;padding:12px 9px;text-align:left;font-size:11px;color:#46564b}.founder-wallet-balances .stat>span{font-size:18px;display:block;margin-bottom:5px}.founder-wallet-balances .stat strong{display:block;color:#101b14;font-size:clamp(15px,4vw,20px);margin-top:6px;overflow-wrap:anywhere}.founder-withdraw-panel{border-top:4px solid #f58220}.founder-withdraw-panel .wallet-panel-heading>span{background:#fff0df}.founder-withdraw-panel .btn{background:#f58220;color:#fff}.founder-ledger-panel{border-top:4px solid #16824a}.founder-withdrawals-panel{border-top:4px solid #f58220}.founder-wallet-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.founder-wallet-list>.rule{margin:0}@media(max-width:390px){.wallet-hero,.founder-wallet-hero{padding:16px}.wallet-action{padding:12px 9px}.wallet-action b{font-size:12px}.founder-wallet-list{grid-template-columns:1fr}.founder-wallet-balances{gap:7px}}
 
+
+.founder-wallet-balances .fund-bucket{background:#e9f6ee;border-color:#b9dfc6}.founder-wallet-balances .commission-bucket{background:#f0eaff;border-color:#d5c6f2}
 </style>
 
 <style>
@@ -2789,7 +2791,7 @@ function founderWallet(){
   if(!isFounder())return memberHome();
   return page("👛 Portefeuille Fondateur",`
    <section class="founder-wallet-hero"><div class="wallet-hero-top"><span>🏛️ TRÉSORERIE BuSAF</span><span class="wallet-live">● SYNCHRONISATION SUPABASE</span></div><small>Solde disponible calculé</small><strong id="fwAvailable">Chargement… <i>FCFA</i></strong><p>Fonds et commissions éligibles au retrait. Aucun dépôt n'est exigé pour le compte fondateur.</p></section>
-   <div class="founder-wallet-balances"><div class="stat"><span>📥</span>Total crédité<strong id="fwCredits">—</strong></div><div class="stat"><span>📤</span>Total débité<strong id="fwDebits">—</strong></div><div class="stat"><span>⏳</span>Retraits en attente<strong id="fwPending">—</strong></div></div>
+   <div class="founder-wallet-balances"><div class="stat fund-bucket"><span>🏛️</span>Fonds BuSAF disponibles<strong id="fwFundsAvailable">Chargement…</strong></div><div class="stat commission-bucket"><span>🤝</span>Commissions disponibles<strong id="fwCommissionsAvailable">Chargement…</strong></div><div class="stat"><span>📥</span>Total crédité<strong id="fwCredits">—</strong></div><div class="stat"><span>📤</span>Total débité<strong id="fwDebits">—</strong></div><div class="stat"><span>⏳</span>Retraits en attente<strong id="fwPending">—</strong></div></div>
    <section class="founder-wallet-panel founder-withdraw-panel"><div class="wallet-panel-heading"><span>🟠</span><div><h3>Demander un retrait</h3><p>Transfert vers un compte Mobile Money</p></div></div><div class="founder-withdraw-form"><div><label>Montant (FCFA)</label><input id="fwAmount" type="number" min="1" inputmode="numeric" placeholder="Ex. 5000"></div><div><label>Source des fonds</label><select id="fwAccount"><option value="Fonds BuSAF">Fonds BuSAF</option><option value="Commissions de parrainage">Commissions de parrainage</option></select></div><div><label>Opérateur</label><select id="fwOperator"><option>Orange Money</option><option>Moov Money</option><option>Telecel Money</option><option>Wave</option></select></div><div><label>Numéro Mobile Money</label><input id="fwPhone" type="tel" inputmode="tel" placeholder="Numéro de réception"></div><div class="founder-withdraw-action"><button class="btn" onclick="submitFounderWithdrawal()">ENVOYER LA DEMANDE</button><p class="small">Chaque demande est vérifiée et reste en attente de validation. Aucun paiement automatique.</p></div></div></section>
    <section class="founder-wallet-panel founder-ledger-panel"><div class="wallet-panel-heading"><span>🧾</span><div><h3>Historique des opérations</h3><p>Crédits et débits enregistrés</p></div></div><div id="fwTransactions" class="founder-wallet-list"><div class="empty">Chargement des opérations…</div></div></section>
    <section class="founder-wallet-panel founder-withdrawals-panel"><div class="wallet-panel-heading"><span>📦</span><div><h3>Demandes de retrait</h3><p>Suivi des validations et paiements</p></div></div><div id="fwWithdrawals" class="founder-wallet-list"><div class="empty">Chargement des demandes…</div></div></section>
@@ -2797,27 +2799,33 @@ function founderWallet(){
   `);
  }
 async function loadFounderWallet(){
- if(!isFounder()||!state.profile?.id)return;
- const id=state.profile.id,fmt=n=>money(Number(n||0)),el=k=>document.getElementById(k);
- try{
-  const [txs,withdrawals]=await Promise.all([
-   api('/rest/v1/busaf_transactions_portefeuille?select=id,type_operation,montant,sens,statut,reference_interne,created_at&profil_id=eq.'+encodeURIComponent(id)+'&order=created_at.desc&limit=50'),
-   api('/rest/v1/busaf_retraits?select=id,montant,numero_mobile_money,operateur,compte,statut,created_at&profil_id=eq.'+encodeURIComponent(id)+'&order=created_at.desc&limit=30')
-  ]);
-  const confirmed=(txs||[]).filter(x=>x.statut==='confirmee');
-  const credits=confirmed.filter(x=>x.sens==='credit').reduce((s,x)=>s+Number(x.montant||0),0);
-  const debits=confirmed.filter(x=>x.sens==='debit').reduce((s,x)=>s+Number(x.montant||0),0);
-  const pending=(withdrawals||[]).filter(x=>['en_attente','approuve'].includes(String(x.statut||'').toLowerCase())).reduce((s,x)=>s+Number(x.montant||0),0);
-  if(el('fwAvailable'))el('fwAvailable').textContent=fmt(credits-debits-pending);
-  if(el('fwCredits'))el('fwCredits').textContent=fmt(credits);
-  if(el('fwDebits'))el('fwDebits').textContent=fmt(debits);
-  if(el('fwPending'))el('fwPending').textContent=fmt(pending);
-  if(el('fwTransactions'))el('fwTransactions').innerHTML=(txs||[]).length?(txs||[]).map(x=>'<div class="rule"><strong>'+esc(x.type_operation||'Opération')+'</strong> — '+fmt(x.montant)+'<br>'+esc(x.sens||'')+' · '+esc(x.statut||'')+'<br><small>'+esc(x.created_at||'')+' · '+esc(x.reference_interne||'')+'</small></div>').join(''):'<div class="empty">Aucune opération enregistrée.</div>';
-  if(el('fwWithdrawals'))el('fwWithdrawals').innerHTML=(withdrawals||[]).length?(withdrawals||[]).map(x=>'<div class="rule"><strong>'+fmt(x.montant)+'</strong> — '+esc(x.statut||'')+'<br>'+esc(x.compte||'')+' · '+esc(x.operateur||'')+' · '+esc(x.numero_mobile_money||'')+'<br><small>'+esc(x.created_at||'')+'</small></div>').join(''):'<div class="empty">Aucune demande de retrait.</div>';
- }catch(e){
-  ['fwAvailable','fwCredits','fwDebits','fwPending'].forEach(k=>{if(el(k))el(k).textContent='Indisponible';});
-  if(el('fwTransactions'))el('fwTransactions').innerHTML='<div class="notice warning">Chargement impossible : '+esc(e.message||'erreur Supabase')+'.</div>';
- }
+  if(!isFounder()||!state.profile?.id)return;
+  const id=state.profile.id,fmt=n=>money(Number(n||0)),el=k=>document.getElementById(k);
+  const dateFmt=v=>{if(!v)return "Date inconnue";const d=new Date(v);return Number.isNaN(d.getTime())?String(v):d.toLocaleString("fr-FR");};
+  try{
+   const [txs,withdrawals,funds,commissions]=await Promise.all([
+    api('/rest/v1/busaf_transactions_portefeuille?select=id,type_operation,montant,sens,statut,reference_interne,created_at&profil_id=eq.'+encodeURIComponent(id)+'&order=created_at.desc&limit=50',{timeoutMs:15000}),
+    api('/rest/v1/busaf_retraits?select=id,montant,numero_mobile_money,operateur,compte,statut,created_at&profil_id=eq.'+encodeURIComponent(id)+'&order=created_at.desc&limit=30',{timeoutMs:15000}),
+    api('/rest/v1/rpc/busaf_solde_compte_fondateur',{method:'POST',body:JSON.stringify({p_profil_id:id,p_compte:'Fonds BuSAF'}),timeoutMs:15000}),
+    api('/rest/v1/rpc/busaf_solde_compte_fondateur',{method:'POST',body:JSON.stringify({p_profil_id:id,p_compte:'Commissions de parrainage'}),timeoutMs:15000})
+   ]);
+   const confirmed=(txs||[]).filter(x=>x.statut==='confirmee');
+   const credits=confirmed.filter(x=>x.sens==='credit').reduce((s,x)=>s+Number(x.montant||0),0);
+   const debits=confirmed.filter(x=>x.sens==='debit').reduce((s,x)=>s+Number(x.montant||0),0);
+   const pending=(withdrawals||[]).filter(x=>['en_attente','approuve'].includes(String(x.statut||'').toLowerCase())).reduce((s,x)=>s+Number(x.montant||0),0);
+   const fundsAvailable=Number(funds||0),commissionAvailable=Number(commissions||0);
+   if(el('fwAvailable'))el('fwAvailable').textContent=fmt(fundsAvailable+commissionAvailable)+' FCFA';
+   if(el('fwFundsAvailable'))el('fwFundsAvailable').textContent=fmt(fundsAvailable)+' FCFA';
+   if(el('fwCommissionsAvailable'))el('fwCommissionsAvailable').textContent=fmt(commissionAvailable)+' FCFA';
+   if(el('fwCredits'))el('fwCredits').textContent=fmt(credits)+' FCFA';
+   if(el('fwDebits'))el('fwDebits').textContent=fmt(debits)+' FCFA';
+   if(el('fwPending'))el('fwPending').textContent=fmt(pending)+' FCFA';
+   if(el('fwTransactions'))el('fwTransactions').innerHTML=(txs||[]).length?(txs||[]).map(x=>'<div class="rule"><strong>'+esc(x.type_operation||'Opération')+'</strong> — '+fmt(x.montant)+' FCFA<br>'+esc(x.sens||'')+' · '+esc(x.statut||'')+'<br><small>'+esc(dateFmt(x.created_at))+' · '+esc(x.reference_interne||'')+'</small></div>').join(''):'<div class="empty">Aucune opération enregistrée.</div>';
+   if(el('fwWithdrawals'))el('fwWithdrawals').innerHTML=(withdrawals||[]).length?(withdrawals||[]).map(x=>'<div class="rule"><strong>'+fmt(x.montant)+' FCFA</strong> — '+esc(String(x.statut||'').replace(/_/g,' '))+'<br>'+esc(x.compte||'')+' · '+esc(x.operateur||'')+' · '+esc(x.numero_mobile_money||'')+'<br><small>'+esc(dateFmt(x.created_at))+'</small></div>').join(''):'<div class="empty">Aucune demande de retrait.</div>';
+  }catch(e){
+   ['fwAvailable','fwFundsAvailable','fwCommissionsAvailable','fwCredits','fwDebits','fwPending'].forEach(k=>{if(el(k))el(k).textContent='Indisponible';});
+   if(el('fwTransactions'))el('fwTransactions').innerHTML='<div class="notice warning">Chargement impossible : '+esc(e.message||'erreur Supabase')+'.</div>';
+  }
 }
 async function submitFounderWithdrawal(){
  if(!isFounder()||!state.profile?.id)return;
