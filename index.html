@@ -2973,11 +2973,11 @@ function memberHome(){
   <section class="member-v2-head">
    <div class="member-v2-brandline"><div class="member-v2-brand"><b>BuSAF</b><small>BUSINESS AFRICAIN</small></div><div class="member-v2-head-tools"><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div></div>
    <div class="member-v2-user"><div class="member-v2-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo de profil">':'👤'}</div><div class="member-v2-identity"><small>BIENVENUE SUR BuSAF</small><h1>${esc(name)}</h1><span>MEMBRE BuSAF</span><div class="member-v2-meta">${esc(countryFlag(country))} ${esc(country)} · 📱 ${esc(phone)}</div></div></div>
-   <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong>${money(state.marketBalance)}</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
+   <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong id="memberWalletBalanceHome">${money(state.marketBalance)} FCFA</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
    <div class="member-v2-referral"><div><small>MON CODE DE PARRAINAGE</small><b>${esc(referral)}</b></div><button onclick="invite()">📲 INVITER</button></div>
   </section>
   <div class="member-v2-actions"><button onclick="setScreen('money')">＋ Déposer</button><button onclick="setScreen('money')">↗ Retirer</button><button onclick="setScreen('market')">🛒 Acheter</button></div>
-  <section class="member-v2-finance-pair"><div class="member-v2-earnings"><div><small>MES GAINS CONFIRMÉS</small><b id="mhEarningsCard">Chargement…</b><span>Commissions validées</span></div><button onclick="setScreen('profits')">Détails →</button></div><button class="member-v2-wallet-mini" onclick="setScreen('money')"><span>👛</span><small>MON PORTEFEUILLE</small><b>${money(state.marketBalance)}</b><i>Voir le solde →</i></button></section>
+  <section class="member-v2-finance-pair"><div class="member-v2-earnings"><div><small>MES GAINS CONFIRMÉS</small><b id="mhEarningsCard">Chargement…</b><span>Commissions validées</span></div><button onclick="setScreen('profits')">Détails →</button></div><button class="member-v2-wallet-mini" onclick="setScreen('money')"><span>👛</span><small>MON PORTEFEUILLE</small><b id="memberWalletBalanceMini">${money(state.marketBalance)} FCFA</b><i>Voir le solde →</i></button></section>
   <section class="member-v2-live"><div class="member-v2-title"><div><small>MON TABLEAU DE BORD</small><h2>Mon activité</h2></div><button onclick="loadMemberHomeMetrics()" aria-label="Actualiser mon activité">↻</button></div><div class="member-v2-live-grid"><div><small>Achats confirmés</small><b id="mhPurchases">…</b></div><div><small>Ventes confirmées</small><b id="mhSales">…</b></div><div><small>Stock disponible</small><b id="mhStock">…</b></div><div><small>Gains confirmés</small><b id="mhEarnings">…</b></div></div><p id="mhMetricsMessage">Synchronisation avec ton compte BuSAF…</p></section>
   <section class="member-v2-section"><div class="member-v2-title"><div><small>TOUS MES SERVICES</small><h2>Mon espace membre</h2></div><span>8 SERVICES</span></div>
    <div class="member-v2-grid">${tiles.map(([id,ico,label,desc,cls])=>`<button class="member-v2-tile ${cls}" onclick="setScreen('${id}')"><span class="member-v2-tile-icon">${ico}</span><b>${label}</b><small>${desc}</small><i>Ouvrir →</i></button>`).join('')}</div>
@@ -3889,7 +3889,35 @@ async function loadMemberCommissions(){
 function memberPartner(){return page("⭐ Progression Partner",`<div class="statgrid"><div class="stat">Ventes ce mois<strong id="partnerMonthCount">Chargement…</strong></div><div class="stat">Ventes totales<strong id="partnerTotalCount">Chargement…</strong></div></div><div class="progress"><i id="partnerProgressBar" style="width:0%"></i></div><div id="partnerProgressMessage" class="small">Vérification des ventes confirmées dans Supabase…</div><div class="rule"><h3>Condition</h3><p>10 ventes validées du Marché BuSAF dans un même mois. Les ventes non confirmées ne comptent pas.</p></div><button class="btn alt" onclick="loadMemberSalesProgress()">🔄 ACTUALISER</button><button class="btn alt" onclick="setScreen('profits')">VOIR MES BÉNÉFICES</button>`);}
 
 function memberAdvantages(){return page("🎁 Avantages des membres",`<div class="rule"><h3>⭐ 10 ventes dans le même mois</h3><p>10 ventes validées du Marché BuSAF dans le même mois → statut Partner.</p><button class="btn alt" onclick="setScreen('partner')">PROGRESSION PARTNER</button></div><div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('bonus100')">OBJECTIF 100 VENTES</button></div><div class="rule"><h3>💰 Revente</h3><p>Le vendeur reçoit 40 % sur chaque revente validée ; son parrain direct reçoit 7 % après son premier achat confirmé et sur ses reventes validées.</p></div>`);}
-function memberMoney(){return page("👛 Mon portefeuille",`<section class="wallet-hero"><div class="wallet-hero-top"><span>💼 COMPTE MARCHÉ</span><span class="wallet-live">● DONNÉES DU COMPTE</span></div><small>Solde disponible</small><strong>${money(state.marketBalance)} <i>FCFA</i></strong><p>Ton portefeuille BuSAF centralise tes dépôts, retraits et opérations confirmées.</p></section><div class="wallet-action-grid"><button class="wallet-action wallet-deposit" onclick="openMoneyDeposit()"><span>＋</span><b>Faire un dépôt</b><small>Recharger le compte</small></button><button class="wallet-action wallet-withdraw" onclick="openMoneyWithdraw()"><span>↗</span><b>Demander un retrait</b><small>Recevoir par Mobile Money</small></button></div><div class="wallet-security-note">🔐 <strong>Protection du solde</strong><br>Un dépôt est crédité uniquement après confirmation sécurisée du paiement. Un retrait est soumis à la vérification du solde disponible.</div><section class="wallet-history-panel deposit-history-panel"><div class="wallet-panel-heading"><span>📥</span><div><h3>Historique des dépôts</h3><p>Recharges et paiements entrants</p></div></div><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="wallet-history-panel withdrawal-history-panel"><div class="wallet-panel-heading"><span>📤</span><div><h3>Historique des retraits</h3><p>Demandes et paiements sortants</p></div></div><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section>`);setTimeout(()=>{loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
+async function loadMemberWalletBalance(){
+ if(!state.profile?.id||!state.token)return;
+ if(window.__busafWalletBalancePromise)return window.__busafWalletBalancePromise;
+ const task=(async()=>{
+  const targets=['memberWalletBalanceHome','memberWalletBalanceMini','memberWalletBalancePage'];
+  try{
+   const result=await api('/rest/v1/rpc/busaf_solde_compte_fondateur',{
+    method:'POST',
+    body:JSON.stringify({p_profil_id:state.profile.id,p_compte:'Compte Marché'}),
+    timeoutMs:12000
+   });
+   const balance=Number(result);
+   if(!Number.isFinite(balance))throw new Error('Le serveur a retourné un solde invalide.');
+   state.marketBalance=Math.max(0,balance);
+   try{localStorage.setItem('busaf_market_balance',String(state.marketBalance));}catch(_){}
+   targets.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(state.marketBalance)+' FCFA';});
+   return state.marketBalance;
+  }catch(e){
+   console.warn('Solde portefeuille membre non synchronisé:',e);
+   targets.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent='Indisponible';});
+   const pageBalance=document.getElementById('memberWalletBalancePage');
+   if(pageBalance)pageBalance.title='Impossible de vérifier le solde auprès du serveur.';
+   return null;
+  }
+ })();
+ window.__busafWalletBalancePromise=task;
+ try{return await task;}finally{if(window.__busafWalletBalancePromise===task)window.__busafWalletBalancePromise=null;}
+}
+function memberMoney(){return page("👛 Mon portefeuille",`<section class="wallet-hero"><div class="wallet-hero-top"><span>💼 COMPTE MARCHÉ</span><span class="wallet-live">● DONNÉES DU COMPTE</span></div><small>Solde disponible</small><strong id="memberWalletBalancePage">${money(state.marketBalance)} <i>FCFA</i></strong><p>Ton portefeuille BuSAF centralise tes dépôts, retraits et opérations confirmées.</p></section><div class="wallet-action-grid"><button class="wallet-action wallet-deposit" onclick="openMoneyDeposit()"><span>＋</span><b>Faire un dépôt</b><small>Recharger le compte</small></button><button class="wallet-action wallet-withdraw" onclick="openMoneyWithdraw()"><span>↗</span><b>Demander un retrait</b><small>Recevoir par Mobile Money</small></button></div><div class="wallet-security-note">🔐 <strong>Protection du solde</strong><br>Un dépôt est crédité uniquement après confirmation sécurisée du paiement. Un retrait est soumis à la vérification du solde disponible.</div><section class="wallet-history-panel deposit-history-panel"><div class="wallet-panel-heading"><span>📥</span><div><h3>Historique des dépôts</h3><p>Recharges et paiements entrants</p></div></div><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="wallet-history-panel withdrawal-history-panel"><div class="wallet-panel-heading"><span>📤</span><div><h3>Historique des retraits</h3><p>Demandes et paiements sortants</p></div></div><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section>`);setTimeout(()=>{loadMemberWalletBalance();loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
 async function loadMemberDepositHistory(){
  const box=document.getElementById("memberDepositHistory");if(!box)return;
  if(!state.userId||!state.token||!state.profile?.id){box.innerHTML='<div class="empty">Connecte-toi pour consulter tes dépôts.</div>';return;}
@@ -3924,7 +3952,7 @@ async function loadMemberWithdrawalHistory(){
    if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="empty">Aucune demande de retrait enregistrée.</div>';return;}
    box.innerHTML=rows.map(r=>{
     const status=String(r.statut||'inconnu').toLowerCase();
-    const label=['confirme','payee','payé','paye'].includes(status)?'PAYÉ':status==='en_attente'?'EN ATTENTE DE VALIDATION':['echec','échec'].includes(status)?'ÉCHEC':['refuse','refusé'].includes(status)?'REFUSÉ':String(r.statut||'À VÉRIFIER').replace(/_/g,' ').toUpperCase();
+    const label=['confirme','payee','payé','paye'].includes(status)?'PAYÉ':['approuve','approuvé'].includes(status)?'APPROUVÉ — EN ATTENTE DE PAIEMENT':status==='en_attente'?'EN ATTENTE DE VALIDATION':['echec','échec'].includes(status)?'ÉCHEC':['refuse','refusé'].includes(status)?'REFUSÉ':String(r.statut||'À VÉRIFIER').replace(/_/g,' ').toUpperCase();
     const color=label==='PAYÉ'?'#16733a':['REFUSÉ','ÉCHEC'].includes(label)?'#b3261e':'#8a5a00';
     const date=r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'Date inconnue';
     return '<div class="rule" style="margin:8px 0;border-left:4px solid #b3261e"><strong style="color:#b3261e">📤 RETRAIT DEMANDÉ : '+esc(money(Number(r.montant||0)))+'</strong><div>Vers '+esc(String(r.operateur||'Opérateur'))+' · '+esc(String(r.numero_mobile_money||'Numéro non indiqué'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">STATUT : '+esc(label)+'</div><div class="small">Référence : '+esc(String(r.id||'—'))+'</div></div>';
