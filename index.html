@@ -1819,6 +1819,55 @@ html[data-busaf-theme] #app .quick-inner button.active{color:var(--green)!import
 #app.founder-mode .founder-v2-tile i{color:#087a43!important}
 #app.founder-mode .founder-v2-theme{display:none!important}
 
+
+/* ===== Application visible et complète des thèmes par écran ===== */
+html[data-busaf-theme] body{background:var(--light)!important;color:var(--text)!important}
+html[data-busaf-theme] #app .busaf-shell-header,
+html[data-busaf-theme] #app .header{background:linear-gradient(115deg,var(--green),var(--green2))!important;color:#fff!important}
+html[data-busaf-theme] #app .wrap{background:transparent!important}
+html[data-busaf-theme] #app .card,
+html[data-busaf-theme] #app .work-panel,
+html[data-busaf-theme] #app .profile-section-card,
+html[data-busaf-theme] #app .wallet-history-panel,
+html[data-busaf-theme] #app .founder-wallet-panel{border-color:var(--line)!important}
+html[data-busaf-theme] #app .card>h1,
+html[data-busaf-theme] #app .card>h2,
+html[data-busaf-theme] #app .section-title,
+html[data-busaf-theme] #app .member-section-title,
+html[data-busaf-theme] #app .founder-section-title,
+html[data-busaf-theme] #app .busaf-page-heading h1{color:var(--green)!important}
+html[data-busaf-theme] #app .btn:not(.danger):not(.red),
+html[data-busaf-theme] #app button.primary{background:linear-gradient(115deg,var(--green),var(--green2))!important;border-color:var(--green)!important;color:#fff!important}
+html[data-busaf-theme] #app .btn.alt,
+html[data-busaf-theme] #app .back{background:var(--light)!important;border-color:var(--line)!important;color:var(--green)!important}
+html[data-busaf-theme] #app .reference-card,
+html[data-busaf-theme] #app .founder-app,
+html[data-busaf-theme] #app .member-v2-tile,
+html[data-busaf-theme] #app .founder-v2-tile{border-color:var(--line)!important}
+html[data-busaf-theme] #app .reference-card .reference-icon,
+html[data-busaf-theme] #app .founder-app .ficon{background:var(--light)!important;color:var(--green)!important}
+html[data-busaf-theme] #app .member-v2-head,
+html[data-busaf-theme] #app .founder-v2-hero,
+html[data-busaf-theme] #app .founder-hero,
+html[data-busaf-theme] #app .member-welcome{background:linear-gradient(125deg,var(--green),var(--green2))!important;color:#fff!important}
+html[data-busaf-theme] #app .member-v2-head h1,
+html[data-busaf-theme] #app .founder-v2-hero h1,
+html[data-busaf-theme] #app .founder-v2-hero p{color:#fff!important}
+html[data-busaf-theme] #app .profile-cover{background:linear-gradient(125deg,var(--green),var(--green2))!important}
+html[data-busaf-theme] #app .profile-summary-card>span,
+html[data-busaf-theme] #app .profile-action-card>span{background:var(--light)!important;color:var(--green)!important}
+html[data-busaf-theme] #app .profile-code-box{background:var(--light)!important;border-color:var(--line)!important}
+html[data-busaf-theme] #app .profile-code-box strong{color:var(--green)!important}
+html[data-busaf-theme] #app .bottom,
+html[data-busaf-theme] #app .quickbar{border-color:var(--line)!important}
+html[data-busaf-theme] #app .bottom-inner button.active,
+html[data-busaf-theme] #app .quick-inner button.active{background:var(--light)!important;color:var(--green)!important}
+html[data-busaf-theme] #app input:focus,
+html[data-busaf-theme] #app select:focus,
+html[data-busaf-theme] #app textarea:focus{border-color:var(--green)!important;outline-color:var(--line)!important}
+html[data-busaf-theme] #app .stat,
+html[data-busaf-theme] #app .dash-stat{border-color:var(--line)!important}
+
 </style>
 </head>
 <body>
@@ -4206,7 +4255,8 @@ function render(){
    founderStocks:"founderStocks",founderSettings:"founderSettings",founderReferral:"founderReferral",
    founderAnnouncements:"founderAnnouncements",signup:"account",login:"account",benefits:"benefits"
   };
-  document.documentElement.setAttribute("data-busaf-theme",themeByScreen[state.screen]||"public");
+  const activeTheme=(state.screen==="member"&&isFounder())?"founder":(themeByScreen[state.screen]||"public");
+  document.documentElement.setAttribute("data-busaf-theme",activeTheme);
   const appRoot=document.getElementById("app");
   if(appRoot){
     appRoot.classList.toggle("founder-mode",!!state.userId&&isFounder());
