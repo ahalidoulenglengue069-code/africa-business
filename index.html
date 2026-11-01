@@ -2402,7 +2402,6 @@ async function restoreAuthenticatedSession(){
         state.token=latestAccess;
         if(latestUserId)state.userId=latestUserId;
         state.email=localStorage.getItem("busaf_email")||state.email||"";
-        state.screen=state.userId?"member":"public";
         if(state.userId)return true;
       }
       // Une erreur de réseau ou un jeton périmé seul ne prouve pas que
@@ -2411,7 +2410,6 @@ async function restoreAuthenticatedSession(){
         state.userId=latestUserId||state.userId||"";
         state.email=localStorage.getItem("busaf_email")||state.email||"";
         state.token=latestAccess||"";
-        state.screen=state.userId?"member":"public";
         if(state.userId){
           state.sessionRestoreWarning="La session doit être renouvelée. Réessaie sans recréer ton compte.";
           return true;
@@ -2424,11 +2422,9 @@ async function restoreAuthenticatedSession(){
       state.userId=savedUserId;
       state.email=localStorage.getItem("busaf_email")||"";
       state.token=storedToken;
-      state.screen="member";
       state.sessionRestoreWarning="Connexion au serveur lente. Ton compte reste mémorisé; réessaie dans un instant.";
       return true;
     }
-    state.screen="public";
     return false;
   }
 }
@@ -4470,7 +4466,7 @@ async function resumeBusafAfterReturn(){
 }
 window.addEventListener("online",()=>{resumeBusafAfterReturn().catch(e=>console.warn("Reconnexion BuSAF:",e));});
 document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")resumeBusafAfterReturn().catch(e=>console.warn("Retour BuSAF:",e));});
-window.addEventListener("pageshow",()=>{resumeBusafAfterReturn().catch(e=>console.warn("Réouverture BuSAF:",e));});
+window.addEventListener("pageshow",(event)=>{if(event.persisted)resumeBusafAfterReturn().catch(e=>console.warn("Réouverture BuSAF:",e));});
 
 async function start(){
   try{
