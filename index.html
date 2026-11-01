@@ -1886,6 +1886,46 @@ html[data-busaf-theme] #app .founder-stat{border-color:var(--line)}
 html[data-busaf-theme] #app .product-card,html[data-busaf-theme] #app .public-product{color:var(--text)}
 html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-color:var(--line)}
 
+
+/* Palette dédiée aux quatre espaces demandés : invités, portefeuille, commissions, progression */
+html[data-busaf-theme="invites"],html[data-busaf-theme="founderDirectInvites"]{
+ --green:#2878b8;--green2:#4b9bd3;--light:#eff7ff;--card:#ffffff;--text:#193f5c;--muted:#5b7890;--line:#d4e7f5;--shadow:0 8px 22px rgba(35,103,153,.09)
+}
+html[data-busaf-theme="money"],html[data-busaf-theme="founderWallet"]{
+ --green:#16866d;--green2:#32ad8d;--light:#eef9f5;--card:#ffffff;--text:#17483d;--muted:#5b7d73;--line:#d1eae1;--shadow:0 8px 22px rgba(25,115,91,.09)
+}
+html[data-busaf-theme="commissions"],html[data-busaf-theme="founderReferral"]{
+ --green:#287f9b;--green2:#45a9bd;--light:#eff9fb;--card:#ffffff;--text:#194756;--muted:#5c7b85;--line:#d2e9ee;--shadow:0 8px 22px rgba(37,119,143,.09)
+}
+html[data-busaf-theme="partner"]{
+ --green:#a87924;--green2:#d0a64e;--light:#fff9eb;--card:#ffffff;--text:#4d3a19;--muted:#806b43;--line:#efe1bd;--shadow:0 8px 22px rgba(145,105,34,.09)
+}
+/* Harmonisation des grands panneaux dans ces espaces, sans toucher aux boutons d'action */
+html[data-busaf-theme="invites"] #app .invite-hero,
+html[data-busaf-theme="founderDirectInvites"] #app .invite-hero{background:linear-gradient(135deg,#e3f2ff,#cfe7fa)!important;border:1px solid #c6e1f5!important;color:#193f5c!important}
+html[data-busaf-theme="invites"] #app .invite-hero h2,
+html[data-busaf-theme="invites"] #app .invite-hero p,
+html[data-busaf-theme="invites"] #app .invite-hero span,
+html[data-busaf-theme="founderDirectInvites"] #app .invite-hero h2,
+html[data-busaf-theme="founderDirectInvites"] #app .invite-hero p,
+html[data-busaf-theme="founderDirectInvites"] #app .invite-hero span{color:#193f5c!important}
+html[data-busaf-theme="money"] #app .wallet-hero,
+html[data-busaf-theme="founderWallet"] #app .wallet-hero{background:linear-gradient(135deg,#d9f2e9,#c5e9dc)!important;border:1px solid #bfe2d4!important;color:#17483d!important}
+html[data-busaf-theme="money"] #app .wallet-hero small,
+html[data-busaf-theme="money"] #app .wallet-hero p,
+html[data-busaf-theme="money"] #app .wallet-hero strong,
+html[data-busaf-theme="founderWallet"] #app .wallet-hero small,
+html[data-busaf-theme="founderWallet"] #app .wallet-hero p,
+html[data-busaf-theme="founderWallet"] #app .wallet-hero strong{color:#17483d!important}
+html[data-busaf-theme="commissions"] #app .stat,
+html[data-busaf-theme="commissions"] #app .rule,
+html[data-busaf-theme="founderReferral"] #app .stat,
+html[data-busaf-theme="founderReferral"] #app .rule{background:#ffffff!important;border-color:#d2e9ee!important;color:#194756!important}
+html[data-busaf-theme="partner"] #app .stat,
+html[data-busaf-theme="partner"] #app .rule{background:#ffffff!important;border-color:#efe1bd!important;color:#4d3a19!important}
+html[data-busaf-theme="partner"] #app .progress{background:#f3e9cf!important;border:1px solid #ead9ae!important}
+html[data-busaf-theme="partner"] #app .progress>i{background:linear-gradient(90deg,#b88a36,#dfbd70)!important}
+
 </style>
 </head>
 <body>
