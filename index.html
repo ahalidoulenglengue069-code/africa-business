@@ -2221,7 +2221,7 @@ window.addEventListener("popstate",(event)=>{
  state.screen=screen;
  render();
  if(screen==="market" || screen==="public" || screen==="products" || screen==="founderMarket" || screen==="founderStocks"){
-  loadMarketCatalog(true).then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation automatique du Marché:",e));
+  loadMarketCatalog().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation automatique du Marché:",e));
  }
  window.scrollTo({top:0,left:0,behavior:"instant"});
 });
