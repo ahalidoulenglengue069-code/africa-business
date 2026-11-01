@@ -3186,15 +3186,16 @@ async function loadMemberProfits(){
  if(!sellerEl||!referralEl||!walletEl)return;
  if(!state.profile?.id||!state.token){message.textContent='Connecte-toi pour consulter tes montants.';return;}
  try{
-  const [commissions,transactions]=await Promise.all([
+  const [commissions,transactions,withdrawals]=await Promise.all([
    api('/rest/v1/busaf_commissions?select=type_commission,montant,statut&beneficiaire_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=500',{timeoutMs:15000}),
-   api('/rest/v1/busaf_transactions_portefeuille?select=montant,sens,statut&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=500',{timeoutMs:15000})
+   api('/rest/v1/busaf_transactions_portefeuille?select=montant,sens,statut&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=500',{timeoutMs:15000}),
+   api('/rest/v1/busaf_retraits?select=montant,statut&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&limit=200',{timeoutMs:15000})
   ]);
   const confirmed=(Array.isArray(commissions)?commissions:[]).filter(x=>x.statut==='confirmee');
   const seller=confirmed.filter(x=>x.type_commission==='benefice_vendeur_40').reduce((n,x)=>n+Number(x.montant||0),0);
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
   const tx=(Array.isArray(transactions)?transactions:[]).filter(x=>x.statut==='confirmee');
-  const balance=tx.reduce((n,x)=>n+(x.sens==='credit'?1:-1)*Number(x.montant||0),0);
+  const pendingWithdrawals=(Array.isArray(withdrawals)?withdrawals:[]).filter(x=>['en_attente','approuve'].includes(String(x.statut||'').toLowerCase())).reduce((n,x)=>n+Number(x.montant||0),0);\n  const balance=Math.max(0,tx.reduce((n,x)=>n+(x.sens==='credit'?1:-1)*Number(x.montant||0),0)-pendingWithdrawals);
   sellerEl.textContent=money(seller)+' FCFA';
   referralEl.textContent=money(referral)+' FCFA';
   walletEl.textContent=money(balance)+' FCFA';
