@@ -4431,9 +4431,45 @@ async function refreshVisibleBusafData(){
   if(screen==="founderDirectInvites"&&(!state.directInvitesLoaded||now-(state.directInvitesLoadedAt||0)>60000))loadDirectInvites().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Actualisation invités:",e));
  }
 }
-window.addEventListener("online",()=>{refreshVisibleBusafData().catch(e=>console.warn("Reconnexion BuSAF:",e));});
-document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")refreshVisibleBusafData().catch(e=>console.warn("Retour BuSAF:",e));});
-window.addEventListener("pageshow",()=>{refreshVisibleBusafData().catch(e=>console.warn("Réouverture BuSAF:",e));});
+// Reprise automatique au retour dans BuSAF : restaure d'abord la session Supabase
+// (y compris la rotation du refresh token), puis recharge les données de l'espace actif.
+let busafResumePromise=null;
+let busafLastResumeAt=0;
+async function resumeBusafAfterReturn(){
+ const now=Date.now();
+ if(busafResumePromise)return busafResumePromise;
+ if(now-busafLastResumeAt<5000)return;
+ busafLastResumeAt=now;
+ busafResumePromise=(async()=>{
+  const hasSavedSession=!!(localStorage.getItem("busaf_access_token")||localStorage.getItem("busaf_refresh_token"));
+  if(hasSavedSession){
+   const wasUserId=state.userId;
+   const authenticated=await restoreAuthenticatedSession();
+   if(authenticated){
+    if(!wasUserId||state.screen==="public"||state.screen==="login"||state.screen==="signup"){
+     state.screen="member";
+     history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
+    }
+    render();
+   }
+  }
+  await refreshVisibleBusafData();
+  const screen=state.screen;
+  if(!state.userId)return;
+  if(screen==="member"||screen==="partner"){
+   loadMemberHomeMetrics();
+   loadMemberSalesProgress();
+  }else if(screen==="invites"||screen==="founderDirectInvites"){
+   if(screen==="invites")loadDirectInvites().then(()=>{if(state.screen===screen)render();}).catch(e=>console.warn("Reprise invités:",e));
+  }else if(screen==="commissions")loadMemberCommissions();
+  else if(screen==="profits")loadMemberProfits();
+  else if(screen==="stockMarket")loadMarketDepot().then(()=>{if(state.screen===screen){render();loadMemberResales();}}).catch(e=>console.warn("Reprise stock:",e));
+ })().catch(e=>console.warn("Reprise automatique BuSAF:",e)).finally(()=>{busafResumePromise=null;});
+ return busafResumePromise;
+}
+window.addEventListener("online",()=>{resumeBusafAfterReturn().catch(e=>console.warn("Reconnexion BuSAF:",e));});
+document.addEventListener("visibilitychange",()=>{if(document.visibilityState==="visible")resumeBusafAfterReturn().catch(e=>console.warn("Retour BuSAF:",e));});
+window.addEventListener("pageshow",()=>{resumeBusafAfterReturn().catch(e=>console.warn("Réouverture BuSAF:",e));});
 
 async function start(){
   try{
