@@ -2315,14 +2315,19 @@ async function login(e){
 
 async function signup(e){
  e.preventDefault();
- const nom=document.getElementById("regNom").value.trim();
- const email=document.getElementById("regEmail").value.trim();
- const tel=document.getElementById("regTel").value.trim();
- const ville=document.getElementById("regVille").value.trim();
- const pays=document.getElementById("regPays").value.trim();
- const code=document.getElementById("regCode").value.trim().toUpperCase();
- const password=document.getElementById("regPassword").value;
+ // Lire uniquement les champs réellement présents dans le formulaire d'inscription.
+ // regVille n'existe plus depuis le passage au sélecteur de pays : sa lecture directe
+ // provoquait « Cannot read properties of null (reading 'value') ».
+ const fieldValue=(id)=>{const el=document.getElementById(id);return el?String(el.value||"").trim():"";};
+ const nom=fieldValue("regNom");
+ const email=fieldValue("regEmail");
+ const tel=fieldValue("regTel");
+ const ville=fieldValue("regVille");
+ const pays=fieldValue("regPays");
+ const code=fieldValue("regCode").toUpperCase();
+ const password=fieldValue("regPassword");
  const msg=document.getElementById("regMsg"),btn=document.getElementById("regBtn");
+ if(!msg||!btn){console.error("Formulaire BuSAF incomplet : éléments de retour ou bouton manquants.");return;}
  btn.disabled=true;btn.textContent="CRÉATION...";
  try{
   if(!code)throw new Error("Le code d'invitation est obligatoire.");
