@@ -2698,7 +2698,7 @@ async function loadMemberHomeMetrics(){
   const ownResales=(Array.isArray(resales)?resales:[]).filter(x=>ok(x.statut));
   const stock=(Array.isArray(stocks)?stocks:[]).reduce((n,x)=>n+Math.max(0,Number(x.quantite||0)-Number(x.quantite_reservee||0)),0);
   const gains=(Array.isArray(commissions)?commissions:[]).filter(x=>ok(x.statut)).reduce((n,x)=>n+Number(x.montant||0),0);
-  set('mhPurchases',purchases.length);set('mhSales',ownSales.length+ownResales.length);set('mhStock',stock);set('mhEarnings',money(gains)+' FCFA');set('mhEarningsCard',money(gains)+' FCFA');
+  set('mhPurchases',purchases.length);set('mhSales',ownSales.length+ownResales.length);set('mhStock',stock);set('mhEarnings',money(gains));set('mhEarningsCard',money(gains));
   if(msg)msg.textContent='Données confirmées synchronisées depuis Supabase. Les opérations en attente ne sont pas comptées.';
  }catch(e){console.warn('Activité membre BuSAF:',e);if(msg)msg.textContent='Certaines données ne sont pas disponibles : '+(e.message||'erreur de connexion');set('mhPurchases','—');set('mhSales','—');set('mhStock','—');set('mhEarnings','—');set('mhEarningsCard','Indisponible');}
 }
