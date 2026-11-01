@@ -2584,54 +2584,38 @@ async function sendForgotPassword(){
 }
 function confirmLogout(){
  if(!state.token || !state.userId){ setScreen("public"); return; }
- openModal("🔐 Déconnexion sécurisée", `
-  <div class="notice warning">Voulez-vous vraiment vous déconnecter ?</div>
-  <div class="notice">Pour protéger ton compte, BuSAF va vérifier ton <strong>e-mail</strong> et ton <strong>mot de passe</strong> avant de fermer la session.</div>
+ openModal("🔐 Déconnexion", `
+  <div class="notice warning">Voulez-vous vraiment vous déconnecter de BuSAF ?</div>
+  <div class="notice">La session actuellement ouverte sera fermée sur cet appareil. Ton compte, ton profil et tes données resteront inchangés.</div>
   <div class="row">
    <button class="btn alt" onclick="closeModal()">ANNULER</button>
-   <button class="btn red" onclick="openLogoutVerification()">CONTINUER</button>
+   <button class="btn red" onclick="performLogout()">OUI, ME DÉCONNECTER</button>
   </div>
  `);
 }
-function openLogoutVerification(){
- openModal("🔑 Vérification avant déconnexion", `
-  <div class="notice">Entre les identifiants du compte actuellement connecté.</div>
-  <label>E-mail</label><input id="logoutEmail" type="email" autocomplete="username" value="${esc(state.email||"")}" placeholder="ton@email.com">
-  <label>Mot de passe</label><input id="logoutPassword" type="password" autocomplete="current-password" placeholder="Mot de passe">
-  <div id="logoutMsg" class="notice hidden"></div>
-  <button id="logoutVerifyBtn" class="btn red" onclick="verifyLogoutCredentials()">VÉRIFIER ET ME DÉCONNECTER</button>
-  <button class="btn alt" onclick="closeModal()">ANNULER</button>
- `);
-}
-async function verifyLogoutCredentials(){
- const email=document.getElementById("logoutEmail")?.value.trim()||"";
- const password=document.getElementById("logoutPassword")?.value||"";
- const msg=document.getElementById("logoutMsg");
- const btn=document.getElementById("logoutVerifyBtn");
- if(!email||!password){msg.className="notice error";msg.textContent="❌ E-mail et mot de passe obligatoires.";return;}
- if(email.toLowerCase()!==(state.email||"").toLowerCase()){msg.className="notice error";msg.textContent="❌ Cet e-mail ne correspond pas au compte actuellement connecté.";return;}
- btn.disabled=true; btn.textContent="VÉRIFICATION...";
- try{
-  await api("/auth/v1/token?grant_type=password",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
-  await performLogout();
- }catch(err){
-  msg.className="notice error";
-  msg.textContent="❌ E-mail ou mot de passe incorrect. Aucune déconnexion n'a été effectuée.";
-  btn.disabled=false; btn.textContent="VÉRIFIER ET ME DÉCONNECTER";
- }
-}
 function logout(){ confirmLogout(); }
 async function performLogout(){
- const oldToken=state.token, oldEmail=state.email;
+ const oldEmail=state.email;
+ const btn=document.querySelector(".modalbox .btn.red");
+ if(btn){btn.disabled=true;btn.textContent="DÉCONNEXION…";}
+ let serverLogoutConfirmed=false;
  try{
-  if(oldToken) await fetch(`${SUPABASE_URL}/auth/v1/logout`,{method:"POST",headers:{apikey:SUPABASE_KEY,Authorization:"Bearer "+oldToken}});
- }catch(e){console.warn("Déconnexion serveur BuSAF:",e);}
+  // Ferme uniquement cette session Supabase; ne déconnecte pas les autres appareils.
+  await api("/auth/v1/logout?scope=local",{method:"POST",timeoutMs:8000});
+  serverLogoutConfirmed=true;
+ }catch(e){
+  // Même hors ligne, retirer les jetons locaux pour ne pas réouvrir l'espace sur cet appareil.
+  console.warn("Déconnexion serveur BuSAF non confirmée; fermeture locale appliquée:",e);
+ }
  try{ if(typeof logBusafEvent==="function") logBusafEvent("logout","Déconnexion",{email:oldEmail}); }catch(e){}
  localStorage.removeItem("busaf_access_token");
+ localStorage.removeItem("busaf_refresh_token");
  localStorage.removeItem("busaf_user_id");
  localStorage.removeItem("busaf_email");
  state.token=""; state.userId=""; state.email=""; state.profile=null; state.screen="public";
- closeModal(); render();
+ closeModal();
+ render();
+ if(!serverLogoutConfirmed)console.warn("BuSAF : session locale fermée, mais révocation distante non vérifiée faute de connexion.");
 }
 function addNotification(title,text,type="info"){
  state.notifications.unshift({id:Date.now()+Math.random(),title,text,type,date:new Date().toLocaleString("fr-FR"),read:false});
