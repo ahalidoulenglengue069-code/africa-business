@@ -1941,7 +1941,7 @@ function monthlySalesCount(){const k=monthKey();const rows=Array.isArray(state.s
 function dailySalesCount(){const k=dayKey();const rows=Array.isArray(state.sales)?state.sales:[];return rows.filter(x=>x&&dayKey(new Date(x.date))===k).reduce((a,x)=>a+Number(x.qty||0),0);}
 function totalSalesCount(){const rows=Array.isArray(state.sales)?state.sales:[];return rows.reduce((a,x)=>a+Number(x.qty||0),0);}
 async function loadMemberSalesProgress(){
- const ids=["memberPartnerProgress","partnerMonthCount"];
+ const ids=["memberPartnerProgress","partnerMonthCount","member100Progress","partnerTotalCount"];
  if(!state.userId||!state.profile?.id||!state.token){
   for(const id of ids){const el=document.getElementById(id);if(el)el.textContent="Connexion requise";}
   updateProgressMessage("Connecte-toi pour vérifier tes ventes.");
@@ -1968,6 +1968,8 @@ async function loadMemberSalesProgress(){
  }catch(e){
   const msg="Chargement impossible : "+(e.message||"Erreur Supabase");
   for(const id of ids){const el=document.getElementById(id);if(el)el.textContent="—";}
+  const memberMonthText=document.getElementById("memberPartnerProgressText");if(memberMonthText)memberMonthText.textContent=msg;
+  const memberTotalText=document.getElementById("member100ProgressText");if(memberTotalText)memberTotalText.textContent=msg;
   updateProgressMessage(msg);
  }
  function updateProgressMessage(value){const el=document.getElementById("partnerProgressMessage");if(el)el.textContent=value;}
