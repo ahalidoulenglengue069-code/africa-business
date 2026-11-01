@@ -1891,6 +1891,77 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
 
 
 
+
+<style id="busaf-founder-profile-visibility-v2">
+/* Espace fondateur : identité et informations mises en évidence */
+#app .founder-v2-hero{
+  background:linear-gradient(135deg,#087a38 0%,#0b9347 58%,#19a85a 100%)!important;
+  color:#fff!important;
+  border:1px solid #0b9347!important;
+  border-radius:24px!important;
+  padding:clamp(15px,3.5vw,24px)!important;
+  box-shadow:0 12px 28px rgba(8,122,56,.18)!important;
+}
+#app .founder-v2-brand{align-items:center;margin-bottom:12px}
+#app .founder-v2-brand span{display:block;color:#fff!important;font-size:30px!important;line-height:1.05;font-weight:950;letter-spacing:.2px}
+#app .founder-v2-brand small{display:block;margin-top:5px;color:#e7ffed!important;font-size:11px!important;font-weight:850;letter-spacing:1.1px;opacity:1!important}
+#app .founder-v2-founder-profile{
+  display:flex;align-items:center;gap:15px;
+  margin:12px 0 10px!important;padding:15px!important;
+  background:#fff!important;border:1px solid #d6f0de!important;
+  border-radius:20px!important;box-shadow:0 7px 18px rgba(4,70,34,.12);
+}
+#app .founder-v2-founder-avatar{
+  width:clamp(76px,19vw,100px)!important;height:clamp(76px,19vw,100px)!important;
+  flex:0 0 clamp(76px,19vw,100px)!important;
+  display:flex!important;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  border-radius:18px!important;background:#e2f3e7!important;
+  border:2px solid #a8d9b7!important;color:#087a38!important;
+  overflow:hidden;
+}
+#app .founder-v2-founder-avatar img{width:100%;height:100%;object-fit:cover}
+#app .founder-v2-founder-avatar span{font-size:32px;line-height:1}
+#app .founder-v2-founder-avatar small{font-size:8px;font-weight:900;line-height:1.1;color:#087a38;text-align:center}
+#app .founder-v2-founder-profile .founder-v2-welcome{min-width:0;padding:0!important}
+#app .founder-v2-welcome>small{
+  display:inline-block;color:#087a38!important;background:#e8f7ec;
+  border-radius:7px;padding:6px 8px;font-size:10px!important;
+  line-height:1.35;letter-spacing:.8px;font-weight:950;
+}
+#app .founder-v2-welcome h1{
+  color:#145b34!important;font-size:clamp(21px,5.3vw,29px)!important;
+  line-height:1.12;margin:8px 0 5px!important;font-weight:950;
+  overflow-wrap:anywhere;
+}
+#app .founder-v2-welcome p{
+  color:#087a38!important;font-size:14px!important;font-weight:900;margin:0!important;
+}
+#app .founder-v2-founder-meta{
+  display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:10px!important;
+  color:#365b45!important;font-size:12px!important;font-weight:750;line-height:1.45;
+}
+#app .founder-v2-founder-code{
+  display:inline-flex;margin-top:10px!important;padding:8px 11px!important;
+  background:#e8f7ec!important;border:1px solid #b9dfc5!important;
+  border-radius:9px!important;color:#087a38!important;
+  font-size:11px!important;font-weight:950;letter-spacing:.6px;
+}
+#app .founder-v2-intro{
+  margin:12px 2px 15px!important;color:#f0fff4!important;
+  font-size:13px!important;font-weight:750;line-height:1.5;
+}
+#app .founder-v2-stats>div{background:#ffffff20!important;border-color:#ffffff55!important}
+#app .founder-v2-stats small{color:#effff3!important;font-size:10px!important;font-weight:850}
+#app .founder-v2-stats b{color:#fff!important;font-size:23px!important}
+@media(max-width:390px){
+  #app .founder-v2-founder-profile{gap:10px;padding:11px!important}
+  #app .founder-v2-founder-avatar{border-radius:15px!important}
+  #app .founder-v2-welcome>small{font-size:9px!important;letter-spacing:.3px}
+  #app .founder-v2-welcome h1{font-size:20px!important}
+  #app .founder-v2-founder-meta{font-size:11px!important}
+}
+</style>
+
 </head>
 <body>
 <div id="app" class="app"></div>
@@ -2764,7 +2835,7 @@ function founderHome(){
  const pending=Number(stats.pending||0);
  const tile=(id,ico,label,sub,cls)=>`<button class="founder-v2-tile ${cls}" onclick="setScreen('${id}')"><span>${ico}</span><b>${label}</b><small>${sub}</small><i>Ouvrir →</i></button>`;
  return `<div class="founder-v2">
-  <section class="founder-v2-hero"><div class="founder-v2-brand"><div><span>BuSAF</span><small>BUSINESS AFRICAIN · ADMINISTRATION</small></div></div><div class="founder-v2-founder-profile"><div class="founder-v2-founder-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo du fondateur">':'👑'}</div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR · COMPTE OFFICIEL</small><h1>${esc(name)}</h1><p>👑 Fondateur BuSAF</p><div class="founder-v2-founder-meta">${esc(countryFlag(founderCountry))} ${esc(founderCountry)} · 📱 ${esc(founderPhone)}</div><div class="founder-v2-founder-code">CODE : ${esc(profile.code_parrain||'BUSAF-FONDATEUR')}</div></div></div><p class="founder-v2-intro">Centre de contrôle — pilote les activités réelles de la plateforme.</p>
+  <section class="founder-v2-hero"><div class="founder-v2-brand"><div><span>BuSAF</span><small>BUSINESS AFRICAIN · ADMINISTRATION</small></div></div><div class="founder-v2-founder-profile"><div class="founder-v2-founder-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo du fondateur">':'<span>👑</span><small>Photo du fondateur</small>'}</div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR · COMPTE OFFICIEL</small><h1>${esc(name)}</h1><p>👑 Fondateur BuSAF</p><div class="founder-v2-founder-meta">${esc(countryFlag(founderCountry))} ${esc(founderCountry)} · 📱 ${esc(founderPhone)}</div><div class="founder-v2-founder-code">CODE : ${esc(profile.code_parrain||'BUSAF-FONDATEUR')}</div></div></div><p class="founder-v2-intro">Centre de contrôle — pilote les activités réelles de la plateforme.</p>
    <div class="founder-v2-stats"><div class="founder-kpi founder-kpi-members"><span>👥</span><small>MEMBRES INSCRITS</small><b>${members}</b></div><div class="founder-kpi founder-kpi-sales"><span>🛒</span><small>VENTES CONFIRMÉES</small><b>${Number(stats.confirmed||0)}</b></div><div class="founder-kpi founder-kpi-products"><span>📦</span><small>PRODUITS PUBLIÉS</small><b>${products}</b></div><div class="founder-kpi founder-kpi-revenue"><span>💳</span><small>MONTANT CONFIRMÉ</small><b>${money(stats.revenue||0)}</b></div></div>
    <div class="founder-v2-hero-actions"><button class="founder-home-refresh" onclick="refreshFounderHomeStats()">↻ Actualiser les données</button><button onclick="setScreen('founderMembers')">👥 Voir les membres</button></div>
   </section>
