@@ -2723,7 +2723,7 @@ function memberHome(){
  ];
  return `<div class="member-v2">
   <section class="member-v2-head">
-   <div class="member-v2-brandline"><div class="member-v2-brand"><b>BuSAF</b><small>BUSINESS AFRICAIN</small></div><div class="member-v2-head-tools"><button class="member-v2-theme" onclick="toggleWorkspaceTheme('member')" aria-label="Changer le thème">${busafWorkspaceTheme('member')==='dark'?'☀️':'🌙'}</button><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div></div>
+   <div class="member-v2-brandline"><div class="member-v2-brand"><b>BuSAF</b><small>BUSINESS AFRICAIN</small></div><div class="member-v2-head-tools"><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div></div>
    <div class="member-v2-user"><div class="member-v2-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo de profil">':'👤'}</div><div class="member-v2-identity"><small>BIENVENUE SUR BuSAF</small><h1>${esc(name)}</h1><span>MEMBRE BuSAF</span><div class="member-v2-meta">${esc(countryFlag(country))} ${esc(country)} · 📱 ${esc(phone)}</div></div></div>
    <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong>${money(state.marketBalance)}</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
    <div class="member-v2-referral"><div><small>MON CODE DE PARRAINAGE</small><b>${esc(referral)}</b></div><button onclick="invite()">📲 INVITER</button></div>
@@ -3886,7 +3886,7 @@ function render(){
   if(appRoot){
     appRoot.classList.toggle("founder-mode",!!state.userId&&isFounder());
     appRoot.classList.toggle("member-mode",!!state.userId&&!isFounder());
-    appRoot.classList.toggle("workspace-dark",!!state.userId&&!isFounder()&&busafWorkspaceTheme("member")==="dark");
+    appRoot.classList.toggle("workspace-dark",false);
   }
  let content="";
  if(!state.userId){
