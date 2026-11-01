@@ -2498,7 +2498,7 @@ async function loadMarketCatalog(force=false){
    // Cette requête fonctionne aussi pour un visiteur non connecté grâce à la policy anon SELECT.
    // Le Marché accepte les produits numériques et physiques ; les archives sont masquées.
    const rows=await api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
-   state.marketCatalog=Array.isArray(rows)?rows.filter(p=>String(p.type_produit||'').toLowerCase()!=='archive'):[];
+   state.marketCatalog=Array.isArray(rows)?rows.filter(p=>String(p.type_produit||'').toLowerCase()==='digital'):[];
    state.marketCatalogLoaded=true;
    return state.marketCatalog;
   }catch(e){
