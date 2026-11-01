@@ -2094,7 +2094,10 @@ const state={
   boutiqueProducts:safeJson("busaf_boutique_products",[]),
   marketCatalog:[],
   marketCatalogLoaded:false,
-  marketCatalogPromise:null
+  marketCatalogPromise:null,
+  benefitRate:40,
+  benefitPromoActive:false,
+  benefitPromoExpiresAt:null
 };
 
 // Produits de démonstration/test : ils ne doivent jamais apparaître dans BuSAF réel.
@@ -2116,7 +2119,7 @@ function publicProductView(p){
   <div class="market-v2-image">${img}<span>BuSAF MARKET</span></div>
   <div class="market-v2-info"><h3>${esc(p?.nom||'Produit BuSAF')}</h3>
    <p>${esc(p?.description||'Découvrez ce produit du Marché BuSAF.')}</p>
-   <div class="market-v2-benefit"><span>Bénéfice vendeur</span><b>12 %</b></div>
+   <div class="market-v2-benefit"><span>Bénéfice vendeur</span><b>${Number(state.benefitRate||40)} %</b></div>
    <div class="market-v2-price">${money(price)}</div>
    <button onclick="viewMarketProduct('${String(p?.id||'')}')">Voir le produit <span>→</span></button>
   </div>
@@ -2897,17 +2900,12 @@ async function refreshFounderHomeStats(){
 }
 
 function founderMarket(){
- if(!isFounder()){return memberMarket();}
+ if(!isFounder())return memberMarket();
  const all=marketCatalogProducts();
- const cards=all.map(p=>{
-  const name=p.nom||'Produit';
-  const price=Number(p.prix||0);
-  const image=p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(name)}" onclick="openPhotoLightbox(this.src,this.alt)" style="cursor:zoom-in">`:`<div class="emoji">📦</div>`;
-  return `<div class="founder-product">${image}<h3>${esc(name)}</h3><div class="fprice">${money(price)}</div><div class="founder-actions"><button class="btn" onclick="openMarketProductForm('${String(p.id)}')">✏️ MODIFIER</button><button class="btn red" onclick="deleteMarketProduct('${String(p.id)}')">🗑️ SUPPRIMER</button></div></div>`;
- }).join('');
- return page('👑 Gestion du Marché',`<div class="notice success founder-market-note"><strong>ESPACE FONDATEUR</strong><br>Ici, tu gères les produits. Il n'y a <strong>aucun bouton Acheter</strong>.</div><button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button><button class="btn alt small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><div class="founder-product-grid" style="margin-top:10px">${cards||`<div class="empty" style="grid-column:1/-1">Aucun produit publié.</div>`}</div>`);
+ const cards=all.map(p=>{const name=p.nom||'Produit';const price=Number(p.prix||0);const image=p.image_url?`<img src="${esc(p.image_url)}" alt="${esc(name)}" onclick="openPhotoLightbox(this.src,this.alt)" style="cursor:zoom-in">`:`<div class="emoji">📦</div>`;return `<div class="founder-product">${image}<h3>${esc(name)}</h3><div class="fprice">${money(price)}</div><div class="founder-actions"><button class="btn" onclick="openMarketProductForm('${String(p.id)}')">✏️ MODIFIER</button><button class="btn red" onclick="deleteMarketProduct('${String(p.id)}')">🗑️ SUPPRIMER</button></div></div>`;}).join('');
+ const status=state.benefitPromoActive?'<div class="notice warning"><strong>🎉 PROMOTION ACTIVE : '+Number(state.benefitRate)+' %</strong><br>Fin : '+esc(state.benefitPromoExpiresAt?new Date(state.benefitPromoExpiresAt).toLocaleString('fr-FR'):'à confirmer')+'</div>':'<div class="notice success"><strong>Bénéfice normal : 40 %</strong><br>Aucune promotion active.</div>';
+ return page('👑 Gestion du Marché',`<div class="notice success founder-market-note"><strong>ESPACE FONDATEUR</strong><br>Ici, tu gères les produits. Il n'y a <strong>aucun bouton Acheter</strong>.</div>${status}<button class="btn" onclick="openBenefitPromoModal()">🎁 PROMOTION / BÉNÉFICE EXCEPTIONNEL</button><button class="btn" onclick="openMarketProductForm()">➕ AJOUTER UN PRODUIT</button><button class="btn alt small" onclick="refreshMarketCatalog()">🔄 ACTUALISER</button><div class="founder-product-grid" style="margin-top:10px">${cards||`<div class="empty" style="grid-column:1/-1">Aucun produit publié.</div>`}</div>`);
 }
-
 async function founderLoadStats(){
  if(!isFounder()||!state.token)return;
  const out={products:0,members:0,sales:0,confirmed:0,pending:0,failed:0,revenue:0};
@@ -2996,7 +2994,7 @@ async function processFounderResale(id,confirmSale){
  try{
   const result=await api('/rest/v1/rpc/busaf_confirmer_revente',{method:'POST',body:JSON.stringify({p_revente_id:id,p_confirmer:confirmSale}),timeoutMs:15000});
   await loadFounderResales();
-  alert(confirmSale?'Revente confirmée. Bénéfice vendeur (12 %) : '+money(result?.benefice_vendeur||0)+' FCFA. Commission parrain direct (7 %) : '+money(result?.commission_parrain||0)+' FCFA.':'Demande de revente refusée.');
+  alert(confirmSale?'Revente confirmée. Bénéfice vendeur ('+Number(result?.taux_benefice||40)+' %) : '+money(result?.benefice_vendeur||0)+' FCFA. Commission parrain direct (7 %) : '+money(result?.commission_parrain||0)+' FCFA.':'Demande de revente refusée.');
  }catch(e){alert('Opération impossible : '+(e.message||'Erreur inconnue'));}
 }
 function founderWallet(){
@@ -3341,7 +3339,7 @@ function publicProducts(){
 function publicBenefits(){return page("⭐ Avantages",`
 <div class="rule"><h3>🛒 Plusieurs produits différents</h3><p>Un membre peut acheter plusieurs produits du Marché BuSAF, mais un même produit ne peut être acheté qu'une seule fois par le même membre.</p></div>
 <div class="rule"><h3>🔄 Revente</h3><p>Après son achat, le membre peut revendre le produit directement ou l'ajouter à son Stock BuSAF.</p></div>
-<div class="rule"><h3>💰 Bénéfice vendeur</h3><p>Chaque revente validée donne au vendeur un bénéfice de <strong>12 %</strong>.</p></div>
+<div class="rule"><h3>💰 Bénéfice vendeur</h3><p>Chaque revente validée donne au vendeur un bénéfice de <strong>${Number(state.benefitRate||40)} %</strong>.</p></div>
 <div class="rule"><h3>🤝 Commission du parrain direct</h3><p>Le parrain direct reçoit <strong>7 %</strong> après le premier achat confirmé de chaque invité direct, puis sur ses reventes validées. Aucun niveau indirect n'est commissionné.</p></div>
 <div class="rule"><h3>⭐ Partner</h3><p>10 ventes validées du Marché BuSAF dans le même mois donnent le statut Partner.</p></div>
 <div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées donnent 25 000 FCFA par mois pendant 3 mois, selon la règle BuSAF définie.</p></div>`);}
@@ -3375,6 +3373,23 @@ function marketCatalogProducts(){
  const db=state.marketCatalog||[];
  return db.length?db:[];
 }
+async function loadCurrentBenefit(){
+ const d=await api('/rest/v1/rpc/busaf_benefice_actuel',{method:'POST',body:'{}',timeoutMs:10000});
+ state.benefitRate=Number(d?.taux||40);state.benefitPromoActive=!!d?.est_promo;state.benefitPromoExpiresAt=d?.expire_at||null;return d;
+}
+function openBenefitPromoModal(){
+ if(!isFounder())return;
+ openModal('🎁 Promotion / bénéfice exceptionnel',`<div class="notice success">Le bénéfice normal est de <strong>40 %</strong>. Le taux spécial sera appliqué pendant la durée choisie, puis retour automatique à 40 %.</div><label>Nouveau bénéfice vendeur (%)</label><input id="benefitPromoRate" type="number" min="0.01" max="100" step="0.01" value="${state.benefitPromoActive?state.benefitRate:50}"><label>Durée (heures)</label><input id="benefitPromoHours" type="number" min="1" max="720" step="1" value="24"><p class="small">Exemple : 50 % pendant 24 heures. Maximum 30 jours.</p><button class="btn" onclick="saveBenefitPromo()">🎉 ACTIVER LA PROMOTION</button>${state.benefitPromoActive?'<button class="btn red" onclick="stopBenefitPromo()">ARRÊTER LA PROMOTION</button>':''}<button class="btn alt" onclick="closeModal()">ANNULER</button>`);
+}
+async function saveBenefitPromo(){
+ if(!isFounder())return;const rate=Number(document.getElementById('benefitPromoRate')?.value||0),hours=Number(document.getElementById('benefitPromoHours')?.value||0);
+ if(!(rate>0&&rate<=100&&hours>=1&&hours<=720&&Number.isInteger(hours))){alert('Taux de 0,01 à 100 et durée entière de 1 à 720 heures.');return;}
+ try{const d=await api('/rest/v1/rpc/busaf_configurer_promo_benefice',{method:'POST',body:JSON.stringify({p_taux:rate,p_duree_heures:hours,p_activer:true}),timeoutMs:15000});state.benefitRate=Number(d?.taux||rate);state.benefitPromoActive=!!d?.est_promo;state.benefitPromoExpiresAt=d?.expire_at||null;closeModal();state.marketCatalogLoaded=false;render();alert('Promotion activée : '+state.benefitRate+' % pendant '+hours+' heure(s).');}catch(e){alert('Promotion non enregistrée : '+(e.message||'Erreur serveur'));}
+}
+async function stopBenefitPromo(){
+ if(!isFounder()||!confirm('Arrêter la promotion et revenir immédiatement à 40 % ?'))return;
+ try{const d=await api('/rest/v1/rpc/busaf_configurer_promo_benefice',{method:'POST',body:JSON.stringify({p_taux:null,p_duree_heures:null,p_activer:false}),timeoutMs:15000});state.benefitRate=Number(d?.taux||40);state.benefitPromoActive=false;state.benefitPromoExpiresAt=null;closeModal();state.marketCatalogLoaded=false;render();alert('Promotion arrêtée. Retour à 40 %.');}catch(e){alert('Arrêt impossible : '+(e.message||'Erreur serveur'));}
+}
 async function loadMarketCatalog(force=false){
  if(state.marketCatalogLoaded&&!force)return state.marketCatalog;
  // Partager la même requête si l'accueil public et la session se chargent ensemble.
@@ -3383,7 +3398,8 @@ async function loadMarketCatalog(force=false){
   try{
    // Cette requête fonctionne aussi pour un visiteur non connecté grâce à la policy anon SELECT.
    // Le Marché accepte les produits numériques et physiques ; les archives sont masquées.
-   const rows=await api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc');
+   const [rows]=await Promise.all([api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc'),loadCurrentBenefit().catch(e=>console.warn('Taux de bénéfice BuSAF:',e))]);
+
    state.marketCatalog=Array.isArray(rows)?rows.filter(p=>String(p.type_produit||'').toLowerCase()==='digital'):[];
    state.marketCatalogLoaded=true;
    return state.marketCatalog;
@@ -4062,7 +4078,7 @@ async function saveProfile(){
 function memberProfits(){
  return page("💰 Mes Bénéfices",`
  <div class="profit-cards">
-  <div class="profit-card profit-market"><span class="profit-label">💰 Bénéfices vendeur (12 %)</span><strong id="memberSellerProfit">Chargement…</strong></div>
+  <div class="profit-card profit-market"><span class="profit-label">💰 Bénéfices vendeur (${Number(state.benefitRate||40)} %)</span><strong id="memberSellerProfit">Chargement…</strong></div>
   <div class="profit-card profit-boutique"><span class="profit-label">🤝 Commissions directes (7 %)</span><strong id="memberReferralCommission">Chargement…</strong></div>
   <div class="profit-card profit-sales"><span class="profit-label">👛 Solde portefeuille confirmé</span><strong id="memberWalletBalance">Chargement…</strong></div>
  </div>
@@ -4105,7 +4121,7 @@ async function loadMemberCommissions(){
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
   const seller=confirmed.filter(x=>(x.type_commission==='benefice_vendeur_12'||x.type_commission==='benefice_vendeur_40')).reduce((n,x)=>n+Number(x.montant||0),0);
   summary.innerHTML='<div class="statgrid"><div class="stat">Commissions parrain direct<strong>'+money(referral)+' FCFA</strong></div><div class="stat">Bénéfices vendeur<strong>'+money(seller)+' FCFA</strong></div></div>';
-  rowsBox.innerHTML=confirmed.length?'<h3 class="section-title">Historique confirmé</h3><div class="list">'+confirmed.map(x=>'<li><strong>'+(x.type_commission==='parrain_direct_7'?'🤝 Parrain direct (7 %)':(x.type_commission==='benefice_vendeur_40'?'💰 Bénéfice vendeur historique (40 %)':'💰 Bénéfice vendeur (12 %)'))+'</strong><br>'+money(x.montant)+' FCFA<br><small>'+esc(x.created_at||'')+'</small></li>').join('')+'</div>':'<div class="empty">Aucune commission confirmée pour le moment. Elles apparaîtront automatiquement après confirmation du paiement.</div>';
+  rowsBox.innerHTML=confirmed.length?'<h3 class="section-title">Historique confirmé</h3><div class="list">'+confirmed.map(x=>'<li><strong>'+(x.type_commission==='parrain_direct_7'?'🤝 Parrain direct (7 %)':(x.type_commission==='benefice_vendeur_40'?'💰 Bénéfice vendeur (40 %)':(x.type_commission==='benefice_vendeur_promo'?'🎉 Bénéfice promotionnel ('+Number(x.taux||0)+' %)':'💰 Bénéfice vendeur ('+Number(x.taux||40)+' %)')))+'</strong><br>'+money(x.montant)+' FCFA<br><small>'+esc(x.created_at||'')+'</small></li>').join('')+'</div>':'<div class="empty">Aucune commission confirmée pour le moment. Elles apparaîtront automatiquement après confirmation du paiement.</div>';
  }catch(e){
   summary.innerHTML='<div class="notice error">Chargement des commissions impossible : '+esc(e.message||'Erreur Supabase')+'</div>';
   rowsBox.innerHTML='';
