@@ -4360,8 +4360,10 @@ window.addEventListener("pageshow",()=>{refreshVisibleBusafData().catch(e=>conso
 
 async function start(){
   try{
+    // Le lien de récupération est le seul cas où l'écran attend Auth avant l'affichage.
     const recovery=await handlePasswordRecovery();
     if(recovery)return;
+
     const rawHash=location.hash.replace(/^#/,"");
     const routeParts=rawHash.split("?");
     const route=routeParts[0]||"";
@@ -4370,43 +4372,55 @@ async function start(){
     const sharedProductId=routeParams.get("product")||"";
     if(inviteFromLink)localStorage.setItem("busaf_pending_invite",inviteFromLink);
     if(sharedProductId)localStorage.setItem("busaf_shared_product",sharedProductId);
-    if(route && ["public","market","benefits","profits","commissions","rules","signup","login"].includes(route)){
+
+    // Première peinture immédiate : ne jamais attendre Supabase pour afficher le site.
+    const savedUserId=localStorage.getItem("busaf_user_id")||"";
+    const savedAccess=localStorage.getItem("busaf_access_token")||"";
+    const savedEmail=localStorage.getItem("busaf_email")||"";
+    if(savedUserId){
+      state.userId=savedUserId;
+      state.token=savedAccess;
+      state.email=savedEmail;
+      state.screen="member";
+    }else if(route && ["public","market","benefits","profits","commissions","rules","signup","login"].includes(route)){
       state.screen=route;
     }else{
       state.screen=sharedProductId?"signup":"public";
     }
     history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
+    render();
 
-    // Écran de démarrage stable : ne pas afficher brièvement l'accueil public
-    // avant de découvrir que le membre possède déjà une session active.
-    const app=document.getElementById("app");
-    if(app)app.innerHTML='<main style="min-height:65vh;display:grid;place-items:center;padding:28px;text-align:center;font-family:Arial;color:#174b32"><div><div style="font-size:34px">🌍</div><strong>Ouverture de BuSAF…</strong><p style="color:#64756b">Récupération de ta session et de tes données.</p></div></main>';
-    const authenticated=await restoreAuthenticatedSession();
-    if(authenticated){
-      state.screen="member";
-      history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
-      render();
-      // Charger les données complémentaires en arrière-plan sans remplacer l'espace affiché.
-      loadMarketCatalog().then(async()=>{
-        await syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
-        if(state.screen==="member"||state.screen==="market")render();
+    // Les requêtes réseau se font après l'affichage et ne bloquent plus l'accueil.
+    const restoreTask=restoreAuthenticatedSession().then(authenticated=>{
+      if(authenticated){
+        state.screen="member";
+        history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
+        render();
+        syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
+        initBusafRealtime().catch(e=>console.warn("Realtime BuSAF indisponible :",e));
+        syncSharedBusafEvents().catch(e=>console.warn("Événements non synchronisés :",e));
+        if(!window.busafSyncTimer)window.busafSyncTimer=setInterval(()=>{syncSharedBusafEvents();},30000);
+      }
+      return authenticated;
+    }).catch(e=>{
+      console.warn("Restauration de session BuSAF différée :",e);
+      return false;
+    });
+
+    // Le catalogue démarre indépendamment de la restauration Auth.
+    if(["public","market","signup"].includes(state.screen) || savedUserId){
+      loadMarketCatalog().then(()=>{
+        if(!state.userId && ["public","market"].includes(state.screen))render();
       }).catch(e=>console.warn("Marché non chargé :",e));
-      initBusafRealtime().catch(e=>console.warn("Realtime BuSAF indisponible :",e));
-      syncSharedBusafEvents().catch(e=>console.warn("Événements non synchronisés :",e));
-      if(!window.busafSyncTimer)window.busafSyncTimer=setInterval(()=>{syncSharedBusafEvents();},30000);
-    }else{
-      render();
-      loadMarketCatalog().then(()=>{if(!state.userId)render();}).catch(e=>console.warn("Marché public non chargé :",e));
     }
+    await restoreTask;
   }catch(e){
     console.error("Erreur démarrage BuSAF:",e);
-    // En cas d'erreur de session ou de données locales, revenir proprement à l'accueil public.
     try{
-      // Ne jamais supprimer une session valide à cause d'une erreur d'affichage ou de réseau.
       state.userId=state.userId||localStorage.getItem("busaf_user_id")||"";
       state.email=state.email||localStorage.getItem("busaf_email")||"";
       state.token=state.token||localStorage.getItem("busaf_access_token")||"";
-      state.screen=state.userId?"member":"public";
+      state.screen=state.userId?(state.profile&&isFounder()?"founder":"member"):"public";
       state.sales=Array.isArray(state.sales)?state.sales:[];
       state.orders=Array.isArray(state.orders)?state.orders:[];
       state.invites=Array.isArray(state.invites)?state.invites:[];
@@ -4415,10 +4429,11 @@ async function start(){
     }catch(renderError){
       console.error("Erreur rendu BuSAF:",renderError);
       const app=document.getElementById("app");
-      if(app) app.innerHTML=`<main style="padding:24px;font-family:Arial;text-align:center"><h2>🌍 BuSAF</h2><p>Une erreur technique empêche l'affichage.</p><button onclick="location.reload()" style="padding:14px 20px;border:0;border-radius:12px;background:#078447;color:white;font-weight:700">RECHARGER</button></main>`;
+      if(app)app.innerHTML='<main style="padding:24px;font-family:Arial;text-align:center"><h2>🌍 BuSAF</h2><p>Une erreur technique empêche l’affichage.</p><button onclick="location.reload()">RECHARGER</button></main>';
     }
   }
 }
+
 // Lancer réellement la restauration de session à chaque ouverture/actualisation.
 // Le script est placé en fin de body : le DOM est déjà disponible.
 if(!window.__busafStartLaunched){window.__busafStartLaunched=true;start();}
