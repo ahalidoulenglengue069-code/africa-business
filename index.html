@@ -3196,7 +3196,8 @@ async function loadMemberProfits(){
   const seller=confirmed.filter(x=>x.type_commission==='benefice_vendeur_40').reduce((n,x)=>n+Number(x.montant||0),0);
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
   const tx=(Array.isArray(transactions)?transactions:[]).filter(x=>x.statut==='confirmee');
-  const pendingWithdrawals=(Array.isArray(withdrawals)?withdrawals:[]).filter(x=>['en_attente','approuve'].includes(String(x.statut||'').toLowerCase())).reduce((n,x)=>n+Number(x.montant||0),0);\n  const balance=Math.max(0,tx.reduce((n,x)=>n+(x.sens==='credit'?1:-1)*Number(x.montant||0),0)-pendingWithdrawals);
+  const pendingWithdrawals=(Array.isArray(withdrawals)?withdrawals:[]).filter(x=>['en_attente','approuve'].includes(String(x.statut||'').toLowerCase())).reduce((n,x)=>n+Number(x.montant||0),0);
+  const balance=Math.max(0,tx.reduce((n,x)=>n+(x.sens==='credit'?1:-1)*Number(x.montant||0),0)-pendingWithdrawals);
   sellerEl.textContent=money(seller)+' FCFA';
   referralEl.textContent=money(referral)+' FCFA';
   walletEl.textContent=money(balance)+' FCFA';
