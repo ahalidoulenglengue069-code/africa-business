@@ -1740,7 +1740,7 @@ function publicProductView(p){
   <div class="market-v2-image">${img}<span>BuSAF MARKET</span></div>
   <div class="market-v2-info"><h3>${esc(p?.nom||'Produit BuSAF')}</h3>
    <p>${esc(p?.description||'Découvrez ce produit du Marché BuSAF.')}</p>
-   <div class="market-v2-benefit"><span>Bénéfice vendeur</span><b>12 %</b></div>
+   <div class="market-v2-benefit"><span>Bénéfice vendeur</span><b>40 %</b></div>
    <div class="market-v2-price">${money(price)}</div>
    <button onclick="viewMarketProduct('${String(p?.id||'')}')">Voir le produit <span>→</span></button>
   </div>
@@ -2542,7 +2542,7 @@ async function processFounderResale(id,confirmSale){
  try{
   const result=await api('/rest/v1/rpc/busaf_confirmer_revente',{method:'POST',body:JSON.stringify({p_revente_id:id,p_confirmer:confirmSale}),timeoutMs:15000});
   await loadFounderResales();
-  alert(confirmSale?'Revente confirmée. Bénéfice vendeur (12 %) : '+money(result?.benefice_vendeur||0)+' FCFA. Commission parrain direct (7 %) : '+money(result?.commission_parrain||0)+' FCFA.':'Demande de revente refusée.');
+  alert(confirmSale?'Revente confirmée. Bénéfice vendeur (40 %) : '+money(result?.benefice_vendeur||0)+' FCFA. Commission parrain direct (7 %) : '+money(result?.commission_parrain||0)+' FCFA.':'Demande de revente refusée.');
  }catch(e){alert('Opération impossible : '+(e.message||'Erreur inconnue'));}
 }
 function founderWallet(){
@@ -2852,11 +2852,11 @@ function publicProducts(){
 function publicBenefits(){return page("⭐ Avantages",`
 <div class="rule"><h3>🛒 Plusieurs produits différents</h3><p>Un membre peut acheter plusieurs produits du Marché BuSAF, mais un même produit ne peut être acheté qu'une seule fois par le même membre.</p></div>
 <div class="rule"><h3>🔄 Revente</h3><p>Après son achat, le membre peut revendre le produit directement ou l'ajouter à son Stock BuSAF.</p></div>
-<div class="rule"><h3>💰 Bénéfice vendeur</h3><p>Chaque revente validée donne au vendeur un bénéfice de <strong>12 %</strong>.</p></div>
+<div class="rule"><h3>💰 Bénéfice vendeur</h3><p>Chaque revente validée donne au vendeur un bénéfice de <strong>40 %</strong>.</p></div>
 <div class="rule"><h3>🤝 Commission du parrain direct</h3><p>Le parrain direct reçoit <strong>7 %</strong> après le premier achat confirmé de chaque invité direct, puis sur ses reventes validées. Aucun niveau indirect n'est commissionné.</p></div>
 <div class="rule"><h3>⭐ Partner</h3><p>10 ventes validées du Marché BuSAF dans le même mois donnent le statut Partner.</p></div>
 <div class="rule"><h3>🏆 100 ventes</h3><p>100 ventes validées donnent 25 000 FCFA par mois pendant 3 mois, selon la règle BuSAF définie.</p></div>`);}
-function publicProfits(){return page("💰 Bénéfices",`<div class="rule"><h3>💰 Revente du Marché</h3><p>Le vendeur reçoit <strong>12 %</strong> de bénéfice sur chaque revente validée d’un produit du Marché BuSAF.</p></div><div class="rule"><h3>🤝 Parrain direct</h3><p>Le parrain direct reçoit <strong>7 %</strong> selon les règles BuSAF sur les achats et reventes confirmés de ses invités directs.</p></div><div class="notice">Aucun filleul indirect n’est commissionné.</div>`);}
+function publicProfits(){return page("💰 Bénéfices",`<div class="rule"><h3>💰 Revente du Marché</h3><p>Le vendeur reçoit <strong>40 %</strong> de bénéfice sur chaque revente validée d’un produit du Marché BuSAF.</p></div><div class="rule"><h3>🤝 Parrain direct</h3><p>Le parrain direct reçoit <strong>7 %</strong> selon les règles BuSAF sur les achats et reventes confirmés de ses invités directs.</p></div><div class="notice">Aucun filleul indirect n’est commissionné.</div>`);}
 function publicEarn(){return page("📈 Comment gagner",`<div class="rule"><h3>1. Acheter</h3><p>Le nouveau membre choisit d'abord un produit déjà acheté et confirmé par son parrain direct. Les invités directs du fondateur peuvent acheter tout produit disponible au Marché. Ensuite, il peut acheter d'autres produits différents.</p></div><div class="rule"><h3>2. Revendre</h3><p>Après achat, il peut revendre le produit directement ou l'ajouter à son Stock BuSAF.</p></div><div class="rule"><h3>3. Bénéfice vendeur</h3><p>Chaque revente validée donne <strong>12 %</strong> au vendeur.</p></div><div class="rule"><h3>4. Parrainage</h3><p>Le parrain direct reçoit <strong>7 %</strong> après le premier achat confirmé et sur les reventes validées de ses invités directs.</p></div><div class="rule"><h3>5. Progression</h3><p>10 ventes validées dans le même mois → Partner. 100 ventes validées → 25 000 FCFA par mois pendant 3 mois.</p></div>`);}
 function publicBoutiques(){return page("🏪 Boutiques",`<div class="rule"><h3>Boutiques physiques des membres</h3><p>Les produits physiques publiés par les membres sont regroupés dans l'espace BOUTIQUES. Ils restent séparés des produits numériques du Marché BuSAF.</p></div><div class="rule"><h3>Publication</h3><p>La création de la Boutique est <strong>gratuite</strong>. Lorsqu'un produit physique est publié, BuSAF prélève immédiatement <strong>5 %</strong> du prix indiqué. Le produit reste affiché à son prix exact.</p></div><div class="rule"><h3>Achat et contact</h3><p>Le client peut acheter, envoyer un message ou utiliser WhatsApp selon les possibilités prévues. Le vendeur et l'acheteur peuvent organiser la remise du produit.</p></div><div class="notice">Les commissions de parrainage du Marché ne s'appliquent pas aux ventes personnelles des Boutiques.</div>`);}
 function publicHow(){return page("📖 Fonctionnement",`<div class="rule"><h3>Un Marché numérique</h3><p>Les produits, achats, paiements et ventes sont suivis dans le Marché BuSAF.</p></div><div class="rule"><h3>Un Stock BuSAF</h3><p>Après confirmation du paiement, le produit acheté est ajouté automatiquement au stock du membre. Le stock diminue après validation d’une revente.</p></div><div class="rule"><h3>Un portefeuille Marché</h3><p>Les dépôts, retraits et commissions liés au Marché sont suivis dans le portefeuille BuSAF.</p></div><div class="rule"><h3>Confidentialité</h3><p>Un membre ne doit pas pouvoir consulter les informations privées d’un autre membre.</p></div>`);}
@@ -3572,7 +3572,7 @@ async function saveProfile(){
 function memberProfits(){
  return page("💰 Mes Bénéfices",`
  <div class="profit-cards">
-  <div class="profit-card profit-market"><span class="profit-label">💰 Bénéfices vendeur (12 %)</span><strong id="memberSellerProfit">Chargement…</strong></div>
+  <div class="profit-card profit-market"><span class="profit-label">💰 Bénéfices vendeur (40 %)</span><strong id="memberSellerProfit">Chargement…</strong></div>
   <div class="profit-card profit-boutique"><span class="profit-label">🤝 Commissions directes (7 %)</span><strong id="memberReferralCommission">Chargement…</strong></div>
   <div class="profit-card profit-sales"><span class="profit-label">👛 Solde portefeuille confirmé</span><strong id="memberWalletBalance">Chargement…</strong></div>
  </div>
@@ -3624,7 +3624,7 @@ async function loadMemberCommissions(){
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
   const seller=confirmed.filter(x=>(x.type_commission==='benefice_vendeur_12'||x.type_commission==='benefice_vendeur_40')).reduce((n,x)=>n+Number(x.montant||0),0);
   summary.innerHTML='<div class="statgrid"><div class="stat">Commissions parrain direct<strong>'+money(referral)+' FCFA</strong></div><div class="stat">Bénéfices vendeur<strong>'+money(seller)+' FCFA</strong></div></div>';
-  rowsBox.innerHTML=confirmed.length?'<h3 class="section-title">Historique confirmé</h3><div class="list">'+confirmed.map(x=>'<li><strong>'+(x.type_commission==='parrain_direct_7'?'🤝 Parrain direct (7 %)':'💰 Bénéfice vendeur (12 %)')+'</strong><br>'+money(x.montant)+' FCFA<br><small>'+esc(x.created_at||'')+'</small></li>').join('')+'</div>':'<div class="empty">Aucune commission confirmée pour le moment. Elles apparaîtront automatiquement après confirmation du paiement.</div>';
+  rowsBox.innerHTML=confirmed.length?'<h3 class="section-title">Historique confirmé</h3><div class="list">'+confirmed.map(x=>'<li><strong>'+(x.type_commission==='parrain_direct_7'?'🤝 Parrain direct (7 %)':'💰 Bénéfice vendeur (40 %)')+'</strong><br>'+money(x.montant)+' FCFA<br><small>'+esc(x.created_at||'')+'</small></li>').join('')+'</div>':'<div class="empty">Aucune commission confirmée pour le moment. Elles apparaîtront automatiquement après confirmation du paiement.</div>';
  }catch(e){
   summary.innerHTML='<div class="notice error">Chargement des commissions impossible : '+esc(e.message||'Erreur Supabase')+'</div>';
   rowsBox.innerHTML='';
