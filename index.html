@@ -3935,7 +3935,7 @@ function memberAccount(){
        <div class="profile-summary-card"><span>📱</span><small>Téléphone</small><strong>${esc(profile.telephone||"À renseigner")}</strong></div>
        <div class="profile-summary-card"><span>🌍</span><small>Pays</small><strong>${esc(profile.pays?countryFlag(profile.pays)+" "+profile.pays:"À renseigner")}</strong></div>
        <div class="profile-summary-card"><span>📍</span><small>Ville</small><strong>${esc(profile.Ville||"À renseigner")}</strong></div>
-       <div class="profile-summary-card"><span>🪪</span><small>Code personnel</small><strong>${esc(code)}</strong></div>
+       <div class="profile-summary-card busaf-visible-referral-code"><span>🔑</span><small>MON CODE PARRAIN</small><strong>${esc(invitationCode())}</strong><button type="button" onclick="copyInvitation('code')">📋 COPIER MON CODE</button></div>
      </div>
      <div class="profile-section-card">
        <div class="profile-section-heading"><span>🧾</span><div><h3>Mes informations</h3><p>Les informations liées à ton compte BuSAF.</p></div></div>
@@ -4741,5 +4741,10 @@ html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-bars i 
   background:linear-gradient(90deg,#087a38,#16a34a)!important;
 }
 </style>
-</body>
+<style id="busaf-visible-referral-code-v1">
+.busaf-visible-referral-code{background:#e8f7ed!important;border:2px solid #159447!important;border-radius:14px!important;padding:14px!important;min-width:0!important}
+.busaf-visible-referral-code small{display:block!important;color:#176b38!important;font-weight:900!important;font-size:12px!important;letter-spacing:.5px}
+.busaf-visible-referral-code strong{display:block!important;color:#075c2d!important;font-size:clamp(18px,4.5vw,25px)!important;font-weight:1000!important;line-height:1.35!important;overflow-wrap:anywhere!important;visibility:visible!important;opacity:1!important}
+.busaf-visible-referral-code button{display:block!important;width:100%!important;margin-top:9px!important;background:#087c3b!important;color:#fff!important;border:0!important;border-radius:9px!important;padding:10px!important;font-weight:900!important}
+</style></body>
 </html>
