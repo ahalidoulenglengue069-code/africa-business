@@ -1357,6 +1357,23 @@ td,th{padding:10px 9px;border-bottom:1px solid #e8efe9;text-align:left}
 #app.founder-mode .founder-home-refresh{width:100%;position:relative;z-index:2;margin-top:12px;padding:11px 13px;border:1px solid #ffffff50;border-radius:13px;background:#ffffff16;color:#fff;font-size:11px;font-weight:900}
 @media(min-width:700px){#app.member-mode .member-v2-grid,#app.founder-mode .founder-v2-grid{grid-template-columns:repeat(4,minmax(0,1fr))}#app.member-mode .member-v2-head{padding:26px}#app.founder-mode .founder-v2-stats{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(max-width:390px){#app.member-mode .member-v2-section,#app.member-mode .member-v2-progress,#app.founder-mode .founder-v2-section{padding:13px}#app.member-mode .member-v2-tile{min-height:130px;padding:12px}#app.founder-mode .founder-v2-tile{min-height:132px;padding:11px}#app.founder-mode .founder-v2-tile>span{width:38px;height:38px}}
+
+/* Centre de gestion des stocks — données d'inventaire */
+.founder-stock-kpis{margin:12px 0}
+.founder-stock-list{display:grid;gap:10px;margin:12px 0}
+.founder-stock-row{background:#fff;border:1px solid #e2eae4;border-radius:16px;padding:14px;box-shadow:0 5px 16px #163d250b}
+.founder-stock-row-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.founder-stock-row-top strong{display:block;color:#173b29;font-size:14px}
+.founder-stock-row-top small{display:block;color:#64766a;font-size:11px;margin-top:4px}
+.founder-stock-status{white-space:nowrap;font-size:9px;font-weight:900;padding:6px 8px;border-radius:20px}
+.founder-stock-status.is-low{background:#fff0df;color:#9a4d00}
+.founder-stock-status.is-ok{background:#e5f5e9;color:#087a3b}
+.founder-stock-numbers{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px;margin-top:13px}
+.founder-stock-numbers>div{background:#f5f8f6;border-radius:10px;padding:9px 6px;min-width:0}
+.founder-stock-numbers small{display:block;font-size:9px;color:#6b7b70;line-height:1.25}
+.founder-stock-numbers b{display:block;font-size:16px;color:#173b29;margin-top:4px}
+.founder-stock-updated{font-size:10px;color:#77847b;margin-top:10px}
+@media(max-width:390px){.founder-stock-row{padding:11px}.founder-stock-numbers{gap:5px}.founder-stock-numbers>div{padding:8px 4px}.founder-stock-numbers b{font-size:14px}}
 </style>
 </head>
 <body>
@@ -1582,6 +1599,7 @@ function setScreen(screen){
  history.pushState({busafScreen:screen},"","#"+screen);
  render();
  if(screen==="founderPayments" && isFounder())refreshFounderPayments();
+ if(screen==="founderStocks" && isFounder())loadFounderStocks();
  if(screen==="commissions" && state.userId)loadMemberCommissions();
  if(screen==="profits" && state.userId)loadMemberProfits();
  if(screen==="stockMarket" && state.userId)loadMarketDepot().then(()=>{if(state.screen===screen){render();loadMemberResales();}});
@@ -2360,7 +2378,51 @@ async function submitFounderWithdrawal(){
 }
 
 function founderFinance(){if(!isFounder())return memberHome();const s=state.founderStats||{};return page('💰 Finances',`<div class="notice success">Montants calculés à partir des ventes confirmées chargées depuis Supabase.</div><div class="statgrid"><div class="stat">Ventes confirmées<strong>${s.confirmed??'—'}</strong></div><div class="stat">Montant confirmé<strong>${money(s.revenue||0)}</strong></div></div><button class="btn" onclick="refreshFounderData()">🔄 ACTUALISER</button>`);}
-function founderStocks(){if(!isFounder())return memberHome();const products=state.marketCatalog||[];const cards=products.map(p=>`<div class="rule"><strong>${esc(p.nom||'Produit')}</strong><br>Prix : ${money(p.prix)}<br>Type : ${esc(p.type_produit||'—')}</div>`).join('');return page('📦 Gestion des stocks',`<div class="notice">Produits réels du Marché BuSAF. Aucune quantité de stock n'est inventée.</div>${cards||'<div class="empty">Aucun produit chargé.</div>'}<button class="btn" onclick="refreshMarketCatalog()">🔄 ACTUALISER LES PRODUITS</button>`);}
+function founderStocks(){
+ if(!isFounder())return memberHome();
+ return page('📦 Gestion des stocks',`
+  <div class="notice success"><strong>INVENTAIRE CENTRAL BuSAF</strong><br>Quantités lues dans la table stocks_busaf. Les quantités réservées sont séparées du stock disponible.</div>
+  <div class="statgrid founder-stock-kpis"><div class="stat">Lignes de stock<strong id="fStockLines">…</strong></div><div class="stat">Unités disponibles<strong id="fStockAvailable">…</strong></div><div class="stat">Unités réservées<strong id="fStockReserved">…</strong></div><div class="stat">Alertes de stock<strong id="fStockAlerts">…</strong></div></div>
+  <div class="rule"><label for="founderStockSearch">Rechercher un produit ou un propriétaire</label><input id="founderStockSearch" type="search" placeholder="Nom du produit, membre…" oninput="filterFounderStocks()"><label for="founderStockType">Type de stock</label><select id="founderStockType" onchange="filterFounderStocks()"><option value="">Tous les types</option><option value="marche">Marché</option><option value="revente">Revente</option></select></div>
+  <div id="founderStockRows"><div class="empty">Chargement de l'inventaire réel…</div></div>
+  <button class="btn alt" onclick="loadFounderStocks()">↻ ACTUALISER L'INVENTAIRE</button>
+  <button class="btn alt" onclick="setScreen('founderPayments')">💳 VOIR LES VENTES ET PAIEMENTS</button>
+ `);
+}
+async function loadFounderStocks(){
+ if(!isFounder())return;
+ const box=document.getElementById('founderStockRows');if(box)box.innerHTML='<div class="empty">Synchronisation de l’inventaire…</div>';
+ try{
+  const [stocks,products,profiles]=await Promise.all([
+   api('/rest/v1/stocks_busaf?select=id,produit_id,proprietaire_id,type_stock,quantite,quantite_reservee,seuil_alerte,updated_at&order=updated_at.desc&limit=1000',{timeoutMs:18000}),
+   api('/rest/v1/produits?select=id,nom,prix,image_url&limit=1000',{timeoutMs:18000}),
+   api('/rest/v1/profils_busaf?select=id,nom_complet,telephone&limit=1000',{timeoutMs:18000})
+  ]);
+  if(!Array.isArray(stocks)||!Array.isArray(products)||!Array.isArray(profiles))throw new Error('Réponse incomplète du serveur.');
+  state.founderStockRows=stocks.map(s=>({...s,product:products.find(p=>String(p.id)===String(s.produit_id))||null,owner:profiles.find(p=>String(p.id)===String(s.proprietaire_id))||null}));
+  const available=stocks.reduce((n,s)=>n+Math.max(0,Number(s.quantite||0)-Number(s.quantite_reservee||0)),0);
+  const reserved=stocks.reduce((n,s)=>n+Math.max(0,Number(s.quantite_reservee||0)),0);
+  const alerts=stocks.filter(s=>Math.max(0,Number(s.quantite||0)-Number(s.quantite_reservee||0))<=Number(s.seuil_alerte||0)).length;
+  const put=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=String(v)};
+  put('fStockLines',stocks.length);put('fStockAvailable',available);put('fStockReserved',reserved);put('fStockAlerts',alerts);
+  renderFounderStockRows();
+ }catch(e){console.error('Inventaire fondateur:',e);if(box)box.innerHTML='<div class="notice error">Inventaire indisponible : '+esc(e.message||'Erreur serveur')+'</div>';}
+}
+function filterFounderStocks(){renderFounderStockRows();}
+function renderFounderStockRows(){
+ const box=document.getElementById('founderStockRows');if(!box)return;
+ const q=(document.getElementById('founderStockSearch')?.value||'').trim().toLowerCase();
+ const type=(document.getElementById('founderStockType')?.value||'').toLowerCase();
+ const rows=(state.founderStockRows||[]).filter(s=>{
+  const product=s.product?.nom||'Produit non identifié',owner=s.owner?.nom_complet||'Propriétaire non identifié';
+  return (!q||(product+' '+owner+' '+(s.owner?.telephone||'')).toLowerCase().includes(q))&&(!type||String(s.type_stock||'').toLowerCase().includes(type));
+ });
+ if(!rows.length){box.innerHTML='<div class="empty">Aucune ligne de stock ne correspond à cette recherche.</div>';return;}
+ box.innerHTML='<div class="founder-stock-list">'+rows.map(s=>{
+  const qty=Math.max(0,Number(s.quantite||0)),reserved=Math.max(0,Number(s.quantite_reservee||0)),available=Math.max(0,qty-reserved),threshold=Number(s.seuil_alerte||0),low=available<=threshold;
+  return '<article class="founder-stock-row"><div class="founder-stock-row-top"><div><strong>'+esc(s.product?.nom||'Produit non identifié')+'</strong><small>'+esc(s.owner?.nom_complet||'Propriétaire non identifié')+' · '+esc(s.type_stock||'Type non précisé')+'</small></div><span class="founder-stock-status '+(low?'is-low':'is-ok')+'">'+(low?'STOCK BAS':'DISPONIBLE')+'</span></div><div class="founder-stock-numbers"><div><small>Disponible</small><b>'+available+'</b></div><div><small>Réservé</small><b>'+reserved+'</b></div><div><small>Quantité totale</small><b>'+qty+'</b></div><div><small>Seuil alerte</small><b>'+threshold+'</b></div></div><div class="founder-stock-updated">Dernière mise à jour : '+esc(s.updated_at?new Date(s.updated_at).toLocaleString('fr-FR'):'Non renseignée')+'</div></article>';
+ }).join('')+'</div>';
+}
 function founderPlaceholder(title,desc){
  if(!isFounder())return memberHome();
  const key=String(title||'').toLowerCase();
