@@ -3181,8 +3181,8 @@ function loginPage(){
   <button class="btn" id="loginBtn">SE CONNECTER</button>
  </form>
  <div id="loginMsg" class="notice hidden"></div>
- <button class="btn alt" onclick="forgot()">MOT DE PASSE OUBLIÉ ?</button>
- <button class="btn alt" onclick="setScreen('signup')">👤 CRÉER MON COMPTE</button>
+ <button class="btn alt" id="loginForgotBtn" onclick="forgot()">MOT DE PASSE OUBLIÉ ?</button>
+ <button class="btn alt" id="loginSignupBtn" onclick="setScreen('signup')">👤 CRÉER MON COMPTE</button>
  `);
 }
 function signupPage(){
@@ -4746,5 +4746,15 @@ html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-v2-bars i 
 #app .busaf-bottom-nav.public-bottom-v2 button span{font-weight:1000}
 #app .busaf-bottom-nav.public-bottom-v2 button small{font-weight:900}
 </style>
+
+<style id="busaf-login-three-button-colors-v1">
+/* Connexion : trois actions clairement différenciées */
+#app #loginBtn{background:#087a3b!important;color:#fff!important;border:1px solid #066331!important;box-shadow:0 5px 14px rgba(8,122,59,.18)!important}
+#app #loginForgotBtn{background:#1769d2!important;color:#fff!important;border:1px solid #1256b0!important;box-shadow:0 5px 14px rgba(23,105,210,.16)!important}
+#app #loginSignupBtn{background:#d97706!important;color:#fff!important;border:1px solid #b85f05!important;box-shadow:0 5px 14px rgba(217,119,6,.16)!important}
+#app #loginBtn,#app #loginForgotBtn,#app #loginSignupBtn{display:block!important;width:100%!important;min-height:48px!important;margin:10px 0!important;border-radius:11px!important;font-weight:900!important;letter-spacing:.25px!important}
+#app #loginBtn:disabled{opacity:.75!important}
+</style>
+
 </body>
 </html>
