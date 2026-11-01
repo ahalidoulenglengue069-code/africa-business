@@ -2954,6 +2954,7 @@ async function loadMemberHomeMetrics(){
 function busafWorkspaceTheme(scope){const key=scope==='founder'?'busaf_founder_theme':'busaf_member_theme';try{return localStorage.getItem(key)==='dark'?'dark':'light';}catch(e){return 'light';}}
 function toggleWorkspaceTheme(scope){const key=scope==='founder'?'busaf_founder_theme':'busaf_member_theme';const next=busafWorkspaceTheme(scope)==='dark'?'light':'dark';try{localStorage.setItem(key,next);}catch(e){}render();}
 function memberHome(){
+  setTimeout(()=>loadMemberWalletBalance(),0);
  const name=state.profile?.nom_complet||state.email||"Membre";
  const profile=state.profile||{};
  const referral=profile.code_parrain||invitationCode();
