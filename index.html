@@ -4858,5 +4858,28 @@ html[data-busaf-theme] #app.member-mode .member-v2-track i{background:linear-gra
 html[data-busaf-theme] #app.member-mode .member-v2-tile{color:#263b52!important}
 html[data-busaf-theme] #app.member-mode .member-v2-tile small{color:#586b7d!important}
 </style>
+
+<style id="busaf-member-theme-specificity-final">
+/* Priorité supérieure aux règles globales html[data-busaf-theme] */
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-head,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-head,
+html[data-busaf-theme] #app.member-mode .member-welcome{
+ background:linear-gradient(135deg,#17283d 0%,#263f5c 58%,#315879 100%)!important;
+ color:#fff!important;
+ box-shadow:0 14px 30px rgba(23,40,61,.16)!important;
+}
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-balance button,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-balance button{
+ background:#fff!important;color:#294d72!important;border-color:#dce8f5!important;
+}
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-actions button:last-child,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-actions button:last-child{
+ background:#315f91!important;color:#fff!important;border-color:#315f91!important;
+}
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-title h2,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-title h2{color:#263b52!important}
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-track i,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-track i{background:linear-gradient(90deg,#315f91,#5b91c4)!important}
+</style>
 </body>
 </html>
