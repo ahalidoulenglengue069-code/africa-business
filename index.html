@@ -1532,6 +1532,7 @@ function setScreen(screen){
   if(screen==="founderPayments" && isFounder() && !state.founderPaymentsLoading)refreshFounderPayments();
   if(screen==="commissions" && state.userId)loadMemberCommissions();
   if(screen==="profits" && state.userId)loadMemberProfits();
+  if(screen==="stockMarket" && state.userId)loadMarketDepot().then(()=>{if(state.screen===screen){render();loadMemberResales();}});
   return;
  }
  state.screen=screen;
