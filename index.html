@@ -1474,6 +1474,50 @@ td,th{padding:10px 9px;border-bottom:1px solid #e8efe9;text-align:left}
  .member-v2-live-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 }
 
+
+/* Présentation harmonisée des fiches et formulaires de compte */
+.busaf-workspace-page{width:min(100%,1040px);margin-inline:auto}
+.busaf-page-heading{margin-bottom:18px}
+.busaf-page-heading h1{font-weight:900}
+.busaf-page-content{display:grid;gap:12px}
+.busaf-page-content>.notice{margin:0;padding:14px 15px;line-height:1.55}
+.busaf-page-content>.rule{margin:0;padding:16px}
+.busaf-page-content>.btn{margin:0}
+.busaf-page-content>.list{margin:0}
+.busaf-page-content .statgrid{gap:10px;margin:0}
+.busaf-page-content .stat{padding:14px;border-radius:17px;min-width:0}
+.busaf-page-content .stat strong{overflow-wrap:anywhere}
+.profile-dashboard{display:grid;gap:12px}
+.profile-cover{padding:clamp(16px,4vw,24px);border-radius:26px}
+.profile-identity{margin:25px 0 18px}
+.profile-avatar{width:96px;height:96px;flex-basis:96px;border-radius:25px}
+.profile-avatar .profile-photo,.profile-avatar .profile-photo-placeholder{border-radius:22px}
+.profile-identity-text h2{font-size:clamp(20px,4vw,27px);font-weight:900}
+.profile-edit-cover{min-height:45px}
+.profile-summary-card{display:flex;flex-direction:column;gap:3px;min-height:112px}
+.profile-summary-card>span{margin-bottom:5px}
+.profile-section-card{padding:17px;border-radius:21px}
+.profile-section-heading{padding-bottom:9px;border-bottom:1px solid #edf2ee}
+.profile-code-box{padding:18px}
+.profile-actions-grid{gap:10px}
+.profile-action-card{min-height:126px;padding:15px;border-radius:18px}
+.profile-action-card>span{margin-bottom:5px}
+.profile-edit-form{display:grid;gap:8px}
+.profile-edit-form label{margin-top:5px;font-weight:800;color:#355a43}
+.profile-edit-form input,.profile-edit-form select{min-height:46px;border:1px solid #dce8df;border-radius:12px;padding:11px 12px;background:#fff;color:#173b29;width:100%}
+.profile-edit-form .btn{margin-top:8px}
+#app.founder-mode .profile-section-card{border-color:#e9e0ce}
+#app.founder-mode .profile-section-heading>span{background:#f7efdE}
+#app.founder-mode .profile-code-box{background:#fbf7ed;border-color:#d8c28e}
+#app.founder-mode .profile-code-box strong{color:#76521e}
+@media(max-width:420px){
+ .profile-identity{gap:12px}
+ .profile-avatar{width:78px;height:78px;flex-basis:78px}
+ .profile-summary-card{min-height:104px}
+ .profile-action-card{min-height:116px}
+ .busaf-page-content>.rule{padding:13px}
+}
+
 </style>
 </head>
 <body>
@@ -3404,12 +3448,17 @@ function memberAccount(){
 }
 
 function editProfile(){
+ const pays=String(state.profile?.pays||"");
+ const countries=["Burkina Faso","Bénin","Côte d’Ivoire","Ghana","Guinée","Mali","Niger","Nigeria","Sénégal","Togo","Cameroun","Tchad","République démocratique du Congo","République du Congo","Gabon","Mauritanie","Guinée-Bissau","Gambie","Liberia","Sierra Leone","Afrique du Sud","Algérie","Maroc","Tunisie","Égypte","France","Belgique","Canada","États-Unis","Royaume-Uni","Allemagne","Italie","Espagne","Arabie saoudite","Émirats arabes unis","Chine","Inde","Autre pays"];
  openModal("✏️ Modifier mon profil",`
-   <label>Nom complet</label><input id="epName" value="${esc(state.profile?.nom_complet||"")}">
-   <label>Téléphone</label><input id="epTel" value="${esc(state.profile?.telephone||"")}">
-   <label>Ville</label><input id="epCity" value="${esc(state.profile?.Ville||"")}">
-   <button class="btn" onclick="saveProfile()">VALIDER</button>
-   <button class="btn alt" onclick="closeModal()">ANNULER</button>
+   <div class="profile-edit-form">
+    <label>Nom complet</label><input id="epName" autocomplete="name" value="${esc(state.profile?.nom_complet||"")}">
+    <label>Téléphone</label><input id="epTel" type="tel" autocomplete="tel" value="${esc(state.profile?.telephone||"")}">
+    <label>Pays de résidence</label><select id="epCountry"><option value="">Sélectionner le pays</option>${countries.map(c=>`<option value="${esc(c)}" ${pays===c?"selected":""}>${countryFlag(c)} ${esc(c)}</option>`).join("")}</select>
+    <label>Ville</label><input id="epCity" value="${esc(state.profile?.Ville||"")}">
+    <button class="btn" onclick="saveProfile()">ENREGISTRER MES INFORMATIONS</button>
+    <button class="btn alt" onclick="closeModal()">ANNULER</button>
+   </div>
  `);
 }
 
@@ -3418,16 +3467,18 @@ async function saveProfile(){
  const nom=document.getElementById("epName")?.value.trim();
  const tel=document.getElementById("epTel")?.value.trim();
  const ville=document.getElementById("epCity")?.value.trim();
+ const pays=document.getElementById("epCountry")?.value.trim()||"";
  if(!nom){alert("Le nom complet est obligatoire.");return;}
 
  try{
    await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}`,{
      method:"PATCH",
      headers:{"Prefer":"return=minimal"},
-     body:JSON.stringify({nom_complet:nom,telephone:tel,Ville:ville})
+     body:JSON.stringify({nom_complet:nom,telephone:tel,pays,Ville:ville})
    });
    state.profile.nom_complet=nom;
    state.profile.telephone=tel;
+   state.profile.pays=pays;
    state.profile.Ville=ville;
    closeModal();
    saveState();
