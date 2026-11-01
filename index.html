@@ -3654,24 +3654,25 @@ function openBoutiqueSale(i){const p=state.boutiqueProducts[i];if(!p)return;open
 function confirmBoutiqueSale(i){const p=state.boutiqueProducts[i],customer=document.getElementById("shopCustomer")?.value.trim();if(!p||!customer){alert("Nom du client obligatoire.");return;}const sellerAmount=p.price;state.boutiqueBalance+=sellerAmount;state.orders.unshift({id:Date.now(),product:p.name,price:p.price,date:new Date().toLocaleString("fr-FR"),mode:"boutique",customer});addNotification("🏪 Vente boutique",`Vente de ${p.name} enregistrée. Part vendeur : ${money(sellerAmount)}.`,"boutique");saveState();closeModal();openModal("Vente enregistrée",`<div class="notice success">Vente boutique confirmée. Part vendeur : <strong>${money(sellerAmount)}</strong>.</div><div class="notice warning">En production, paiement et prélèvement 5 % doivent être sécurisés côté serveur.</div><button class="btn" onclick="closeModal();setScreen('orders')">VOIR LES COMMANDES</button>`);}
 
 async function loadDirectInvites(){
- if(!state.userId||!state.token||!state.profile?.id){
-   state.directInvites=[];
-   state.directInvitesError="Ta session BuSAF n'est pas prête. Reconnecte-toi puis réessaie.";
-   state.directInvitesLoaded=false;
-   return [];
- }
  if(state.directInvitesLoading)return state.directInvites||[];
  state.directInvitesLoading=true;
  state.directInvitesError="";
  try{
+   // Attendre la restauration de Supabase si l'espace s'ouvre trop tôt au retour dans l'application.
+   if(!state.userId||!state.token||!state.profile?.id){
+     const hasSavedSession=!!(localStorage.getItem("busaf_access_token")||localStorage.getItem("busaf_refresh_token"));
+     if(hasSavedSession)await restoreAuthenticatedSession();
+   }
+   if(!state.userId||!state.token||!state.profile?.id){
+     throw new Error("La session BuSAF n'a pas pu être restaurée. Vérifie ta connexion puis réessaie.");
+   }
    let rows;
    if(isFounder()){
      // Le fondateur consulte ses invités directs depuis les profils réellement liés à son profil.
      const parrainId=encodeURIComponent(state.profile.id);
      rows=await api("/rest/v1/profils_busaf?select=id,nom_complet,telephone,code_parrain,pays,Ville,role,photo_url,created_at&parrain_id=eq."+parrainId+"&order=created_at.desc.nullslast,nom_complet.asc&limit=500",{method:"GET",timeoutMs:20000});
    }else{
-     // Pour les membres, utiliser la RPC sécurisée SECURITY DEFINER afin que
-     // les règles RLS n'empêchent pas de voir leurs propres filleuls directs.
+     // Pour les membres, utiliser la RPC sécurisée SECURITY DEFINER afin que les règles RLS ne masquent pas leurs invités directs.
      rows=await api("/rest/v1/rpc/busaf_mes_invites_directs",{method:"POST",body:"{}",timeoutMs:20000});
    }
    if(!Array.isArray(rows))throw new Error("Réponse inattendue du serveur pour les invités directs.");
