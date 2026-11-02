@@ -4186,48 +4186,54 @@ async function loadMemberWalletBalance(){
 
 function memberMoney(){return page("👛 Mon portefeuille",`<section class="wallet-hero"><div class="wallet-hero-top"><span>💼 COMPTE MARCHÉ</span><span class="wallet-live">● DONNÉES DU COMPTE</span></div><small>Solde disponible</small><strong id="memberWalletBalancePage">${money(state.marketBalance)} <i>FCFA</i></strong><p>Ton portefeuille BuSAF centralise tes dépôts, retraits et opérations confirmées.</p></section><div class="wallet-action-grid"><button class="wallet-action wallet-deposit" onclick="openMoneyDeposit()"><span>＋</span><b>Faire un dépôt</b><small>Recharger le compte</small></button><button class="wallet-action wallet-withdraw" onclick="openMoneyWithdraw()"><span>↗</span><b>Demander un retrait</b><small>Recevoir par Mobile Money</small></button></div><div class="wallet-security-note">🔐 <strong>Protection du solde</strong><br>Un dépôt est crédité uniquement après confirmation sécurisée du paiement. Un retrait est soumis à la vérification du solde disponible.</div><section class="wallet-history-panel deposit-history-panel"><div class="wallet-panel-heading"><span>📥</span><div><h3>Historique des dépôts</h3><p>Recharges et paiements entrants</p></div></div><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="wallet-history-panel withdrawal-history-panel"><div class="wallet-panel-heading"><span>📤</span><div><h3>Historique des retraits</h3><p>Demandes et paiements sortants</p></div></div><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section>`);setTimeout(()=>{loadMemberWalletBalance();loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
 async function loadMemberDepositHistory(){
- const box=document.getElementById("memberDepositHistory");if(!box)return;
+ const boxId="memberDepositHistory";
+ const generation=(window.__busafDepositHistoryGeneration||0)+1;
+ window.__busafDepositHistoryGeneration=generation;
+ const current=()=>window.__busafDepositHistoryGeneration===generation?document.getElementById(boxId):null;
+ const box=current();if(!box)return;
  if(!state.userId||!state.token||!state.profile?.id){box.innerHTML='<div class="empty">Connecte-toi pour consulter tes dépôts.</div>';return;}
- if(window.__busafDepositHistoryPromise){return window.__busafDepositHistoryPromise;}
- const task=(async()=>{
-  box.innerHTML='<div class="empty">Chargement des dépôts…</div>';
-  try{
-   const path='/rest/v1/busaf_depots?select=id,montant,operateur,compte,reference,statut,created_at,confirme_le&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
-   const rows=await api(path,{method:'GET',timeoutMs:12000});
-   if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="empty">Aucune demande de dépôt enregistrée.</div>';return;}
-   box.innerHTML=rows.map(r=>{
-    const status=String(r.statut||'inconnu').toLowerCase();
-    const label=['confirme','confirmé','confirmee','confirmée','paye','payé','payee','payée','success','succeeded'].includes(status)?'CONFIRMÉ':status==='en_attente'?'EN ATTENTE DE PAIEMENT / VALIDATION':['echec','échec','failed','cancelled','annule','annulé'].includes(status)?'ÉCHEC / ANNULÉ':['refuse','refusé'].includes(status)?'REFUSÉ':String(r.statut||'À VÉRIFIER').replace(/_/g,' ').toUpperCase();
-    const color=label==='CONFIRMÉ'?'#16733a':['ÉCHEC / ANNULÉ','REFUSÉ'].includes(label)?'#b3261e':'#8a5a00';
-    const date=r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'Date inconnue';
-    return '<div class="rule" style="margin:8px 0;border-left:4px solid #16733a"><strong style="color:#16733a">📥 DÉPÔT DEMANDÉ : '+esc(money(Number(r.montant||0)))+'</strong><div>Compte : '+esc(String(r.compte||'Compte non précisé'))+' · '+esc(String(r.operateur||'Opérateur non précisé'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">STATUT : '+esc(label)+'</div><div class="small">Référence : '+esc(String(r.reference||r.id||'—'))+'</div></div>';
-   }).join('');
-  }catch(e){console.error('Historique des dépôts BuSAF:',e);box.innerHTML='<div class="notice error">Impossible de charger les dépôts : '+esc(String(e?.message||'erreur serveur'))+'</div>';}
- })();
- window.__busafDepositHistoryPromise=task;
- try{await task;}finally{if(window.__busafDepositHistoryPromise===task)window.__busafDepositHistoryPromise=null;}
+ box.innerHTML='<div class="empty">Chargement des dépôts…</div>';
+ try{
+  const path='/rest/v1/busaf_depots?select=id,montant,operateur,compte,reference,statut,created_at,confirme_le&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
+  const rows=await api(path,{method:'GET',timeoutMs:8000});
+  const target=current();if(!target)return;
+  if(!Array.isArray(rows)||!rows.length){target.innerHTML='<div class="empty">Aucun dépôt enregistré pour ce compte.</div>';return;}
+  target.innerHTML=rows.map(r=>{
+   const status=String(r.statut||'inconnu').toLowerCase();
+   const label=['confirme','confirmé','confirmee','confirmée','paye','payé','payee','payée','success','succeeded'].includes(status)?'CONFIRMÉ':status==='en_attente'?'EN ATTENTE DE PAIEMENT / VALIDATION':['echec','échec','failed','cancelled','annule','annulé'].includes(status)?'ÉCHEC / ANNULÉ':['refuse','refusé'].includes(status)?'REFUSÉ':String(r.statut||'À VÉRIFIER').replace(/_/g,' ').toUpperCase();
+   const color=label==='CONFIRMÉ'?'#16733a':['ÉCHEC / ANNULÉ','REFUSÉ'].includes(label)?'#b3261e':'#8a5a00';
+   const date=r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'Date inconnue';
+   return '<div class="rule" style="margin:8px 0;border-left:4px solid #16733a"><strong style="color:#16733a">📥 DÉPÔT DEMANDÉ : '+esc(money(Number(r.montant||0)))+'</strong><div>Compte : '+esc(String(r.compte||'Compte non précisé'))+' · '+esc(String(r.operateur||'Opérateur non précisé'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">STATUT : '+esc(label)+'</div><div class="small">Référence : '+esc(String(r.reference||r.id||'—'))+'</div></div>';
+  }).join('');
+ }catch(e){
+  console.error('Historique des dépôts BuSAF:',e);
+  const target=current();if(target)target.innerHTML='<div class="notice error">Chargement des dépôts impossible : '+esc(String(e?.message||'erreur serveur'))+'. Réessaie dans un instant.</div>';
+ }
 }
 async function loadMemberWithdrawalHistory(){
- const box=document.getElementById("memberWithdrawalHistory");if(!box)return;
+ const boxId="memberWithdrawalHistory";
+ const generation=(window.__busafWithdrawalHistoryGeneration||0)+1;
+ window.__busafWithdrawalHistoryGeneration=generation;
+ const current=()=>window.__busafWithdrawalHistoryGeneration===generation?document.getElementById(boxId):null;
+ const box=current();if(!box)return;
  if(!state.userId||!state.token||!state.profile?.id){box.innerHTML='<div class="empty">Connecte-toi pour consulter tes retraits.</div>';return;}
- if(window.__busafWithdrawalHistoryPromise){return window.__busafWithdrawalHistoryPromise;}
- const task=(async()=>{
-  box.innerHTML='<div class="empty">Chargement des retraits…</div>';
-  try{
-   const path='/rest/v1/busaf_retraits?select=id,montant,numero_mobile_money,operateur,compte,statut,created_at&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
-   const rows=await api(path,{method:'GET',timeoutMs:12000});
-   if(!Array.isArray(rows)||!rows.length){box.innerHTML='<div class="empty">Aucune demande de retrait enregistrée.</div>';return;}
-   box.innerHTML=rows.map(r=>{
-    const status=String(r.statut||'inconnu').toLowerCase();
-    const label=['confirme','payee','payé','paye'].includes(status)?'PAYÉ':['approuve','approuvé'].includes(status)?'APPROUVÉ — EN ATTENTE DE PAIEMENT':status==='en_attente'?'EN ATTENTE DE VALIDATION':['echec','échec'].includes(status)?'ÉCHEC':['refuse','refusé'].includes(status)?'REFUSÉ':String(r.statut||'À VÉRIFIER').replace(/_/g,' ').toUpperCase();
-    const color=label==='PAYÉ'?'#16733a':['REFUSÉ','ÉCHEC'].includes(label)?'#b3261e':'#8a5a00';
-    const date=r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'Date inconnue';
-    return '<div class="rule" style="margin:8px 0;border-left:4px solid #b3261e"><strong style="color:#b3261e">📤 RETRAIT DEMANDÉ : '+esc(money(Number(r.montant||0)))+'</strong><div>Vers '+esc(String(r.operateur||'Opérateur'))+' · '+esc(String(r.numero_mobile_money||'Numéro non indiqué'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">STATUT : '+esc(label)+'</div><div class="small">Référence : '+esc(String(r.id||'—'))+'</div></div>';
-   }).join('');
-  }catch(e){console.error('Historique des retraits BuSAF:',e);box.innerHTML='<div class="notice error">Impossible de charger les retraits : '+esc(String(e?.message||'erreur serveur'))+'</div>';}
- })();
- window.__busafWithdrawalHistoryPromise=task;
- try{await task;}finally{if(window.__busafWithdrawalHistoryPromise===task)window.__busafWithdrawalHistoryPromise=null;}
+ box.innerHTML='<div class="empty">Chargement des retraits…</div>';
+ try{
+  const path='/rest/v1/busaf_retraits?select=id,montant,numero_mobile_money,operateur,compte,statut,created_at&profil_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=30';
+  const rows=await api(path,{method:'GET',timeoutMs:8000});
+  const target=current();if(!target)return;
+  if(!Array.isArray(rows)||!rows.length){target.innerHTML='<div class="empty">Aucun retrait enregistré pour ce compte.</div>';return;}
+  target.innerHTML=rows.map(r=>{
+   const status=String(r.statut||'inconnu').toLowerCase();
+   const label=['confirme','payee','payé','paye','success','succeeded'].includes(status)?'PAYÉ':['approuve','approuvé'].includes(status)?'APPROUVÉ — EN ATTENTE DE PAIEMENT':status==='en_attente'?'EN ATTENTE DE VALIDATION':['echec','échec','failed'].includes(status)?'ÉCHEC':['refuse','refusé'].includes(status)?'REFUSÉ':String(r.statut||'À VÉRIFIER').replace(/_/g,' ').toUpperCase();
+   const color=label==='PAYÉ'?'#16733a':['REFUSÉ','ÉCHEC'].includes(label)?'#b3261e':'#8a5a00';
+   const date=r.created_at?new Date(r.created_at).toLocaleString('fr-FR'):'Date inconnue';
+   return '<div class="rule" style="margin:8px 0;border-left:4px solid #b17b42"><strong style="color:#8a633b">📤 RETRAIT DEMANDÉ : '+esc(money(Number(r.montant||0)))+'</strong><div>Vers '+esc(String(r.operateur||'Opérateur'))+' · '+esc(String(r.numero_mobile_money||'Numéro non indiqué'))+'</div><div class="small">'+esc(date)+'</div><div style="font-weight:900;color:'+color+';margin-top:5px">STATUT : '+esc(label)+'</div><div class="small">Référence : '+esc(String(r.id||'—'))+'</div></div>';
+  }).join('');
+ }catch(e){
+  console.error('Historique des retraits BuSAF:',e);
+  const target=current();if(target)target.innerHTML='<div class="notice error">Chargement des retraits impossible : '+esc(String(e?.message||'erreur serveur'))+'. Réessaie dans un instant.</div>';
+ }
 }
 function openMoneyDeposit(){openModal("💳 Demande de dépôt",`<label>Compte à créditer</label><select id="depAccount"><option value="Compte Marché">Compte Marché</option></select><label>Montant (FCFA)</label><input id="depAmount" type="number" min="1" step="1" inputmode="numeric" placeholder="Ex. 5000"><label>Opérateur Mobile Money</label><select id="depOperator"><option value="Orange Money">Orange Money</option><option value="Moov Money">Moov Money</option><option value="Telecel Money">Telecel Money</option><option value="Wave">Wave</option></select><div class="notice warning">Le dépôt sera enregistré en attente. Le compte ne sera crédité qu'après confirmation sécurisée du paiement par le fournisseur.</div><button class="btn" id="depSubmitBtn" onclick="requestMoneyDeposit()">ENREGISTRER LA DEMANDE</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 async function requestMoneyDeposit(){
