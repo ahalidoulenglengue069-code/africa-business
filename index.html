@@ -4075,7 +4075,7 @@ async function saveProfile(){
  const ville=document.getElementById("epCity")?.value.trim();
  const pays=document.getElementById("epCountry")?.value.trim()||"";
  if(!nom){alert("Le nom complet est obligatoire.");return;}
- const btn=document.querySelector("#modalbox button[onclick="saveProfile()"]");
+ const btn=document.querySelector('#modalbox button[onclick^="saveProfile"]');
  if(btn){btn.disabled=true;btn.textContent="ENREGISTREMENT…";}
  try{
    // Demander la ligne modifiée : un PATCH vide (RLS ou filtre) ne doit pas être annoncé comme réussi.
