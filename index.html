@@ -3075,7 +3075,10 @@ async function loadFounderStocks(){
    api('/rest/v1/profils_busaf?select=id,nom_complet,telephone&limit=1000',{timeoutMs:18000})
   ]);
   if(!Array.isArray(stocks)||!Array.isArray(products)||!Array.isArray(profiles))throw new Error('Réponse incomplète du serveur.');
-  state.founderStockRows=stocks.map(s=>({...s,product:products.find(p=>String(p.id)===String(s.produit_id))||null,owner:profiles.find(p=>String(p.id)===String(s.proprietaire_id))||null}));
+  // Indexer les références une seule fois : évite de reparcourir jusqu'à 1 000 produits et 1 000 profils pour chaque ligne de stock sur mobile.
+  const productById=new Map(products.map(p=>[String(p.id),p]));
+  const profileById=new Map(profiles.map(p=>[String(p.id),p]));
+  state.founderStockRows=stocks.map(s=>({...s,product:productById.get(String(s.produit_id))||null,owner:profileById.get(String(s.proprietaire_id))||null}));
   const units=stocks.reduce((n,s)=>n+Math.max(0,Number(s.quantite||0)),0);
   const members=new Set(stocks.map(s=>String(s.proprietaire_id))).size;
   const productCount=new Set(stocks.map(s=>String(s.produit_id))).size;
