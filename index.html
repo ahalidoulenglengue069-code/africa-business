@@ -5132,5 +5132,29 @@ html[data-busaf-theme] #app.member-mode .btn.alt{
 }
 </style>
 
+
+<style id="busaf-member-theme-final-override-v4">
+/* Écrase explicitement l'ancien thème bleu avec la palette verte validée */
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-head,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-head,
+html[data-busaf-theme] #app.member-mode .member-welcome{
+ background:linear-gradient(132deg,#1c6848 0%,#287b55 58%,#398b63 100%)!important;
+ color:#fff!important;border:1px solid #75a98a!important;
+ box-shadow:0 12px 28px rgba(30,83,55,.15)!important;
+}
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-balance button,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-balance button{
+ background:#fff!important;color:#245b3f!important;border-color:#d2e4d7!important;
+}
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-actions button:last-child,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-actions button:last-child{
+ background:#287b52!important;color:#fff!important;border-color:#287b52!important;
+}
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-title h2,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-title h2{color:#245b3e!important}
+html[data-busaf-theme]:not([data-busaf-theme="public"]) #app.member-mode .member-v2-track i,
+html[data-busaf-theme="public"] #app.member-mode .member-v2-track i{background:linear-gradient(90deg,#39845c,#75a982)!important}
+</style>
+
 </body>
 </html>
