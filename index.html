@@ -2330,6 +2330,22 @@ async function restoreAuthenticatedSessionCore(){
     state.userId=""; state.email=""; state.token=""; state.profile=null;
     return false;
   }
+  // Chemin rapide : si le jeton mémorisé est encore valide, la lecture RLS du
+  // profil authentifie déjà la session. Évite un aller-retour /auth/v1/user
+  // supplémentaire à chaque ouverture sur mobile.
+  const savedUserId=localStorage.getItem("busaf_user_id")||"";
+  if(storedToken&&savedUserId){
+    state.userId=savedUserId;
+    state.email=localStorage.getItem("busaf_email")||"";
+    state.token=storedToken;
+    try{
+      await loadProfile();
+      if(state.profile?.id)return true;
+    }catch(fastProfileError){
+      console.warn("Reprise rapide BuSAF indisponible, vérification Auth classique :",fastProfileError.message||fastProfileError);
+      state.profile=null;
+    }
+  }
   try{
     let user=null;
     if(storedToken){
