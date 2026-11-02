@@ -3586,7 +3586,8 @@ async function saveMarketProduct(editId=''){
  const submitButton=document.querySelector('#modalbox button[onclick^="saveMarketProduct"]');
  if(submitButton){submitButton.disabled=true;submitButton.textContent='PUBLICATION EN COURS…';}
  try{
-   await loadProfile();
+   // Le profil déjà chargé suffit : éviter une lecture réseau avant chaque publication.
+   if(!state.profile?.id)await loadProfile();
    const creatorId=founderProfileId();
    if(!creatorId)throw new Error('Profil fondateur introuvable.');
    const f=document.getElementById('mpPhoto')?.files?.[0];
@@ -4074,23 +4075,25 @@ async function saveProfile(){
  const ville=document.getElementById("epCity")?.value.trim();
  const pays=document.getElementById("epCountry")?.value.trim()||"";
  if(!nom){alert("Le nom complet est obligatoire.");return;}
-
+ const btn=document.querySelector("#modalbox button[onclick="saveProfile()"]");
+ if(btn){btn.disabled=true;btn.textContent="ENREGISTREMENT…";}
  try{
-   await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}`,{
+   // Demander la ligne modifiée : un PATCH vide (RLS ou filtre) ne doit pas être annoncé comme réussi.
+   const rows=await api(`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=id,user_id,nom_complet,telephone,pays,Ville,role,parrain_id,code_parrain,photo_url`,{
      method:"PATCH",
-     headers:{"Prefer":"return=minimal"},
+     headers:{"Prefer":"return=representation"},
      body:JSON.stringify({nom_complet:nom,telephone:tel,pays,Ville:ville})
    });
-   state.profile.nom_complet=nom;
-   state.profile.telephone=tel;
-   state.profile.pays=pays;
-   state.profile.Ville=ville;
+   const saved=Array.isArray(rows)?rows[0]:null;
+   if(!saved?.id)throw new Error("Supabase n’a confirmé aucune ligne modifiée. Vérifie les droits du profil avant de réessayer.");
+   state.profile={...state.profile,...saved};
    closeModal();
    saveState();
    render();
    addNotification("👤 Profil","Ton profil BuSAF a été mis à jour.","profile");
  }catch(e){
-   alert("❌ "+e.message);
+   if(btn){btn.disabled=false;btn.textContent="ENREGISTRER MES INFORMATIONS";}
+   alert("❌ Enregistrement non confirmé : "+e.message);
  }
 }
 
