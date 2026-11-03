@@ -208,6 +208,8 @@ textarea{min-height:100px;resize:vertical}
 .profile-action-card{min-width:0;border:1px solid var(--line);border-radius:15px;background:#fff;padding:13px 11px;text-align:left;display:flex;flex-direction:column;align-items:flex-start;gap:5px;box-shadow:0 4px 13px rgba(0,70,40,.06)}
 .profile-action-card>span{font-size:24px}.profile-action-card b{font-size:13px;color:#17442c}.profile-action-card small{font-size:11px;line-height:1.3;color:var(--muted)}
 .profile-logout{margin-top:12px}
+.tile.logout-tile{background:#c62828!important;color:#fff!important;border:1px solid #a91f1f!important;box-shadow:0 4px 12px rgba(198,40,40,.18)!important}
+.tile.logout-tile .ico{color:#fff!important}
 @media(min-width:650px){.profile-identity{margin:25px 0 17px}.profile-edit-cover{width:auto;min-width:200px}.profile-actions-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:360px){.profile-cover{padding:14px}.profile-identity{gap:10px}.profile-avatar{flex-basis:72px;width:72px;height:72px}.profile-identity-text h2{font-size:18px}.profile-summary-grid{gap:5px}.profile-summary-card{padding:10px 7px}.profile-summary-card strong{font-size:11px}.profile-detail-row{font-size:12px}}
 
@@ -2865,7 +2867,7 @@ async function joinMeeting(i){await syncMeetingsFromServer();const m=state.meeti
 async function toggleMedia(type){if(!navigator.mediaDevices?.getUserMedia){alert('Ton navigateur ne permet pas la caméra ou le microphone.');return;}try{const s=await navigator.mediaDevices.getUserMedia(type==='camera'?{video:true,audio:false}:{video:false,audio:true});s.getTracks().forEach(t=>t.stop());openModal(type==='camera'?'Caméra':'Micro',`<div class="notice success">${type==='camera'?'Caméra':'Microphone'} autorisé.</div><button class="btn" onclick="closeModal()">OK</button>`);}catch(e){openModal('Accès refusé',`<div class="notice error">Autorisation ${type==='camera'?'caméra':'microphone'} refusée.</div><button class="btn" onclick="closeModal()">OK</button>`);}}
 
 function tile([id,ico,label]){
- if(id==="logout")return `<button class="tile" onclick="logout()"><span class="ico">${ico}</span>${label}</button>`;
+ if(id==="logout")return `<button class="tile logout-tile" onclick="logout()"><span class="ico">${ico}</span>${label}</button>`;
  return `<button class="tile" onclick="setScreen('${id}')"><span class="ico">${ico}</span>${label}</button>`;
 }
 
