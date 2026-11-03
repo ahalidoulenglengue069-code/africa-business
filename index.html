@@ -5318,5 +5318,60 @@ html[data-busaf-theme] #app .profile-logout.btn.red{
  .public-v2-market .market-v2-info{padding:8px!important}
 }
 </style>
+
+<style id="busaf-market-layout-final-override">
+/* Imposer le modèle horizontal sur tous les catalogues qui réutilisent la carte produit */
+#app .public-v2-products,
+#app .public-products,
+#app #marketCardsGrid{
+ grid-template-columns:minmax(0,1fr)!important;
+}
+#app .public-v2-products>.market-v2-card,
+#app .public-products>.market-v2-card,
+#app #marketCardsGrid>.market-v2-card{
+ display:grid!important;
+ grid-template-columns:minmax(118px,40%) minmax(0,1fr)!important;
+ grid-auto-flow:initial!important;
+ align-items:stretch!important;
+ min-height:210px!important;
+ width:100%!important;
+}
+#app .public-v2-products>.market-v2-card>.market-v2-image,
+#app .public-products>.market-v2-card>.market-v2-image,
+#app #marketCardsGrid>.market-v2-card>.market-v2-image{
+ grid-column:1!important;
+ grid-row:1!important;
+ height:100%!important;
+ min-height:210px!important;
+ width:100%!important;
+ aspect-ratio:auto!important;
+ align-self:stretch!important;
+}
+#app .public-v2-products>.market-v2-card>.market-v2-info,
+#app .public-products>.market-v2-card>.market-v2-info,
+#app #marketCardsGrid>.market-v2-card>.market-v2-info{
+ grid-column:2!important;
+ grid-row:1!important;
+ min-width:0!important;
+ align-self:stretch!important;
+ justify-content:center!important;
+}
+#app .market-v2-card>.market-v2-image img{
+ position:absolute!important;
+ inset:0!important;
+ width:100%!important;
+ height:100%!important;
+ max-width:none!important;
+ object-fit:cover!important;
+}
+@media(max-width:380px){
+ #app .public-v2-products>.market-v2-card,
+ #app .public-products>.market-v2-card,
+ #app #marketCardsGrid>.market-v2-card{grid-template-columns:minmax(105px,38%) minmax(0,1fr)!important;min-height:190px!important}
+ #app .public-v2-products>.market-v2-card>.market-v2-image,
+ #app .public-products>.market-v2-card>.market-v2-image,
+ #app #marketCardsGrid>.market-v2-card>.market-v2-image{min-height:190px!important}
+}
+</style>
 </body>
 </html>
