@@ -4574,6 +4574,38 @@ function render(){
 window.addEventListener("error",e=>console.error("BuSAF:",e.message));
 window.addEventListener("unhandledrejection",e=>console.error("BuSAF:",e.reason));
 
+// Chargement commun des données de l'espace après restauration Auth.
+ // Le premier rendu ne doit pas être confondu avec un chargement des données :
+ // start() affiche l'espace avant Supabase et doit ensuite déclencher ses lectures métier.
+ let busafWorkspaceLoadPromise=null;
+ async function loadActiveWorkspaceData(){
+  if(busafWorkspaceLoadPromise)return busafWorkspaceLoadPromise;
+  if(!state.userId||!state.token)return;
+  const task=(async()=>{
+   if(!state.profile?.id){
+    try{await loadProfile();}catch(e){console.warn("Profil BuSAF en attente de synchronisation :",e.message||e);}
+   }
+   if(!state.profile?.id)return;
+   if(isFounder()){
+    if(!state.founderStats?.loadedAt||Date.now()-state.founderStats.loadedAt>60000){
+     try{await founderLoadStats();if(state.screen==="founder")render();}
+     catch(e){console.warn("Indicateurs fondateur en attente :",e.message||e);}
+    }
+   }else{
+    // Au démarrage, le tableau de bord membre était affiché sans charger ses métriques.
+    // Ces lectures sont idempotentes/cachées et ne modifient aucune donnée métier.
+    await Promise.allSettled([
+     loadMemberHomeMetrics(),
+     loadMemberWalletBalance(),
+     loadMemberSalesProgress()
+    ]);
+   }
+  })();
+  busafWorkspaceLoadPromise=task;
+  try{return await task;}
+  finally{if(busafWorkspaceLoadPromise===task)busafWorkspaceLoadPromise=null;}
+ }
+
 // Actualisation automatique au retour dans l'application ou après une coupure Internet.
 // Aucun bouton « Actualiser » ni rechargement complet de la page n'est nécessaire.
 let busafLastAutoRefresh=0;
@@ -4613,6 +4645,7 @@ async function resumeBusafAfterReturn(){
      history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
     }
     render();
+    loadActiveWorkspaceData().catch(e=>console.warn("Reprise des données de l'espace BuSAF :",e));
    }
   }
   await refreshVisibleBusafData();
@@ -4670,6 +4703,7 @@ async function start(){
         state.screen="member";
         history.replaceState({busafScreen:state.screen},"",location.pathname+"#"+state.screen);
         render();
+        loadActiveWorkspaceData().catch(e=>console.warn("Chargement initial de l'espace BuSAF :",e));
         syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
         initBusafRealtime().catch(e=>console.warn("Realtime BuSAF indisponible :",e));
         syncSharedBusafEvents().catch(e=>console.warn("Événements non synchronisés :",e));
