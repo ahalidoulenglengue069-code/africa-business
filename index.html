@@ -5261,5 +5261,62 @@ html[data-busaf-theme] #app .profile-logout.btn.red{
 }
 #app .profile-logout.btn.red:active{background:#a91f1f!important;background-image:none!important}
 </style>
+
+<style id="busaf-market-horizontal-photo-fill">
+/* Cartes du catalogue : photo pleine hauteur à gauche, détails à droite */
+.market-page-v2 .public-v2-products,
+.public-v2-market .public-v2-products{
+ display:grid!important;
+ grid-template-columns:minmax(0,1fr)!important;
+ gap:12px!important;
+}
+.market-page-v2 .market-v2-card,
+.public-v2-market .market-v2-card{
+ display:grid!important;
+ grid-template-columns:minmax(118px,40%) minmax(0,1fr)!important;
+ align-items:stretch!important;
+ min-height:210px!important;
+ padding:0!important;
+ overflow:hidden!important;
+}
+.market-page-v2 .market-v2-image,
+.public-v2-market .market-v2-image{
+ position:relative!important;
+ width:100%!important;
+ height:100%!important;
+ min-height:210px!important;
+ aspect-ratio:auto!important;
+ overflow:hidden!important;
+ background:#edf3ee!important;
+}
+.market-page-v2 .market-v2-image img,
+.public-v2-market .market-v2-image img{
+ position:absolute!important;
+ inset:0!important;
+ display:block!important;
+ width:100%!important;
+ height:100%!important;
+ max-width:none!important;
+ object-fit:cover!important;
+ object-position:center!important;
+}
+.market-page-v2 .market-v2-info,
+.public-v2-market .market-v2-info{
+ min-width:0!important;
+ padding:11px!important;
+ gap:7px!important;
+ justify-content:center!important;
+}
+.market-page-v2 .market-v2-info p,
+.public-v2-market .market-v2-info p{min-height:0!important}
+@media(max-width:380px){
+ .market-page-v2 .market-v2-card,
+ .public-v2-market .market-v2-card{grid-template-columns:minmax(105px,38%) minmax(0,1fr)!important;min-height:190px!important}
+ .market-page-v2 .market-v2-image,
+ .public-v2-market .market-v2-image{min-height:190px!important}
+ .market-page-v2 .market-v2-info,
+ .public-v2-market .market-v2-info{padding:8px!important}
+}
+</style>
 </body>
 </html>
