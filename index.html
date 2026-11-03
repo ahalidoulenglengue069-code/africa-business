@@ -1108,6 +1108,7 @@ input,textarea,select{border-radius:12px!important}
 .market-v2-promo-label{display:inline-flex;align-self:flex-start;align-items:center;background:#fff4d9;color:#8a5a00;border:1px solid #f2d99a;border-radius:7px;padding:4px 7px;font-size:9px;font-weight:900}
 .market-v2-earning{display:flex;flex-direction:column;gap:3px;background:#e8f6ec;border:1px solid #cce8d4;border-radius:9px;padding:8px 9px;color:#24613b}.market-v2-earning span{font-size:10px;font-weight:800}.market-v2-earning strong{font-size:17px;line-height:1.2;color:#087a3b;font-weight:950}
 .market-v2-price{font-size:16px;font-weight:900;color:#087a3b}
+.market-v2-compact{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-top:1px}.market-v2-rate{font-size:10px;font-weight:900;color:#24613b;background:#eff8f1;border-radius:7px;padding:5px 7px}.market-v2-gain{font-size:13px;font-weight:950;color:#087a3b}.market-v2-promo-mini{font-size:9px;font-weight:800;color:#8a5a00;background:#fff4d9;border-radius:6px;padding:4px 5px}.market-v2-price span{font-size:10px;font-weight:600;color:#68796e}
 .market-v2-info>button{border:0;border-radius:10px;background:#087a3b;color:#fff;padding:10px 8px;font-size:10px;font-weight:900}
 .public-v2-how>div>small{color:#087a3b}
 .public-v2-feature-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:15px}
@@ -2135,10 +2136,12 @@ function publicProductView(p){
   <div class="market-v2-image">${img}<span>BuSAF MARKET</span></div>
   <div class="market-v2-info"><h3>${esc(p?.nom||'Produit BuSAF')}</h3>
    <p>${esc(p?.description||'Découvrez ce produit du Marché BuSAF.')}</p>
-   <div class="market-v2-benefit"><span>Bénéfice vendeur</span><b>${Number(state.benefitRate||40)} %</b></div>
-   ${state.benefitPromoActive?'<div class="market-v2-promo-label">🎉 Promotion temporaire active</div>':''}
-   <div class="market-v2-earning"><span>💰 Tu peux gagner à la revente</span><strong>${money(price*Number(state.benefitRate||40)/100)}</strong></div>
-   <div class="market-v2-price">${money(price)}</div>
+   <div class="market-v2-compact">
+    <span class="market-v2-rate"> ${Number(state.benefitRate||40)} % revendeur</span>
+    <strong class="market-v2-gain">+ ${money(price*Number(state.benefitRate||40)/100)}</strong>
+    ${state.benefitPromoActive?'<small class="market-v2-promo-mini">🎉 Promo</small>':''}
+   </div>
+   <div class="market-v2-price"><span>Prix :</span> ${money(price)}</div>
    <button onclick="viewMarketProduct('${String(p?.id||'')}')">Voir le produit <span>→</span></button>
   </div>
  </article>`;
