@@ -1992,12 +1992,16 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
 const SUPABASE_URL="https://hbfbocrodyfydvikxbql.supabase.co";
 const SUPABASE_KEY="sb_publishable_a8FQDW_M5Lxamtfn5mNogA_Fcyro_0L";
 let busafRealtime=null;
+let busafRealtimeInitPromise=null;
+let busafEventsSyncPromise=null;
 let busafVideoChannel=null;
 let busafVideoStream=null;
 const busafVideoPeers=new Map();
 const busafVideoId=(globalThis.crypto&&crypto.randomUUID)?crypto.randomUUID():('u-'+Date.now()+'-'+Math.random().toString(36).slice(2));
 async function initBusafRealtime(){
  if(busafRealtime && typeof busafRealtime.channel === "function") return busafRealtime;
+ if(busafRealtimeInitPromise)return busafRealtimeInitPromise;
+ busafRealtimeInitPromise=(async()=>{
  if(!window.supabase?.createClient){
   const cdns=[
    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
@@ -2023,6 +2027,9 @@ async function initBusafRealtime(){
  busafRealtime=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false}});
  if(!busafRealtime || typeof busafRealtime.channel!=="function") { busafRealtime=null; throw new Error("Supabase Realtime est chargé, mais le canal de communication n’est pas disponible."); }
  return busafRealtime;
+ })();
+ try{return await busafRealtimeInitPromise;}
+ finally{busafRealtimeInitPromise=null;}
 }
 function safeEventText(details){try{return typeof details==='string'?details:JSON.stringify(details||{});}catch(e){return '';}}
 async function logSharedBusafEvent(event_type,title,details={}){
@@ -2031,6 +2038,8 @@ async function logSharedBusafEvent(event_type,title,details={}){
 }
 async function syncSharedBusafEvents(){
  if(!state.userId||!state.token)return;
+ if(busafEventsSyncPromise)return busafEventsSyncPromise;
+ busafEventsSyncPromise=(async()=>{
  try{
   const rows=await api('/rest/v1/busaf_events?user_id=is.null&select=id,event_type,title,details,created_at&order=created_at.desc&limit=50');
   if(!Array.isArray(rows))return; let changed=false;
@@ -2043,6 +2052,9 @@ async function syncSharedBusafEvents(){
   }
   if(changed){state.notifications=state.notifications.slice(-100).reverse();saveState();render();}
  }catch(e){console.warn('Notifications BuSAF non synchronisées:',e);}
+ })();
+ try{return await busafEventsSyncPromise;}
+ finally{busafEventsSyncPromise=null;}
 }
 async function syncMeetingsFromServer(){
  if(!state.userId||!state.token)return;
@@ -3444,7 +3456,7 @@ async function stopBenefitPromo(){
 async function loadMarketCatalog(force=false){
  if(state.marketCatalogLoaded&&!force)return state.marketCatalog;
  // Partager la même requête si l'accueil public et la session se chargent ensemble.
- if(state.marketCatalogPromise&&!force)return state.marketCatalogPromise;
+ if(state.marketCatalogPromise)return state.marketCatalogPromise;
  const request=(async()=>{
   try{
    // Cette requête fonctionne aussi pour un visiteur non connecté grâce à la policy anon SELECT.
@@ -4661,7 +4673,7 @@ async function start(){
         syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
         initBusafRealtime().catch(e=>console.warn("Realtime BuSAF indisponible :",e));
         syncSharedBusafEvents().catch(e=>console.warn("Événements non synchronisés :",e));
-        if(!window.busafSyncTimer)window.busafSyncTimer=setInterval(()=>{syncSharedBusafEvents();},30000);
+        if(!window.busafSyncTimer)window.busafSyncTimer=setInterval(()=>{syncSharedBusafEvents();},60000);
       }
       return authenticated;
     }).catch(e=>{
