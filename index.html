@@ -2273,18 +2273,18 @@ async function api(path,options={}){
 }
 async function loadProfile(){
  if(!state.userId||!state.token){state.profile=null;return null;}
- const path=`/rest/v1/profils_busaf?user_id=eq.${encodeURIComponent(state.userId)}&select=*`;
- // GET simple sans en-têtes personnalisés : évite le précontrôle CORS OPTIONS sur mobile.
+ // RPC sécurisé : renvoie uniquement le profil lié au jeton Auth courant.
+ // Il évite l'évaluation de la politique RLS fondateur lors de chaque connexion membre.
  let rows,lastError;
  for(let attempt=0;attempt<2;attempt++){
   try{
-   rows=await api(path,{method:"GET",timeoutMs:15000});
+   rows=await api("/rest/v1/rpc/busaf_mon_profil_actuel",{method:"POST",body:"{}",timeoutMs:15000});
    lastError=null;
    break;
   }catch(e){
    lastError=e;
    if(attempt===0&&String(e?.message||"").includes("délai de 15 s")){
-    await new Promise(resolve=>setTimeout(resolve,250));
+    await new Promise(resolve=>setTimeout(resolve,350));
     continue;
    }
    throw new Error("Authentification réussie, mais lecture du profil BuSAF interrompue : "+(e?.message||"réseau lent")+". Ton profil n'a pas été recréé.");
