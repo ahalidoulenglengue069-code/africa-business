@@ -2143,7 +2143,7 @@ function publicProductView(p){
    (state.benefitPromoActive?'<small class="market-v2-promo-mini">🎉 Promotion temporaire active</small>':'')+'</div>'+
    '<div class="market-v2-earning"><span>💰 Gain possible à la revente</span><strong>+ '+money(gain)+'</strong></div>'+
    '<div class="market-v2-price"><span>Prix du produit</span><strong>'+money(price)+'</strong></div>'+
-   '<button onclick="viewMarketProduct(\\''+String(p?.id||'')+'\\')">Voir le produit <span>→</span></button>'+
+   '<button data-product-id="'+esc(String(p?.id||''))+'" onclick="viewMarketProduct(this.dataset.productId)">Voir le produit <span>→</span></button>'+
   '</div></article>';
 }
 function productForId(id){
