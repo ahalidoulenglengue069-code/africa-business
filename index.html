@@ -2633,23 +2633,56 @@ async function sendForgotPassword(){
  const email=document.getElementById("forgotEmail")?.value.trim();
  if(!email){alert("Adresse e-mail obligatoire.");return;}
  try{
-  await api("/auth/v1/recover",{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,redirect_to:location.origin+location.pathname})});
+  const redirectTo=location.origin+location.pathname;
+  await api("/auth/v1/recover?redirect_to="+encodeURIComponent(redirectTo),{method:"POST",headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email})});
   closeModal();
   openModal("📩 Demande envoyée",`<div class="notice success">Si cette adresse correspond à un compte BuSAF, les instructions de récupération ont été envoyées.</div><button class="btn" onclick="closeModal()">OK</button>`);
  }catch(e){alert("❌ "+e.message)}
 }
 function confirmLogout(){
  if(!state.token || !state.userId){ setScreen("public"); return; }
- openModal("🔐 Déconnexion", `
-  <div class="notice warning">Voulez-vous vraiment vous déconnecter de BuSAF ?</div>
-  <div class="notice">La session actuellement ouverte sera fermée sur cet appareil. Ton compte, ton profil et tes données resteront inchangés.</div>
+ openModal("🔐 Vérification avant déconnexion", `
+  <div class="notice warning">Pour protéger ton compte, confirme ton adresse e-mail et ton mot de passe avant de te déconnecter.</div>
+  <label>E-mail du compte connecté</label>
+  <input id="logoutEmail" type="email" autocomplete="username" required value="${esc(state.email||"")}">
+  <label>Mot de passe actuel</label>
+  <div class="password-field"><input id="logoutPassword" type="password" autocomplete="current-password" required placeholder="Entre ton mot de passe"><button class="password-toggle" type="button" onclick="togglePasswordVisibility('logoutPassword',this)" aria-label="Afficher le mot de passe">👁️</button></div>
+  <div id="logoutVerifyMsg" class="notice hidden"></div>
   <div class="row">
-   <button class="btn alt" onclick="closeModal()">ANNULER</button>
-   <button class="btn red" onclick="performLogout()">OUI, ME DÉCONNECTER</button>
+   <button class="btn alt" type="button" onclick="closeModal()">ANNULER</button>
+   <button class="btn red" id="logoutVerifyBtn" type="button" onclick="verifyAndLogout()">VÉRIFIER ET ME DÉCONNECTER</button>
   </div>
  `);
 }
 function logout(){ confirmLogout(); }
+async function verifyAndLogout(){
+ const email=String(document.getElementById("logoutEmail")?.value||"").trim().toLowerCase();
+ const password=document.getElementById("logoutPassword")?.value||"";
+ const msg=document.getElementById("logoutVerifyMsg");
+ const btn=document.getElementById("logoutVerifyBtn");
+ const currentEmail=String(state.email||"").trim().toLowerCase();
+ const showError=(message)=>{if(msg){msg.className="notice error";msg.textContent="❌ "+message;}};
+ if(!email||!password){showError("Entre l’adresse e-mail et le mot de passe de ton compte.");return;}
+ if(email!==currentEmail){showError("L’adresse e-mail doit correspondre au compte actuellement connecté.");return;}
+ if(!state.userId||!state.token){showError("La session BuSAF n’est plus active. Reconnecte-toi.");return;}
+ if(btn){btn.disabled=true;btn.textContent="VÉRIFICATION…";}
+ if(msg){msg.className="notice";msg.textContent="Vérification sécurisée auprès de Supabase…";}
+ try{
+  const verified=await api("/auth/v1/token?grant_type=password",{method:"POST",timeoutMs:20000,headers:{Authorization:"Bearer "+SUPABASE_KEY},body:JSON.stringify({email,password})});
+  if(!verified?.access_token||!verified?.user?.id||String(verified.user.id)!==String(state.userId)||String(verified.user.email||"").trim().toLowerCase()!==currentEmail){
+   throw new Error("Les identifiants ne correspondent pas au compte actuellement connecté.");
+  }
+  // La vérification par mot de passe crée un jeton Auth temporaire : on le révoque
+  // immédiatement, puis performLogout ferme la session déjà ouverte dans BuSAF.
+  try{
+   await api("/auth/v1/logout?scope=local",{method:"POST",timeoutMs:8000,headers:{Authorization:"Bearer "+verified.access_token}});
+  }catch(revokeError){console.warn("Révocation de la session temporaire de vérification :",revokeError);}
+  await performLogout();
+ }catch(e){
+  showError(e?.message||"Vérification impossible. Vérifie ton e-mail et ton mot de passe.");
+  if(btn){btn.disabled=false;btn.textContent="VÉRIFIER ET ME DÉCONNECTER";}
+ }
+}
 async function performLogout(){
  const oldEmail=state.email;
  const btn=document.querySelector(".modalbox .btn.red");
