@@ -2044,7 +2044,7 @@ async function syncSharedBusafEvents(){
  if(busafEventsSyncPromise)return busafEventsSyncPromise;
  busafEventsSyncPromise=(async()=>{
  try{
-  const rows=await api('/rest/v1/busaf_events?or=(user_id.is.null,user_id.eq.${encodeURIComponent(state.userId)})&select=id,event_type,title,details,created_at&order=created_at.desc&limit=50');
+  const rows=await api('/rest/v1/busaf_events?or=(user_id.is.null,user_id.eq.'+encodeURIComponent(state.userId)+')&select=id,event_type,title,details,created_at&order=created_at.desc&limit=50');
   if(!Array.isArray(rows))return; let changed=false;
   for(const ev of rows.reverse()){
    const sid='server-event-'+String(ev.id); if((state.dismissedServerNotifications||[]).includes(sid)||state.notifications.some(n=>n.serverId===sid))continue;
