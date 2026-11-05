@@ -1967,6 +1967,16 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
 }
 </style>
 
+
+<style id="busaf-values-details">
+.public-v2-values-points details{border:1px solid #ffffff35;background:#ffffff12;border-radius:15px;color:#f1fff4;overflow:hidden}
+.public-v2-values-points summary{list-style:none;cursor:pointer;padding:15px 16px;font-size:clamp(14px,2vw,17px);font-weight:750;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.public-v2-values-points summary::-webkit-details-marker{display:none}
+.public-v2-values-points summary::after{content:"＋";font-size:20px;font-weight:500;opacity:.9;flex:0 0 auto}
+.public-v2-values-points details[open] summary::after{content:"−"}
+.public-v2-values-points details p{margin:0;padding:0 16px 16px;color:#e0eee5;font-size:14px;line-height:1.6}
+.public-v2-values-points details[open]{background:#ffffff1c;border-color:#ffffff65}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
@@ -2914,7 +2924,12 @@ function publicHome(){
     <button onclick="setScreen('rules')"><span>🛡️</span><b>Conditions claires</b><small>Prends connaissance des règles avant de participer.</small></button>
    </div>
   </section>
-  <section class="public-v2-values"><div><small>L’ESPRIT BuSAF</small><h2>La motivation ouvre la voie. L’action fait la différence.</h2><p>Construis avec patience. Informe-toi avant chaque achat. Suis tes résultats et avance avec sérieux. BuSAF est un espace pour entreprendre, apprendre et saisir des opportunités numériques.</p></div><div class="public-v2-values-points"><span>✓ Apprendre en avançant</span><span>✓ Agir avec responsabilité</span><span>✓ Développer son réseau direct</span><span>✓ Suivre ses opérations clairement</span></div></section>
+  <section class="public-v2-values"><div><small>L’ESPRIT BuSAF</small><h2>La motivation ouvre la voie. L’action fait la différence.</h2><p>Construis avec patience. Informe-toi avant chaque achat. Suis tes résultats et avance avec sérieux. BuSAF est un espace pour entreprendre, apprendre et saisir des opportunités numériques.</p></div><div class="public-v2-values-points">
+   <details><summary>✓ Apprendre en avançant</summary><p>Découvre les produits numériques, lis leurs descriptions et prends le temps de comprendre leur utilité, leur prix et les conditions avant de commencer.</p></details>
+   <details><summary>✓ Agir avec responsabilité</summary><p>Vérifie les informations avant chaque achat ou revente. Engage-toi seulement lorsque tu comprends les conditions et les étapes de l’opération.</p></details>
+   <details><summary>✓ Développer son réseau direct</summary><p>Partage ton code ou ton lien de parrainage pour inviter directement de nouveaux membres. Les commissions éventuelles suivent les règles BuSAF et dépendent des opérations éligibles et validées.</p></details>
+   <details><summary>✓ Suivre ses opérations clairement</summary><p>Consulte dans ton espace les informations disponibles sur tes commandes, achats, ventes, commissions et mouvements de portefeuille. Un paiement n’est considéré comme confirmé qu’après validation effective.</p></details>
+  </div></section>
   <section class="public-v2-bottom"><h2>Ton prochain chapitre peut commencer ici.</h2><p>Fais le premier pas : découvre le marché et rejoins la communauté BuSAF.</p><button onclick="setScreen('signup')">Créer mon compte BuSAF →</button></section>
  </div>`;
 }
