@@ -4172,7 +4172,7 @@ async function loadMemberProfits(){
    api('/rest/v1/rpc/busaf_solde_compte_fondateur',{method:'POST',body:JSON.stringify({p_profil_id:state.profile.id,p_compte:'Compte Marché'}),timeoutMs:12000})
   ]);
   const confirmed=(Array.isArray(commissions)?commissions:[]).filter(x=>x.statut==='confirmee');
-  const seller=confirmed.filter(x=>(x.type_commission==='benefice_vendeur_12'||x.type_commission==='benefice_vendeur_40')).reduce((n,x)=>n+Number(x.montant||0),0);
+  const seller=confirmed.filter(x=>(x.type_commission==='benefice_vendeur_12'||x.type_commission==='benefice_vendeur_40'||x.type_commission==='benefice_vendeur_promo')).reduce((n,x)=>n+Number(x.montant||0),0);
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
   const balance=Number(balanceResult);
   if(!Number.isFinite(balance))throw new Error('Solde du portefeuille invalide.');
@@ -4191,7 +4191,7 @@ async function loadMemberCommissions(){
   const rows=await api('/rest/v1/busaf_commissions?select=id,type_commission,taux,montant,statut,vente_id,revente_id,created_at&beneficiaire_id=eq.'+encodeURIComponent(state.profile.id)+'&order=created_at.desc&limit=100',{timeoutMs:15000});
   const confirmed=(Array.isArray(rows)?rows:[]).filter(x=>x.statut==='confirmee');
   const referral=confirmed.filter(x=>x.type_commission==='parrain_direct_7').reduce((n,x)=>n+Number(x.montant||0),0);
-  const seller=confirmed.filter(x=>(x.type_commission==='benefice_vendeur_12'||x.type_commission==='benefice_vendeur_40')).reduce((n,x)=>n+Number(x.montant||0),0);
+  const seller=confirmed.filter(x=>(x.type_commission==='benefice_vendeur_12'||x.type_commission==='benefice_vendeur_40'||x.type_commission==='benefice_vendeur_promo')).reduce((n,x)=>n+Number(x.montant||0),0);
   summary.innerHTML='<div class="statgrid"><div class="stat">Commissions parrain direct<strong>'+money(referral)+' FCFA</strong></div><div class="stat">Bénéfices vendeur<strong>'+money(seller)+' FCFA</strong></div></div>';
   rowsBox.innerHTML=confirmed.length?'<h3 class="section-title">Historique confirmé</h3><div class="list">'+confirmed.map(x=>'<li><strong>'+(x.type_commission==='parrain_direct_7'?'🤝 Parrain direct (7 %)':(x.type_commission==='benefice_vendeur_40'?'💰 Bénéfice vendeur (40 %)':(x.type_commission==='benefice_vendeur_promo'?'🎉 Bénéfice promotionnel ('+Number(x.taux||0)+' %)':'💰 Bénéfice vendeur ('+Number(x.taux||40)+' %)')))+'</strong><br>'+money(x.montant)+' FCFA<br><small>'+esc(x.created_at||'')+'</small></li>').join('')+'</div>':'<div class="empty">Aucune commission confirmée pour le moment. Elles apparaîtront automatiquement après confirmation du paiement.</div>';
  }catch(e){
