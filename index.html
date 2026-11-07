@@ -2015,23 +2015,16 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
 </style>
 
 <style id="busaf-founder-treasury-color-v2">
-/* Espace fondateur : trésorerie marron doux, texte très lisible. */
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-wallet-hero{
- background:linear-gradient(130deg,#6b4630 0%,#80583b 58%,#9a7050 100%)!important;
+/* Marron forcé sur le seul encadré de trésorerie fondateur. */
+#app .founder-wallet-hero,html #app section.founder-wallet-hero{
+ background:#80583b!important;
+ background-image:linear-gradient(130deg,#65432f 0%,#80583b 58%,#9a7050 100%)!important;
  border:1px solid #b18b69!important;
  box-shadow:0 8px 22px rgba(65,42,27,.16)!important;
  color:#fffaf4!important;
 }
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-wallet-hero .wallet-hero-top,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-wallet-hero>small,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-wallet-hero>strong,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-wallet-hero>strong i,
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-wallet-hero>p{
- color:#fffaf4!important;opacity:1!important;
-}
-html[data-busaf-theme]:not([data-busaf-theme="public"]) #app .founder-wallet-hero .wallet-live{
- background:rgba(255,255,255,.15)!important;border:1px solid rgba(255,250,244,.35)!important;color:#fffaf4!important;
-}
+#app .founder-wallet-hero *{color:#fffaf4!important;opacity:1!important}
+#app .founder-wallet-hero .wallet-live{background:rgba(255,255,255,.15)!important;border:1px solid rgba(255,250,244,.35)!important}
 </style>
 </head>
 <body>
