@@ -1980,6 +1980,21 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
 .busaf-value-item.is-open>button span{font-size:0}
 .busaf-value-item.is-open>button span:after{content:"−";font-size:20px}
 </style>
+
+<style id="busaf-product-frame-requested-v1">
+/* Format produit demandé : photo à gauche, informations et gain à droite. */
+#app .public-v2-products,#app .public-products,#app #marketCardsGrid{display:flex!important;flex-direction:column!important;gap:12px!important;width:100%!important}
+#app .public-v2-products>.market-v2-card,#app .public-products>.market-v2-card,#app #marketCardsGrid>.market-v2-card{display:flex!important;flex-direction:row!important;align-items:stretch!important;min-height:0!important;width:100%!important;overflow:hidden!important}
+#app .market-v2-card>.market-v2-image{flex:0 0 36%!important;width:36%!important;min-width:105px!important;min-height:185px!important;align-self:stretch!important}
+#app .market-v2-card>.market-v2-info{gap:7px!important;padding:11px!important;justify-content:flex-start!important}
+#app .market-v2-info h3{font-size:clamp(14px,3.7vw,18px)!important;line-height:1.2!important}
+#app .market-v2-info p{-webkit-line-clamp:2!important;font-size:11px!important;line-height:1.35!important}
+#app .market-v2-rate{padding:5px 8px!important;font-size:11px!important}
+#app .market-v2-earning{padding:7px 9px!important;gap:3px!important}
+#app .market-v2-earning strong{font-size:clamp(16px,4.2vw,21px)!important}
+#app .market-v2-info>button{min-height:38px!important}
+@media(max-width:380px){#app .market-v2-card>.market-v2-image{flex-basis:35%!important;width:35%!important;min-width:98px!important;min-height:175px!important}#app .market-v2-card>.market-v2-info{padding:9px!important;gap:6px!important}}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
