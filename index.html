@@ -1995,6 +1995,24 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
 #app .market-v2-info>button{min-height:38px!important}
 @media(max-width:380px){#app .market-v2-card>.market-v2-image{flex-basis:35%!important;width:35%!important;min-width:98px!important;min-height:175px!important}#app .market-v2-card>.market-v2-info{padding:9px!important;gap:6px!important}}
 </style>
+
+<style id="busaf-product-frame-compact-final-v2">
+/* Correction finale : limiter réellement la hauteur des cartes sur mobile. */
+#app .public-v2-products>.market-v2-card,#app .public-products>.market-v2-card,#app #marketCardsGrid>.market-v2-card{display:flex!important;flex-direction:row!important;align-items:stretch!important;min-height:0!important;height:176px!important;max-height:176px!important;overflow:hidden!important}
+#app .public-v2-products>.market-v2-card>.market-v2-image,#app .public-products>.market-v2-card>.market-v2-image,#app #marketCardsGrid>.market-v2-card>.market-v2-image{flex:0 0 34%!important;width:34%!important;min-width:0!important;height:176px!important;min-height:0!important;max-height:176px!important;align-self:stretch!important;overflow:hidden!important}
+#app .public-v2-products>.market-v2-card>.market-v2-image img,#app .public-products>.market-v2-card>.market-v2-image img,#app #marketCardsGrid>.market-v2-card>.market-v2-image img{height:100%!important;min-height:0!important;max-height:176px!important;object-fit:cover!important}
+#app .public-v2-products>.market-v2-card>.market-v2-info,#app .public-products>.market-v2-card>.market-v2-info,#app #marketCardsGrid>.market-v2-card>.market-v2-info{min-height:0!important;height:176px!important;max-height:176px!important;padding:7px!important;gap:4px!important;justify-content:space-between!important;overflow:hidden!important}
+#app .market-v2-info h3{font-size:14px!important;line-height:1.1!important}
+#app .market-v2-info p{font-size:10px!important;line-height:1.2!important;-webkit-line-clamp:1!important;min-height:0!important}
+#app .market-v2-rate{padding:4px 6px!important;font-size:10px!important}
+#app .market-v2-earning{padding:5px 7px!important;gap:2px!important}
+#app .market-v2-earning span{font-size:9px!important}
+#app .market-v2-earning strong{font-size:16px!important}
+#app .market-v2-price{font-size:10px!important;gap:2px!important}
+#app .market-v2-price strong{font-size:14px!important}
+#app .market-v2-info>button{min-height:29px!important;height:29px!important;padding:4px 6px!important;font-size:10px!important}
+@media(max-width:380px){#app .public-v2-products>.market-v2-card,#app .public-products>.market-v2-card,#app #marketCardsGrid>.market-v2-card{height:166px!important;max-height:166px!important}#app .public-v2-products>.market-v2-card>.market-v2-image,#app .public-products>.market-v2-card>.market-v2-image,#app #marketCardsGrid>.market-v2-card>.market-v2-image,#app .public-v2-products>.market-v2-card>.market-v2-info,#app .public-products>.market-v2-card>.market-v2-info,#app #marketCardsGrid>.market-v2-card>.market-v2-info{height:166px!important;max-height:166px!important}#app .public-v2-products>.market-v2-card>.market-v2-image img,#app .public-products>.market-v2-card>.market-v2-image img,#app #marketCardsGrid>.market-v2-card>.market-v2-image img{max-height:166px!important}}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
