@@ -3584,7 +3584,7 @@ function openSponsorEligibleProducts(ids,errorMessage){
 }
 async function startMarketPurchase(productId){
  if(!state.userId||!state.token){
-   openModal('🔐 Connexion requise',`<div class="notice warning">Connecte-toi à ton compte BuSAF pour acheter un produit du Marché.</div><button class="btn" onclick="closeModal();setScreen('login')">SE CONNECTER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);
+   openModal('🔐 Connexion requise',`<div class="notice warning busaf-login-required-message" style="display:block!important;visibility:visible!important;opacity:1!important;height:auto!important;min-height:64px!important;padding:14px!important;margin:12px 0 16px!important;background:#fff8e5!important;border:1px solid #e8d69c!important;border-radius:13px!important;color:#493714!important;font-size:15px!important;font-weight:700!important;line-height:1.55!important;white-space:normal!important;overflow:visible!important">👉 Connecte-toi à ton compte BuSAF pour acheter un produit du Marché. 👈</div><button class="btn" style="display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;min-height:44px!important;margin:8px 0!important" onclick="closeModal();setScreen('login')">SE CONNECTER</button><button class="btn alt" style="display:block!important;visibility:visible!important;opacity:1!important;width:100%!important;min-height:44px!important;margin:8px 0!important" onclick="closeModal()">ANNULER</button>`);
    return;
  }
  const product=(state.marketCatalog||[]).find(x=>String(x.id)===String(productId));
