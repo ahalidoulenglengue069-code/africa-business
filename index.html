@@ -3531,7 +3531,7 @@ async function loadMarketCatalog(force=false){
   try{
    // Cette requête fonctionne aussi pour un visiteur non connecté grâce à la policy anon SELECT.
    // Le Marché accepte les produits numériques et physiques ; les archives sont masquées.
-   const [rows]=await Promise.all([api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url&order=created_at.desc'),loadCurrentBenefit().catch(e=>console.warn('Taux de bénéfice BuSAF:',e))]);
+   const [rows]=await Promise.all([api('/rest/v1/produits?select=id,nom,description,prix,type_produit,createur_id,created_at,image_url,archived_at&archived_at=is.null&order=created_at.desc'),loadCurrentBenefit().catch(e=>console.warn('Taux de bénéfice BuSAF:',e))]);
 
    state.marketCatalog=Array.isArray(rows)?rows.filter(p=>String(p.type_produit||'').toLowerCase()==='digital'):[];
    state.marketCatalogLoaded=true;
@@ -3634,26 +3634,27 @@ async function deleteMarketProduct(id){
  if(!marketCanPublish()){alert('Seul le fondateur peut gérer les produits du Marché.');return;}
  const p=(state.marketCatalog||[]).find(x=>String(x.id)===String(id));
  if(!p)return;
- if(!confirm(`Supprimer « ${p.nom||'ce produit'} » du Marché ?`))return;
+ if(!confirm(`Retirer « ${p.nom||'ce produit'} » du Marché ? Le produit sera masqué aux acheteurs, mais son historique de ventes, ses achats et ses commissions seront conservés.`))return;
  try{
-   await api(`/rest/v1/produits?id=eq.${encodeURIComponent(id)}`,{
-     method:'DELETE',
-     headers:{'Prefer':'return=minimal'}
+   // Archivage logique : ne jamais effacer un produit référencé par les ventes,
+   // les achats ou les stocks. L'historique financier reste intact.
+   const archived=await api(`/rest/v1/produits?id=eq.${encodeURIComponent(id)}&archived_at=is.null&select=id`,{
+     method:'PATCH',
+     headers:{'Prefer':'return=representation'},
+     body:JSON.stringify({archived_at:new Date().toISOString()})
    });
-
-   // On retire immédiatement le produit de la mémoire locale.
-   // Puis on recharge obligatoirement depuis Supabase afin qu'il ne réapparaisse
-   // ni dans l'espace Fondateur, ni dans le Marché public, ni sur un autre écran.
+   if(!Array.isArray(archived)||!archived.some(x=>String(x.id)===String(id))){
+     throw new Error('Supabase n’a pas confirmé le retrait du produit. Vérifie les droits du fondateur.');
+   }
    state.marketCatalog=(state.marketCatalog||[]).filter(x=>String(x.id)!==String(id));
    state.marketCatalogLoaded=true;
    render();
-
-   // Vérification réelle auprès de Supabase.
    state.marketCatalogLoaded=false;
    await loadMarketCatalog(true);
    render();
+   alert('✅ Produit retiré du Marché. Les ventes et les commissions historiques sont conservées.');
  }catch(e){
-   alert('❌ Suppression impossible : '+e.message);
+   alert('❌ Retrait impossible : '+(e.message||'Erreur serveur'));
  }
 }
 function requestPhysicalPurchase(id){
@@ -5596,7 +5597,19 @@ html[data-busaf-theme] #app .profile-logout.btn.red{
 @media(max-width:380px){
  #app .public-v2-products>.market-v2-card,
  #app .public-products>.market-v2-card,
- #app #marketCardsGrid>.market-v2-card{grid-template-columns:minmax(96px,33%) minmax(0,1fr)!important}
+ #app #marketCardsGrid>.market-v2-card{grid-template-columns:minmax(96
+<style id="busaf-founder-delete-button-red-fix">
+/* Le bouton SUPPRIMER du Marché fondateur doit rester rouge malgré les thèmes. */
+#app .founder-product .founder-actions button.btn.red,
+html[data-busaf-theme] #app .founder-product .founder-actions button.btn.red,
+html[data-busaf-theme] #app.founder-mode .founder-product .founder-actions button.btn.red{
+  background:#c62828!important;background-color:#c62828!important;background-image:none!important;
+  color:#fff!important;border:1px solid #a91f1f!important;
+  box-shadow:0 3px 9px rgba(160,20,20,.18)!important;
+}
+#app .founder-product .founder-actions button.btn.red:active{background:#a91f1f!important;background-image:none!important}
+</style>
+px,33%) minmax(0,1fr)!important}
  #app .public-v2-products>.market-v2-card>.market-v2-info,
  #app .public-products>.market-v2-card>.market-v2-info,
  #app #marketCardsGrid>.market-v2-card>.market-v2-info{padding:7px!important;gap:5px!important}
