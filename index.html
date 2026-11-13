@@ -3518,7 +3518,7 @@ function openSupportReply(id){
 async function saveSupportReply(id){
  const reponse=(document.getElementById('supportReplyText')?.value||'').trim(),statut=document.getElementById('supportReplyStatus')?.value||'en_cours';
  if(!reponse){alert('Écris une réponse avant de continuer.');return;}
- try{await api('/rest/v1/busaf_contact_requests?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({reponse,statut,repondu_par:state.userId,repondu_le:new Date().toISOString(),updated_at:new Date().toISOString()})});closeModal();await refreshFounderSupport();alert('Réponse enregistrée. Le membre peut la consulter dans son suivi.');}
+ try{await api('/rest/v1/busaf_contact_requests?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({reponse,statut,repondu_par:state.userId,repondu_le:new Date().toISOString(),updated_at:new Date().toISOString()})});const req=(state.supportRequests||[]).find(x=>String(x.id)===String(id));const target=(state.supportProfiles||{})[req?.profil_id]?.user_id;if(target){try{await api('/rest/v1/busaf_events',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({event_type:'assistance_reponse',title:'📨 Le fondateur a répondu à ta demande',details:{request_id:id,objet:req?.objet||''},user_id:target})});}catch(notifyError){console.warn('Notification assistance non envoyée:',notifyError);}}closeModal();await refreshFounderSupport();alert('Réponse enregistrée. Le membre peut la consulter dans son suivi.');}
  catch(e){alert('Échec de la réponse : '+(e.message||e));}
 }
 function memberSupportRequests(){
