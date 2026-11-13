@@ -3494,7 +3494,7 @@ async function sendContactRequest(){const sujet=(document.getElementById('contac
 
 async function loadSupportRequests(founder){
  const rows=await api('/rest/v1/busaf_contact_requests?select=id,profil_id,nom,email,objet,message,statut,created_at,reponse,repondu_le&order=created_at.desc&limit=200');
- state.supportRequests=Array.isArray(rows)?rows:[];state.supportRequestsLoaded=true;
+ state.supportRequests=Array.isArray(rows)?rows:[];if(founder)state.founderSupportLoaded=true;else state.memberSupportLoaded=true;
  if(founder){
   const ids=[...new Set(state.supportRequests.map(x=>x.profil_id).filter(Boolean))];
   state.supportProfiles={};
@@ -4667,7 +4667,7 @@ function render(){
       if(state.screen==='founderMembers' && !state.founderMembersLoaded && !state.founderMembersLoading){ setTimeout(()=>refreshFounderMembers(),0); }
       if(state.screen==='founderPayments' && !state.founderPaymentsLoaded && !state.founderPaymentsLoading){ setTimeout(()=>refreshFounderPayments(),0); }
       if(state.screen==='founderDirectInvites' && !state.directInvitesLoaded && !state.directInvitesLoading){ setTimeout(()=>loadDirectInvites().then(()=>{if(state.screen==='founderDirectInvites')render();}),0); }
-      if(state.screen==='founderSupport' && !state.supportRequestsLoaded){ setTimeout(()=>refreshFounderSupport(),0); }
+      if(state.screen==='founderSupport' && !state.founderSupportLoaded){ setTimeout(()=>refreshFounderSupport(),0); }
       if(state.screen==='founderStocks' && !state.marketCatalogLoaded){ setTimeout(()=>refreshMarketCatalog(),0); }
    }else{
     const map={
