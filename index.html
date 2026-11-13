@@ -1158,6 +1158,10 @@ input,textarea,select{border-radius:12px!important}
 .busaf-header-right{display:flex;align-items:center;gap:8px}.busaf-header-right button{border:0;border-radius:11px;padding:10px 13px;font-weight:850}
 .busaf-login-link{background:#edf5ef;color:#12643a}.busaf-signup-link{background:#087a3b;color:#fff}.busaf-profile-shortcut{background:#edf5ef;color:#12643a;font-size:20px}
 .busaf-workspace-page{max-width:1080px;margin:18px auto 34px;padding:0 14px 20px}
+.workspace-notif-button{margin-left:auto;position:relative;flex:0 0 auto;min-width:44px;height:42px;padding:0 12px;border:1px solid #dce9df;border-radius:13px;background:#eef7f0;color:#087a3b;font-size:19px;font-weight:900;display:inline-flex;align-items:center;justify-content:center;gap:6px;box-shadow:0 3px 10px #173c240d}
+.workspace-notif-button .workspace-notif-count{position:absolute;top:-7px;right:-6px;min-width:19px;height:19px;padding:0 5px;border-radius:99px;background:#e53935;color:#fff;font-size:11px;line-height:19px;text-align:center;border:2px solid #fff;font-weight:1000}
+.founder-v2-notif{margin-left:auto;border:1px solid #ffffff55;background:#ffffff18;color:#fff;border-radius:12px;min-width:44px;height:42px;font-size:20px}
+.member-v2-bell{position:relative}
 .busaf-page-heading{display:flex;align-items:center;gap:12px;margin:8px 0 18px}
 .busaf-back{flex:0 0 42px;width:42px;height:42px;border:0;border-radius:13px;background:#eaf4ed;color:#087a3b;font-size:22px;font-weight:900}
 .busaf-page-heading small{display:block;color:#16804a;font-size:9px;font-weight:950;letter-spacing:1.5px}
@@ -3000,7 +3004,7 @@ function founderHome(){
  const pending=Number(stats.pending||0);
  const tile=(id,ico,label,sub,cls)=>`<button class="founder-v2-tile ${cls}" onclick="setScreen('${id}')"><span>${ico}</span><b>${label}</b><small>${sub}</small><i>Ouvrir →</i></button>`;
  return `<div class="founder-v2">
-  <section class="founder-v2-hero"><div class="founder-v2-brand"><div><span>BuSAF</span><small>BUSINESS AFRICAIN · ADMINISTRATION</small></div></div><div class="founder-v2-founder-profile"><div class="founder-v2-founder-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo du fondateur">':'<span>👑</span><small>Photo du fondateur</small>'}</div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR · COMPTE OFFICIEL</small><h1>${esc(name)}</h1><p>👑 Fondateur BuSAF</p><div class="founder-v2-founder-meta">${esc(countryFlag(founderCountry))} ${esc(founderCountry)} · 📱 ${esc(founderPhone)}</div><div class="founder-v2-founder-code" style="display:flex!important;flex-wrap:wrap;align-items:center;gap:6px;width:max-content;max-width:100%;margin-top:10px;padding:9px 12px;background:#fff4cf!important;border:2px solid #e4bd58!important;border-radius:10px;color:#173b29!important;font-size:12px!important;font-weight:1000!important;letter-spacing:.4px;line-height:1.35;visibility:visible!important;opacity:1!important;overflow-wrap:anywhere"><span style="color:#71500b!important">🔑 CODE PARRAIN :</span><strong style="color:#173b29!important;font-size:14px!important">${esc(String(profile.code_parrain||"").trim()||"BUSAF-FONDATEUR")}</strong></div></div></div><p class="founder-v2-intro">Centre de contrôle — pilote les activités réelles de la plateforme.</p>
+  <section class="founder-v2-hero"><div class="founder-v2-brand"><div><span>BuSAF</span><small>BUSINESS AFRICAIN · ADMINISTRATION</small></div>${workspaceNotificationButton("founder-v2-notif")}</div><div class="founder-v2-founder-profile"><div class="founder-v2-founder-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo du fondateur">':'<span>👑</span><small>Photo du fondateur</small>'}</div><div class="founder-v2-welcome"><small>ESPACE FONDATEUR · COMPTE OFFICIEL</small><h1>${esc(name)}</h1><p>👑 Fondateur BuSAF</p><div class="founder-v2-founder-meta">${esc(countryFlag(founderCountry))} ${esc(founderCountry)} · 📱 ${esc(founderPhone)}</div><div class="founder-v2-founder-code" style="display:flex!important;flex-wrap:wrap;align-items:center;gap:6px;width:max-content;max-width:100%;margin-top:10px;padding:9px 12px;background:#fff4cf!important;border:2px solid #e4bd58!important;border-radius:10px;color:#173b29!important;font-size:12px!important;font-weight:1000!important;letter-spacing:.4px;line-height:1.35;visibility:visible!important;opacity:1!important;overflow-wrap:anywhere"><span style="color:#71500b!important">🔑 CODE PARRAIN :</span><strong style="color:#173b29!important;font-size:14px!important">${esc(String(profile.code_parrain||"").trim()||"BUSAF-FONDATEUR")}</strong></div></div></div><p class="founder-v2-intro">Centre de contrôle — pilote les activités réelles de la plateforme.</p>
    <div class="founder-v2-stats"><div class="founder-kpi founder-kpi-members"><span>👥</span><small>MEMBRES INSCRITS</small><b>${members}</b></div><div class="founder-kpi founder-kpi-sales"><span>🛒</span><small>VENTES CONFIRMÉES</small><b>${Number(stats.confirmed||0)}</b></div><div class="founder-kpi founder-kpi-products"><span>📦</span><small>PRODUITS PUBLIÉS</small><b>${products}</b></div><div class="founder-kpi founder-kpi-revenue"><span>💳</span><small>MONTANT CONFIRMÉ</small><b>${money(stats.revenue||0)}</b></div></div>
    <div class="founder-v2-hero-actions"><button class="founder-home-refresh" onclick="refreshFounderHomeStats()">↻ Actualiser les données</button><button onclick="setScreen('founderMembers')">👥 Voir les membres</button></div>
   </section>
@@ -3338,7 +3342,7 @@ function memberHome(){
  ];
  return `<div class="member-v2">
   <section class="member-v2-head">
-   <div class="member-v2-brandline"><div class="member-v2-brand"><b>BuSAF</b><small>BUSINESS AFRICAIN</small></div><div class="member-v2-head-tools"><button class="member-v2-bell" onclick="setScreen('notifications')" aria-label="Notifications">🔔</button></div></div>
+   <div class="member-v2-brandline"><div class="member-v2-brand"><b>BuSAF</b><small>BUSINESS AFRICAIN</small></div><div class="member-v2-head-tools">${workspaceNotificationButton("member-v2-bell")}</div></div>
    <div class="member-v2-user"><div class="member-v2-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo de profil">':'👤'}</div><div class="member-v2-identity"><small>BIENVENUE SUR BuSAF</small><h1>${esc(name)}</h1><span>MEMBRE BuSAF</span><div class="member-v2-meta">${esc(countryFlag(country))} ${esc(country)} · 📱 ${esc(phone)}</div></div></div>
    <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong id="memberWalletBalanceHome">${money(state.marketBalance)} FCFA</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
    <div class="member-v2-referral"><div><small>MON CODE DE PARRAINAGE</small><b>${esc(referral)}</b></div><button onclick="invite()">📲 INVITER</button></div>
@@ -3358,7 +3362,7 @@ function memberHome(){
 
 function page(title,body,extra=""){
  return `<section class="busaf-workspace-page">
-  <div class="busaf-page-heading"><button class="busaf-back" onclick="goBack()" aria-label="Retour">←</button><div><small>BuSAF • ESPACE NUMÉRIQUE</small><h1>${title}</h1></div></div>
+  <div class="busaf-page-heading"><button class="busaf-back" onclick="goBack()" aria-label="Retour">←</button><div><small>BuSAF • ESPACE NUMÉRIQUE</small><h1>${title}</h1></div>${workspaceNotificationButton()}</div>
   <div class="busaf-page-content">${body}${extra}</div>
  </section>`;
 }
@@ -4584,6 +4588,10 @@ function unreadNotificationCount(){
 function notificationTopHtml(){
  const n=unreadNotificationCount();
  return `<button class="notif-top" onclick="setScreen('notifications')" aria-label="Notifications">🔔 Notifications${n>0?` <span class="notif-count">${n}</span>`:""}</button>`;
+}
+function workspaceNotificationButton(extraClass=''){
+ const n=unreadNotificationCount();
+ return '<button type="button" class="workspace-notif-button '+extraClass+'" onclick="setScreen(\\'notifications\\')" aria-label="Ouvrir les notifications" title="Notifications">🔔'+(n?'<span class="workspace-notif-count">'+(n>99?'99+':n)+'</span>':'')+'</button>';
 }
 function header(member=false){
  const founder=member&&isFounder();
