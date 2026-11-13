@@ -4786,6 +4786,48 @@ async function refreshVisibleBusafData(){
 // (y compris la rotation du refresh token), puis recharge les données de l'espace actif.
 let busafResumePromise=null;
 let busafLastResumeAt=0;
+// Synchronisation légère de la rubrique actuellement ouverte.
+// Les verrous et caches déjà présents empêchent les lectures concurrentes.
+let busafActiveRefreshPromise=null;
+let busafActiveRefreshAt=0;
+async function refreshActiveWorkspaceData(){
+ const now=Date.now();
+ if(!state.userId||!state.token||document.visibilityState==="hidden")return;
+ if(busafActiveRefreshPromise)return busafActiveRefreshPromise;
+ if(now-busafActiveRefreshAt<20000)return;
+ busafActiveRefreshAt=now;
+ const screen=state.screen;
+ const task=(async()=>{
+  try{
+   if(!state.profile?.id){await loadProfile();if(!state.profile?.id)return;}
+   if(screen==="member"||screen==="partner"){
+    await Promise.allSettled([loadMemberHomeMetrics(),loadMemberWalletBalance(),loadMemberSalesProgress()]);
+   }else if(screen==="invites"){
+    await loadDirectInvites();
+   }else if(screen==="commissions"){
+    await loadMemberCommissions();
+   }else if(screen==="profits"){
+    await loadMemberProfits();
+   }else if(screen==="stockMarket"){
+    await loadMarketDepot();
+    if(state.screen===screen){render();await loadMemberResales();}
+   }else if(screen==="founder"){
+    if(!state.founderStats?.loadedAt||now-state.founderStats.loadedAt>45000)await founderLoadStats();
+   }else if(screen==="founderMembers"){
+    await refreshFounderMembers();
+   }else if(screen==="founderDirectInvites"){
+    await loadDirectInvites();
+   }else if(screen==="founderPayments"){
+    await refreshFounderPayments();
+   }else if(screen==="founderStocks"){
+    await loadFounderStocks();
+   }
+  }catch(e){console.warn("Synchronisation de l'espace actif BuSAF:",e);}
+ })();
+ busafActiveRefreshPromise=task;
+ try{return await task;}finally{if(busafActiveRefreshPromise===task)busafActiveRefreshPromise=null;}
+}
+
 async function resumeBusafAfterReturn(){
  const now=Date.now();
  if(busafResumePromise)return busafResumePromise;
@@ -4864,7 +4906,10 @@ async function start(){
         syncConfirmedMarketPurchases().catch(e=>console.warn("Achats non synchronisés :",e));
         initBusafRealtime().catch(e=>console.warn("Realtime BuSAF indisponible :",e));
         syncSharedBusafEvents().catch(e=>console.warn("Événements non synchronisés :",e));
-        if(!window.busafSyncTimer)window.busafSyncTimer=setInterval(()=>{syncSharedBusafEvents();},60000);
+        if(!window.busafSyncTimer)window.busafSyncTimer=setInterval(()=>{
+          syncSharedBusafEvents();
+          refreshActiveWorkspaceData();
+        },25000);
       }
       return authenticated;
     }).catch(e=>{
