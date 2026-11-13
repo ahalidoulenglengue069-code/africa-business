@@ -2245,7 +2245,7 @@ function money(n){return Number(n||0).toLocaleString("fr-FR")+" FCFA"}
 /* ===== NAVIGATION BuSAF : historique réel du bouton Retour Android ===== */
 function normalScreen(screen){
  const fallback=state.userId?(isFounder()?"founder":"member"):"public";
- const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderWallet","founderPayments","founderMembers","founderDirectInvites","founderReferral","founderStocks","founderAnnouncements","founderSettings"];
+ const allowed=["public","market","benefits","profits","commissions","rules","signup","login","member","invites","orders","account","partner","memberBenefits","money","stockMarket","notifications","help","privacy","contact","how","founder","founderMarket","founderDashboard","founderStats","founderFinance","founderWallet","founderPayments","founderMembers","founderDirectInvites","founderReferral","founderStocks","founderAnnouncements","founderSettings","founderSupport","memberSupportRequests"];
  return allowed.includes(String(screen||""))?String(screen):fallback;
 }
 
@@ -2270,6 +2270,8 @@ function setScreen(screen){
  render();
  if(screen==="member" && state.userId && !isFounder())loadMemberHomeMetrics();
  if(screen==="founderPayments" && isFounder())refreshFounderPayments();
+ if(screen==="founderSupport" && isFounder())refreshFounderSupport();
+ if(screen==="memberSupportRequests" && state.userId&&!isFounder())refreshMemberSupport();
  if(screen==="founderStocks" && isFounder())loadFounderStocks();
  if(screen==="commissions" && state.userId)loadMemberCommissions();
  if(screen==="profits" && state.userId)loadMemberProfits();
@@ -3488,6 +3490,44 @@ function publicHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Inscrip
 function publicContact(){return page('📞 Contact',`<div class="contact-hero"><div class="contact-hero-icon">📞</div><div><h3>Centre de contact BuSAF</h3><p>Besoin d’aide concernant ton compte, le Marché, un achat, une commission ou un paiement ? Envoie une demande claire pour que l’équipe puisse l’examiner.</p></div></div><div class="contact-topic-grid"><div class="contact-topic"><span>👤</span><b>Compte & connexion</b><small>Inscription, connexion ou profil</small></div><div class="contact-topic"><span>🛒</span><b>Marché & achats</b><small>Produit, commande ou achat</small></div><div class="contact-topic"><span>💳</span><b>Paiement</b><small>Dépôt, retrait ou paiement</small></div><div class="contact-topic"><span>🤝</span><b>Commissions</b><small>Parrainage et bénéfices</small></div></div><div class="contact-steps"><h3>📋 Comment demander de l’aide ?</h3><p><b>1.</b> Choisis le sujet de ta demande.</p><p><b>2.</b> Explique le problème avec les détails utiles, sans communiquer ton mot de passe.</p><p><b>3.</b> Envoie la demande. Un message confirmera si elle a été enregistrée.</p></div><div class="contact-send-panel"><h3>✉️ Écrire à BuSAF</h3><p>Les demandes suivies dans le centre de contact nécessitent une connexion à ton compte.</p><button class="btn contact-main-btn" onclick="openContactModal()">📞 CONTACTER BuSAF</button><button class="btn alt" onclick="setScreen('help')">❓ CONSULTER L’AIDE</button></div>`);}
 function openContactModal(){openModal('📞 Demande de contact',`<label>Sujet de la demande</label><select id="contactSujet"><option value="Compte et connexion">👤 Compte et connexion</option><option value="Marché et achats">🛒 Marché et achats</option><option value="Paiement, dépôt ou retrait">💳 Paiement, dépôt ou retrait</option><option value="Ventes et commandes">📦 Ventes et commandes</option><option value="Parrainage et commissions">🤝 Parrainage et commissions</option><option value="Problème technique">🛠️ Problème technique</option><option value="Autre demande">💬 Autre demande</option></select><label>Objet précis</label><input id="contactObjet" maxlength="120" placeholder="Résume le problème en quelques mots"><label>Message détaillé</label><textarea id="contactMsg" maxlength="3000" rows="5" placeholder="Explique ce qui s’est passé, l’espace concerné et le résultat attendu. N’écris jamais ton mot de passe."></textarea><div class="notice">🔒 N’envoie jamais ton mot de passe ni tes codes de sécurité.</div><button class="btn" id="sendContactBtn" onclick="sendContactRequest()">ENVOYER LA DEMANDE</button><button class="btn alt" onclick="closeModal()">ANNULER</button>`);}
 async function sendContactRequest(){const sujet=(document.getElementById('contactSujet')?.value||'Autre demande').trim();const objet=(document.getElementById('contactObjet')?.value||'').trim();const message=(document.getElementById('contactMsg')?.value||'').trim();if(!objet||!message){alert('Choisis un objet et écris ton message avant l’envoi.');return;}if(!state.userId||!state.profile?.id){alert('Connecte-toi à ton compte BuSAF pour envoyer une demande suivie par le centre de contact.');closeModal();setScreen('login');return;}const btn=document.getElementById('sendContactBtn');if(btn){btn.disabled=true;btn.textContent='ENVOI EN COURS…';}try{await api('/rest/v1/busaf_contact_requests',{method:'POST',headers:{'Prefer':'return=minimal'},body:JSON.stringify({profil_id:state.profile.id,nom:state.profile.nom_complet||'',email:state.email||'',objet:'['+sujet+'] '+objet,message:message,statut:'nouvelle'})});closeModal();alert('Demande enregistrée dans le centre de contact BuSAF.');}catch(e){if(btn){btn.disabled=false;btn.textContent='ENVOYER LA DEMANDE';}alert('Échec : la demande n’a pas été enregistrée. Vérifie ta connexion et réessaie.');console.error('Erreur demande contact BuSAF:',e);}}
+
+async function loadSupportRequests(founder){
+ const rows=await api('/rest/v1/busaf_contact_requests?select=id,profil_id,nom,email,objet,message,statut,created_at,reponse,repondu_le&order=created_at.desc&limit=200');
+ state.supportRequests=Array.isArray(rows)?rows:[];
+ if(founder){
+  const ids=[...new Set(state.supportRequests.map(x=>x.profil_id).filter(Boolean))];
+  state.supportProfiles={};
+  if(ids.length){const ps=await api('/rest/v1/profils_busaf?id=in.('+ids.map(encodeURIComponent).join(',')+')&select=id,nom_complet');(ps||[]).forEach(p=>state.supportProfiles[p.id]=p);}
+ }
+}
+function supportStatus(v){return v==='resolue'?'Résolue':v==='en_cours'?'En cours':'Nouvelle';}
+function founderSupport(){
+ const rows=state.supportRequests||[];
+ let html='<div class="rule"><h3>Demandes reçues</h3><p>Lis les messages, réponds aux membres et suis leur traitement.</p><button class="btn alt" onclick="refreshFounderSupport()">↻ ACTUALISER</button></div>';
+ if(!rows.length)html+='<div class="rule">Aucune demande reçue pour le moment.</div>';
+ rows.forEach(r=>{const p=(state.supportProfiles||{})[r.profil_id]||{};html+='<article class="rule" style="margin-top:12px"><b>'+esc(p.nom_complet||r.nom||'Membre BuSAF')+'</b><p><small>'+esc(r.email||'')+' · '+new Date(r.created_at).toLocaleString('fr-FR')+' · '+supportStatus(r.statut)+'</small></p><h3>'+esc(r.objet)+'</h3><p style="white-space:pre-wrap">'+esc(r.message)+'</p>'+(r.reponse?'<div class="notice success"><b>Réponse :</b><p>'+esc(r.reponse)+'</p></div>':'')+'<button class="btn" onclick="openSupportReply(\''+r.id+'\')">✉️ RÉPONDRE / TRAITER</button></article>';});
+ return page('🛟 Centre d’assistance',html);
+}
+async function refreshFounderSupport(){try{await loadSupportRequests(true);render();}catch(e){alert('Chargement impossible : '+(e.message||e));}}
+function openSupportReply(id){
+ const r=(state.supportRequests||[]).find(x=>String(x.id)===String(id));if(!r)return;
+ openModal('✉️ Répondre au membre','<p><b>'+esc(r.nom||'Membre')+'</b> — '+esc(r.objet)+'</p><div class="rule"><p>'+esc(r.message)+'</p></div><label>Réponse</label><textarea id="supportReplyText" rows="5" maxlength="3000">'+esc(r.reponse||'')+'</textarea><label>Statut</label><select id="supportReplyStatus"><option value="nouvelle">Nouvelle</option><option value="en_cours">En cours</option><option value="resolue">Résolue</option></select><button class="btn" onclick="saveSupportReply(\''+r.id+'\')">ENREGISTRER</button><button class="btn alt" onclick="closeModal()">ANNULER</button>');
+ document.getElementById('supportReplyStatus').value=r.statut||'nouvelle';
+}
+async function saveSupportReply(id){
+ const reponse=(document.getElementById('supportReplyText')?.value||'').trim(),statut=document.getElementById('supportReplyStatus')?.value||'en_cours';
+ if(!reponse){alert('Écris une réponse avant de continuer.');return;}
+ try{await api('/rest/v1/busaf_contact_requests?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Prefer':'return=minimal'},body:JSON.stringify({reponse,statut,repondu_par:state.userId,repondu_le:new Date().toISOString(),updated_at:new Date().toISOString()})});closeModal();await refreshFounderSupport();alert('Réponse enregistrée. Le membre peut la consulter dans son suivi.');}
+ catch(e){alert('Échec de la réponse : '+(e.message||e));}
+}
+function memberSupportRequests(){
+ const rows=state.supportRequests||[];let html='<button class="btn alt" onclick="refreshMemberSupport()">↻ ACTUALISER</button>';
+ if(!rows.length)html+='<div class="rule">Tu n’as pas encore envoyé de demande.</div>';
+ rows.forEach(r=>{html+='<article class="rule" style="margin-top:12px"><b>'+esc(r.objet)+'</b><p><small>'+new Date(r.created_at).toLocaleString('fr-FR')+' · '+supportStatus(r.statut)+'</small></p><p style="white-space:pre-wrap">'+esc(r.message)+'</p>'+(r.reponse?'<div class="notice success"><b>Réponse du fondateur</b><p style="white-space:pre-wrap">'+esc(r.reponse)+'</p></div>':'<p>En attente de la réponse du fondateur.</p>')+'</article>';});
+ return page('📨 Suivi de mes demandes',html);
+}
+async function refreshMemberSupport(){try{await loadSupportRequests(false);render();}catch(e){alert('Chargement impossible : '+(e.message||e));}}
+
 function publicWhy(){return page("🎯 Pourquoi devenir membre",`<div class="rule"><h3>Découvrir avant de s'inscrire</h3><p>Le visiteur peut consulter le Marché, les avantages, les bénéfices, les commissions et les conditions avant de créer son compte.</p></div><div class="rule"><h3>Une fois membre</h3><p>Le membre accède à son Marché, ses achats, son Stock BuSAF, ses invités, son portefeuille et ses commissions.</p></div>`);}
 /* =========================
    PAGES MEMBRES
@@ -4513,7 +4553,7 @@ function deleteAllNotifications(){
 }
 
 function memberRules(){return publicRules();}
-function memberHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Compte</h3><p>Créer, connecter, modifier et déconnecter le compte.</p><button class="btn alt" onclick="setScreen('account')">MON COMPTE</button></div><div class="rule"><h3>🛒 Marché</h3><p>Acheter, revendre directement ou ajouter au Stock BuSAF.</p><button class="btn alt" onclick="setScreen('market')">MARCHÉ</button></div><div class="rule"><h3>📦 Stock BuSAF</h3><p>Les produits achetés et confirmés sont ajoutés automatiquement au stock.</p><button class="btn alt" onclick="setScreen('stockMarket')">MON STOCK</button></div><div class="rule"><h3>👥 Invitations</h3><p>Tout membre connecté peut partager son code ou son lien, sans achat préalable.</p><button class="btn alt" onclick="setScreen('invites')">MES INVITÉS</button></div><div class="rule"><h3>💰 Bénéfices / commissions</h3><p>Consulte les bénéfices vendeur, les commissions et les montants confirmés.</p><button class="btn alt" onclick="setScreen('profits')">BÉNÉFICES</button><button class="btn alt" onclick="setScreen('commissions')">COMMISSIONS</button></div><div class="rule"><h3>⭐ Progression</h3><p>10 ventes dans le mois pour Partner ; ${Number(state.benefitRate||40)} % de bénéfice vendeur sur une revente validée ; 7 % pour le parrain direct ; 100 ventes validées = 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('partner')">PARTNER</button><button class="btn alt" onclick="setScreen('memberBenefits')">AVANTAGES</button></div><div class="rule"><h3>💳 Portefeuille</h3><p>Les dépôts et retraits du Compte Marché sont suivis dans ton portefeuille.</p><button class="btn alt" onclick="setScreen('money')">DÉPÔT / RETRAIT</button></div><button class="btn" onclick="setScreen('contact')">CONTACTER BuSAF</button>`);}
+function memberHelp(){return page("❓ Aide",`<div class="rule"><h3>👤 Compte</h3><p>Créer, connecter, modifier et déconnecter le compte.</p><button class="btn alt" onclick="setScreen('account')">MON COMPTE</button></div><div class="rule"><h3>🛒 Marché</h3><p>Acheter, revendre directement ou ajouter au Stock BuSAF.</p><button class="btn alt" onclick="setScreen('market')">MARCHÉ</button></div><div class="rule"><h3>📦 Stock BuSAF</h3><p>Les produits achetés et confirmés sont ajoutés automatiquement au stock.</p><button class="btn alt" onclick="setScreen('stockMarket')">MON STOCK</button></div><div class="rule"><h3>👥 Invitations</h3><p>Tout membre connecté peut partager son code ou son lien, sans achat préalable.</p><button class="btn alt" onclick="setScreen('invites')">MES INVITÉS</button></div><div class="rule"><h3>💰 Bénéfices / commissions</h3><p>Consulte les bénéfices vendeur, les commissions et les montants confirmés.</p><button class="btn alt" onclick="setScreen('profits')">BÉNÉFICES</button><button class="btn alt" onclick="setScreen('commissions')">COMMISSIONS</button></div><div class="rule"><h3>⭐ Progression</h3><p>10 ventes dans le mois pour Partner ; ${Number(state.benefitRate||40)} % de bénéfice vendeur sur une revente validée ; 7 % pour le parrain direct ; 100 ventes validées = 25 000 FCFA par mois pendant 3 mois.</p><button class="btn alt" onclick="setScreen('partner')">PARTNER</button><button class="btn alt" onclick="setScreen('memberBenefits')">AVANTAGES</button></div><div class="rule"><h3>💳 Portefeuille</h3><p>Les dépôts et retraits du Compte Marché sont suivis dans ton portefeuille.</p><button class="btn alt" onclick="setScreen('money')">DÉPÔT / RETRAIT</button></div><button class="btn" onclick="setScreen('contact')">CONTACTER BuSAF</button><button class="btn alt" onclick="setScreen('memberSupportRequests')">📨 SUIVRE MES DEMANDES</button>`);}
 function memberPrivacy(){return publicPrivacy();}
 function memberContact(){return publicContact();}
 function memberHow(){return publicHow();}
@@ -4562,7 +4602,7 @@ function render(){
    account:"account",profits:"profits",commissions:"commissions",partner:"partner",
    memberBenefits:"benefits",stockMarket:"stockMarket",
    notifications:"notifications",rules:"rules",help:"help",privacy:"privacy",contact:"contact",how:"how",
-   founderStocks:"founderStocks",founderSettings:"founderSettings",founderReferral:"founderReferral",
+   founderStocks:"founderStocks",founderSettings:"founderSettings",founderSupport:"founderSupport",memberSupportRequests:"memberSupportRequests",founderReferral:"founderReferral",
    founderAnnouncements:"founderAnnouncements",signup:"account",login:"account",benefits:"benefits"
   };
   const activeTheme=(state.screen==="member"&&isFounder())?"founder":(themeByScreen[state.screen]||"public");
@@ -4625,12 +4665,13 @@ function render(){
       if(state.screen==='founderMembers' && !state.founderMembersLoaded && !state.founderMembersLoading){ setTimeout(()=>refreshFounderMembers(),0); }
       if(state.screen==='founderPayments' && !state.founderPaymentsLoaded && !state.founderPaymentsLoading){ setTimeout(()=>refreshFounderPayments(),0); }
       if(state.screen==='founderDirectInvites' && !state.directInvitesLoaded && !state.directInvitesLoading){ setTimeout(()=>loadDirectInvites().then(()=>{if(state.screen==='founderDirectInvites')render();}),0); }
+      if(state.screen==='founderSupport' && !state.supportRequestsLoaded){ setTimeout(()=>refreshFounderSupport(),0); }
       if(state.screen==='founderStocks' && !state.marketCatalogLoaded){ setTimeout(()=>refreshMarketCatalog(),0); }
    }else{
     const map={
      member:memberHome,market:memberMarket,invites:memberInvites,orders:memberOrders,account:memberAccount,
      profits:memberProfits,commissions:memberCommissions,partner:memberPartner,memberBenefits:memberAdvantages,money:memberMoney,
-     stockMarket:memberStockMarket,notifications:memberNotifications,
+     stockMarket:memberStockMarket,notifications:memberNotifications,memberSupportRequests:memberSupportRequests,
      rules:memberRules,help:memberHelp,privacy:memberPrivacy,contact:memberContact,how:memberHow
     };
     content=(map[state.screen]||memberHome)();
