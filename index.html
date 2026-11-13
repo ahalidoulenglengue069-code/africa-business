@@ -2110,7 +2110,14 @@ async function syncSharedBusafEvents(){
  try{
   const rows=await api('/rest/v1/busaf_events?or=(user_id.is.null,user_id.eq.'+encodeURIComponent(state.userId)+')&select=id,event_type,title,details,created_at&order=created_at.desc&limit=50');
   if(!Array.isArray(rows))return; let changed=false;
+  // Les connexions et déconnexions sont des traces techniques, pas des notifications destinées aux utilisateurs.
+  const authEventTypes=new Set(['login','logout','connexion','deconnexion','connection','disconnection','user_login','user_logout']);
+  const previousCount=state.notifications.length;
+  state.notifications=state.notifications.filter(n=>!authEventTypes.has(String(n?.type||'').toLowerCase()));
+  if(state.notifications.length!==previousCount)changed=true;
   for(const ev of rows.reverse()){
+   const eventType=String(ev?.event_type||'').toLowerCase();
+   if(authEventTypes.has(eventType))continue;
    const sid='server-event-'+String(ev.id); if((state.dismissedServerNotifications||[]).includes(sid)||state.notifications.some(n=>n.serverId===sid))continue;
    const d=ev.details||{}; let text=ev.title||'Nouvelle action BuSAF';
    if(ev.event_type==='reunion_creee')text=`${ev.title}${d.date?' — '+d.date:''}${d.time?' à '+d.time:''}`;
