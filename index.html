@@ -3362,7 +3362,7 @@ function memberHome(){
 
 function page(title,body,extra=""){
  return `<section class="busaf-workspace-page">
-  <div class="busaf-page-heading"><button class="busaf-back" onclick="goBack()" aria-label="Retour">←</button><div><small>BuSAF • ESPACE NUMÉRIQUE</small><h1>${title}</h1></div>${workspaceNotificationButton()}</div>
+  <div class="busaf-page-heading"><button class="busaf-back" onclick="goBack()" aria-label="Retour">←</button><div><small>BuSAF • ESPACE NUMÉRIQUE</small><h1>${title}</h1></div>${state.userId?workspaceNotificationButton():''}</div>
   <div class="busaf-page-content">${body}${extra}</div>
  </section>`;
 }
@@ -4591,7 +4591,7 @@ function notificationTopHtml(){
 }
 function workspaceNotificationButton(extraClass=''){
  const n=unreadNotificationCount();
- return '<button type="button" class="workspace-notif-button '+extraClass+'" onclick="setScreen(\\'notifications\\')" aria-label="Ouvrir les notifications" title="Notifications">🔔'+(n?'<span class="workspace-notif-count">'+(n>99?'99+':n)+'</span>':'')+'</button>';
+ return '<button type="button" class="workspace-notif-button '+extraClass+'" onclick="setScreen(&quot;notifications&quot;)" aria-label="Ouvrir les notifications" title="Notifications">🔔'+(n?'<span class="workspace-notif-count">'+(n>99?'99+':n)+'</span>':'')+'</button>';
 }
 function header(member=false){
  const founder=member&&isFounder();
