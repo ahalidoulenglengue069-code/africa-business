@@ -3339,31 +3339,58 @@ function memberHome(){
  const country=profile.pays||"Pays non renseigné";
  const phone=profile.telephone||"Téléphone non renseigné";
  const tiles=[
-  ['money','👛','Portefeuille','Gérer mes fonds','tile-wallet'],
-  ['stockMarket','📦','Stocks','Mes produits','tile-stock'],
-  ['orders','🛍️','Commandes','Mes achats et ventes','tile-orders'],
-  ['profits','💰','Bénéfices','Mes gains','tile-profits'],
-  ['commissions','🤝','Commissions','Mes commissions','tile-commissions'],
-  ['partner','⭐','Progression','Mon évolution','tile-progress'],
-  ['invites','👥','Mes invités','Invitations directes','tile-invites'],
+  ['money','👛','Portefeuille','Dépôts, retraits et solde','tile-wallet'],
+  ['stockMarket','📦','Mes stocks','Produits disponibles à revendre','tile-stock'],
+  ['orders','🛍️','Commandes','Achats et ventes effectués','tile-orders'],
+  ['profits','💰','Bénéfices','Gains issus de mes ventes','tile-profits'],
+  ['commissions','🤝','Commissions','Récompenses de parrainage','tile-commissions'],
+  ['partner','⭐','Progression','Objectifs et statut PARTNER','tile-progress'],
+  ['invites','👥','Mes invités','Membres invités directement','tile-invites'],
   ['account','👤','Mon compte','Profil et sécurité','tile-account']
  ];
- return `<div class="member-v2">
-  <section class="member-v2-head">
-   <div class="member-v2-brandline"><div class="member-v2-brand"><b>BuSAF</b><small>BUSINESS AFRICAIN</small></div><div class="member-v2-head-tools">${workspaceNotificationButton("member-v2-bell")}</div></div>
-   <div class="member-v2-user"><div class="member-v2-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo de profil">':'👤'}</div><div class="member-v2-identity"><small>BIENVENUE SUR BuSAF</small><h1>${esc(name)}</h1><span>MEMBRE BuSAF</span><div class="member-v2-meta">${esc(countryFlag(country))} ${esc(country)} · 📱 ${esc(phone)}</div></div></div>
-   <div class="member-v2-balance"><div><small>MON COMPTE MARCHÉ</small><strong id="memberWalletBalanceHome">${money(state.marketBalance)} FCFA</strong></div><button onclick="setScreen('money')">Gérer mon portefeuille →</button></div>
-   <div class="member-v2-referral"><div><small>MON CODE DE PARRAINAGE</small><b>${esc(referral)}</b></div><button onclick="invite()">📲 INVITER</button></div>
+ return `<div class="member-v2 member-hub">
+  <header class="hub-topbar">
+   <div class="hub-brand"><span class="hub-brand-mark">B</span><span><b>BuSAF</b><small>BUSINESS AFRICAIN</small></span></div>
+   <div class="hub-top-actions">${workspaceNotificationButton("member-v2-bell")}<button class="hub-profile-shortcut" onclick="setScreen('account')" aria-label="Mon compte">👤</button></div>
+  </header>
+  <section class="hub-welcome">
+   <div class="hub-welcome-copy"><span class="hub-eyebrow">VOTRE ESPACE PERSONNEL</span><h1>Bonjour, ${esc(name)} 👋</h1><p>Retrouvez votre activité, vos services et vos informations BuSAF au même endroit.</p>
+    <div class="hub-member-meta"><span>${esc(countryFlag(country))} ${esc(country)}</span><i></i><span>📱 ${esc(phone)}</span></div>
+   </div>
+   <div class="hub-avatar">${profile.photo_url?'<img src="'+esc(profile.photo_url)+'" alt="Photo de profil">':'<span>👤</span>'}</div>
   </section>
-  <div class="member-v2-actions"><button onclick="setScreen('money')">＋ Déposer</button><button onclick="setScreen('money')">↗ Retirer</button><button onclick="setScreen('market')">🛒 Acheter</button></div>
-  <section class="member-v2-finance-pair"><div class="member-v2-earnings"><div><small>MES GAINS CONFIRMÉS</small><b id="mhEarningsCard">Chargement…</b><span>Commissions validées</span></div><button onclick="setScreen('profits')">Détails →</button></div><button class="member-v2-wallet-mini" onclick="setScreen('money')"><span>👛</span><small>MON PORTEFEUILLE</small><b id="memberWalletBalanceMini">${money(state.marketBalance)} FCFA</b><i>Voir le solde →</i></button></section>
-  <section class="member-v2-live"><div class="member-v2-title"><div><small>MON TABLEAU DE BORD</small><h2>Mon activité</h2></div><button onclick="loadMemberHomeMetrics()" aria-label="Actualiser mon activité">↻</button></div><div class="member-v2-live-grid"><div><small>Achats confirmés</small><b id="mhPurchases">…</b></div><div><small>Ventes confirmées</small><b id="mhSales">…</b></div><div><small>Stock disponible</small><b id="mhStock">…</b></div><div><small>Gains confirmés</small><b id="mhEarnings">…</b></div></div><p id="mhMetricsMessage">Synchronisation avec ton compte BuSAF…</p></section>
-  <section class="member-v2-section"><div class="member-v2-title"><div><small>TOUS MES SERVICES</small><h2>Mon espace membre</h2></div><span>8 SERVICES</span></div>
-   <div class="member-v2-grid">${tiles.map(([id,ico,label,desc,cls])=>`<button class="member-v2-tile ${cls}" onclick="setScreen('${id}')"><span class="member-v2-tile-icon">${ico}</span><b>${label}</b><small>${desc}</small><i>Ouvrir →</i></button>`).join('')}</div>
+  <section class="hub-balance-card">
+   <div class="hub-balance-head"><span>👛 COMPTE MARCHÉ</span><span class="hub-balance-status"><i></i> Votre espace financier</span></div>
+   <div class="hub-balance-main"><div><small>Solde disponible</small><strong id="memberWalletBalanceHome">${money(state.marketBalance)} <em>FCFA</em></strong></div><button onclick="setScreen('money')">Voir le portefeuille <span>→</span></button></div>
+   <div class="hub-balance-actions"><button onclick="setScreen('money')"><b>＋</b> Déposer</button><button onclick="setScreen('money')"><b>↗</b> Retirer</button><button onclick="setScreen('market')"><b>⌕</b> Marché</button></div>
   </section>
-  <section class="member-v2-progress"><div class="member-v2-title"><div><small>MES OBJECTIFS</small><h2>Évolution & récompenses</h2></div><span>🚀</span></div>
-   <div class="member-v2-progress-item"><div><b>⭐ Statut PARTNER</b><strong id="memberPartnerProgress">Chargement…</strong></div><p id="memberPartnerProgressText">Vérification des ventes confirmées…</p><div class="member-v2-track"><i id="memberPartnerProgressBar" style="width:0%"></i></div></div>
-   <div class="member-v2-progress-item"><div><b>🏆 Objectif 100 ventes</b><strong id="member100Progress">Chargement…</strong></div><p id="member100ProgressText">Vérification des ventes confirmées…</p><div class="member-v2-track"><i id="member100ProgressBar" style="width:0%"></i></div></div>
+  <section class="hub-metrics">
+   <div class="hub-section-heading"><div><span class="hub-eyebrow">VUE D’ENSEMBLE</span><h2>Mon activité</h2></div><button onclick="loadMemberHomeMetrics()" aria-label="Actualiser mon activité" title="Actualiser">↻</button></div>
+   <div class="hub-metric-grid">
+    <article><span class="hub-metric-icon">🛍️</span><small>Achats confirmés</small><b id="mhPurchases">…</b></article>
+    <article><span class="hub-metric-icon">💼</span><small>Ventes confirmées</small><b id="mhSales">…</b></article>
+    <article><span class="hub-metric-icon">📦</span><small>Stock disponible</small><b id="mhStock">…</b></article>
+    <article><span class="hub-metric-icon">💰</span><small>Gains confirmés</small><b id="mhEarnings">…</b></article>
+   </div>
+   <p id="mhMetricsMessage" class="hub-sync-note">Synchronisation avec votre compte BuSAF…</p>
+  </section>
+  <section class="hub-services">
+   <div class="hub-section-heading"><div><span class="hub-eyebrow">TOUT POUR VOTRE ACTIVITÉ</span><h2>Mes services</h2></div><span class="hub-count">08 SERVICES</span></div>
+   <div class="hub-service-grid">${tiles.map(([id,ico,label,desc,cls],index)=>`<button class="hub-service-card ${cls}" onclick="setScreen('${id}')"><span class="hub-service-icon">${ico}</span><span class="hub-service-copy"><b>${label}</b><small>${desc}</small></span><span class="hub-service-arrow">→</span></button>`).join('')}</div>
+  </section>
+  <section class="hub-earnings">
+   <div class="hub-section-heading"><div><span class="hub-eyebrow">SUIVI FINANCIER</span><h2>Mes gains confirmés</h2></div><button class="hub-text-link" onclick="setScreen('profits')">Détails →</button></div>
+   <div class="hub-earnings-row"><div><span>Montant validé</span><b id="mhEarningsCard">Chargement…</b><small>Commissions et gains confirmés uniquement</small></div><span class="hub-earnings-symbol">↗</span></div>
+   <button class="hub-mini-wallet" onclick="setScreen('money')"><span>👛</span><span><b>Mon portefeuille</b><small id="memberWalletBalanceMini">${money(state.marketBalance)} FCFA</small></span><i>Consulter →</i></button>
+  </section>
+  <section class="hub-referral">
+   <div><span class="hub-eyebrow">DÉVELOPPEZ VOTRE RÉSEAU</span><h2>Votre code de parrainage</h2><p>Invitez de nouveaux membres à découvrir BuSAF.</p><strong>${esc(referral)}</strong></div>
+   <button onclick="invite()">📲 Inviter un membre</button>
+  </section>
+  <section class="hub-goals">
+   <div class="hub-section-heading"><div><span class="hub-eyebrow">VOTRE ÉVOLUTION</span><h2>Objectifs & récompenses</h2></div><span>🏆</span></div>
+   <div class="hub-goal-item"><div><b>⭐ Statut PARTNER</b><strong id="memberPartnerProgress">Chargement…</strong></div><p id="memberPartnerProgressText">Vérification des ventes confirmées…</p><div class="hub-progress-track"><i id="memberPartnerProgressBar" style="width:0%"></i></div></div>
+   <div class="hub-goal-item"><div><b>🏆 Objectif 100 ventes</b><strong id="member100Progress">Chargement…</strong></div><p id="member100ProgressText">Vérification des ventes confirmées…</p><div class="hub-progress-track"><i id="member100ProgressBar" style="width:0%"></i></div></div>
   </section>
  </div>`;
 }
@@ -5745,6 +5772,101 @@ html,body,#app{background:var(--busaf-ivory)}
  #app .profile-summary-grid{gap:8px!important}
  #app .profile-summary-card{padding:11px 9px!important}
 }
+
+/* Tableau de bord membre BuSAF — structure claire et responsive */
+#app .member-hub{display:grid;gap:15px;padding:4px 0 24px;color:#173b2a}
+#app .hub-topbar{display:flex;align-items:center;justify-content:space-between;padding:5px 2px}
+#app .hub-brand{display:flex;align-items:center;gap:10px}
+#app .hub-brand-mark{width:39px;height:39px;border-radius:13px;background:#087a3b;color:#fff;display:grid;place-items:center;font-size:22px;font-weight:950;box-shadow:0 5px 14px #087a3b25}
+#app .hub-brand b{display:block;font-size:19px;letter-spacing:-.5px;color:#12462d}
+#app .hub-brand small{display:block;font-size:9px;letter-spacing:1.35px;font-weight:800;color:#789083}
+#app .hub-top-actions{display:flex;align-items:center;gap:8px}
+#app .hub-top-actions .member-v2-bell,#app .hub-profile-shortcut{width:40px;height:40px;border:1px solid #dce9df;border-radius:13px;background:#fff;color:#17613a;font-size:18px;display:grid;place-items:center}
+#app .hub-welcome{position:relative;display:flex;justify-content:space-between;align-items:center;gap:12px;padding:22px;border-radius:22px;background:linear-gradient(120deg,#eaf6ed 0%,#f7fbf7 68%,#e0f1e5 100%);border:1px solid #dcecdf;overflow:hidden}
+#app .hub-welcome:after{content:"";position:absolute;width:150px;height:150px;border-radius:50%;right:34px;top:-105px;background:#ccebd5;opacity:.65}
+#app .hub-welcome-copy{position:relative;z-index:1;min-width:0}
+#app .hub-eyebrow{display:block;color:#21804b;font-size:9px;font-weight:900;letter-spacing:1.35px}
+#app .hub-welcome h1{font-size:clamp(21px,4vw,29px);line-height:1.2;color:#16452d;margin:8px 0}
+#app .hub-welcome p{font-size:12px;line-height:1.55;color:#5e7767;margin:0;max-width:540px}
+#app .hub-member-meta{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-top:13px;color:#52705e;font-size:10px;font-weight:700}
+#app .hub-member-meta i{width:4px;height:4px;border-radius:50%;background:#91ae9b}
+#app .hub-avatar{position:relative;z-index:1;flex:none;width:66px;height:66px;border-radius:20px;overflow:hidden;background:#d4ead9;border:3px solid #fff;box-shadow:0 5px 16px #16452d18;display:grid;place-items:center;font-size:30px}
+#app .hub-avatar img{width:100%;height:100%;object-fit:cover}
+#app .hub-balance-card{padding:18px;border-radius:21px;background:linear-gradient(125deg,#075b35,#0b7942);color:#fff;box-shadow:0 10px 24px #075b3520}
+#app .hub-balance-head{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:9px;letter-spacing:1px;font-weight:900;color:#e4f4e9}
+#app .hub-balance-status{font-size:9px;letter-spacing:0;font-weight:700;color:#d1ead9}
+#app .hub-balance-status i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#9ce4b2;margin-right:5px}
+#app .hub-balance-main{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:17px}
+#app .hub-balance-main small{display:block;color:#cce6d5;font-size:10px}
+#app .hub-balance-main strong{display:block;margin-top:4px;font-size:clamp(25px,6vw,34px);color:#fff}
+#app .hub-balance-main em{font-size:12px;font-style:normal;color:#d2eadb}
+#app .hub-balance-main>button{border:1px solid #ffffff65;border-radius:11px;background:#ffffff16;color:#fff;padding:10px 12px;font-size:10px;font-weight:800}
+#app .hub-balance-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:17px}
+#app .hub-balance-actions button{border:1px solid #ffffff30;border-radius:11px;background:#ffffff14;color:#fff;padding:9px 5px;font-size:11px;font-weight:800}
+#app .hub-balance-actions b{margin-right:4px;font-size:15px}
+#app .hub-metrics,#app .hub-services,#app .hub-earnings,#app .hub-goals{padding:17px;border:1px solid #e2ece4;border-radius:20px;background:#fff;box-shadow:0 5px 18px #173c240b}
+#app .hub-section-heading{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:13px}
+#app .hub-section-heading h2{font-size:19px;color:#173f2b;margin:4px 0 0}
+#app .hub-section-heading>button:not(.hub-text-link){width:32px;height:32px;border:1px solid #e0ebe2;border-radius:10px;background:#f6faf7;color:#237448;font-size:19px}
+#app .hub-count{font-size:9px;font-weight:900;letter-spacing:.7px;color:#65816e;background:#eef6f0;border-radius:20px;padding:7px 9px}
+#app .hub-metric-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+#app .hub-metric-grid article{min-width:0;padding:12px 10px;border:1px solid #e7eee8;border-radius:14px;background:#f9fcf9}
+#app .hub-metric-icon{display:block;font-size:19px;margin-bottom:8px}
+#app .hub-metric-grid small{display:block;color:#6c8073;font-size:10px;line-height:1.3;min-height:26px}
+#app .hub-metric-grid b{display:block;color:#17623a;font-size:18px;margin-top:5px;overflow-wrap:anywhere}
+#app .hub-sync-note{font-size:10px;color:#819087;margin:10px 0 0}
+#app .hub-service-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+#app .hub-service-card{position:relative;display:flex;align-items:center;gap:11px;min-width:0;text-align:left;border:1px solid #e4ece5;border-radius:15px;padding:12px;background:#fbfdfb;color:#193f2b;min-height:78px}
+#app .hub-service-icon{width:39px;height:39px;flex:none;border-radius:12px;background:#e8f3eb;display:grid;place-items:center;font-size:21px}
+#app .hub-service-copy{display:flex;flex-direction:column;gap:4px;min-width:0;padding-right:12px}
+#app .hub-service-copy b{font-size:12px;color:#204b32}
+#app .hub-service-copy small{font-size:9px;line-height:1.3;color:#718176}
+#app .hub-service-arrow{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:17px;color:#6d9b7a}
+#app .hub-service-card.tile-wallet{background:#f0f8f1;border-color:#d8eadc}
+#app .hub-service-card.tile-stock{background:#f3f8f5}
+#app .hub-service-card.tile-orders{background:#fbfaf5}
+#app .hub-service-card.tile-profits{background:#f4faf5}
+#app .hub-service-card.tile-commissions{background:#f7faf7}
+#app .hub-service-card.tile-progress{background:#f0f8f5}
+#app .hub-service-card.tile-invites{background:#f3f8f6}
+#app .hub-service-card.tile-account{background:#f7faf8}
+#app .hub-text-link{border:0;background:none;color:#147542;font-size:11px;font-weight:900}
+#app .hub-earnings-row{display:flex;justify-content:space-between;align-items:center;padding:13px;border-radius:14px;background:#eff8f1}
+#app .hub-earnings-row span{display:block;font-size:10px;color:#668071}
+#app .hub-earnings-row b{display:block;font-size:21px;color:#12643a;margin:4px 0}
+#app .hub-earnings-row small{display:block;font-size:9px;color:#7c8d81}
+#app .hub-earnings-symbol{font-size:25px!important;color:#23814c!important}
+#app .hub-mini-wallet{display:flex;align-items:center;gap:10px;width:100%;margin-top:9px;padding:11px;border:1px solid #e5eee6;border-radius:13px;background:#fff;text-align:left}
+#app .hub-mini-wallet>span:first-child{font-size:22px}
+#app .hub-mini-wallet>span:nth-child(2){display:flex;flex-direction:column;gap:3px}
+#app .hub-mini-wallet b{font-size:11px;color:#254a33}
+#app .hub-mini-wallet small{font-size:10px;color:#6f8275}
+#app .hub-mini-wallet i{margin-left:auto;font-size:9px;font-style:normal;font-weight:800;color:#247348}
+#app .hub-referral{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:17px;border-radius:19px;background:#f2f8f3;border:1px solid #dcebdd}
+#app .hub-referral h2{font-size:17px;color:#19452d;margin:5px 0}
+#app .hub-referral p{font-size:10px;color:#6e8174;margin:0 0 9px}
+#app .hub-referral strong{display:inline-block;padding:7px 10px;border:1px dashed #8bb99a;border-radius:9px;background:#fff;color:#17633a;font-size:12px;letter-spacing:.4px}
+#app .hub-referral>button{flex:none;border:0;border-radius:11px;background:#087a3b;color:#fff;padding:11px 12px;font-size:10px;font-weight:900}
+#app .hub-goal-item{padding:13px 0;border-top:1px solid #edf2ee}
+#app .hub-goal-item>div{display:flex;justify-content:space-between;gap:8px;color:#214832;font-size:11px}
+#app .hub-goal-item strong{color:#187344}
+#app .hub-goal-item p{font-size:10px;color:#7a8a80;margin:6px 0 9px}
+#app .hub-progress-track{height:8px;border-radius:20px;background:#e8efe9;overflow:hidden}
+#app .hub-progress-track i{display:block;height:100%;border-radius:20px;background:linear-gradient(90deg,#16814a,#5bb77b)}
+@media(max-width:600px){
+ #app .member-hub{gap:12px}
+ #app .hub-welcome{padding:16px;border-radius:18px}
+ #app .hub-avatar{width:55px;height:55px;border-radius:17px}
+ #app .hub-balance-card{padding:15px}
+ #app .hub-balance-main{align-items:flex-start;flex-direction:column}
+ #app .hub-balance-main>button{align-self:flex-start}
+ #app .hub-metrics,#app .hub-services,#app .hub-earnings,#app .hub-goals{padding:14px}
+ #app .hub-metric-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #app .hub-metric-grid article{padding:11px}
+ #app .hub-referral{align-items:flex-start;flex-direction:column}
+ #app .hub-referral>button{width:100%}
+}
+
 </style>
 
 </body>
