@@ -3012,6 +3012,7 @@ function founderHome(){
     ${tile('founderPayments','💳','Paiements & ventes','Transactions réelles','fv-orange')}
     ${tile('founderWallet','👛','Portefeuille','Fonds et retraits','fv-purple')}
     ${tile('founderMembers','👥','Tous les membres','Liste des inscrits','fv-teal')}
+    ${tile('founderSupport','🛟','Centre d’assistance','Demandes et réponses aux membres','fv-green')}
     ${tile('founderDirectInvites','🤝','Mes invités directs','Ton réseau personnel','fv-pink')}
     ${tile('founderFinance','💰','Finances','Suivi financier','fv-gold')}
     ${tile('founderStocks','📦','Stocks','Suivi des produits','fv-slate')}
@@ -3493,11 +3494,11 @@ async function sendContactRequest(){const sujet=(document.getElementById('contac
 
 async function loadSupportRequests(founder){
  const rows=await api('/rest/v1/busaf_contact_requests?select=id,profil_id,nom,email,objet,message,statut,created_at,reponse,repondu_le&order=created_at.desc&limit=200');
- state.supportRequests=Array.isArray(rows)?rows:[];
+ state.supportRequests=Array.isArray(rows)?rows:[];state.supportRequestsLoaded=true;
  if(founder){
   const ids=[...new Set(state.supportRequests.map(x=>x.profil_id).filter(Boolean))];
   state.supportProfiles={};
-  if(ids.length){const ps=await api('/rest/v1/profils_busaf?id=in.('+ids.map(encodeURIComponent).join(',')+')&select=id,nom_complet');(ps||[]).forEach(p=>state.supportProfiles[p.id]=p);}
+  if(ids.length){const ps=await api('/rest/v1/profils_busaf?id=in.('+ids.map(encodeURIComponent).join(',')+')&select=id,user_id,nom_complet');(ps||[]).forEach(p=>state.supportProfiles[p.id]=p);}
  }
 }
 function supportStatus(v){return v==='resolue'?'Résolue':v==='en_cours'?'En cours':'Nouvelle';}
