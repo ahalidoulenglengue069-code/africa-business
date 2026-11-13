@@ -1063,7 +1063,7 @@ input,textarea,select{border-radius:12px!important}
 .member-v2-title>span{font-size:23px;color:#087a3b;font-weight:900}
 .member-v2-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
 .member-v2-tile{min-width:0;text-align:left;border:0;border-radius:16px;padding:14px;display:flex;flex-direction:column;align-items:flex-start;min-height:132px;color:#183b2a}
-.rubric-notif-badge{position:absolute;top:-7px;right:-9px;z-index:3;min-width:19px;height:19px;padding:0 5px;display:inline-flex;align-items:center;justify-content:center;border:2px solid #fff;border-radius:999px;background:#d92d20;color:#fff;font-size:10px;font-weight:900;font-style:normal;line-height:1;box-shadow:0 2px 5px rgba(0,0,0,.18)}.member-v2-tile-icon,.founder-v2-tile>span{position:relative;display:inline-flex;align-items:center;justify-content:center}
+.rubric-notif-badge{position:absolute;top:-13px;right:-15px;z-index:3;width:23px;height:23px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid #fff;border-radius:50%;background:#fff;color:#b42318;font-size:13px;font-weight:900;font-style:normal;line-height:1;box-shadow:0 1px 5px rgba(0,0,0,.2)}.rubric-notif-badge b{position:absolute;top:-6px;right:-7px;min-width:14px;height:14px;padding:0 3px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #fff;border-radius:99px;background:#d92d20;color:#fff;font-size:8px;line-height:1}.member-v2-tile-icon,.founder-v2-tile>span{position:relative;display:inline-flex;align-items:center;justify-content:center}
 .member-v2-tile-icon{width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#ffffffa8;font-size:22px;margin-bottom:9px}
 .member-v2-tile b{font-size:14px}.member-v2-tile small{font-size:11px;color:#566c5e;margin-top:3px}.member-v2-tile i{font-style:normal;font-size:10px;font-weight:800;margin-top:auto;padding-top:10px}
 .tile-wallet{background:#e4f5e9}.tile-stock{background:#e5f0ff}.tile-orders{background:#fff0df}.tile-profits{background:#f0eaff}.tile-commissions{background:#ffe8ef}.tile-progress{background:#def5f0}.tile-invites{background:#e6f2ff}.tile-account{background:#edf1f3}
@@ -4607,7 +4607,7 @@ function unreadNotificationCountForRubric(screen){
 }
 function notificationBadgeHtml(screen){
  const count=unreadNotificationCountForRubric(screen);
- return count?'<i class="rubric-notif-badge" aria-label="'+count+' notification(s) non lue(s)">'+(count>99?'99+':count)+'</i>':'';
+ return '<i class="rubric-notif-badge" aria-label="'+(count?count+' notification(s) non lue(s)':'Notifications')+'" title="'+(count?count+' notification(s) non lue(s)':'Notifications')+'">🔔'+(count?'<b>'+(count>99?'99+':count)+'</b>':'')+'</i>';
 }
 
 function notificationTopHtml(){
