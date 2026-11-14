@@ -2082,6 +2082,29 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
  #app:has(.public-v2) .busaf-header-right button{flex:1}
 }
 </style>
+
+<style id="busaf-public-motivation-photo-v4">
+/* Photo de motivation un peu plus grande et mieux mise en valeur */
+#app:has(.public-v2) .public-v2-motivation{align-items:center;gap:12px;padding:10px}
+#app:has(.public-v2) .public-v2-motivation img{
+ width:clamp(104px,29vw,132px);
+ height:clamp(88px,24vw,112px);
+ flex:0 0 clamp(104px,29vw,132px);
+ object-fit:cover;
+ object-position:center;
+ border-radius:12px;
+ box-shadow:0 4px 12px rgba(0,35,18,.2)
+}
+#app:has(.public-v2) .public-v2-motivation strong{font-size:14px;line-height:1.3}
+#app:has(.public-v2) .public-v2-motivation span{font-size:11px;line-height:1.45}
+@media(max-width:420px){
+ #app:has(.public-v2) .public-v2-motivation img{
+  width:clamp(94px,28vw,116px);
+  height:clamp(86px,25vw,104px);
+  flex-basis:clamp(94px,28vw,116px)
+ }
+}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
