@@ -2141,6 +2141,44 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
  #app:has(.public-v2) .busaf-motivation-watermark{font-size:88px}
 }
 </style>
+
+<style id="busaf-public-motivation-visible-logo-v6">
+/* Correctif de visibilité : logo BuSAF réellement placé derrière la photo */
+#app:has(.public-v2) .busaf-motivation-photo{
+ position:relative!important;isolation:isolate!important;
+ width:clamp(142px,38vw,170px)!important;
+ height:clamp(126px,33vw,148px)!important;
+ flex:0 0 clamp(142px,38vw,170px)!important;
+ overflow:hidden!important;
+ background:linear-gradient(145deg,#0b9347 0%,#07532f 100%)!important;
+ border:2px solid rgba(255,255,255,.78)!important;
+ border-radius:17px!important
+}
+#app:has(.public-v2) .busaf-motivation-watermark{
+ position:absolute!important;z-index:0!important;inset:0!important;
+ display:grid!important;place-items:center!important;
+ color:rgba(255,255,255,.38)!important;
+ font-size:118px!important;font-weight:1000!important;
+ letter-spacing:-10px!important;line-height:1!important;
+ text-shadow:0 2px 12px rgba(0,0,0,.18)!important
+}
+#app:has(.public-v2) .busaf-motivation-photo img{
+ position:relative!important;z-index:1!important;
+ display:block!important;width:calc(100% - 12px)!important;
+ height:calc(100% - 12px)!important;flex:none!important;
+ object-fit:cover!important;object-position:center!important;
+ border:2px solid #fff!important;border-radius:12px!important
+}
+#app:has(.public-v2) .public-v2-motivation{gap:13px!important}
+@media(max-width:420px){
+ #app:has(.public-v2) .busaf-motivation-photo{
+  width:clamp(128px,37vw,148px)!important;
+  height:clamp(118px,34vw,136px)!important;
+  flex-basis:clamp(128px,37vw,148px)!important
+ }
+ #app:has(.public-v2) .busaf-motivation-watermark{font-size:104px!important}
+}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
