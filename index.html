@@ -2105,6 +2105,42 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
  }
 }
 </style>
+
+<style id="busaf-public-motivation-logo-frame-v5">
+/* Photo de motivation : cadre de marque BuSAF plus grand */
+#app:has(.public-v2) .busaf-motivation-photo{
+ position:relative;isolation:isolate;flex:0 0 clamp(128px,34vw,154px);
+ width:clamp(128px,34vw,154px);height:clamp(112px,29vw,132px);
+ display:grid;place-items:center;overflow:hidden;border-radius:15px;
+ background:linear-gradient(145deg,#0b8b49,#075b34);
+ border:1px solid rgba(255,255,255,.42);
+ box-shadow:0 5px 14px rgba(0,35,18,.22)
+}
+#app:has(.public-v2) .busaf-motivation-watermark{
+ position:absolute;z-index:-1;inset:0;display:grid;place-items:center;
+ color:rgba(255,255,255,.24);font-size:100px;font-weight:1000;
+ letter-spacing:-8px;line-height:1
+}
+#app:has(.public-v2) .busaf-motivation-photo:after{
+ content:"BuSAF";position:absolute;right:6px;bottom:5px;
+ color:rgba(255,255,255,.86);font-size:8px;font-weight:1000;
+ letter-spacing:1.2px;text-shadow:0 1px 4px rgba(0,0,0,.45)
+}
+#app:has(.public-v2) .busaf-motivation-photo img{
+ position:relative;z-index:1;width:calc(100% - 10px);height:calc(100% - 10px);
+ flex:none;object-fit:cover;object-position:center;border-radius:11px;
+ border:2px solid rgba(255,255,255,.8);
+ box-shadow:0 2px 8px rgba(0,0,0,.18)
+}
+#app:has(.public-v2) .public-v2-motivation{gap:12px;padding:10px}
+@media(max-width:420px){
+ #app:has(.public-v2) .busaf-motivation-photo{
+  flex-basis:clamp(116px,34vw,136px);
+  width:clamp(116px,34vw,136px);height:clamp(108px,31vw,124px)
+ }
+ #app:has(.public-v2) .busaf-motivation-watermark{font-size:88px}
+}
+</style>
 </head>
 <body>
 <div id="app" class="app"></div>
@@ -3038,7 +3074,7 @@ function publicHome(){
  return `<div class="public-v2">
   <section class="public-v2-hero">
    <div class="public-v2-copy"><span>LE COMMERCE NUMÉRIQUE AFRICAIN</span><h1>Achète. Vends.<br><em>Développe ton activité.</em></h1><p>Découvre des produits numériques, réalise tes achats et développe tes revenus grâce à la revente et au parrainage.</p>
-    <div class="public-v2-motivation"><img src="https://assets.weforum.org/article/image/APc0-70JZWFKgYbUea30PmQdF12tNBhlaYSrseR9xmc.jpeg" alt="Des entrepreneuses africaines travaillent ensemble" loading="lazy"><div><small>TA MOTIVATION, TON AVENIR</small><strong>Chaque grande réussite commence par un premier pas.</strong><span>Ose apprendre, passe à l’action et fais grandir ton projet avec BuSAF.</span></div></div>
+    <div class="public-v2-motivation"><div class="busaf-motivation-photo"><span class="busaf-motivation-watermark" aria-hidden="true">B</span><img src="https://assets.weforum.org/article/image/APc0-70JZWFKgYbUea30PmQdF12tNBhlaYSrseR9xmc.jpeg" alt="Des entrepreneuses africaines travaillent ensemble" loading="lazy"></div><div><small>TA MOTIVATION, TON AVENIR</small><strong>Chaque grande réussite commence par un premier pas.</strong><span>Ose apprendre, passe à l’action et fais grandir ton projet avec BuSAF.</span></div></div>
     <div class="public-v2-cta"><button onclick="setScreen('market')">Explorer le marché <b>→</b></button><button onclick="setScreen('signup')">Créer mon compte</button></div>
    </div>
    <div class="public-v2-points"><span>✓ Marché de produits numériques</span><span>✓ Suivi des achats et commandes</span><span>✓ Opérations validées avec transparence</span></div>
