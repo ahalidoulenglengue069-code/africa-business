@@ -3271,13 +3271,16 @@ async function refreshFounderPayments(){
   });
   state.founderPayments=Array.isArray(rows)?rows:[];
   state.founderPaymentsLoaded=true;
-  await Promise.all([loadFounderResales(),loadFounderWithdrawals()]);
+
  }catch(e){
   state.founderPaymentsError=e.message||'Erreur de chargement';
   console.error('Chargement paiements BuSAF :',e);
  }finally{
   state.founderPaymentsLoading=false;
-  if(state.screen==='founderPayments')render();
+  if(state.screen==='founderPayments'){
+   render();
+   await Promise.all([loadFounderResales(),loadFounderWithdrawals()]);
+  }
  }
 }
 async function loadFounderWithdrawals(){
