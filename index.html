@@ -3257,7 +3257,7 @@ function founderPayments(){
  if(!isFounder())return memberHome();
  const rows=state.founderPayments||[];
  const list=state.founderPaymentsLoading?`<div class="empty">Chargement automatique des paiements…</div>`:state.founderPaymentsError?`<div class="notice error">${esc(state.founderPaymentsError)}</div>`:rows.length?`<div class="list">${rows.map(v=>`<div class="rule"><strong>${money(v.montant||0)}</strong> — ${esc(v.statut||'—')}<br>Produit : ${esc((state.marketCatalog||[]).find(p=>String(p.id)===String(v.produit_id))?.nom||'Produit BuSAF')}<br>Acheteur : ${esc(v.acheteur_id||'—')}<br>Référence : ${esc(v.reference||'—')}<br><span class="small">${esc(v.created_at||'')}</span></div>`).join('')}</div>`:`<div class="empty">Aucune transaction accessible pour le moment. Appuie sur Actualiser pour réessayer.</div>`;
- return page('💳 Paiements & ventes',`<div class="notice">Transactions chargées automatiquement depuis Supabase. Les transactions en attente ou expirées ne sont pas encore des ventes confirmées.</div><div id="founderPaymentsList">${list}</div><section class="rule"><h3>🧾 Reventes des membres à confirmer</h3><div id="founderResalesList">Chargement des demandes de revente…</div></section><button class="btn alt" onclick="refreshFounderPayments()">🔄 Actualiser</button>`);
+ return page('💳 Paiements & ventes',`<div class="notice">Transactions chargées automatiquement depuis Supabase. Les transactions en attente ou expirées ne sont pas encore des ventes confirmées.</div><div id="founderPaymentsList">${list}</div><section class="rule"><h3>🧾 Reventes des membres à confirmer</h3><div id="founderResalesList">Chargement des demandes de revente…</div></section><section class="rule"><h3>💸 Retraits des membres à traiter</h3><div id="founderWithdrawalsList">Chargement des demandes de retrait…</div></section><button class="btn alt" onclick="refreshFounderPayments()">🔄 Actualiser</button>`);
 }
 async function refreshFounderPayments(){
  if(!isFounder()||state.founderPaymentsLoading)return;
@@ -3271,7 +3271,7 @@ async function refreshFounderPayments(){
   });
   state.founderPayments=Array.isArray(rows)?rows:[];
   state.founderPaymentsLoaded=true;
-  await loadFounderResales();
+  await Promise.all([loadFounderResales(),loadFounderWithdrawals()]);
  }catch(e){
   state.founderPaymentsError=e.message||'Erreur de chargement';
   console.error('Chargement paiements BuSAF :',e);
@@ -3280,6 +3280,38 @@ async function refreshFounderPayments(){
   if(state.screen==='founderPayments')render();
  }
 }
+async function loadFounderWithdrawals(){
+ const el=document.getElementById('founderWithdrawalsList');
+ try{
+  const rows=await api('/rest/v1/busaf_retraits?select=id,profil_id,montant,numero_mobile_money,operateur,compte,statut,reference_paiement,mode_verification,created_at&statut=in.(en_attente,approuve)&order=created_at.asc');
+  const items=Array.isArray(rows)?rows:[];
+  if(!el)return;
+  el.innerHTML=items.length?items.map(r=>{
+   const status=String(r.statut||'').toLowerCase();
+   const actions=status==='en_attente'
+    ? '<button class="btn" onclick="processFounderWithdrawal(\''+r.id+'\',\'approuve\')">APPROUVER LA DEMANDE</button> <button class="btn red" onclick="processFounderWithdrawal(\''+r.id+'\',\'refuse\')">REFUSER</button>'
+    : '<button class="btn" onclick="processFounderWithdrawal(\''+r.id+'\',\'paye\')">ENREGISTRER LE PAIEMENT EFFECTUÉ</button>';
+   return '<div class="rule"><strong>'+money(r.montant)+' FCFA</strong> — '+esc(status.replace(/_/g,' '))+'<br>Compte : '+esc(r.compte||'—')+'<br>Opérateur : '+esc(r.operateur||'—')+' · Numéro : '+esc(r.numero_mobile_money||'—')+'<br><small>Profil : '+esc(r.profil_id||'—')+' · '+esc(r.created_at||'')+'</small>'+(r.reference_paiement?'<br>Référence paiement : '+esc(r.reference_paiement):'')+'<div style="margin-top:8px">'+actions+'</div></div>';
+  }).join(''):'<div class="empty">Aucune demande de retrait en attente.</div>';
+ }catch(e){if(el)el.innerHTML='<div class="notice error">'+esc(e.message||'Chargement impossible')+'</div>';}
+}
+async function processFounderWithdrawal(id,nextStatus){
+ let payload={statut:nextStatus};
+ if(nextStatus==='paye'){
+  let ref=window.prompt('Confirme d’abord que le transfert Mobile Money a réellement été effectué. Saisis la référence du transfert :');
+  if(ref===null)return;
+  ref=ref.trim();
+  if(ref.length<4||ref.length>160){alert('Référence de transfert obligatoire : 4 à 160 caractères.');return;}
+  if(!confirm('As-tu vérifié le reçu ou l’historique Mobile Money et confirmé que le bénéficiaire a reçu le montant ?'))return;
+  payload.reference_paiement=ref;
+  payload.mode_verification='manuelle';
+ }else if(!confirm(nextStatus==='approuve'?'Approuver cette demande sans déclarer le retrait payé ?':'Refuser cette demande de retrait ?'))return;
+ try{
+  await api('/rest/v1/busaf_retraits?id=eq.'+encodeURIComponent(id),{method:'PATCH',headers:{'Prefer':'return=representation'},body:JSON.stringify(payload),timeoutMs:15000});
+  await loadFounderWithdrawals();
+  alert(nextStatus==='paye'?'Retrait marqué payé avec référence enregistrée. Le portefeuille est débité par le déclencheur sécurisé.':nextStatus==='approuve'?'Demande de retrait approuvée. Aucun débit effectué.':'Demande de retrait refusée.');
+ }catch(e){alert('Traitement impossible : '+(e.message||'Erreur inconnue'));}
+}
 async function loadFounderResales(){
  const el=document.getElementById('founderResalesList');
  try{
@@ -3287,7 +3319,7 @@ async function loadFounderResales(){
   const items=Array.isArray(rows)?rows:[];
   if(el)el.innerHTML=items.length?items.map(r=>{
    const product=(state.marketCatalog||[]).find(p=>String(p.id)===String(r.produit_id));
-   return `<div class="rule"><strong>${esc(product?.nom||'Produit BuSAF')}</strong><br>Vendeur : ${esc(r.vendeur_id)}<br>Client : ${esc(r.nom_client)}<br>Quantité : ${Number(r.quantite||0)}<br>Montant : ${money(r.montant)} FCFA<br>Paiement déclaré : ${esc(r.moyen_paiement)}<br>Réf. : ${esc(r.reference)}<br><button class="btn" onclick="processFounderResale('${r.id}',true)">CONFIRMER LE PAIEMENT</button> <button class="btn red" onclick="processFounderResale('${r.id}',false)">REFUSER</button></div>`;
+   return `<div class="rule"><strong>${esc(product?.nom||'Produit BuSAF')}</strong><br>Vendeur : ${esc(r.vendeur_id)}<br>Client : ${esc(r.nom_client)}<br>Quantité : ${Number(r.quantite||0)}<br>Montant : ${money(r.montant)} FCFA<br>Paiement déclaré : ${esc(r.moyen_paiement)}<br>Réf. : ${esc(r.reference)}<br><button class="btn" onclick="processFounderResale('${r.id}',true)">VÉRIFIER ET CONFIRMER</button> <button class="btn red" onclick="processFounderResale('${r.id}',false)">REFUSER</button></div>`;
   }).join(''):'<div class="empty">Aucune revente en attente.</div>';
  }catch(e){if(el)el.innerHTML='<div class="notice error">'+esc(e.message||'Chargement impossible')+'</div>';}
 }
