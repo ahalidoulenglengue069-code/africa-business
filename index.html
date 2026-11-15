@@ -3283,7 +3283,7 @@ async function refreshFounderPayments(){
 async function loadFounderResales(){
  const el=document.getElementById('founderResalesList');
  try{
-  const rows=await api('/rest/v1/busaf_reventes?select=id,reference,vendeur_id,produit_id,quantite,nom_client,moyen_paiement,montant,statut,created_at&statut=eq.en_attente&order=created_at.asc');
+  const rows=await api('/rest/v1/busaf_reventes?select=id,reference,reference_paiement,vendeur_id,produit_id,quantite,nom_client,moyen_paiement,montant,statut,created_at&statut=eq.en_attente&order=created_at.asc');
   const items=Array.isArray(rows)?rows:[];
   if(el)el.innerHTML=items.length?items.map(r=>{
    const product=(state.marketCatalog||[]).find(p=>String(p.id)===String(r.produit_id));
@@ -3292,11 +3292,20 @@ async function loadFounderResales(){
  }catch(e){if(el)el.innerHTML='<div class="notice error">'+esc(e.message||'Chargement impossible')+'</div>';}
 }
 async function processFounderResale(id,confirmSale){
- if(!confirm(confirmSale?'Confirmer la réception du paiement et retirer la quantité du dépôt du vendeur ?':'Refuser cette demande de revente ?'))return;
+ let paymentReference=null;
+ if(confirmSale){
+  paymentReference=window.prompt('Avant de confirmer, vérifie que le paiement est réellement reçu. Saisis la référence de transaction figurant sur le reçu ou dans l’historique Mobile Money :');
+  if(paymentReference===null)return;
+  paymentReference=paymentReference.trim();
+  if(paymentReference.length<4||paymentReference.length>160){alert('Référence obligatoire : entre 4 et 160 caractères.');return;}
+  if(!confirm('As-tu vérifié dans le compte Mobile Money que le montant de cette revente a bien été reçu ?'))return;
+ }else if(!confirm('Refuser cette demande de revente ?'))return;
  try{
-  const result=await api('/rest/v1/rpc/busaf_confirmer_revente',{method:'POST',body:JSON.stringify({p_revente_id:id,p_confirmer:confirmSale}),timeoutMs:15000});
+  const payload={p_revente_id:id,p_confirmer:confirmSale};
+  if(confirmSale)payload.p_reference_paiement=paymentReference;
+  const result=await api('/rest/v1/rpc/busaf_confirmer_revente',{method:'POST',body:JSON.stringify(payload),timeoutMs:15000});
   await loadFounderResales();
-  alert(confirmSale?'Revente confirmée. Bénéfice vendeur ('+Number(result?.taux_benefice||40)+' %) : '+money(result?.benefice_vendeur||0)+' FCFA. Commission parrain direct (7 %) : '+money(result?.commission_parrain||0)+' FCFA.':'Demande de revente refusée.');
+  alert(confirmSale?'Paiement vérifié manuellement et revente confirmée. Référence : '+paymentReference+'. Bénéfice vendeur ('+Number(result?.taux_benefice||40)+' %) : '+money(result?.benefice_vendeur||0)+' FCFA. Commission parrain direct (7 %) : '+money(result?.commission_parrain||0)+' FCFA.':'Demande de revente refusée.');
  }catch(e){alert('Opération impossible : '+(e.message||'Erreur inconnue'));}
 }
 function founderWallet(){
