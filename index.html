@@ -3549,7 +3549,7 @@ function memberHome(){
   </section>
   <section class="hub-balance-card">
    <div class="hub-balance-head"><span>👛 COMPTE MARCHÉ</span><span class="hub-balance-status"><i></i> Votre espace financier</span></div>
-   <div class="hub-balance-main"><div><small>Solde disponible</small><strong id="memberWalletBalanceHome">${money(state.marketBalance)} <em>FCFA</em></strong></div><button onclick="setScreen('money')">Voir le portefeuille <span>→</span></button></div>
+   <div class="hub-balance-main"><div><small>Solde disponible</small><strong id="memberWalletBalanceHome">${money(state.marketBalance)}</strong></div><button onclick="setScreen('money')">Voir le portefeuille <span>→</span></button></div>
    <div class="hub-balance-actions"><button onclick="setScreen('money')"><b>＋</b> Déposer</button><button onclick="setScreen('money')"><b>↗</b> Retirer</button><button onclick="setScreen('market')"><b>⌕</b> Marché</button></div>
   </section>
   <section class="hub-metrics">
@@ -3569,7 +3569,7 @@ function memberHome(){
   <section class="hub-earnings">
    <div class="hub-section-heading"><div><span class="hub-eyebrow">SUIVI FINANCIER</span><h2>Mes gains confirmés</h2></div><button class="hub-text-link" onclick="setScreen('profits')">Détails →</button></div>
    <div class="hub-earnings-row"><div><span>Montant validé</span><b id="mhEarningsCard">Chargement…</b><small>Commissions et gains confirmés uniquement</small></div><span class="hub-earnings-symbol">↗</span></div>
-   <button class="hub-mini-wallet" onclick="setScreen('money')"><span>👛</span><span><b>Mon portefeuille</b><small id="memberWalletBalanceMini">${money(state.marketBalance)} FCFA</small></span><i>Consulter →</i></button>
+   <button class="hub-mini-wallet" onclick="setScreen('money')"><span>👛</span><span><b>Mon portefeuille</b><small id="memberWalletBalanceMini">${money(state.marketBalance)}</small></span><i>Consulter →</i></button>
   </section>
   <section class="hub-referral">
    <div><span class="hub-eyebrow">DÉVELOPPEZ VOTRE RÉSEAU</span><h2>Votre code de parrainage</h2><p>Invitez de nouveaux membres à découvrir BuSAF.</p><strong>${esc(referral)}</strong></div>
@@ -4538,7 +4538,7 @@ function memberAdvantages(){return page("🎁 Avantages des membres",`<div class
 async function loadMemberWalletBalance(){
  if(!state.profile?.id||!state.token)return;
  const targets=['memberWalletBalanceHome','memberWalletBalanceMini','memberWalletBalancePage'];
- const apply=value=>targets.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(value)+' FCFA';});
+ const apply=value=>targets.forEach(id=>{const el=document.getElementById(id);if(el)el.textContent=money(value);});
  const profileId=state.profile.id;
  const cached=window.__busafWalletBalanceCache;
  if(cached&&cached.profileId===profileId&&Date.now()-cached.at<20000){state.marketBalance=cached.balance;apply(cached.balance);return cached.balance;}
@@ -4567,7 +4567,7 @@ async function loadMemberWalletBalance(){
  try{return await task;}finally{if(window.__busafWalletBalancePromise?.promise===task)window.__busafWalletBalancePromise=null;}
 }
 
-function memberMoney(){return page("👛 Mon portefeuille",`<section class="wallet-hero"><div class="wallet-hero-top"><span>💼 COMPTE MARCHÉ</span><span class="wallet-live">● DONNÉES DU COMPTE</span></div><small>Solde disponible</small><strong id="memberWalletBalancePage">${money(state.marketBalance)} <i>FCFA</i></strong><p>Ton portefeuille BuSAF centralise tes dépôts, retraits et opérations confirmées.</p></section><div class="wallet-action-grid"><button class="wallet-action wallet-deposit" onclick="openMoneyDeposit()"><span>＋</span><b>Faire un dépôt</b><small>Recharger le compte</small></button><button class="wallet-action wallet-withdraw" onclick="openMoneyWithdraw()"><span>↗</span><b>Demander un retrait</b><small>Recevoir par Mobile Money</small></button></div><div class="wallet-security-note">🔐 <strong>Protection du solde</strong><br>Un dépôt est crédité uniquement après confirmation sécurisée du paiement. Un retrait est soumis à la vérification du solde disponible.</div><section class="wallet-history-panel deposit-history-panel"><div class="wallet-panel-heading"><span>📥</span><div><h3>Historique des dépôts</h3><p>Recharges et paiements entrants</p></div></div><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="wallet-history-panel withdrawal-history-panel"><div class="wallet-panel-heading"><span>📤</span><div><h3>Historique des retraits</h3><p>Demandes et paiements sortants</p></div></div><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section>`);setTimeout(()=>{loadMemberWalletBalance();loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
+function memberMoney(){return page("👛 Mon portefeuille",`<section class="wallet-hero"><div class="wallet-hero-top"><span>💼 COMPTE MARCHÉ</span><span class="wallet-live">● DONNÉES DU COMPTE</span></div><small>Solde disponible</small><strong id="memberWalletBalancePage">${money(state.marketBalance)}</strong><p>Ton portefeuille BuSAF centralise tes dépôts, retraits et opérations confirmées.</p></section><div class="wallet-action-grid"><button class="wallet-action wallet-deposit" onclick="openMoneyDeposit()"><span>＋</span><b>Faire un dépôt</b><small>Recharger le compte</small></button><button class="wallet-action wallet-withdraw" onclick="openMoneyWithdraw()"><span>↗</span><b>Demander un retrait</b><small>Recevoir par Mobile Money</small></button></div><div class="wallet-security-note">🔐 <strong>Protection du solde</strong><br>Un dépôt est crédité uniquement après confirmation sécurisée du paiement. Un retrait est soumis à la vérification du solde disponible.</div><section class="wallet-history-panel deposit-history-panel"><div class="wallet-panel-heading"><span>📥</span><div><h3>Historique des dépôts</h3><p>Recharges et paiements entrants</p></div></div><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="wallet-history-panel withdrawal-history-panel"><div class="wallet-panel-heading"><span>📤</span><div><h3>Historique des retraits</h3><p>Demandes et paiements sortants</p></div></div><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section>`);setTimeout(()=>{loadMemberWalletBalance();loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
 async function loadMemberDepositHistory(){
  const boxId="memberDepositHistory";
  const generation=(window.__busafDepositHistoryGeneration||0)+1;
