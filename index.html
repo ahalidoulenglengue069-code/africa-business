@@ -3002,19 +3002,6 @@ function directResale(id){
  if(!p)return;
  openModal('💰 Revente',`<div class="notice">Produit : <strong>${esc(p.nom||p.name||'Produit BuSAF')}</strong><br>La revente réelle doit être validée côté serveur avant de créditer un solde.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON DÉPÔT</button><button class="btn alt" onclick="closeModal()">FERMER</button>`);
 }
-function buyProduct(id,mode){
- const p=productForId(id);if(!p)return;
- if(hasBoughtProduct(id)){
-   openModal('✅ Déjà acheté',`<div class="notice success">Tu as déjà acheté <strong>${esc(p.name)}</strong>. Un même produit ne peut pas être acheté deux fois par le même membre.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON DÉPÔT</button>`);return;
- }
- if(mode==='direct'){directResale(id);return;}
- state.orders.unshift({id:Date.now(),product:p.name,productId:p.id,price:p.price,date:new Date().toLocaleString('fr-FR'),mode:'first_purchase',fromSponsor:true});
- state.marketStock++;
- const item=state.marketStockItems.find(x=>x.productId===p.id);if(item)item.qty++;else state.marketStockItems.push({productId:p.id,name:p.name,emoji:p.emoji,price:p.price,qty:1});
- saveState();
- openModal('🛒 Premier achat enregistré',`<div class="notice success"><strong>${esc(p.name)}</strong><br>Le produit est maintenant dans ton dépôt de vente.</div><div class="notice">Pour un nouveau membre, ce premier achat est réalisé auprès de son parrain direct. Les achats suivants se font dans le Marché BuSAF.</div><button class="btn" onclick="closeModal();setScreen('stockMarket')">VOIR MON STOCK</button>`);
-}
-
 function canInvite(){return Boolean(state.userId&&state.profile);}
 function invitationCode(){return String(state.profile?.code_parrain||"").trim()||(state.userId?`BUSAF-${state.userId.replace(/-/g,"").slice(0,8).toUpperCase()}`:"BUSAF-MEMBRE");}
 function invitationLink(){return `${location.origin}${location.pathname}#signup?invite=${encodeURIComponent(invitationCode())}`;}
