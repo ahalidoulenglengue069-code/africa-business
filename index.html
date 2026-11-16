@@ -4567,7 +4567,7 @@ async function loadMemberWalletBalance(){
  try{return await task;}finally{if(window.__busafWalletBalancePromise?.promise===task)window.__busafWalletBalancePromise=null;}
 }
 
-function memberMoney(){return page("👛 Mon portefeuille",`<section class="wallet-hero"><div class="wallet-hero-top"><span>▣ COMPTE MARCHÉ</span><span class="wallet-live">● DONNÉES DU COMPTE</span></div><div class="wallet-balance-card"><div class="wallet-balance-status">● DONNÉES DU COMPTE</div><div class="wallet-balance-label">Solde disponible</div><strong id="memberWalletBalancePage">${money(state.marketBalance)}</strong><p>Ton portefeuille BuSAF centralise tes dépôts, retraits et opérations confirmées.</p></div></section><div class="wallet-action-grid"><button class="wallet-action wallet-deposit" onclick="openMoneyDeposit()"><span>＋</span><b>Faire un dépôt</b><small>Recharger le compte</small></button><button class="wallet-action wallet-withdraw" onclick="openMoneyWithdraw()"><span>↗</span><b>Demander un retrait</b><small>Recevoir par Mobile Money</small></button></div><div class="wallet-security-note">🔐 <strong>Protection du solde</strong><br>Un dépôt est crédité uniquement après confirmation sécurisée du paiement. Un retrait est soumis à la vérification du solde disponible.</div><section class="wallet-history-panel deposit-history-panel"><div class="wallet-panel-heading"><span>📥</span><div><h3>Historique des dépôts</h3><p>Recharges et paiements entrants</p></div></div><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="wallet-history-panel withdrawal-history-panel"><div class="wallet-panel-heading"><span>📤</span><div><h3>Historique des retraits</h3><p>Demandes et paiements sortants</p></div></div><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section>`);setTimeout(()=>{loadMemberWalletBalance();loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
+function memberMoney(){return page("👛 Mon portefeuille",`<section class="wallet-hero"><div class="wallet-hero-top"><span>▣ COMPTE MARCHÉ</span></div><div class="wallet-balance-card"><div class="wallet-visual" aria-hidden="true"><span>👛</span><i>●</i><b>BuSAF</b></div><div class="wallet-balance-info"><div class="wallet-balance-status">● DONNÉES DU COMPTE</div><div class="wallet-balance-label">Solde disponible</div><strong id="memberWalletBalancePage">${money(state.marketBalance)}</strong><p>Ton portefeuille BuSAF centralise tes dépôts, retraits et opérations confirmées.</p></div></div></section><div class="wallet-action-grid"><button class="wallet-action wallet-deposit" onclick="openMoneyDeposit()"><span>＋</span><b>Faire un dépôt</b><small>Recharger le compte</small></button><button class="wallet-action wallet-withdraw" onclick="openMoneyWithdraw()"><span>↗</span><b>Demander un retrait</b><small>Recevoir par Mobile Money</small></button></div><div class="wallet-security-note">🔐 <strong>Protection du solde</strong><br>Un dépôt est crédité uniquement après confirmation sécurisée du paiement. Un retrait est soumis à la vérification du solde disponible.</div><section class="wallet-history-panel deposit-history-panel"><div class="wallet-panel-heading"><span>📥</span><div><h3>Historique des dépôts</h3><p>Recharges et paiements entrants</p></div></div><div id="memberDepositHistory"><div class="empty">Chargement des dépôts…</div></div></section><section class="wallet-history-panel withdrawal-history-panel"><div class="wallet-panel-heading"><span>📤</span><div><h3>Historique des retraits</h3><p>Demandes et paiements sortants</p></div></div><div id="memberWithdrawalHistory"><div class="empty">Chargement des retraits…</div></div></section>`);setTimeout(()=>{loadMemberWalletBalance();loadMemberDepositHistory();loadMemberWithdrawalHistory();},0);}
 async function loadMemberDepositHistory(){
  const boxId="memberDepositHistory";
  const generation=(window.__busafDepositHistoryGeneration||0)+1;
@@ -6233,18 +6233,33 @@ article.public-product.market-v2-card .market-v2-info>button{display:block!impor
 
 
 <style id="busaf-member-wallet-premium-v1">
-/* Modèle validé : noir charbon, or élégant et crème */
-#app .wallet-hero{padding:0!important;overflow:hidden!important;border:2px solid #b98a2f!important;border-radius:23px!important;background:linear-gradient(125deg,#080b09 0%,#171812 58%,#3b2b12 100%)!important;box-shadow:0 8px 22px rgba(0,0,0,.2)!important;margin:7px 0 16px!important}
-#app .wallet-hero-top{padding:17px 19px!important;color:#f5d98f!important;font-size:16px!important;font-weight:900!important;letter-spacing:.5px!important}
-#app .wallet-live{background:#252219!important;border:1px solid #80652e!important;color:#f5dfaa!important}
-#app .wallet-balance-card{margin:0!important;padding:18px 19px 17px!important;border-radius:19px!important;background:linear-gradient(135deg,#fff9eb 0%,#f5e8cd 100%)!important;border:1px solid #e6c77d!important;color:#2c2114!important}
-#app .wallet-balance-status{color:#9a6d18!important;font-size:11px!important;font-weight:900!important;letter-spacing:.45px!important;margin:0 0 17px!important}
-#app .wallet-balance-label{color:#45321e!important;font-size:16px!important;font-weight:850!important;margin-bottom:7px!important}
-#app .wallet-balance-card>strong{display:block!important;background:linear-gradient(110deg,#090b09,#241b10)!important;border:1px solid #bd902f!important;border-radius:17px!important;padding:11px 14px!important;color:#fffaf0!important;font-size:clamp(35px,9vw,47px)!important;line-height:1.12!important;font-weight:950!important;letter-spacing:-.7px!important;text-align:center!important;box-shadow:0 5px 13px rgba(0,0,0,.16)!important}
-#app .wallet-balance-card>p{color:#57432b!important;font-size:12px!important;line-height:1.5!important;margin:13px 0 0!important}
-#app .wallet-action-grid{gap:11px!important;margin:0 0 16px!important}
-#app .wallet-action{min-height:116px!important;padding:13px 11px!important;border-radius:17px!important;background:linear-gradient(145deg,#fff8e8,#eddbb5)!important;border:1.5px solid #bd913d!important;box-shadow:0 5px 13px rgba(0,0,0,.12)!important;color:#211a11!important}
-#app .wallet-action>span{width:39px!important;height:39px!important;border-radius:50%!important;background:#11130f!important;color:#f6d98f!important;font-size:24px!important;box-shadow:0 0 0 2px #c49a45!important}
+/* Reproduction fidèle du modèle approuvé : noir, or et crème */
+#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading{
+ background:linear-gradient(115deg,#080b09 0%,#151610 68%,#3b2b12 100%)!important;
+ border-bottom:4px solid #c99a38!important;border-radius:0 0 15px 15px!important;
+ padding:17px 15px!important;margin:0 0 18px!important;color:#fff8e9!important;
+ box-shadow:0 5px 14px rgba(0,0,0,.16)!important
+}
+#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading small{color:#f0cf7b!important;font-weight:800!important;letter-spacing:.5px!important}
+#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading h1{color:#fff9ed!important;font-weight:900!important}
+#app .busaf-workspace-page:has(.wallet-hero) .busaf-back{background:#302719!important;color:#f4d88e!important;border:1px solid #98732d!important}
+#app .wallet-hero{padding:0!important;overflow:hidden!important;border:2px solid #c39736!important;border-radius:23px!important;background:linear-gradient(125deg,#080b09 0%,#171812 58%,#3b2b12 100%)!important;box-shadow:0 8px 22px rgba(0,0,0,.2)!important;margin:7px 0 16px!important}
+#app .wallet-hero-top{padding:16px 19px!important;color:#f5d98f!important;font-size:17px!important;font-weight:950!important;letter-spacing:.6px!important}
+#app .wallet-live{display:none!important}
+#app .wallet-balance-card{display:grid!important;grid-template-columns:112px minmax(0,1fr)!important;align-items:center!important;gap:14px!important;margin:0!important;padding:19px!important;border-radius:19px!important;background:linear-gradient(135deg,#fff9eb 0%,#f5e8cd 100%)!important;border:1px solid #e6c77d!important;color:#2c2114!important}
+#app .wallet-visual{position:relative!important;min-height:150px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;border-right:2px solid #d4a83d!important;color:#17140e!important}
+#app .wallet-visual:before{content:""!important;position:absolute!important;width:90px!important;height:90px!important;border:3px solid #d7a42e!important;border-radius:50%!important;box-shadow:0 0 0 8px rgba(215,164,46,.12),inset 0 0 18px rgba(215,164,46,.12)!important}
+#app .wallet-visual>span{position:relative!important;z-index:1!important;font-size:61px!important;line-height:1!important;filter:drop-shadow(0 4px 3px rgba(0,0,0,.16))!important}
+#app .wallet-visual>i{position:absolute!important;bottom:19px!important;left:12px!important;font-style:normal!important;font-size:26px!important;color:#d69b1c!important;text-shadow:12px -9px 0 #e9b83d,24px 1px 0 #c78a16!important}
+#app .wallet-visual>b{position:relative!important;z-index:1!important;margin-top:7px!important;color:#68400e!important;font-size:11px!important;font-weight:950!important;letter-spacing:1px!important}
+#app .wallet-balance-info{min-width:0!important}
+#app .wallet-balance-status{color:#a87918!important;font-size:10px!important;font-weight:950!important;letter-spacing:.4px!important;margin:0 0 13px!important}
+#app .wallet-balance-label{color:#45321e!important;font-size:15px!important;font-weight:850!important;margin-bottom:7px!important}
+#app .wallet-balance-info>strong{display:block!important;background:linear-gradient(110deg,#090b09,#241b10)!important;border:1px solid #bd902f!important;border-radius:15px!important;padding:10px 8px!important;color:#fffaf0!important;font-size:clamp(28px,7vw,43px)!important;line-height:1.12!important;font-weight:950!important;letter-spacing:-.6px!important;text-align:center!important;box-shadow:0 5px 13px rgba(0,0,0,.16)!important;white-space:nowrap!important}
+#app .wallet-balance-info>p{color:#57432b!important;font-size:11px!important;line-height:1.45!important;margin:12px 0 0!important}
+#app .wallet-action-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:11px!important;margin:0 0 16px!important}
+#app .wallet-action{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:5px!important;min-width:0!important;min-height:118px!important;padding:13px!important;border-radius:17px!important;background:linear-gradient(145deg,#fff8e8,#eddbb5)!important;border:1.5px solid #bd913d!important;box-shadow:0 5px 13px rgba(0,0,0,.12)!important;color:#211a11!important;text-align:left!important}
+#app .wallet-action>span{display:flex!important;align-items:center!important;justify-content:center!important;width:36px!important;height:36px!important;border-radius:50%!important;background:#11130f!important;color:#f6d98f!important;font-size:22px!important;box-shadow:0 0 0 2px #c49a45!important}
 #app .wallet-action b{color:#2c2114!important;font-size:13px!important;font-weight:900!important}
 #app .wallet-action small{color:#5a452b!important;font-size:10px!important}
 #app .wallet-security-note{background:#f4eddf!important;border:1px solid #d7c49d!important;border-left:4px solid #a77a25!important;border-radius:13px!important;padding:13px 14px!important;color:#3b3020!important;font-size:11px!important;line-height:1.55!important}
@@ -6254,7 +6269,24 @@ article.public-product.market-v2-card .market-v2-info>button{display:block!impor
 #app .wallet-panel-heading h3{font-size:15px!important;font-weight:900!important;color:#2b2116!important}
 #app .wallet-panel-heading p{font-size:10px!important;color:#67543a!important}
 #app .deposit-history-panel .rule,#app .withdrawal-history-panel .rule{border-left:3px solid #ae842f!important;background:#f5eddf!important}
-@media(max-width:390px){#app .wallet-hero-top{font-size:14px!important;padding:15px!important}#app .wallet-balance-card{padding:15px!important}#app .wallet-action-grid{gap:8px!important}#app .wallet-action{min-height:108px!important;padding:10px 8px!important}#app .wallet-action b{font-size:11px!important}#app .wallet-action small{font-size:9px!important}#app .wallet-history-panel{padding:11px!important}}
+@media(max-width:420px){
+ #app .wallet-hero-top{font-size:15px!important;padding:14px 15px!important}
+ #app .wallet-balance-card{grid-template-columns:76px minmax(0,1fr)!important;gap:10px!important;padding:13px!important}
+ #app .wallet-visual{min-height:136px!important}
+ #app .wallet-visual:before{width:66px!important;height:66px!important}
+ #app .wallet-visual>span{font-size:48px!important}
+ #app .wallet-visual>i{font-size:19px!important;bottom:18px!important;left:2px!important}
+ #app .wallet-visual>b{font-size:9px!important}
+ #app .wallet-balance-status{font-size:8px!important;margin-bottom:10px!important}
+ #app .wallet-balance-label{font-size:13px!important}
+ #app .wallet-balance-info>strong{font-size:clamp(24px,7vw,31px)!important;padding:9px 4px!important}
+ #app .wallet-balance-info>p{font-size:10px!important}
+ #app .wallet-action-grid{gap:8px!important}
+ #app .wallet-action{min-height:112px!important;padding:10px!important}
+ #app .wallet-action b{font-size:11px!important}
+ #app .wallet-action small{font-size:9px!important}
+ #app .wallet-history-panel{padding:11px!important}
+}
 </style>
 
 </body>
