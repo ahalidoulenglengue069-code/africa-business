@@ -6310,85 +6310,99 @@ article.public-product.market-v2-card .market-v2-info>button{display:block!impor
 
 
 <style id="busaf-member-wallet-readable-v4">
-/* Palette dédiée au portefeuille membre. Sélecteurs renforcés contre le thème global des espaces. */
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading{
+/* Portefeuille membre : règles sans dépendance au nom du thème, pour garantir la visibilité des informations. */
+#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading{
  background:linear-gradient(120deg,#f5eddf,#fffdf8)!important;border:1px solid #e3d7c2!important;
  border-bottom:3px solid #b89b68!important;border-radius:18px!important;color:#294436!important;
  padding:15px!important;box-shadow:0 5px 16px rgba(70,58,36,.06)!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading h1,
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading small{color:#294436!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .busaf-back{
+#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading h1,
+#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading small{color:#294436!important}
+#app .busaf-workspace-page:has(.wallet-hero) .busaf-back{
  background:#fff!important;color:#356447!important;border:1px solid #dce5dc!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-hero{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-hero{
  background:#fff!important;border:1px solid #e5e9e3!important;border-radius:22px!important;
  box-shadow:0 5px 18px rgba(40,60,45,.055)!important;overflow:hidden!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-hero-top{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-hero-top{
  background:#f1f5ef!important;color:#345541!important;border-bottom:1px solid #e3e9e1!important;
  padding:15px 17px!important;font-size:16px!important;font-weight:900!important;text-shadow:none!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-card{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-card{
  display:grid!important;grid-template-columns:90px minmax(0,1fr)!important;gap:14px!important;
  align-items:center!important;min-height:0!important;height:auto!important;padding:16px!important;
  background:#fff!important;border:0!important;border-radius:0 0 20px 20px!important;color:#293d30!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-visual{
  min-height:110px!important;border-right:2px solid #e7ebe5!important;color:#52785b!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual:before{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-visual:before{
  width:76px!important;height:76px!important;border:2px solid #9ab39b!important;box-shadow:0 0 0 6px #f5f4ec!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual>span{font-size:46px!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual>i{color:#a78b58!important;text-shadow:none!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual>b{color:#526c55!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-status{color:#718075!important;font-size:10px!important;font-weight:850!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-label{color:#3b5142!important;font-size:14px!important;font-weight:850!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info>strong{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-visual>span{font-size:46px!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-visual>i{color:#a78b58!important;text-shadow:none!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-visual>b{color:#526c55!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-status{color:#718075!important;font-size:10px!important;font-weight:850!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-label{color:#3b5142!important;font-size:14px!important;font-weight:850!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info>strong{
  display:block!important;background:#edf3ed!important;color:#315d40!important;border:1px solid #dce7dc!important;
  border-radius:14px!important;padding:11px 7px!important;font-size:clamp(25px,7vw,34px)!important;
  line-height:1.1!important;text-align:center!important;white-space:nowrap!important;box-shadow:none!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info>p{color:#68776c!important;font-size:11px!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action-grid{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info>p{color:#68776c!important;font-size:11px!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-action-grid{
  display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-action{
  background:#f3f6f1!important;background-image:none!important;border:1px solid #dce5d9!important;
  color:#304b39!important;border-radius:16px!important;min-height:108px!important;padding:12px!important;
  box-shadow:0 3px 10px rgba(40,60,45,.045)!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action>span{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-action>span{
  background:#e5ede3!important;color:#356447!important;border:1px solid #d0dfcf!important;box-shadow:none!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action b,
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action small{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-action b,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-action small{
  color:#304b39!important;opacity:1!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action b{font-size:13px!important;font-weight:900!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action small{font-size:10px!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-security-note{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-action b{font-size:13px!important;font-weight:900!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-action small{font-size:10px!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-security-note{
  background:#f7f7f1!important;color:#3d5142!important;border:1px solid #e4e6da!important;
  border-left:4px solid #a7b59b!important;border-radius:14px!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-history-panel{
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-history-panel{
  background:#fff!important;color:#3b5041!important;border:1px solid #e4e8e1!important;border-radius:16px!important
 }
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-panel-heading h3,
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-history-panel .rule,
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-history-panel .rule *{color:#3b5041!important}
-html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-panel-heading p{color:#718075!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-panel-heading h3,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-history-panel .rule,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-history-panel .rule *{color:#3b5041!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-panel-heading p{color:#718075!important}
 @media(max-width:420px){
- html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-card{grid-template-columns:72px minmax(0,1fr)!important;gap:10px!important;padding:12px!important}
- html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual{min-height:96px!important}
- html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual:before{width:62px!important;height:62px!important}
- html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual>span{font-size:39px!important}
- html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info>strong{font-size:clamp(23px,7vw,30px)!important}
- html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action{min-height:100px!important;padding:10px!important}
- html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action b{font-size:11px!important}
- html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .wallet-action small{font-size:9px!important}
+ #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-card{grid-template-columns:72px minmax(0,1fr)!important;gap:10px!important;padding:12px!important}
+ #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual{min-height:96px!important}
+ #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual:before{width:62px!important;height:62px!important}
+ #app .busaf-workspace-page:has(.wallet-hero) .wallet-visual>span{font-size:39px!important}
+ #app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info>strong{font-size:clamp(23px,7vw,30px)!important}
+ #app .busaf-workspace-page:has(.wallet-hero) .wallet-action{min-height:100px!important;padding:10px!important}
+ #app .busaf-workspace-page:has(.wallet-hero) .wallet-action b{font-size:11px!important}
+ #app .busaf-workspace-page:has(.wallet-hero) .wallet-action small{font-size:9px!important}
 }
+
+/* Visibilité explicite de chaque information du compte */
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-hero-top,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-hero-top span{color:#345541!important;opacity:1!important;visibility:visible!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-visual,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-visual span,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-visual b{color:#45664d!important;opacity:1!important;visibility:visible!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info .wallet-balance-status,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info .wallet-balance-label,
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info p{display:block!important;color:#34483a!important;opacity:1!important;visibility:visible!important;text-shadow:none!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info .wallet-balance-status{color:#68786b!important;font-size:11px!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info .wallet-balance-label{color:#34483a!important;font-size:14px!important}
+#app .busaf-workspace-page:has(.wallet-hero) .wallet-balance-info p{color:#647267!important;font-size:11px!important;line-height:1.45!important}
 </style>
 
 </body>
