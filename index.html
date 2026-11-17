@@ -6309,81 +6309,88 @@ article.public-product.market-v2-card .market-v2-info>button{display:block!impor
 
 
 
-<style id="busaf-member-wallet-premium-v1">
-/* Reproduction fidèle du modèle approuvé : noir, or et crème */
-#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading{
- background:linear-gradient(115deg,#080b09 0%,#151610 68%,#3b2b12 100%)!important;
- border-bottom:4px solid #c99a38!important;border-radius:0 0 15px 15px!important;
- padding:17px 15px!important;margin:0 0 18px!important;color:#fff8e9!important;
- box-shadow:0 5px 14px rgba(0,0,0,.16)!important
+<style id="busaf-member-wallet-readable-v2">
+/* Portefeuille membre : vert BuSAF, blanc et menthe pâle, avec contraste renforcé */
+html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading{
+ background:linear-gradient(120deg,#075c35,#087a45)!important;
+ border:0!important;border-bottom:3px solid #d7b66a!important;border-radius:0 0 16px 16px!important;
+ color:#fff!important;padding:16px!important
 }
-#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading small{color:#f0cf7b!important;font-weight:800!important;letter-spacing:.5px!important}
-#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading h1{color:#fff9ed!important;font-weight:900!important}
-#app .busaf-workspace-page:has(.wallet-hero) .busaf-back{background:#302719!important;color:#f4d88e!important;border:1px solid #98732d!important}
-#app .wallet-hero{padding:0!important;overflow:hidden!important;border:2px solid #c39736!important;border-radius:23px!important;background:linear-gradient(125deg,#080b09 0%,#171812 58%,#3b2b12 100%)!important;box-shadow:0 8px 22px rgba(0,0,0,.2)!important;margin:7px 0 16px!important}
-#app .wallet-hero-top{padding:16px 19px!important;color:#f5d98f!important;font-size:17px!important;font-weight:950!important;letter-spacing:.6px!important}
-#app .wallet-live{display:none!important}
-#app .wallet-balance-card{display:grid!important;grid-template-columns:112px minmax(0,1fr)!important;align-items:center!important;gap:14px!important;margin:0!important;padding:19px!important;border-radius:19px!important;background:linear-gradient(135deg,#fff9eb 0%,#f5e8cd 100%)!important;border:1px solid #e6c77d!important;color:#2c2114!important}
-#app .wallet-visual{position:relative!important;min-height:150px!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;border-right:2px solid #d4a83d!important;color:#17140e!important}
-#app .wallet-visual:before{content:""!important;position:absolute!important;width:90px!important;height:90px!important;border:3px solid #d7a42e!important;border-radius:50%!important;box-shadow:0 0 0 8px rgba(215,164,46,.12),inset 0 0 18px rgba(215,164,46,.12)!important}
-#app .wallet-visual>span{position:relative!important;z-index:1!important;font-size:61px!important;line-height:1!important;filter:drop-shadow(0 4px 3px rgba(0,0,0,.16))!important}
-#app .wallet-visual>i{position:absolute!important;bottom:19px!important;left:12px!important;font-style:normal!important;font-size:26px!important;color:#d69b1c!important;text-shadow:12px -9px 0 #e9b83d,24px 1px 0 #c78a16!important}
-#app .wallet-visual>b{position:relative!important;z-index:1!important;margin-top:7px!important;color:#68400e!important;font-size:11px!important;font-weight:950!important;letter-spacing:1px!important}
-#app .wallet-balance-info{min-width:0!important}
-#app .wallet-balance-status{color:#a87918!important;font-size:10px!important;font-weight:950!important;letter-spacing:.4px!important;margin:0 0 13px!important}
-#app .wallet-balance-label{color:#45321e!important;font-size:15px!important;font-weight:850!important;margin-bottom:7px!important}
-#app .wallet-balance-info>strong{display:block!important;background:linear-gradient(110deg,#090b09,#241b10)!important;border:1px solid #bd902f!important;border-radius:15px!important;padding:10px 8px!important;color:#fffaf0!important;font-size:clamp(28px,7vw,43px)!important;line-height:1.12!important;font-weight:950!important;letter-spacing:-.6px!important;text-align:center!important;box-shadow:0 5px 13px rgba(0,0,0,.16)!important;white-space:nowrap!important}
-#app .wallet-balance-info>p{color:#57432b!important;font-size:11px!important;line-height:1.45!important;margin:12px 0 0!important}
-#app .wallet-action-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:11px!important;margin:0 0 16px!important}
-#app .wallet-action{display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;gap:5px!important;min-width:0!important;min-height:118px!important;padding:13px!important;border-radius:17px!important;background:linear-gradient(145deg,#fff8e8,#eddbb5)!important;border:1.5px solid #bd913d!important;box-shadow:0 5px 13px rgba(0,0,0,.12)!important;color:#211a11!important;text-align:left!important}
-#app .wallet-action>span{display:flex!important;align-items:center!important;justify-content:center!important;width:36px!important;height:36px!important;border-radius:50%!important;background:#11130f!important;color:#f6d98f!important;font-size:22px!important;box-shadow:0 0 0 2px #c49a45!important}
-#app .wallet-action b{color:#2c2114!important;font-size:13px!important;font-weight:900!important}
-#app .wallet-action small{color:#5a452b!important;font-size:10px!important}
-#app .wallet-security-note{background:#f4eddf!important;border:1px solid #d7c49d!important;border-left:4px solid #a77a25!important;border-radius:13px!important;padding:13px 14px!important;color:#3b3020!important;font-size:11px!important;line-height:1.55!important}
-#app .wallet-history-panel{background:#fffaf0!important;border:1px solid #d9c69f!important;border-radius:16px!important;padding:14px!important;margin:0 0 13px!important;box-shadow:0 4px 13px rgba(0,0,0,.07)!important}
-#app .deposit-history-panel,#app .withdrawal-history-panel{border-top:4px solid #ad812d!important}
-#app .deposit-history-panel .wallet-panel-heading>span,#app .withdrawal-history-panel .wallet-panel-heading>span{background:#eee1c5!important;color:#4a3519!important}
-#app .wallet-panel-heading h3{font-size:15px!important;font-weight:900!important;color:#2b2116!important}
-#app .wallet-panel-heading p{font-size:10px!important;color:#67543a!important}
-#app .deposit-history-panel .rule,#app .withdrawal-history-panel .rule{border-left:3px solid #ae842f!important;background:#f5eddf!important}
+html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading h1,
+html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading small{color:#fff!important}
+html[data-busaf-theme="money"] #app .busaf-workspace-page:has(.wallet-hero) .busaf-back{
+ background:#fff!important;color:#075c35!important;border:1px solid #cfe5d7!important
+}
+html[data-busaf-theme="money"] #app .wallet-hero{
+ background:#fff!important;border:1px solid #d8e9de!important;border-radius:22px!important;
+ box-shadow:0 6px 20px rgba(20,75,45,.08)!important;overflow:hidden!important
+}
+html[data-busaf-theme="money"] #app .wallet-hero-top{
+ background:linear-gradient(120deg,#087a45,#119653)!important;color:#fff!important;
+ padding:15px 17px!important;font-size:16px!important;font-weight:900!important;text-shadow:none!important
+}
+html[data-busaf-theme="money"] #app .wallet-balance-card{
+ display:grid!important;grid-template-columns:90px minmax(0,1fr)!important;gap:14px!important;
+ align-items:center!important;min-height:0!important;height:auto!important;
+ padding:16px!important;background:#fff!important;border:0!important;border-radius:0 0 20px 20px!important;
+ color:#17412b!important
+}
+html[data-busaf-theme="money"] #app .wallet-visual{
+ min-height:110px!important;border-right:2px solid #d8e9de!important;color:#087a45!important
+}
+html[data-busaf-theme="money"] #app .wallet-visual:before{
+ width:76px!important;height:76px!important;border:3px solid #168b50!important;
+ box-shadow:0 0 0 7px #eff7f1!important
+}
+html[data-busaf-theme="money"] #app .wallet-visual>span{font-size:48px!important}
+html[data-busaf-theme="money"] #app .wallet-visual>i{color:#168b50!important;text-shadow:none!important}
+html[data-busaf-theme="money"] #app .wallet-visual>b{color:#087a45!important}
+html[data-busaf-theme="money"] #app .wallet-balance-status{color:#397452!important;font-size:10px!important;font-weight:850!important}
+html[data-busaf-theme="money"] #app .wallet-balance-label{color:#254a35!important;font-size:14px!important;font-weight:850!important}
+html[data-busaf-theme="money"] #app .wallet-balance-info>strong{
+ display:block!important;background:linear-gradient(120deg,#087a45,#119653)!important;
+ color:#fff!important;border:1px solid #087a45!important;border-radius:14px!important;
+ padding:11px 7px!important;font-size:clamp(25px,7vw,34px)!important;line-height:1.1!important;
+ text-align:center!important;white-space:nowrap!important
+}
+html[data-busaf-theme="money"] #app .wallet-balance-info>p{color:#526b5b!important;font-size:11px!important}
+html[data-busaf-theme="money"] #app .wallet-action-grid{
+ display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important
+}
+html[data-busaf-theme="money"] #app .wallet-action{
+ background:linear-gradient(135deg,#087a45,#119653)!important;border:1px solid #087a45!important;
+ color:#fff!important;border-radius:16px!important;min-height:108px!important;padding:12px!important;
+ box-shadow:0 4px 12px rgba(8,122,69,.14)!important
+}
+html[data-busaf-theme="money"] #app .wallet-action>span{
+ background:rgba(255,255,255,.15)!important;color:#fff!important;border:2px solid #d7b66a!important;
+ box-shadow:none!important
+}
+html[data-busaf-theme="money"] #app .wallet-action b,
+html[data-busaf-theme="money"] #app .wallet-action small{color:#fff!important}
+html[data-busaf-theme="money"] #app .wallet-action b{font-size:13px!important;font-weight:900!important}
+html[data-busaf-theme="money"] #app .wallet-action small{font-size:10px!important;opacity:.95!important}
+html[data-busaf-theme="money"] #app .wallet-security-note{
+ background:#eff7f1!important;color:#254a35!important;border:1px solid #d3e7d9!important;
+ border-left:4px solid #168b50!important;border-radius:14px!important
+}
+html[data-busaf-theme="money"] #app .wallet-history-panel{
+ background:#fff!important;color:#254a35!important;border:1px solid #d8e9de!important;border-radius:16px!important
+}
+html[data-busaf-theme="money"] #app .wallet-panel-heading h3,
+html[data-busaf-theme="money"] #app .wallet-history-panel .rule,
+html[data-busaf-theme="money"] #app .wallet-history-panel .rule *{color:#254a35!important}
+html[data-busaf-theme="money"] #app .wallet-panel-heading p{color:#607768!important}
 @media(max-width:420px){
- #app .wallet-hero-top{font-size:15px!important;padding:14px 15px!important}
- #app .wallet-balance-card{grid-template-columns:76px minmax(0,1fr)!important;gap:10px!important;padding:13px!important}
- #app .wallet-visual{min-height:136px!important}
- #app .wallet-visual:before{width:66px!important;height:66px!important}
- #app .wallet-visual>span{font-size:48px!important}
- #app .wallet-visual>i{font-size:19px!important;bottom:18px!important;left:2px!important}
- #app .wallet-visual>b{font-size:9px!important}
- #app .wallet-balance-status{font-size:8px!important;margin-bottom:10px!important}
- #app .wallet-balance-label{font-size:13px!important}
- #app .wallet-balance-info>strong{font-size:clamp(24px,7vw,31px)!important;padding:9px 4px!important}
- #app .wallet-balance-info>p{font-size:10px!important}
- #app .wallet-action-grid{gap:8px!important}
- #app .wallet-action{min-height:112px!important;padding:10px!important}
- #app .wallet-action b{font-size:11px!important}
- #app .wallet-action small{font-size:9px!important}
- #app .wallet-history-panel{padding:11px!important}
+ html[data-busaf-theme="money"] #app .wallet-balance-card{grid-template-columns:72px minmax(0,1fr)!important;gap:10px!important;padding:12px!important}
+ html[data-busaf-theme="money"] #app .wallet-visual{min-height:96px!important}
+ html[data-busaf-theme="money"] #app .wallet-visual:before{width:62px!important;height:62px!important}
+ html[data-busaf-theme="money"] #app .wallet-visual>span{font-size:40px!important}
+ html[data-busaf-theme="money"] #app .wallet-balance-info>strong{font-size:clamp(23px,7vw,30px)!important}
+ html[data-busaf-theme="money"] #app .wallet-action{min-height:100px!important;padding:10px!important}
+ html[data-busaf-theme="money"] #app .wallet-action b{font-size:11px!important}
+ html[data-busaf-theme="money"] #app .wallet-action small{font-size:9px!important}
 }
-
-/* Correctif accessibilité : contraste renforcé du portefeuille membre */
-#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading,
-#app .busaf-workspace-page:has(.wallet-hero) .busaf-page-heading h1{color:#fffaf0!important}
-#app .wallet-hero-top{color:#ffe7a8!important;text-shadow:0 1px 2px #000!important}
-#app .wallet-balance-card{background:#fffdf7!important;color:#21190f!important}
-#app .wallet-balance-status{color:#684600!important}
-#app .wallet-balance-label{color:#2b2116!important}
-#app .wallet-balance-info>p{color:#302719!important}
-#app .wallet-action{background:#fffdf7!important;color:#21190f!important}
-#app .wallet-action b{color:#17130d!important}
-#app .wallet-action small{color:#403321!important}
-#app .wallet-security-note{background:#fffdf7!important;color:#282116!important;border-color:#b99145!important}
-#app .wallet-history-panel{background:#fffdf7!important;color:#21190f!important}
-#app .wallet-panel-heading h3{color:#21190f!important}
-#app .wallet-panel-heading p{color:#493b28!important}
-#app .wallet-history-panel .rule,
-#app .wallet-history-panel .rule *{color:#282116!important}
-#app .wallet-history-panel .empty{color:#403321!important}
-
 </style>
 
 </body>
