@@ -5010,7 +5010,20 @@ function render(){
     };
     content=(map[state.screen]||memberHome)();
     document.getElementById("app").innerHTML=header(true)+`<main class="wrap">${content}</main>`+memberQuick();
-     if(state.screen==="member"||state.screen==="partner")setTimeout(()=>loadMemberSalesProgress(),0);
+     if(state.screen==="member"||state.screen==="partner")setTimeout(()=>{
+      if(!state.userId||!state.token)return;
+      (async()=>{
+       try{
+        if(!state.profile?.id)await loadProfile();
+        if(!state.profile?.id)return;
+        await Promise.allSettled([
+         loadMemberHomeMetrics(),
+         loadMemberWalletBalance(),
+         loadMemberSalesProgress()
+        ]);
+       }catch(e){console.warn("Chargement automatique du tableau de bord membre:",e);}
+      })();
+     },0);
    }
  }
 }
