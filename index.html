@@ -3556,42 +3556,66 @@ async function publishFounderAnnouncement(){
 
 async function loadMemberHomeMetrics(){
  const profileId=state.profile?.id;if(!profileId||!state.token)return;
+ const ids={purchases:'mhPurchases',sales:'mhSales',stock:'mhStock',gains:'mhEarnings'};
  const set=(id,value)=>{const e=document.getElementById(id);if(e)e.textContent=String(value)};
- const apply=v=>{
-  set('mhPurchases',v.purchases);set('mhSales',v.sales);set('mhStock',v.stock);set('mhEarnings',money(v.gains));set('mhEarningsCard',money(v.gains));
-  const msg=document.getElementById('mhMetricsMessage');if(msg)msg.textContent=v.message;
- };
+ const setStatus=value=>{const e=document.getElementById('mhMetricsMessage');if(e)e.textContent=value;};
+ const apply=(key,value)=>{set(ids[key],key==='gains'?money(value):value);if(key==='gains')set('mhEarningsCard',money(value));};
  const cached=window.__busafHomeMetricsCache;
- if(cached&&cached.profileId===profileId&&Date.now()-cached.at<20000){apply(cached);return;}
+ if(cached&&cached.profileId===profileId&&Date.now()-cached.at<30000){
+  apply('purchases',cached.purchases);apply('sales',cached.sales);apply('stock',cached.stock);apply('gains',cached.gains);
+  setStatus('Dernières données confirmées — vérification automatique en cours…');
+ }
  const pending=window.__busafHomeMetricsPromise;
- if(pending&&pending.profileId===profileId){try{const v=await pending.promise;if(v)apply(v);}catch(_){}return;}
+ if(pending&&pending.profileId===profileId)return pending.promise;
  const task=(async()=>{
   const id=encodeURIComponent(profileId);
-  const msg=document.getElementById('mhMetricsMessage');if(msg)msg.textContent='Actualisation des données…';
-  const [sales,resales,stocks,commissions]=await Promise.all([
-   api('/rest/v1/ventes?select=id,montant,statut,vendeur_id,acheteur_id&or=(vendeur_id.eq.'+id+',acheteur_id.eq.'+id+')&limit=1000',{timeoutMs:15000}),
-   api('/rest/v1/busaf_reventes?select=id,montant,statut,vendeur_id&vendeur_id=eq.'+id+'&limit=1000',{timeoutMs:15000}),
-   api('/rest/v1/busaf_depot_vente?select=quantite&proprietaire_id=eq.'+id+'&limit=1000',{timeoutMs:15000}),
-   api('/rest/v1/busaf_commissions?select=montant,statut,type_commission&beneficiaire_id=eq.'+id+'&limit=1000',{timeoutMs:15000})
-  ]);
   const ok=s=>['confirmee','confirme','validee','valide','payee','paye','success','succeeded'].includes(String(s||'').toLowerCase());
-  const ownSales=(Array.isArray(sales)?sales:[]).filter(x=>String(x.vendeur_id)===String(profileId)&&ok(x.statut));
-  const purchases=(Array.isArray(sales)?sales:[]).filter(x=>String(x.acheteur_id)===String(profileId)&&ok(x.statut));
-  const ownResales=(Array.isArray(resales)?resales:[]).filter(x=>ok(x.statut));
-  if(String(state.profile?.id||'')!==String(profileId))return null;
-  const stock=(Array.isArray(stocks)?stocks:[]).reduce((n,x)=>n+Math.max(0,Number(x.quantite||0)),0);
-  const gains=(Array.isArray(commissions)?commissions:[]).filter(x=>ok(x.statut)).reduce((n,x)=>n+Number(x.montant||0),0);
-  const value={profileId,purchases:purchases.length,sales:ownSales.length+ownResales.length,stock,gains,message:'Données confirmées synchronisées depuis Supabase. Les opérations en attente ne sont pas comptées.',at:Date.now()};
-  window.__busafHomeMetricsCache=value;apply(value);return value;
+  let completed=0,failed=0;
+  const finish=()=>setStatus(failed
+   ? (completed?('Données partiellement synchronisées ('+completed+'/4). Certaines rubriques sont momentanément indisponibles.'):'Connexion aux données indisponible. Nouvelle tentative automatique à la prochaine ouverture.')
+   : (completed===4?'Toutes les données confirmées sont synchronisées. Les opérations en attente ne sont pas comptées.':'Chargement sécurisé des données…'));
+  setStatus('Chargement automatique des données…');
+  const run=async(key,path,transform)=>{
+   try{
+    const rows=await api(path,{timeoutMs:15000});
+    if(String(state.profile?.id||'')!==String(profileId))return;
+    const value=transform(rows);
+    apply(key,value);
+    if(!window.__busafHomeMetricsCache||window.__busafHomeMetricsCache.profileId!==profileId)
+      window.__busafHomeMetricsCache={profileId,purchases:null,sales:null,stock:null,gains:null,at:0};
+    window.__busafHomeMetricsCache[key]=value;
+    completed++;
+   }catch(e){
+    failed++;console.warn('Chargement BuSAF '+key+':',e);
+    set(ids[key],'—');if(key==='gains')set('mhEarningsCard','Indisponible');
+   }finally{finish();}
+  };
+  await Promise.all([
+   run('purchases','/rest/v1/ventes?select=id,statut,acheteur_id&acheteur_id=eq.'+id+'&limit=1000',rows=>(Array.isArray(rows)?rows:[]).filter(x=>ok(x.statut)).length),
+   (async()=>{
+    try{
+     const [sales,resales]=await Promise.all([
+      api('/rest/v1/ventes?select=id,statut,vendeur_id&vendeur_id=eq.'+id+'&limit=1000',{timeoutMs:15000}),
+      api('/rest/v1/busaf_reventes?select=id,statut,vendeur_id&vendeur_id=eq.'+id+'&limit=1000',{timeoutMs:15000})
+     ]);
+     if(String(state.profile?.id||'')!==String(profileId))return;
+     const value=(Array.isArray(sales)?sales:[]).filter(x=>ok(x.statut)).length+(Array.isArray(resales)?resales:[]).filter(x=>ok(x.statut)).length;
+     apply('sales',value);
+     if(!window.__busafHomeMetricsCache||window.__busafHomeMetricsCache.profileId!==profileId)window.__busafHomeMetricsCache={profileId,purchases:null,sales:null,stock:null,gains:null,at:0};
+     window.__busafHomeMetricsCache.sales=value;completed++;
+    }catch(e){failed++;set('mhSales','—');console.warn('Chargement BuSAF ventes:',e);}
+    finally{finish();}
+   })(),
+   run('stock','/rest/v1/busaf_depot_vente?select=quantite&proprietaire_id=eq.'+id+'&limit=1000',rows=>(Array.isArray(rows)?rows:[]).reduce((n,x)=>n+Math.max(0,Number(x.quantite||0)),0)),
+   run('gains','/rest/v1/busaf_commissions?select=montant,statut&beneficiaire_id=eq.'+id+'&limit=1000',rows=>(Array.isArray(rows)?rows:[]).filter(x=>ok(x.statut)).reduce((n,x)=>n+Number(x.montant||0),0))
+  ]);
+  if(String(state.profile?.id||'')===String(profileId)&&completed===4&&window.__busafHomeMetricsCache?.profileId===profileId){
+   window.__busafHomeMetricsCache.at=Date.now();
+  }
+  finish();
  })();
  window.__busafHomeMetricsPromise={profileId,promise:task};
- try{await task;}
- catch(e){
-  console.warn('Activité membre BuSAF:',e);
-  const msg=document.getElementById('mhMetricsMessage');if(msg)msg.textContent='Certaines données ne sont pas disponibles : '+(e.message||'erreur de connexion');
-  set('mhPurchases','—');set('mhSales','—');set('mhStock','—');set('mhEarnings','—');set('mhEarningsCard','Indisponible');
- }
- finally{if(window.__busafHomeMetricsPromise?.promise===task)window.__busafHomeMetricsPromise=null;}
+ try{await task;}finally{if(window.__busafHomeMetricsPromise?.promise===task)window.__busafHomeMetricsPromise=null;}
 }
 
 function busafWorkspaceTheme(scope){const key=scope==='founder'?'busaf_founder_theme':'busaf_member_theme';try{return localStorage.getItem(key)==='dark'?'dark':'light';}catch(e){return 'light';}}
