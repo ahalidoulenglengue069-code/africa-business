@@ -2553,7 +2553,7 @@ function openModal(title,html){
 }
 function closeModal(){document.getElementById("modal").classList.remove("open")}
 
-async function api(path,options={}){
+async function apiRequest(path,options={}){
  // Évite les en-têtes inutiles sur GET : moins de précontrôles CORS sur mobile.
  const headers=Object.assign({"apikey":SUPABASE_KEY},options.headers||{});
  if(options.body!==undefined && options.body!==null && !Object.keys(headers).some(k=>k.toLowerCase()==="content-type"))headers["Content-Type"]="application/json";
@@ -2587,6 +2587,23 @@ async function api(path,options={}){
  if(!r.ok)throw new Error(data.msg||data.message||data.error_description||data.raw||"Erreur Supabase");
  return data;
 }
+// Mutualisation des lectures GET identiques : plusieurs cartes/rubriques peuvent
+// demander la même ressource à l'ouverture. Une seule requête réseau est exécutée.
+// Les écritures POST/PATCH/DELETE ne sont jamais mutualisées.
+const __busafGetRequests=new Map();
+function api(path,options={}){
+ const method=String(options.method||"GET").toUpperCase();
+ if(method!=="GET")return apiRequest(path,options);
+ const headers=options.headers||{};
+ const auth=String(headers.Authorization||headers.authorization||(state.token?"Bearer "+state.token:""));
+ const key=[String(path),auth,String(options.timeoutMs||10000),String(headers.Prefer||headers.prefer||"")].join("|");
+ const existing=__busafGetRequests.get(key);
+ if(existing)return existing;
+ const request=apiRequest(path,options).finally(()=>{if(__busafGetRequests.get(key)===request)__busafGetRequests.delete(key);});
+ __busafGetRequests.set(key,request);
+ return request;
+}
+
 async function loadProfile(){
  if(!state.userId||!state.token){state.profile=null;return null;}
  // RPC sécurisé : renvoie uniquement le profil lié au jeton Auth courant.
