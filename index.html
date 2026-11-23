@@ -2256,6 +2256,8 @@ html[data-busaf-theme] #app .profile-code-box{background:var(--card);border-colo
  #app:has(.public-v2) .busaf-motivation-watermark{font-size:104px!important}
 }
 </style>
+
+<style id="busaf-auto-status-cleanup-v1">.market-auto-status{display:inline-flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:9px;background:#edf5ef;color:#315b40;font-size:11px;font-weight:700;white-space:nowrap}.hub-section-heading>[role="status"]{font-size:11px;color:#52705d}</style>
 </head>
 <body>
 <div id="app" class="app"></div>
@@ -3338,7 +3340,7 @@ function founderPayments(){
  if(!isFounder())return memberHome();
  const rows=state.founderPayments||[];
  const list=state.founderPaymentsLoading?`<div class="empty">Chargement automatique des paiements…</div>`:state.founderPaymentsError?`<div class="notice error">${esc(state.founderPaymentsError)}</div>`:rows.length?`<div class="list">${rows.map(v=>`<div class="rule"><strong>${money(v.montant||0)}</strong> — ${esc(v.statut||'—')}<br>Produit : ${esc((state.marketCatalog||[]).find(p=>String(p.id)===String(v.produit_id))?.nom||'Produit BuSAF')}<br>Acheteur : ${esc(v.acheteur_id||'—')}<br>Référence : ${esc(v.reference||'—')}<br><span class="small">${esc(v.created_at||'')}</span></div>`).join('')}</div>`:`<div class="empty">Aucune transaction accessible pour le moment. Appuie sur Actualiser pour réessayer.</div>`;
- return page('💳 Paiements & ventes',`<div class="notice">Transactions chargées automatiquement depuis Supabase. Les transactions en attente ou expirées ne sont pas encore des ventes confirmées.</div><div id="founderPaymentsList">${list}</div><section class="rule"><h3>🧾 Reventes des membres à confirmer</h3><div id="founderResalesList">Chargement des demandes de revente…</div></section><section class="rule"><h3>💸 Retraits des membres à traiter</h3><div id="founderWithdrawalsList">Chargement des demandes de retrait…</div></section><button class="btn alt" onclick="refreshFounderPayments()">🔄 Actualiser</button>`);
+ return page('💳 Paiements & ventes',`<div class="notice">Transactions chargées automatiquement depuis Supabase. Les transactions en attente ou expirées ne sont pas encore des ventes confirmées.</div><div id="founderPaymentsList">${list}</div><section class="rule"><h3>🧾 Reventes des membres à confirmer</h3><div id="founderResalesList">Chargement des demandes de revente…</div></section><section class="rule"><h3>💸 Retraits des membres à traiter</h3><div id="founderWithdrawalsList">Chargement des demandes de retrait…</div></section><p class="small" role="status">Les données sont actualisées automatiquement à l’ouverture de cet espace.</p>`);
 }
 async function refreshFounderPayments(){
  if(!isFounder()||state.founderPaymentsLoading)return;
@@ -3668,7 +3670,7 @@ function memberHome(){
    <div class="hub-balance-actions"><button onclick="setScreen('money')"><b>＋</b> Déposer</button><button onclick="setScreen('money')"><b>↗</b> Retirer</button><button onclick="setScreen('market')"><b>⌕</b> Marché</button></div>
   </section>
   <section class="hub-metrics">
-   <div class="hub-section-heading"><div><span class="hub-eyebrow">VUE D’ENSEMBLE</span><h2>Mon activité</h2></div><button onclick="loadMemberHomeMetrics()" aria-label="Actualiser mon activité" title="Actualiser">↻</button></div>
+   <div class="hub-section-heading"><div><span class="hub-eyebrow">VUE D’ENSEMBLE</span><h2>Mon activité</h2></div><span class="small" role="status">Mise à jour automatique</span></div>
    <div class="hub-metric-grid">
     <article><span class="hub-metric-icon">🛍️</span><small>Achats confirmés</small><b id="mhPurchases">…</b></article>
     <article><span class="hub-metric-icon">💼</span><small>Ventes confirmées</small><b id="mhSales">…</b></article>
@@ -3797,7 +3799,7 @@ function publicMarket(){
  const cards=products.map(publicProductView).join('');
  return `<div class="market-page-v2">
   <section class="market-page-v2-head"><small>BuSAF • COMMERCE NUMÉRIQUE</small><h1>Le Marché</h1><p>Découvre les produits disponibles et consulte chaque fiche avant de commander.</p><div class="market-page-v2-search"><span>🔎</span><input id="marketSearchInput" type="search" placeholder="Rechercher un produit…" oninput="filterMarketCards(this.value)"></div></section>
-  <div class="market-page-v2-toolbar"><div><small>CATALOGUE BuSAF</small><b>${products.length} produit(s)</b></div><button onclick="loadMarketCatalog(true).then(()=>render())">↻ Actualiser</button></div>
+  <div class="market-page-v2-toolbar"><div><small>CATALOGUE BuSAF</small><b>${products.length} produit(s)</b></div><span class="market-auto-status" aria-live="polite">Mise à jour automatique</span></div>
   <div class="public-v2-products" id="marketCardsGrid">${cards||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit disponible pour le moment.":"Chargement du catalogue…"}</div>`}</div>
   <div class="market-page-v2-foot">Les commandes et paiements sont traités selon les conditions BuSAF. Connecte-toi pour acheter.</div>
   <button class="market-page-v2-join" onclick="setScreen('signup')">Créer mon compte pour commander →</button>
@@ -3958,7 +3960,7 @@ function memberMarket(){
  const cards=all.map(publicProductView).join('');
  return `<div class="member-market-v2">
   <section class="member-market-v2-head"><small>ESPACE MEMBRE • ACHATS ET REVENTE</small><h1>Marché BuSAF</h1><p>Choisis un produit, consulte sa fiche et effectue ton achat. Après confirmation, il sera disponible dans ton stock de revente.</p><div class="member-market-v2-actions"><button onclick="setScreen('stockMarket')">📦 Mon stock</button><button onclick="setScreen('orders')">🧾 Mes commandes</button></div></section>
-  <div class="market-page-v2-toolbar"><div><small>PRODUITS DISPONIBLES</small><b>${all.length} produit(s)</b></div><button onclick="refreshMarketCatalog()">↻ Actualiser</button></div>
+  <div class="market-page-v2-toolbar"><div><small>PRODUITS DISPONIBLES</small><b>${all.length} produit(s)</b></div><span class="market-auto-status" aria-live="polite">Mise à jour automatique</span></div>
   <div class="public-v2-products" id="marketCardsGrid">${cards||`<div class="empty">${state.marketCatalogLoaded?"Aucun produit publié actuellement.":"Chargement des produits…"}</div>`}</div>
  </div>`;
 }
